@@ -4,6 +4,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import LoginScreen from '../screens/LoginScreen';
 import ForgotPasswordScreen from '../screens/ForgotPassword';
+import OtpScreen from '../screens/otpVerification';
+import ResetPasswordScreen from '../screens/ResetPassword';
+import SelectRoleScreen from '../screens/SelectRoleScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -21,8 +25,26 @@ export default function Navigation() {
 
         {/* Forgot Password Screen */}
         <Stack.Screen
-          name="ForgotPassword"   // ✅ Make sure this name matches navigation
+          name="ForgotPassword"  
           component={ForgotPasswordScreen}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="OtpScreen"   
+          component={OtpScreen}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="ResetPasswordScreen"   
+          component={ResetPasswordScreen}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="SelectRoleScreen"   
+          component={SelectRoleScreen}
           options={{ headerShown: false }}
         />
 

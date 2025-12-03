@@ -21,10 +21,10 @@ export default function ForgotPasswordScreen({ navigation }) {
                 {/* Logo */}
                 <View style={styles.logoContainer}>
                     {/* <Image
-            source={require("../assets/logo.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          /> */}
+                        source={require("../assets/logo.png")}
+                        style={styles.logo}
+                        resizeMode="contain"
+                    /> */}
                 </View>
 
                 {/* Description */}
@@ -49,12 +49,15 @@ export default function ForgotPasswordScreen({ navigation }) {
                 <View style={styles.continueWrapper}>
                     <View style={styles.innerShadow} />
 
-                    <TouchableOpacity style={styles.continueBtn}>
+                    {/* ✅ Navigation added here ONLY */}
+                    <TouchableOpacity
+                        style={styles.continueBtn}
+                        onPress={() => navigation.navigate("OtpScreen")}
+                    >
                         <Text style={styles.continueText}>Continue</Text>
                         <ArrowIcon name="chevron-right" size={22} color="#fff" />
                     </TouchableOpacity>
                 </View>
-
 
                 {/* Back to Login */}
                 <TouchableOpacity

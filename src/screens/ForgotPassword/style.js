@@ -108,7 +108,6 @@ innerShadow: {
   zIndex: -1,
 },
 
-
   continueText: {
     color: "#fff",
     fontSize: 16 * scale,
