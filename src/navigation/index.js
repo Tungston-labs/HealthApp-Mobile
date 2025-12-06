@@ -19,54 +19,29 @@ const Stack = createNativeStackNavigator();
 export default function Navigation() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Login">
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="TrainerDetail">
 
-        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="OtpScreen" component={OtpScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="SelectRoleScreen" component={SelectRoleScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="SignupDetailsScreenUser" component={SignupDetailsScreenUser} options={{ headerShown: false }} />
+        <Stack.Screen name="Login" component={LoginScreen}  />
+        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen}  />
+        <Stack.Screen name="OtpScreen" component={OtpScreen}  />
+        <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen}  />
+        <Stack.Screen name="SelectRoleScreen" component={SelectRoleScreen}  />
+        <Stack.Screen name="SignupDetailsScreenUser" component={SignupDetailsScreenUser}  />
         <Stack.Screen
           name="MainWizardScreen"
           component={MainWizardScreen}
-          options={{ headerShown: false }}
-        />
-
-        <Stack.Screen
-          name="ForgotPassword"
-          component={ForgotPasswordScreen}
-          options={{ headerShown: false }}
-        />
-
-        <Stack.Screen
-          name="OtpScreen"
-          component={OtpScreen}
-          options={{ headerShown: false }}
-        />
-
-        <Stack.Screen
-          name="ResetPasswordScreen"
-          component={ResetPasswordScreen}
-          options={{ headerShown: false }}
-        />
-        
-        {/* Select Role */}
-        <Stack.Screen
-          name="SelectRoleScreen"
-          component={SelectRoleScreen}
-          options={{ headerShown: false }}
+          
         />
         <Stack.Screen
           name="Notifications"
           component={NotificationScreen}
-          options={{ headerShown: false }}
+          
         />
 
         <Stack.Screen
           name="MainApp"
           component={AppNavigator}
-          options={{ headerShown: false }}
+          
         />
            <Stack.Screen 
           name="TrainerList" 
@@ -77,7 +52,7 @@ export default function Navigation() {
         <Stack.Screen
           name="TrainerDetail"
           component={TrainerDetailScreen}
-          options={{ headerShown: false }}
+          
         />
       </Stack.Navigator>
     </NavigationContainer>
