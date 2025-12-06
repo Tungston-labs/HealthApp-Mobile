@@ -9,14 +9,15 @@ import ReviewCard from "../../components/TrainerDetail/ReviewCard";
 const TrainerDetailScreen = (rating = 4.5) => {
     return (
         <View style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 40 }}
+            >
 
-                {/* Close Button */}
                 <TouchableOpacity style={styles.closeBtn}>
                     <Icon name="close" size={28} color="#000" />
                 </TouchableOpacity>
 
-                {/* Profile Section */}
                 <View style={styles.headerSection}>
                     <Image
                         source={require("../../../assets/trainer2.jpg")}
@@ -26,7 +27,6 @@ const TrainerDetailScreen = (rating = 4.5) => {
                     <View style={styles.infoSection}>
                         <Text style={styles.name}>Cristofer Bator</Text>
 
-                        {/* FIRST ROW */}
                         <View style={styles.row}>
                             <View>
                                 <Text style={styles.label}>Experience</Text>
@@ -39,7 +39,6 @@ const TrainerDetailScreen = (rating = 4.5) => {
                             </View>
                         </View>
 
-                        {/* SECOND ROW */}
                         <View style={styles.rowSingle}>
                             <View>
                                 <Text style={styles.label}>No of sessions</Text>
@@ -85,7 +84,6 @@ const TrainerDetailScreen = (rating = 4.5) => {
                     </View>
                 </View>
 
-                {/* Reviews */}
                 <ReviewCard
                     image={require("../../../assets/trainer4.jpg")}
                     name="Dummy dummy"
@@ -106,8 +104,6 @@ const TrainerDetailScreen = (rating = 4.5) => {
 
                 <View style={{ height: 90 }} />
             </ScrollView>
-
-            {/* Bottom Button */}
             <View style={styles.footer}>
                 <TouchableOpacity style={styles.bookBtn}>
                     <Text style={styles.bookText}>Book Now</Text>

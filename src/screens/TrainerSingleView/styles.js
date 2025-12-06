@@ -4,7 +4,7 @@ import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
     padding: 16,
     marginTop:32,
   },
@@ -41,9 +41,10 @@ export default StyleSheet.create({
   },
 
   row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 10,
+   flexDirection: "row",
+  alignItems: "flex-start",
+  marginTop: 10,
+  gap: 20, 
   },
   rowSingle: {
   flexDirection: "row",
@@ -114,13 +115,20 @@ sectionTitle: {
     width: "55%",
   },
 
-  footer: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    display:"flex",
-    alignItems:"flex-end",
-  },
+footer: {
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  right: 0,
+  padding: 16,
+  backgroundColor: "#ffffff",
+  alignItems: "flex-end",
+  elevation: 10,
+  shadowColor: "#000",
+  shadowOpacity: 0.1,
+  shadowRadius: 8,
+  shadowOffset: { width: 0, height: -2 },
+},
 
   bookBtn: {
     backgroundColor: "#7774F4",

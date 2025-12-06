@@ -15,7 +15,6 @@ const HeaderWithBack = ({ title = "Header" }) => {
         <Icon name="chevron-back-outline" size={26} color="#000" />
       </TouchableOpacity>
 
-      {/* Title */}
       <Text style={styles.title}>{title}</Text>
       
       <View style={{ width: 26 }} />

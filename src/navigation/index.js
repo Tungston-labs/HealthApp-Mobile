@@ -13,13 +13,14 @@ import MainWizardScreen from '../screens/onboarding/MainWizardScreen/MainWizardS
 import NotificationScreen from "../screens/NotificationScreen"
 import AppNavigator from './AppNavigator';
 import TrainerListScreen from "../screens/TrainerList";
-import TrainerDetailScreen from "../screens/TrainerSingleView"
+import TrainerDetailScreen from "../screens/TrainerSingleView";
+import PaymentScreen from "../screens/PaymentScreen";
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="TrainerDetail">
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="TrainerList">
 
         <Stack.Screen name="Login" component={LoginScreen}  />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen}  />
@@ -48,6 +49,11 @@ export default function Navigation() {
           component={TrainerListScreen}
  
         
+        />
+         <Stack.Screen
+          name="Payment"
+          component={PaymentScreen}
+          
         />
         <Stack.Screen
           name="TrainerDetail"

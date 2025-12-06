@@ -15,8 +15,6 @@ const styles = StyleSheet.create({
     fontFamily: "Segoe UI",
     fontSize: 26,
     fontWeight: "700",
-    lineHeight: 26,
-    letterSpacing: 0,
     color: "#000",
   },
 
@@ -24,14 +22,36 @@ const styles = StyleSheet.create({
     fontFamily: "Segoe UI",
     fontSize: 18,
     fontWeight: "700",
-    lineHeight: 22,
     color: "#000",
-    marginTop: 20,  
+    marginTop: 12,
+  },
+
+  bmiContainer: {
+    marginTop: 10,
+    display:"flex",
+    gap:10,
+    flexDirection:"row",
+  },
+
+  bmiLabel: {
+    fontFamily: "Segoe UI",
+    fontWeight: "400",
+    fontSize: 13,
+    lineHeight: 13,
+    color: "#000",
+  },
+
+  bmiValue: {
+    fontFamily: "Segoe UI",
+    fontWeight: "400",
+    fontSize: 13,
+    lineHeight: 13,
+    color: "#000",
   },
 
   notificationIcon: {
-    alignSelf: "flex-start", 
-    marginTop: 4,             
+    alignSelf: "flex-start",
+    marginTop: 4,
   },
 });
 
