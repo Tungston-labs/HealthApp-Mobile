@@ -13,7 +13,7 @@ export default StyleSheet.create({
   innerContainer: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",   // center all items vertically
+    justifyContent: "center",  
   },
 
   brand: {
@@ -39,7 +39,7 @@ export default StyleSheet.create({
 
   otpBox: {
     width: boxSize,
-    height: boxSize + 20, // increased height
+    height: boxSize + 20, 
     borderWidth: 2,
     borderColor: "#000000",
     borderRadius: 16,
@@ -59,8 +59,8 @@ export default StyleSheet.create({
     paddingHorizontal: 18 * scale,
     borderRadius: 20 * scale,
 
-    alignSelf: "flex-end",     // ✅ button moves to RIGHT
-    marginRight: 30,           // adjust right spacing
+    alignSelf: "flex-end",     
+    marginRight: 30,          
     marginTop: 40,
 
     elevation: 6,

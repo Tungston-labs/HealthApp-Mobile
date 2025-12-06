@@ -1,0 +1,127 @@
+// screens/Trainers/styles.js
+import { StyleSheet } from "react-native";
+
+export default StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+    paddingHorizontal: 16,
+    marginTop: 32,
+  },
+
+  card: {
+    flexDirection: "row",
+    padding: 12,
+    marginBottom: 20,
+  },
+
+  trainerImg: {
+    width: 110,
+    height: 130,
+    borderRadius: 12,
+    objectFit:"cover",
+  },
+
+  viewProfileBtn: {
+    position: "absolute",
+    bottom: 8,
+    alignSelf: "center",
+    backgroundColor: "#fff",
+    paddingHorizontal: 14,
+    paddingVertical: 4,
+    borderRadius: 10,
+    elevation: 2,
+  },
+
+  viewProfileText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+
+  info: {
+    flex: 1,
+    paddingLeft: 15,
+    justifyContent: "space-between",
+  },
+
+  trainerName: {
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  separator: {
+  height: 1,
+  backgroundColor: "#414141",
+  marginVertical: 4,
+},
+
+  subtitle: {
+    fontFamily: "SegoeUI",
+    fontSize: 20,
+    marginTop:24,
+    fontWeight: "700",
+    marginLeft:12,
+    lineHeight: 17,
+    letterSpacing: 0,
+    color: "#000",
+  },
+
+  exp: {
+    fontSize: 14,
+    color: "#555",
+    marginTop: 3,
+  },
+  ratingplan: {
+    flexDirection: "row",
+    justifyContent: "space-between"
+
+  },
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 6,
+  },
+
+  price: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  starrating: {
+    flexDirection: "row",
+    gap: 2,
+
+  },
+  plan: {
+    fontSize: 14,
+    color: "#666",
+  },
+
+  starIcon: {
+    marginLeft: 10,
+  },
+
+  rating: {
+    fontSize: 16,
+    marginLeft: 4,
+    fontWeight: "600",
+  },
+
+  bookBtn: {
+    backgroundColor: "#7774F4",
+    paddingVertical: 12,
+    borderRadius: 20,
+    borderColor:"20px solic black",
+    alignItems: "center",
+    marginTop: 10,
+    
+    width: 140,
+  },
+
+  bookText: {
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: "SegoeUI",
+    fontWeight: "400",
+    lineHeight: 16,
+    letterSpacing: 0,
+  },
+});

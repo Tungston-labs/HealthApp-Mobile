@@ -1,0 +1,33 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/SEGOEUII.TTF",
+      "sha1": "77b2fcd0fb451b0e8cd45ab5c0616e0678a2162a"
+    },
+    {
+      "path": "assets/fonts/SEGOEUIL.TTF",
+      "sha1": "5a52e6396be7698873702862eccc400087e6ff29"
+    },
+    {
+      "path": "assets/fonts/SEGOEUISL.TTF",
+      "sha1": "69dffa150e3ebf9a225ddbfb4ac82e17de583fab"
+    },
+    {
+      "path": "assets/fonts/SEGOEUIZ.TTF",
+      "sha1": "a9e5b42f025ddf78feb6cb5e5c5d87f505c737ee"
+    },
+    {
+      "path": "assets/fonts/SEGUIBL.TTF",
+      "sha1": "fbc4aa9129ccf56a8888d0c96a6fe5a016d26601"
+    },
+    {
+      "path": "assets/fonts/SEGUIBLI.TTF",
+      "sha1": "3fc5c6ddc033cf7a5b76d22fe02d22245d661209"
+    },
+    {
+      "path": "assets/fonts/SEGUISB.TTF",
+      "sha1": "a62a3f8092c618a36543ee4b10df262ff2fced6b"
+    }
+  ]
+}
