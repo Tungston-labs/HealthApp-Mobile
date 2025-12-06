@@ -7,47 +7,69 @@ import ForgotPasswordScreen from '../screens/ForgotPassword';
 import OtpScreen from '../screens/otpVerification';
 import ResetPasswordScreen from '../screens/ResetPassword';
 import SelectRoleScreen from '../screens/SelectRoleScreen';
-
-
+import NotificationScreen from "../screens/NotificationScreen"
+import AppNavigator from './AppNavigator';
+import TrainerListScreen from "../screens/TrainerList";
+import TrainerDetailScreen from "../screens/TrainerSingleView"
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="TrainerDetail">
 
-        {/* Login Screen */}
         <Stack.Screen
           name="Login"
           component={LoginScreen}
           options={{ headerShown: false }}
         />
 
-        {/* Forgot Password Screen */}
         <Stack.Screen
-          name="ForgotPassword"  
+          name="ForgotPassword"
           component={ForgotPasswordScreen}
           options={{ headerShown: false }}
         />
 
         <Stack.Screen
-          name="OtpScreen"   
+          name="OtpScreen"
           component={OtpScreen}
           options={{ headerShown: false }}
         />
 
         <Stack.Screen
-          name="ResetPasswordScreen"   
+          name="ResetPasswordScreen"
           component={ResetPasswordScreen}
+          options={{ headerShown: false }}
+        />
+        
+        {/* Select Role */}
+        <Stack.Screen
+          name="SelectRoleScreen"
+          component={SelectRoleScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Notifications"
+          component={NotificationScreen}
           options={{ headerShown: false }}
         />
 
         <Stack.Screen
-          name="SelectRoleScreen"   
-          component={SelectRoleScreen}
+          name="MainApp"
+          component={AppNavigator}
           options={{ headerShown: false }}
         />
-
+           <Stack.Screen 
+          name="TrainerList" 
+          component={TrainerListScreen}
+ 
+        
+        />
+        <Stack.Screen
+          name="TrainerDetail"
+          component={TrainerDetailScreen}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
