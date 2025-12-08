@@ -9,7 +9,7 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
 import HeaderWithBack from "../../components/HeaderWithBack";
-
+import PaymentSuccessModal from "../../components/PaymentSuccessModal"
 const PaymentScreen = ({ navigation, route }) => {
   const trainer = route?.params?.trainer || {
     name: "Cristofer Bator",
@@ -21,6 +21,7 @@ const PaymentScreen = ({ navigation, route }) => {
   };
 
   const [selectedMethod, setSelectedMethod] = useState("gpay");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -116,16 +117,25 @@ const PaymentScreen = ({ navigation, route }) => {
         </TouchableOpacity>
       </ScrollView>
 
-      <View style={styles.footer}>
-        <View>
-          <Text style={styles.totalLabel}>Total</Text>
-          <Text style={styles.totalValue}>₹ {trainer.amount}</Text>
-        </View>
+     <View style={styles.footer}>
+  <View>
+    <Text style={styles.totalLabel}>Total</Text>
+    <Text style={styles.totalValue}>₹ {trainer.amount}</Text>
+  </View>
 
-        <TouchableOpacity style={styles.payBtn}>
-          <Text style={styles.payText}>Pay</Text>
-        </TouchableOpacity>
-      </View>
+  <TouchableOpacity
+    style={styles.payBtn}
+    onPress={() => setShowSuccess(true)}
+  >
+    <Text style={styles.payText}>Pay</Text>
+  </TouchableOpacity>
+
+  <PaymentSuccessModal
+    visible={showSuccess}
+    onClose={() => setShowSuccess(false)}
+  />
+</View>
+
     </View>
   );
 };

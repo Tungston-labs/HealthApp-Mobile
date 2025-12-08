@@ -8,6 +8,8 @@ import TasksScreen from "../screens/TaskScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 
 import BottomNav from "../components/BottomNavbar";
+import UpcomingSession from "../screens/UpcomingSession";
+import ProfileSection from "../screens/ProfileSection";
 
 const Tab = createBottomTabNavigator();
 
@@ -17,11 +19,12 @@ const AppNavigator = () => {
             tabBar={(props) => <BottomNav {...props} />}
             screenOptions={{ headerShown: false }}
         >
-            <Tab.Screen name="Workout" component={WorkoutScreen} />
+            <Tab.Screen name="Upcoming" component={UpcomingSession} />
 
-            <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="profilesection" component={ProfileSection} />
+
             <Tab.Screen name="Tasks" component={TasksScreen} />
-            <Tab.Screen name="Profile" component={ProfileScreen} />
+            <Tab.Screen name="workout" component={WorkoutScreen} />
         </Tab.Navigator>
     );
 };

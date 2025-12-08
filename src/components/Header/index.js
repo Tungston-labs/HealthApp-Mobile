@@ -17,7 +17,6 @@ const Header = ({ username = "User", subtitle = "Welcome back!", bmiValue = "22.
                     <Text style={styles.bmiLabel}>BMI</Text>
                     <Text style={styles.bmiValue}>{bmiValue}</Text>
                 </View>
-                <Text style={styles.subheading}>{subtitle}</Text>
 
                 {/* BMI BLOCK */}
              
