@@ -1,7 +1,7 @@
 import { StyleSheet, Dimensions } from "react-native";
 const { width } = Dimensions.get("window");
 
-const scale = width / 375;    // ✅ FIXED: scale added
+const scale = width / 375;   
 const boxSize = width * 0.13;
 
 export default StyleSheet.create({

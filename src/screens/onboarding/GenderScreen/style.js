@@ -46,5 +46,7 @@ export default StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     color: "#000",
+    marginRight: 180,
+    marginTop: 60,
   },
 });

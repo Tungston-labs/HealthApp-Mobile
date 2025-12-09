@@ -12,7 +12,7 @@ import {
 import styles from "./style";
 
 export default function OtpScreen({ navigation }) {
-  const [otp, setOtp] = useState(["", "", "", "", ""]); // 5 OTP fields
+  const [otp, setOtp] = useState(["", "", "", "", ""]); 
   const inputRefs = useRef([]);
 
   const handleChange = (text, index) => {
@@ -26,7 +26,6 @@ export default function OtpScreen({ navigation }) {
   };
 
   const handleSubmit = () => {
-    // 🔥 Navigate to ResetPasswordScreen
     navigation.navigate("ResetPasswordScreen");
   };
 
@@ -36,15 +35,12 @@ export default function OtpScreen({ navigation }) {
         behavior={Platform.OS === "ios" ? "padding" : null}
         style={styles.innerContainer}
       >
-        {/* BRAND NAME */}
         <Text style={styles.brand}>OTP</Text>
 
-        {/* DESCRIPTION */}
         <Text style={styles.description}>
           Enter the code you received in your email{"\n"}below to reset your password.
         </Text>
 
-        {/* OTP INPUT  */}
         <View style={styles.otpContainer}>
           {otp.map((digit, index) => (
             <TextInput
@@ -59,13 +55,11 @@ export default function OtpScreen({ navigation }) {
           ))}
         </View>
 
-        {/* SUBMIT BUTTON */}
         <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
           <Text style={styles.submitText}>Submit</Text>
           <Text style={styles.submitArrow}>{">"}</Text>
         </TouchableOpacity>
 
-        {/* BACK TO LOGIN */}
         <TouchableOpacity onPress={() => navigation.navigate("Login")}>
           <Text style={styles.backToLogin}>
             Back to <Text style={styles.loginText}>Log in</Text>

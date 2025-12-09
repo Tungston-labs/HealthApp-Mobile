@@ -11,19 +11,17 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./style";
 
-export default function ResetPasswordScreen({ navigation }) {   // ✅ navigation added
+export default function ResetPasswordScreen({ navigation }) {   
   const [showPassword, setShowPassword] = useState(false);
   const [confirmShowPassword, setConfirmShowPassword] = useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
 
-      {/* Heading */}
       <Text style={styles.title}>
         Create your new password and confirm{"\n"}it to regain access
       </Text>
 
-      {/* Enter New Password */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Enter new password</Text>
 
@@ -45,7 +43,6 @@ export default function ResetPasswordScreen({ navigation }) {   // ✅ navigatio
         </View>
       </View>
 
-      {/* Confirm Password */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Confirm password</Text>
 
@@ -69,16 +66,14 @@ export default function ResetPasswordScreen({ navigation }) {   // ✅ navigatio
         </View>
       </View>
 
-      {/* Reset Button */}
       <TouchableOpacity style={styles.resetBtn}>
         <Text style={styles.resetText}>Reset Password</Text>
         <Ionicons name="chevron-forward" size={22} color="#fff" />
       </TouchableOpacity>
 
-      {/* Back to login */}
       <TouchableOpacity
         style={styles.backWrapper}
-        onPress={() => navigation.navigate("Login")}   // ✅ navigate to Login
+        onPress={() => navigation.navigate("Login")}   
       >
         <Text style={styles.back}>Back to </Text>
         <Text style={styles.loginLink}>Log in</Text>

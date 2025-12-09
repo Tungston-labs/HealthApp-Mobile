@@ -6,7 +6,6 @@ export default function GenderScreen({ selectedGender, onSelectGender }) {
   return (
     <View style={styles.container}>
       
-      {/* FEMALE */}
       <TouchableOpacity
         style={[
           styles.genderBox,
