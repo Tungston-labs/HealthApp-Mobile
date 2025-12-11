@@ -11,12 +11,13 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
+import { useNavigation } from "@react-navigation/native";
 
 const workoutOptions = ["Single", "Couple", "Group"];
 
 const TrainerBookingModal = ({ visible, onClose, trainer }) => {
     const [selected, setSelected] = useState("Single");
-
+    const navigation=useNavigation();
     if (!trainer) return null;
 
     return (
@@ -100,7 +101,7 @@ const TrainerBookingModal = ({ visible, onClose, trainer }) => {
                     </ScrollView>
 
                     <View style={styles.footer}>
-                        <TouchableOpacity style={styles.payBtn}>
+                        <TouchableOpacity style={styles.payBtn} onPress={()=>navigation.navigate("Payment")}>
                             <Text style={styles.payText}>Pay 2500</Text>
                         </TouchableOpacity>
                     </View>
