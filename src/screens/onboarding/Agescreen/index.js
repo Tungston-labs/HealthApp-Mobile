@@ -54,7 +54,6 @@ export default function AgeScreen() {
       <Text style={styles.ageNumber}>{age}</Text>
       <Text style={styles.ageLabel}>Years</Text>
 
-      {/* selection highlight line */}
       <View style={styles.selectionOverlay} />
 
       <View style={styles.wheelWrapper}>

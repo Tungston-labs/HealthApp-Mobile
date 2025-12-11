@@ -15,6 +15,8 @@ import AppNavigator from './AppNavigator';
 import TrainerListScreen from "../screens/TrainerList";
 import TrainerDetailScreen from "../screens/TrainerSingleView";
 import PaymentScreen from "../screens/PaymentScreen";
+import Welcome from '../screens/WelcomeScreens';
+import BMIResultScreen from '../screens/BMIResultScreen';
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
@@ -28,6 +30,7 @@ export default function Navigation() {
         <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen}  />
         <Stack.Screen name="SelectRoleScreen" component={SelectRoleScreen}  />
         <Stack.Screen name="SignupDetailsScreenUser" component={SignupDetailsScreenUser}  />
+
         <Stack.Screen
           name="MainWizardScreen"
           component={MainWizardScreen}
@@ -58,6 +61,16 @@ export default function Navigation() {
         <Stack.Screen
           name="TrainerDetail"
           component={TrainerDetailScreen}
+          
+        />
+        <Stack.Screen
+          name="Welcome"
+          component={Welcome}
+          
+        />
+        <Stack.Screen
+          name="BMIResultScreen"
+          component={BMIResultScreen}
           
         />
       </Stack.Navigator>

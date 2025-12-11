@@ -31,7 +31,6 @@ export default function SelectRoleScreen() {
   return (
     <SafeAreaView style={styles.container}>
 
-      {/* FIXED TOP HEADER */}
       <View style={styles.topHeader}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -43,7 +42,6 @@ export default function SelectRoleScreen() {
         <Text style={styles.headerTitle}>Sign up as</Text>
       </View>
 
-      {/* Center Content */}
       <View style={styles.centerWrapper}>
 
         <Text style={styles.subtitle}>
@@ -52,10 +50,8 @@ export default function SelectRoleScreen() {
 
         <Text style={styles.subText}>Join as a User or Trainer.</Text>
 
-        {/* Cards */}
         <View style={styles.cardRow}>
 
-          {/* Trainer Card */}
           <Animated.View
             style={[
               styles.card,
@@ -77,7 +73,6 @@ export default function SelectRoleScreen() {
             </TouchableOpacity>
           </Animated.View>
 
-          {/* User Card */}
           <Animated.View
             style={[
               styles.card,
@@ -100,10 +95,20 @@ export default function SelectRoleScreen() {
           </Animated.View>
         </View>
       </View>
-      {/* Continue Button */}
-      <TouchableOpacity style={styles.continueBtn} onPress={handleContinue}>
-        <Text style={styles.continueText}>Continue</Text>
-      </TouchableOpacity>
+      <View style={styles.continueFixed}>
+        <TouchableOpacity
+          style={styles.continueBtn}
+          onPress={() => navigation.navigate("SignupDetailsScreenUser")}   // 👈 ADDED
+        >
+          <Text style={styles.continueText}>Continue</Text>
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color="#fff"
+            style={styles.arrowIcon}
+          />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }

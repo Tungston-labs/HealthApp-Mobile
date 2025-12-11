@@ -16,12 +16,12 @@ export default StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     marginBottom: 15,
-    gap: 15,
+    gap: 5,
   },
 
   progressBar: {
     height: 4,
-    width: 60,
+    width: 45,
     borderRadius: 5,
   },
 
@@ -37,8 +37,9 @@ export default StyleSheet.create({
 
   headerTitle: {
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: "450",
     marginBottom: 20,
+    fontFamily: "Segoe UI",
   },
 
   centerContainer: {

@@ -113,7 +113,6 @@ export default StyleSheet.create({
   alignItems: "center",
   gap: 5,
 
-  /* INNER SHADOW */
   shadowColor: "#000",
   shadowOffset: { width: 0, height: -2 },
   shadowOpacity: 0.25,

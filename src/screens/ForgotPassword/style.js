@@ -1,22 +1,21 @@
 import { StyleSheet, Dimensions } from "react-native";
 
 const { width, height } = Dimensions.get("window");
-const scale = width / 375; // Responsive scale based on iPhone 11 width
+const scale = width / 375; 
 
 export default StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 25 * scale,
-    justifyContent: "center", // Center vertically
+    justifyContent: "center", 
   },
 
   centerWrapper: {
-    alignItems: "center", // Center horizontally
+    alignItems: "center", 
     width: "100%",
   },
 
-  /* Logo */
   logoContainer: {
     marginBottom: 20 * scale,
     alignItems: "center",
@@ -26,7 +25,6 @@ export default StyleSheet.create({
     height: 160 * scale,
   },
 
-  /* Description Text */
   description: {
     textAlign: "center",
     fontSize: 14 * scale,
@@ -35,7 +33,6 @@ export default StyleSheet.create({
     marginBottom: 25 * scale,
   },
 
-  /* Label */
   label: {
     fontSize: 16 * scale,
     fontWeight: "700",
@@ -44,7 +41,6 @@ export default StyleSheet.create({
     marginBottom: 8 * scale,
   },
 
-  /* Email Input Box */
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -71,17 +67,16 @@ export default StyleSheet.create({
   marginBottom: 20 * scale,
 },
 
-  /* Continue Button */
   continueBtn: {
   flexDirection: "row",
   alignItems: "center",
   justifyContent: "center",
   backgroundColor: "#7774F4",
   paddingVertical: 10 * scale,
-  paddingHorizontal: 18 * scale,   // makes button small
+  paddingHorizontal: 18 * scale,   
   borderRadius: 20 * scale,
 
-  alignSelf: "flex-end",            // ⬅️ THIS pushes button to RIGHT SIDE
+  alignSelf: "flex-end",           
   marginBottom: 20 * scale,
 
   elevation: 6,
@@ -99,7 +94,6 @@ innerShadow: {
   borderRadius: 20 * scale,
   backgroundColor: "#7774F4",
 
-  // fake inner shadow
   shadowColor: "#000",
   shadowOpacity: 0.25,
   shadowRadius: 10,
@@ -115,7 +109,6 @@ innerShadow: {
     marginRight: 6 * scale,
   },
 
-  /* Back to Login */
   backToLoginWrapper: {
     flexDirection: "row",
     justifyContent: "center",

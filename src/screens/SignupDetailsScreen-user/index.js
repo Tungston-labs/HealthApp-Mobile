@@ -25,18 +25,15 @@ export default function SignupDetailsScreenUser() {
           paddingBottom: 120,
         }}
       >
-        {/* Title */}
         <Text style={styles.welcomeText}>Welcome to health app</Text>
         <Text style={styles.subtitle}>Enter basic details</Text>
 
-        {/* Name */}
         <TextInput
           style={styles.input}
           placeholder="Enter Name"
           placeholderTextColor="#999"
         />
 
-        {/* Email */}
         <View style={styles.inputRow}>
           <Ionicons name="mail-outline" size={18} color="#777" />
           <TextInput
@@ -46,7 +43,6 @@ export default function SignupDetailsScreenUser() {
           />
         </View>
 
-        {/* Phone */}
         <View style={styles.inputRow}>
           <Ionicons name="call-outline" size={18} color="#777" />
           <TextInput
@@ -57,7 +53,6 @@ export default function SignupDetailsScreenUser() {
           />
         </View>
 
-        {/* LOCATION SECTION */}
         <View style={styles.locationRow}>
           <View style={styles.locationLeft}>
             <Ionicons name="location-outline" size={20} color="#777" />
@@ -78,7 +73,6 @@ export default function SignupDetailsScreenUser() {
           )}
         </View>
 
-        {/* LOCATION INPUTS */}
         {showLocationFields && (
           <>
             <View style={styles.locationInputsRow}>
@@ -110,7 +104,6 @@ export default function SignupDetailsScreenUser() {
           </>
         )}
 
-        {/* Back */}
         <TouchableOpacity
           style={{ marginTop: 20 }}
           onPress={() => navigation.navigate("Login")}
@@ -119,7 +112,6 @@ export default function SignupDetailsScreenUser() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Continue Button (RIGHT BOTTOM FIXED) */}
       <View style={styles.continueFixed}>
         <TouchableOpacity
           style={styles.continueBtn}

@@ -41,7 +41,7 @@ export default StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginTop: 20,
+        marginTop: 10,
     },
 
     dayText: {
@@ -62,7 +62,7 @@ export default StyleSheet.create({
     sectionTitle: {
         fontSize: 16,
         fontWeight: "600",
-        marginTop: 20,
+        marginTop: 10,
     },
 
     slotsRow: {
@@ -106,6 +106,17 @@ export default StyleSheet.create({
 
     trainerCard: {
         flexDirection: "row",
+        alignItems: "center",
+        marginTop: 10,
+        width: "100%",
+    },
+    infoRowWrapper: {
+        flex: 1,
+        marginLeft: 10,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingRight: 15,
     },
 
     trainerImage: {
@@ -114,46 +125,21 @@ export default StyleSheet.create({
         borderRadius: 12,
     },
 
-    trainerInfo: {
-        flex: 1,
-        marginLeft: 10,
-    },
 
-    trainerName: {
-        fontSize: 16,
-        fontWeight: "700",
-    },
 
-    infoRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginTop: 6,
-    },
-
-    infoLabel: {
-        fontSize: 11,
-        color: "#888",
-    },
-
-    infoValue: {
-        fontSize: 13,
-        fontWeight: "600",
-    },
-
-    sessionRow: {
+    ratingBox: {
         flexDirection: "row",
         alignItems: "center",
     },
-
-    ratingRow: {
-        flexDirection: "row",
-        alignItems: "center",
-    },
-
     ratingText: {
+        fontSize: 16,
+        fontFamily: "SegoeUI",
         fontWeight: "600",
         marginLeft: 4,
+        color: "#000",
     },
+
+
 
     noSession: {
         flexDirection: "column",
@@ -165,9 +151,9 @@ export default StyleSheet.create({
         fontSize: 12,
         marginLeft: 6,
     },
-    sessionicon:{
-    display:"flex",
-    flexDirection:"row",
+    sessionicon: {
+        display: "flex",
+        flexDirection: "row",
 
     },
     workoutText: {

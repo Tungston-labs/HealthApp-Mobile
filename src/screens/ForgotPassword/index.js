@@ -15,10 +15,8 @@ export default function ForgotPasswordScreen({ navigation }) {
     return (
         <SafeAreaView style={styles.container}>
 
-            {/* Centered Wrapper */}
             <View style={styles.centerWrapper}>
 
-                {/* Logo */}
                 <View style={styles.logoContainer}>
                     {/* <Image
                         source={require("../assets/logo.png")}
@@ -27,15 +25,12 @@ export default function ForgotPasswordScreen({ navigation }) {
                     /> */}
                 </View>
 
-                {/* Description */}
                 <Text style={styles.description}>
                     Enter your registered email address below. We’ll send you a code to reset your password.
                 </Text>
 
-                {/* Email Label */}
                 <Text style={styles.label}>Email</Text>
 
-                {/* Email Input Box */}
                 <View style={styles.inputWrapper}>
                     <Icon name="mail-outline" size={20} color="#8D8D8D" style={styles.inputIcon} />
                     <TextInput
@@ -45,11 +40,9 @@ export default function ForgotPasswordScreen({ navigation }) {
                     />
                 </View>
 
-                {/* Continue Button */}
                 <View style={styles.continueWrapper}>
                     <View style={styles.innerShadow} />
 
-                    {/* ✅ Navigation added here ONLY */}
                     <TouchableOpacity
                         style={styles.continueBtn}
                         onPress={() => navigation.navigate("OtpScreen")}

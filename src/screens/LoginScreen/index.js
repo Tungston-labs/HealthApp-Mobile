@@ -15,12 +15,10 @@ export default function LoginScreen({ navigation }) {
     return (
         <SafeAreaView style={styles.container}>
 
-            {/* Logo */}
             <View style={styles.logoContainer}>
                 <Text style={styles.logoText}>LOGIN</Text>
             </View>
 
-            {/* Email */}
             <View style={styles.inputContainer}>
                 <Text style={styles.label}>Email</Text>
 
@@ -39,7 +37,6 @@ export default function LoginScreen({ navigation }) {
                 </View>
             </View>
 
-            {/* Password */}
             <View style={styles.inputContainer}>
                 <Text style={styles.label}>Password</Text>
 
@@ -74,7 +71,6 @@ export default function LoginScreen({ navigation }) {
                 </TouchableOpacity>
             </View>
 
-            {/* Login Button */}
             <View style={styles.loginBtnWrapper}>
                 <TouchableOpacity
                     style={styles.loginBtn}
@@ -84,7 +80,6 @@ export default function LoginScreen({ navigation }) {
                 </TouchableOpacity>
             </View>
 
-            {/* Footer */}
             <View style={styles.footer}>
                 <Text style={styles.footerText}>Don't have an account?</Text>
                 <TouchableOpacity>

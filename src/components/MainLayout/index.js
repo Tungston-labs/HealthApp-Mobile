@@ -7,10 +7,9 @@ export default function MainLayout({ title, step, onBack, onNext, children }) {
   return (
     <SafeAreaView style={styles.container}>
 
-      {/* HEADER */}
       <View style={styles.headerWrapper}>
         <View style={styles.progressContainer}>
-          {[1, 2, 3, 4, 5].map(item => (
+          {[1, 2, 3, 4, 5, 6, 7].map((item) => (
             <View
               key={item}
               style={[
@@ -28,21 +27,16 @@ export default function MainLayout({ title, step, onBack, onNext, children }) {
 
       <Text style={styles.headerTitle}>{title}</Text>
 
-      {/* CONTENT */}
-      <View style={styles.centerContainer}>
-        {children}
-      </View>
+      <View style={styles.centerContainer}>{children}</View>
 
-      {/* FOOTER */}
       <View style={styles.footer}>
-        {/* ✅ Hide Next Button when step = 1 */}
         {step !== 1 && (
           <TouchableOpacity onPress={onNext} style={styles.nextButton}>
             <Ionicons name="chevron-forward" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         )}
       </View>
-
     </SafeAreaView>
   );
 }
+

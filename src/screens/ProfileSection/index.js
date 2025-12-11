@@ -3,31 +3,34 @@ import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
 import CommonActionModal from "../../components/ModalComponents";
+import TrainingProgressSelector from "../../components/TrainingProgressSelector";
+import TrainerInfoCard from "../../components/TrainerInfoCard";
 
-const ProfileSection = () => {
+const ProfileSection = ({ route }) => {
     const [selectedDate, setSelectedDate] = useState(1);
     const [showCancelModal, setShowCancelModal] = useState(false);
-    const [showDietModal, setShowDietModal] = useState(false);
-    const dates = [
-        { date: "1", day: "Tue" },
-        { date: "3", day: "Thu" },
-        { date: "6", day: "Sat" },
-        { date: "9", day: "Tue" },
-        { date: "11", day: "Thu" },
-        { date: "13", day: "Sat" },
-        { date: "13", day: "Sat" },
-        { date: "13", day: "Sat" },
-
-
-    ];
+    const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+    const [showConsultModal, setShowConsultModal]=useState(false)
     const handleCancelTraining = () => {
         console.log("Training cancelled");
         setShowCancelModal(false);
     };
-    const handleDietSubmit = () => {
+    const handleConsultation = () => {
         console.log("send feedback");
-        setShowDietModal(false);
+        setShowConsultModal(false);
     }
+const handleEmergencyCall=()=>{
+    setShowEmergencyModal(false)
+}
+    const session = route?.params?.session || {
+        name: "Cristofer Bator",
+        experience: "5 year",
+        sessionTiming: "60 min",
+        numSessions: "12",
+        workoutType: "Gym",
+        rating: "4.5",
+        image: "../../../assets/trainer3.jpg",
+    };
     return (
         <View style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -38,100 +41,42 @@ const ProfileSection = () => {
                         <Text style={styles.title}>Trainers</Text>
                         <Text style={styles.subtitle}>Trainer Details</Text>
                     </View>
-                    <TouchableOpacity style={styles.callIcon}>
+                    <TouchableOpacity style={styles.callIcon} onPress={() => setShowEmergencyModal(true)}>
                         <Icon name="call" size={22} color="#fff" />
                     </TouchableOpacity>
                 </View>
 
-                {/* Day Progress Bar */}
-                <View style={styles.dayBar}>
-                    <Text style={styles.dayText}>Day 1</Text>
-                    <View style={styles.timeRow}>
-                        <Text style={styles.timeText}>01:02 Hrs</Text>
-                        <Icon name="time-outline" size={16} color="#fff" />
-                    </View>
-                </View>
-
-                {/* Training Time Slots */}
-                <Text style={styles.sectionTitle}>Training Time 10:30</Text>
-
-                <View style={styles.slotsRow}>
-                    {dates.map((item, index) => {
-                        const isActive = selectedDate === index;
-
-                        return (
-                            <TouchableOpacity
-                                key={index}
-                                onPress={() => setSelectedDate(index)}
-                                style={[
-                                    styles.slotCard,
-                                    isActive && styles.activeSlot
-                                ]}
-                            >
-                                <Text
-                                    style={[
-                                        styles.slotDay,
-                                        isActive && styles.activeSlotText
-                                    ]}
-                                >
-                                    {item.date}
-                                </Text>
-
-                                <Text
-                                    style={[
-                                        styles.slotWeek,
-                                        isActive && styles.activeSlotText
-                                    ]}
-                                >
-                                    {item.day}
-                                </Text>
-                            </TouchableOpacity>
-                        );
-                    })}
-                </View>
-
+                <TrainingProgressSelector
+                    progressDay={3}
+                    progressTime="01:02 Hrs"
+                    onDateSelect={(date) => setSelectedDate(date)}
+                />
 
                 <View style={styles.divider} />
 
                 {/* Trainer Card */}
                 <View style={styles.trainerCard}>
-                    <Image
-                        source={require("../../../assets/trainer2.jpg")}
-                        style={styles.trainerImage}
-                    />
+                    <Image source={require("../../../assets/trainer2.jpg")}
+                        style={styles.trainerImage} />
 
-                    <View style={styles.trainerInfo}>
-                        <Text style={styles.trainerName}>Cristofer Bator</Text>
-
-                        <View style={styles.infoRow}>
-                            <View>
-                                <Text style={styles.infoLabel}>Experience</Text>
-                                <Text style={styles.infoValue}>5 year</Text>
-                            </View>
-
-                            <View>
-                                <Text style={styles.infoLabel}>Session timing</Text>
-                                <View style={styles.sessionRow}>
-                                    <Icon name="time-outline" size={14} />
-                                    <Text style={styles.infoValue}> 60 min</Text>
-                                </View>
-                            </View>
-
-                            <View style={styles.ratingRow}>
-                                <Icon name="star" size={14} color="#F4B400" />
-                                <Text style={styles.ratingText}>4.5</Text>
-                            </View>
+                    <View style={styles.infoRowWrapper}>
+                        <View style={styles.trainerInfoCardWrapper}>
+                            <TrainerInfoCard
+                                name={session.name}
+                                experience={session.experience}
+                                sessionTiming={session.sessionTiming}
+                                numSessions={session.numSessions}
+                                workoutType={session.workoutType}
+                            />
                         </View>
 
-                        <View style={styles.noSession}>
-                            <Text style={styles.noSessionText}> no of session</Text>
-                            <View style={styles.sessionicon}>
-                                <Icon name="time" size={14} />
-                                <Text>12</Text>
-                            </View>
+                        <View style={styles.ratingBox}>
+                            <Icon name="star" size={20} color="#F4C430" />
+                            <Text style={styles.ratingText}>4.6</Text>
                         </View>
                     </View>
                 </View>
+
 
                 <View style={styles.divider} />
 
@@ -150,7 +95,7 @@ const ProfileSection = () => {
                 <View style={styles.buttonRow}>
                     <TouchableOpacity
                         style={styles.primaryButton}
-                        onPress={() => setShowDietModal(true)}
+                        onPress={() => setShowConsultModal(true)}
                     >
                         <Text style={styles.buttonText}>Report</Text>
                     </TouchableOpacity>
@@ -175,28 +120,52 @@ const ProfileSection = () => {
                 visible={showCancelModal}
                 onClose={() => setShowCancelModal(false)}
                 onConfirm={handleCancelTraining}
-                iconName="close-circle"
-                iconColor="#E53935"
+                iconName="close-circle-outline"
+                iconColor="red"
                 title="Cancel training"
-                description="Refunds are available only before completing 7 sessions of your training plan."
+                description="Refunds are available only before completing 7 sessions."
                 cancelText="Cancel"
                 confirmText="Confirm"
+
+                showDropdown={false}
+                showNote={false}
             />
+
             <CommonActionModal
-                visible={showDietModal}
-                onClose={() => setShowDietModal(false)}
-                onConfirm={handleDietSubmit}
-                iconName="nutrition"
-                iconColor="#6C6AF5"
-                title="Connect with Your Personal Diet Coach!"
-                description="Connect with a nutrition expert and receive a plan designed just for you."
+                visible={showEmergencyModal}
+                onClose={() => setShowEmergencyModal(false)}
+                onConfirm={handleEmergencyCall}
+                iconName="call-outline"
+                iconColor="green"
+                title="Confirm Emergency Call"
+                description="Are you sure you want to make an emergency call?"
+                cancelText="Cancel"
+                confirmText="Call now"
+
+                showDropdown={false}
+                showNote={false}
+            />
+
+            <CommonActionModal
+                visible={showConsultModal}
+                onClose={() => setShowConsultModal(false)}
+                onConfirm={handleConsultation}
+                iconName="chatbubble-ellipses-outline"
+                iconColor="#6C63FF"
+                title="Request a Consultation"
+                description="Choose your consultation type and leave a short note."
+
                 cancelText="Cancel"
                 confirmText="Send"
+
+                showDropdown={true}
+                showNote={true}
             />
+
+
 
         </View>
     );
 };
 
 export default ProfileSection;
- 

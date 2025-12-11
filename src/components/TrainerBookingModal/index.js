@@ -12,6 +12,7 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
+import TrainerInfoCard from "../TrainerInfoCard";
 
 const workoutOptions = ["Single", "Couple", "Group"];
 
@@ -40,28 +41,14 @@ const TrainerBookingModal = ({ visible, onClose, trainer }) => {
                                 style={styles.profileImage}
                             />
 
-                            <View style={styles.infoSection}>
-                                <Text style={styles.name}>Cristofer Bator</Text>
+                          <TrainerInfoCard
+                          name="Cristofer Bator"
+                        experience="5 years"
+                        sessionTiming="60 min"
+                        numSessions="12"
+                        workoutType="Yoga"
 
-                                <View style={styles.row}>
-                                    <View>
-                                        <Text style={styles.label}>Experience</Text>
-                                        <Text style={styles.value}>5 year</Text>
-                                    </View>
-
-                                    <View>
-                                        <Text style={styles.label}>Session timing</Text>
-                                        <Text style={styles.value}>⏱ 60 min</Text>
-                                    </View>
-                                </View>
-
-                                <View style={styles.rowSingle}>
-                                    <View>
-                                        <Text style={styles.label}>No of sessions</Text>
-                                        <Text style={styles.value}>⏳ 12</Text>
-                                    </View>
-                                </View>
-                            </View>
+                          />
                         </View>
 
                         <Text style={styles.sectionTitle}>Choose your workout type</Text>

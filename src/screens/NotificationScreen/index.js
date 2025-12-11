@@ -3,8 +3,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import Icon from "react-native-vector-icons/Ionicons";
 import HeaderWithBack from "../../components/HeaderWithBack";
-import styles from './style';
-
+import styles from "./style";
 const notifications = [
   {
     id: 1,

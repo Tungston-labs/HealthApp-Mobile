@@ -16,8 +16,8 @@ const BottomNav = ({ state, descriptors, navigation }) => {
           Upcoming: "home-outline",
           profilesection: "barbell-outline",
           
-          Tasks: "grid-outline",
-          workout: "person-outline",
+          Session: "grid-outline",
+          profile: "person-outline",
         };
         const onPress = () => { 
           if (!isFocused) {

@@ -10,6 +10,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
 import HeaderWithBack from "../../components/HeaderWithBack";
 import PaymentSuccessModal from "../../components/PaymentSuccessModal"
+import TrainerInfoCard from "../../components/TrainerInfoCard";
 const PaymentScreen = ({ navigation, route }) => {
   const trainer = route?.params?.trainer || {
     name: "Cristofer Bator",
@@ -38,22 +39,13 @@ const PaymentScreen = ({ navigation, route }) => {
           <Image source={trainer.image} style={styles.trainerImg} />
 
           <View style={styles.trainerInfo}>
-            <Text style={styles.trainerName}>{trainer.name}</Text>
-
-            <View style={styles.trainerRow}>
-              <View style={{ marginRight: 30 }}>
-                <Text style={styles.label}>Experience</Text>
-                <Text style={styles.value}>{trainer.experience}</Text>
-              </View>
-
-              <View>
-                <Text style={styles.label}>Session timing</Text>
-                <Text style={styles.value}>⏱ {trainer.timing}</Text>
-              </View>
-            </View>
-
-            <Text style={[styles.label, { marginTop: 5 }]}>No of sessions</Text>
-            <Text style={styles.value}>⏳ {trainer.sessions}</Text>
+            <TrainerInfoCard
+                name="Cristofer Bator"
+                        experience="5 years"
+                        sessionTiming="60 min"
+                        numSessions="12"
+                        workoutType="Yoga"
+            />
           </View>
         </View>
 
