@@ -1,59 +1,125 @@
+// screens/styles.js or components/styles.js depending on your structure
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
+  /* ---- Screen container ---- */
   container: {
     flex: 1,
-    backgroundColor: "#F7F7F7",
-    paddingHorizontal: 16,
+    backgroundColor: "transparent", // the screen base is white, content sits on top
   },
 
-  /* ---------- Section Title ---------- */
-  sectionTitle: {
-    fontSize: 18,
+  /* ---- Header / Profile ---- */
+  headerWrapper: {
+    width: "100%",
+    alignItems: "center",
+    paddingTop: 40,
+    paddingBottom: 10,
+    position: "relative",
+    zIndex: 2, // above the circle
+  },
+
+  topGradientSmall: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 200,
+    borderBottomLeftRadius: 999,
+    borderBottomRightRadius: 999,
+    zIndex: -1,
+  },
+
+  imageContainer: {
+    marginTop: 10,
+    width: 140,
+    height: 140,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  imageBorder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 6,
+    borderColor: "#6B63F6", // ring color (blue/purple)
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
+  },
+
+  profileImg: {
+    width: 104,
+    height: 104,
+    borderRadius: 52,
+  },
+
+  profileName: {
+    marginTop: 12,
+    fontSize: 20,
     fontWeight: "700",
-    marginTop: 20,
-    marginBottom: 10,
-    color: "#000",
+    color: "#111",
   },
 
-  /* ---------- Menu tems for View Profile ---------- */
-  menuItem: {
+  backBtn: {
+    position: "absolute",
+    left: 18,
+    top: 42,
+    zIndex: 10,
+    padding: 6,
+  },
+
+  editIconWrapper: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 8,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    zIndex: 3,
+  },
+
+  /* ---- White card / options ---- */
+  optionsWrapper: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 24,
+    paddingTop: 48, 
+    paddingBottom: 40,
+    minHeight: 600, 
+    zIndex: 2,
+  },
+
+  optionRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 15,
+    paddingVertical: 18,
     borderBottomWidth: 1,
-    borderColor: "#E6E6E6",
+    borderColor: "#F0F0F0",
   },
 
-  menuText: {
+  optionText: {
+    marginLeft: 14,
     fontSize: 16,
-    color: "#000",
+    color: "#111",
   },
 
-  logoutItem: {
-    marginTop: 25,
-    paddingVertical: 15,
+  logoutRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 22,
   },
 
   logoutText: {
-    color: "red",
+    marginLeft: 12,
     fontSize: 16,
+    color: "#E2574C",
     fontWeight: "600",
-  },
-
-  /* ---------- Save Button for Edit Profile ---------- */
-  saveBtn: {
-    backgroundColor: "#6C63FF",
-    paddingVertical: 15,
-    borderRadius: 25,
-    marginTop: 30,
-    marginBottom: 40,
-    alignItems: "center",
-  },
-
-  saveText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "700",
   },
 });

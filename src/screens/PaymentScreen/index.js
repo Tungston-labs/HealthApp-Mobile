@@ -12,6 +12,7 @@ import HeaderWithBack from "../../components/HeaderWithBack";
 import PaymentSuccessModal from "../../components/PaymentSuccessModal"
 import TrainerInfoCard from "../../components/TrainerInfoCard";
 const PaymentScreen = ({ navigation, route }) => {
+
   const trainer = route?.params?.trainer || {
     name: "Cristofer Bator",
     experience: "5 year",
@@ -122,10 +123,14 @@ const PaymentScreen = ({ navigation, route }) => {
     <Text style={styles.payText}>Pay</Text>
   </TouchableOpacity>
 
-  <PaymentSuccessModal
-    visible={showSuccess}
-    onClose={() => setShowSuccess(false)}
-  />
+<PaymentSuccessModal
+  visible={showSuccess}
+  onClose={() => {
+    setShowSuccess(false);
+    navigation.navigate("MainApp"); 
+  }}
+/>
+
 </View>
 
     </View>

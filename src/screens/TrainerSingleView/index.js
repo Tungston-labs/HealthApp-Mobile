@@ -6,7 +6,9 @@ import styles from "./styles";
 import RatingBar from "../../components/TrainerDetail/RatingCard";
 import ReviewCard from "../../components/TrainerDetail/ReviewCard";
 import TrainerInfoCard from "../../components/TrainerInfoCard";
+import { useNavigation } from "@react-navigation/native";
 const TrainerDetailScreen = (rating = 4.5) => {
+    const navigation=useNavigation();
     return (
         <View style={styles.container}>
             <ScrollView
@@ -89,7 +91,10 @@ const TrainerDetailScreen = (rating = 4.5) => {
                 <View style={{ height: 90 }} />
             </ScrollView>
             <View style={styles.footer}>
-                <TouchableOpacity style={styles.bookBtn}>
+              <TouchableOpacity 
+                    style={styles.bookBtn} 
+                    onPress={() => navigation.navigate("Payment")}  
+                >
                     <Text style={styles.bookText}>Book Now</Text>
                 </TouchableOpacity>
             </View>

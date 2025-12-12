@@ -1,48 +1,46 @@
+// components/ProfileHeader.js
 import React from "react";
-import { View, Text, Image } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
-import Svg, { Path } from "react-native-svg";
-import styles from "./styles";
+import { View, Text, Image, TouchableOpacity } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import styles from "../../screens/ProfileScreen/styles";
 
-const ProfileHeaderCard = ({ profileImage, name }) => {
+const ProfileHeader = ({
+  image,        
+  name,
+  showBack = false,
+  onBack,
+  showEdit = true,
+  onEdit,
+}) => {
   return (
-    <View style={styles.wrapper}>
-      {/* Gradient Header */}
-      <LinearGradient
-        colors={["#ECEBF6", "#FFFFFF"]} 
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.gradient}
-      >
-        <Text style={styles.title}>Profile</Text>
+    <View style={styles.headerWrapper}>
+      <View style={styles.topGradientSmall} />
 
-        <View style={styles.imageWrapper}>
-          <Image source={profileImage} style={styles.image} />
+      {showBack && (
+        <TouchableOpacity style={styles.backBtn} onPress={onBack}>
+          <Icon name="chevron-back" size={28} color="#111" />
+        </TouchableOpacity>
+      )}
+
+      <View style={styles.imageContainer}>
+        <View style={styles.imageBorder}>
+          <Image
+            source={typeof image === "string" ? { uri: image } : image}
+            style={styles.profileImg}
+            resizeMode="cover"
+          />
         </View>
 
-        <Text style={styles.name}>{name}</Text>
-      </LinearGradient>
+        {showEdit && (
+          <TouchableOpacity style={styles.editIconWrapper} onPress={onEdit}>
+            <Icon name="create-outline" size={18} color="#4A6CF7" />
+          </TouchableOpacity>
+        )}
+      </View>
 
-      {/* Inverted (Concave) Curve */}
-      <Svg
-        width="100%"
-        height="90"
-        viewBox="0 0 400 90"
-        style={styles.curve}
-      >
-        <Path
-          d="
-            M0 0 
-            Q200 140 400 0 
-            L400 90 
-            L0 90 
-            Z
-          "
-          fill="#FFFFFF"
-        />
-      </Svg>
+      {name && <Text style={styles.profileName}>{name}</Text>}
     </View>
   );
 };
 
-export default ProfileHeaderCard;
+export default ProfileHeader;

@@ -9,12 +9,13 @@ import {
 } from "react-native";
 import styles from "./styles";
 import CalendarPicker from "./CalendarPicker";
+import { useNavigation } from "@react-navigation/native";
 
 const FilterModal = ({ visible, onClose }) => {
   const [selectedSlot, setSelectedSlot] = useState("Mon,Wed,Fri");
   const [selectedDate, setSelectedDate] = useState("2025-12-11");
   const [selectedTime, setSelectedTime] = useState("09:45 AM");
-
+const navigation = useNavigation();
   const timeSlots = [
     "09:45 AM",
     "10:45 AM",
@@ -108,11 +109,14 @@ const FilterModal = ({ visible, onClose }) => {
               onSelect={(d) => setSelectedDate(d)}
             />
 
-            <View style={styles.applyWrapper}>
-              <TouchableOpacity style={styles.applyBtn}>
-                <Text style={styles.applyText}>Apply filter →</Text>
-              </TouchableOpacity>
-            </View>
+             <View style={styles.applyWrapper}>
+      <TouchableOpacity
+        style={styles.applyBtn}
+        onPress={() => navigation.navigate("TrainerList")} 
+      >
+        <Text style={styles.applyText}>Apply filter →</Text>
+      </TouchableOpacity>
+    </View>
 
 
       

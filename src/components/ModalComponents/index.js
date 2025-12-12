@@ -5,6 +5,7 @@ import {
   Modal,
   TouchableOpacity,
   TextInput,
+  Image,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
@@ -17,9 +18,9 @@ const CommonActionModal = ({
   title,
   description,
   cancelText,
+  illustration,
   confirmText,
 
-  // NEW OPTIONAL PROPS
   showDropdown = false,
   showNote = false,
 }) => {
@@ -34,18 +35,28 @@ const CommonActionModal = ({
       <View style={styles.overlay}>
         <View style={styles.card}>
 
-          {/* Icon */}
-          <View style={[styles.iconCircle, { borderColor: iconColor }]}>
-            <Icon name={iconName} size={28} color={iconColor} />
-          </View>
+          {iconName && (
+            <View style={[styles.iconCircle, { borderColor: iconColor }]}>
+              <Icon name={iconName} size={28} color={iconColor} />
+            </View>
+          )}
 
-          {/* Title */}
+          {illustration && (
+            <Image
+              source={illustration}
+              style={{
+                width: 180,
+                height: 160,
+                resizeMode: "contain",
+              }}
+            />
+          )}
+
+
           <Text style={styles.title}>{title}</Text>
 
-          {/* Description */}
           <Text style={styles.desc}>{description}</Text>
 
-          {/* ---------- SHOW DROPDOWN ONLY WHEN ENABLED ---------- */}
           {showDropdown && (
             <>
               <Text style={styles.label}>Consultation type</Text>
@@ -79,7 +90,6 @@ const CommonActionModal = ({
             </>
           )}
 
-          {/* ---------- SHOW NOTE BOX ONLY WHEN ENABLED ---------- */}
           {showNote && (
             <>
               <Text style={styles.label}>Note</Text>
@@ -95,7 +105,6 @@ const CommonActionModal = ({
             </>
           )}
 
-          {/* Buttons */}
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
               <Text style={styles.cancelText}>{cancelText}</Text>

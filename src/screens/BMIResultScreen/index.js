@@ -302,7 +302,7 @@ export default function BMIResultScreen({ navigation }) {
 
       <TouchableOpacity
         style={styles.floatingButton}
-        onPress={() => navigation.navigate("MainApp")}
+        onPress={() => navigation.navigate("workout")}
       >
         <Ionicons name="chevron-forward" size={28} color="#fff" />
       </TouchableOpacity>
