@@ -15,7 +15,7 @@ const WorkoutPlan = ({ navigation }) => {
                 {/* Header */}
                 <Header
                     username="Ajay"
-                    subtitle="Choose your board"
+                    subtitle="Your workout plans"
                     onNotificationPress={() => navigation.navigate("Notifications")}
                 />
 

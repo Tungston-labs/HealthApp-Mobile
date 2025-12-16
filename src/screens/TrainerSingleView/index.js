@@ -5,11 +5,16 @@ import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
 import RatingBar from "../../components/TrainerDetail/RatingCard";
 import ReviewCard from "../../components/TrainerDetail/ReviewCard";
-
+import TrainerInfoCard from "../../components/TrainerInfoCard";
+import { useNavigation } from "@react-navigation/native";
 const TrainerDetailScreen = (rating = 4.5) => {
+    const navigation=useNavigation();
     return (
         <View style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 40 }}
+            >
 
                 <TouchableOpacity style={styles.closeBtn}>
                     <Icon name="close" size={28} color="#000" />
@@ -21,28 +26,14 @@ const TrainerDetailScreen = (rating = 4.5) => {
                         style={styles.profileImage}
                     />
 
-                    <View style={styles.infoSection}>
-                        <Text style={styles.name}>Cristofer Bator</Text>
+                    <TrainerInfoCard    
+                        name="Cristofer Bator"
+                        experience="5 years"
+                        sessionTiming="60 min"
+                        numSessions="12"
+                        workoutType="Yoga"
+                    />
 
-                        <View style={styles.row}>
-                            <View>
-                                <Text style={styles.label}>Experience</Text>
-                                <Text style={styles.value}>5 year</Text>
-                            </View>
-
-                            <View>
-                                <Text style={styles.label}>Session timing</Text>
-                                <Text style={styles.value}>⏱ 60 min</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.rowSingle}>
-                            <View>
-                                <Text style={styles.label}>No of sessions</Text>
-                                <Text style={styles.value}>⏳ 12</Text>
-                            </View>
-                        </View>
-                    </View>
 
                 </View>
 
@@ -99,9 +90,11 @@ const TrainerDetailScreen = (rating = 4.5) => {
 
                 <View style={{ height: 90 }} />
             </ScrollView>
-
             <View style={styles.footer}>
-                <TouchableOpacity style={styles.bookBtn}>
+              <TouchableOpacity 
+                    style={styles.bookBtn} 
+                    onPress={() => navigation.navigate("Payment")}  
+                >
                     <Text style={styles.bookText}>Book Now</Text>
                 </TouchableOpacity>
             </View>

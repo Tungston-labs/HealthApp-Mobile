@@ -16,8 +16,11 @@ export default StyleSheet.create({
 
   closeBtn: {
     position: "absolute",
-    top: 15,
-    right: 15,
+    top: 2,
+    backgroundColor: "#E6E5E8",
+    right: 2,
+    padding: 4,
+    borderRadius: 25 / 2,
   },
 
   closeText: {
@@ -75,12 +78,12 @@ export default StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 10,
   },
-rowHeader: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginTop: 15,
-},
+  rowHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 15,
+  },
 
   activeTimeBtn: {
     backgroundColor: "#7774F4",
@@ -120,14 +123,19 @@ rowHeader: {
     color: "#000",
     marginVertical: 6,
   },
-
-  applyBtn: {
-    backgroundColor: "#7774F4",
-    paddingVertical: 14,
-    borderRadius: 18,
-    alignItems: "center",
+  applyWrapper: {
+    width: "100%",
+    alignItems: "flex-end",
     marginTop: 20,
   },
+applyBtn: {
+  backgroundColor: "#7774F4",
+  paddingVertical: 14,
+  borderRadius: 18,
+  width: 140,
+  alignItems: "center",
+},
+
 
   applyText: {
     color: "#fff",

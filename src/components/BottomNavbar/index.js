@@ -13,11 +13,11 @@ const BottomNav = ({ state, descriptors, navigation }) => {
 
         // Icons for each tab
         const icons = {
-          Workout: "home-outline",
-          Home: "barbell-outline",
+          Upcoming: "home-outline",
+          profilesection: "barbell-outline",
           
-          Tasks: "grid-outline",
-          Profile: "person-outline",
+          Session: "grid-outline",
+          profile: "person-outline",
         };
         const onPress = () => { 
           if (!isFocused) {

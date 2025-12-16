@@ -3,23 +3,19 @@ import {
   View,
   Text,
   Modal,
+  ScrollView,
   TouchableOpacity,
   Pressable,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
+import CalendarPicker from "./CalendarPicker";
+import { useNavigation } from "@react-navigation/native";
 
 const FilterModal = ({ visible, onClose }) => {
-
   const [selectedSlot, setSelectedSlot] = useState("Mon,Wed,Fri");
+  const [selectedDate, setSelectedDate] = useState("2025-12-11");
   const [selectedTime, setSelectedTime] = useState("09:45 AM");
-  const [selectedDay, setSelectedDay] = useState("11");
-  const [selectedMonth, setSelectedMonth] = useState("December");
-  const [selectedYear, setSelectedYear] = useState("2025");
-  const [openSlot, setOpenSlot] = useState(true);
-  const [openTime, setOpenTime] = useState(false);
-  const [openDate, setOpenDate] = useState(false);
-
+const navigation = useNavigation();
   const timeSlots = [
     "09:45 AM",
     "10:45 AM",
@@ -30,33 +26,28 @@ const FilterModal = ({ visible, onClose }) => {
     "04:45 PM",
   ];
 
-  const days = ["09", "10", "11", "12", "13"];
-  const months = ["October", "November", "December", "January", "February"];
-  const years = ["1999", "2000", "2025", "2002", "2003"];
-
   return (
     <Modal visible={visible} transparent animationType="slide">
+      <View style={styles.overlay}>
 
-      <Pressable style={styles.overlay} onPress={onClose}>
+        {/* MODAL BOX */}
+        <View style={styles.container}>
 
-        <Pressable style={styles.container} onPress={() => {}}>
-
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-            <Text style={styles.closeText}>✕</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.rowHeader}
-            onPress={() => setOpenSlot(!openSlot)}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           >
-            <Text style={styles.sectionTitle}>Select slot</Text>
-            <Ionicons
-              name={openSlot ? "chevron-up-outline" : "chevron-down-outline"}
-              size={20}
-            />
-          </TouchableOpacity>
 
-          {openSlot && (
+            {/* CLOSE BUTTON */}
+            <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+              <Text style={styles.closeText}>✕</Text>
+            </TouchableOpacity>
+
+            {/* SLOT SECTION */}
+            <View style={styles.rowHeader}>
+              <Text style={styles.sectionTitle}>Select Slot</Text>
+            </View>
+
             <View style={styles.slotRow}>
               {["Mon,Wed,Fri", "Tue,Thu,Sat"].map((slot) => (
                 <TouchableOpacity
@@ -79,20 +70,12 @@ const FilterModal = ({ visible, onClose }) => {
                 </TouchableOpacity>
               ))}
             </View>
-          )}
 
-          <TouchableOpacity
-            style={styles.rowHeader}
-            onPress={() => setOpenTime(!openTime)}
-          >
-            <Text style={styles.sectionTitle}>Select Time slot</Text>
-            <Ionicons
-              name={openTime ? "chevron-up-outline" : "chevron-down-outline"}
-              size={20}
-            />
-          </TouchableOpacity>
+            {/* TIME SECTION */}
+            <View style={styles.rowHeader}>
+              <Text style={styles.sectionTitle}>Select Time Slot</Text>
+            </View>
 
-          {openTime && (
             <View style={styles.timeSlotGrid}>
               {timeSlots.map((t) => (
                 <TouchableOpacity
@@ -115,79 +98,35 @@ const FilterModal = ({ visible, onClose }) => {
                 </TouchableOpacity>
               ))}
             </View>
-          )}
-
-          <TouchableOpacity
-            style={styles.rowHeader}
-            onPress={() => setOpenDate(!openDate)}
-          >
-            <Text style={styles.sectionTitle}>Select Date slot</Text>
-            <Ionicons
-              name={openDate ? "chevron-up-outline" : "chevron-down-outline"}
-              size={20}
-            />
-          </TouchableOpacity>
-
-          {openDate && (
-            <View style={styles.dateBox}>
-
-              <View style={styles.dateColumn}>
-                {days.map((d) => (
-                  <TouchableOpacity key={d} onPress={() => setSelectedDay(d)}>
-                    <Text
-                      style={
-                        selectedDay === d
-                          ? styles.dateItemBold
-                          : styles.dateItem
-                      }
-                    >
-                      {d}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
-              <View style={styles.dateColumn}>
-                {months.map((m) => (
-                  <TouchableOpacity key={m} onPress={() => setSelectedMonth(m)}>
-                    <Text
-                      style={
-                        selectedMonth === m
-                          ? styles.dateItemBold
-                          : styles.dateItem
-                      }
-                    >
-                      {m}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
-              <View style={styles.dateColumn}>
-                {years.map((y) => (
-                  <TouchableOpacity key={y} onPress={() => setSelectedYear(y)}>
-                    <Text
-                      style={
-                        selectedYear === y
-                          ? styles.dateItemBold
-                          : styles.dateItem
-                      }
-                    >
-                      {y}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
+    </ScrollView>
+            {/* DATE SECTION */}
+            <View style={styles.rowHeader}>
+              <Text style={styles.sectionTitle}>Select Date Slot</Text>
             </View>
-          )}
 
-          <TouchableOpacity style={styles.applyBtn}>
-            <Text style={styles.applyText}>Apply filter →</Text>
-          </TouchableOpacity>
+            <CalendarPicker
+              selectedDate={selectedDate}
+              onSelect={(d) => setSelectedDate(d)}
+            />
 
-        </Pressable>
-      </Pressable>
+             <View style={styles.applyWrapper}>
+      <TouchableOpacity
+        style={styles.applyBtn}
+        onPress={() => navigation.navigate("TrainerList")} 
+      >
+        <Text style={styles.applyText}>Apply filter →</Text>
+      </TouchableOpacity>
+    </View>
+
+
+      
+
+        </View>
+
+        {/* OUTSIDE TAP CLOSES MODAL */}
+        <Pressable style={styles.backdrop} onPress={onClose} />
+
+      </View>
     </Modal>
   );
 };

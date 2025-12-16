@@ -2,14 +2,20 @@ import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
+import { useNavigation } from "@react-navigation/native";
 
-const TrainerCard = ({ trainer }) => {
+const TrainerCard = ({ trainer, onBookNow }) => {
+    const navigation = useNavigation();
+
   return (
     <View style={styles.card}>
       <View>
         <Image source={trainer.image} style={styles.trainerImg} />
 
-        <TouchableOpacity style={styles.viewProfileBtn}>
+        <TouchableOpacity
+          style={styles.viewProfileBtn}
+          onPress={() => navigation.navigate("TrainerDetail", { trainer })}
+        >
           <Text style={styles.viewProfileText}>View Profile</Text>
         </TouchableOpacity>
       </View>
@@ -27,7 +33,7 @@ const TrainerCard = ({ trainer }) => {
             <Text style={styles.rating}>{trainer.rating}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.bookBtn}>
+        <TouchableOpacity onPress={onBookNow} style={styles.bookBtn}>
           <Text style={styles.bookText}>Book Now</Text>
         </TouchableOpacity>
       </View>

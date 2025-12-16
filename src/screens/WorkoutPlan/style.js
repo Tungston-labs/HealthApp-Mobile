@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     paddingHorizontal: 2,
-    marginTop: 20,
+    marginTop: 10,
   },
 
   imageBox: {

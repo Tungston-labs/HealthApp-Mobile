@@ -1,23 +1,33 @@
-// components/HeaderWithBackStyle.js
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-  headercontainer: {
-    display: "flex",
-    flexDirection: "row",
-    marginTop: 32,
-  },
+ headercontainer: {
+  flexDirection: "row",
+  marginTop: 42,
+  alignItems: "flex-start",   
+},
 
-  backButton: {
-  },
+backButton: {
+  paddingTop: 4,              
+},
 
-  title: {
-    fontFamily: "Segoe UI",
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#000",
-    marginLeft: 10,
+titleContainer: {
+  flex: 1,
+  flexDirection: "column",
+  marginLeft: 10,
+},
 
-    flex: 1,
-  },
+title: {
+  fontFamily: "Segoe UI",
+  fontSize: 24,
+  fontWeight: "700",
+  color: "#000",
+},
+
+subtitle: {
+  fontSize: 14,
+  color: "#000",
+  marginTop: 2,
+},
+
 });

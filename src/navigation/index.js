@@ -9,18 +9,18 @@ import ResetPasswordScreen from '../screens/ResetPassword';
 import SelectRoleScreen from '../screens/SelectRoleScreen';
 import SignupDetailsScreenUser from '../screens/SignupDetailsScreen-user';
 import MainWizardScreen from '../screens/onboarding/MainWizardScreen/MainWizardScreen';
-
+import EditProfileScreen from "../screens/EditProfileScreen"
 import NotificationScreen from "../screens/NotificationScreen"
 import AppNavigator from './AppNavigator';
 import TrainerListScreen from "../screens/TrainerList";
-import TrainerDetailScreen from "../screens/TrainerSingleView"
+import TrainerDetailScreen from "../screens/TrainerSingleView";
+import PaymentScreen from "../screens/PaymentScreen";
 import Welcome from '../screens/WelcomeScreens';
 import BMIResultScreen from '../screens/BMIResultScreen';
+import WorkoutPlan from '../screens/WorkoutPlan';
 import CreateAccount from '../screens/CreateAccountScreen';
 import ThankYouScreen from '../screens/ThankYouScreen';
 import ScheduleEmpty from '../screens/ScheduleEmpty';
-
-
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
@@ -34,6 +34,7 @@ export default function Navigation() {
         <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen}  />
         <Stack.Screen name="SelectRoleScreen" component={SelectRoleScreen}  />
         <Stack.Screen name="SignupDetailsScreenUser" component={SignupDetailsScreenUser}  />
+
         <Stack.Screen
           name="MainWizardScreen"
           component={MainWizardScreen}
@@ -50,11 +51,25 @@ export default function Navigation() {
           component={AppNavigator}
           
         />
+            <Stack.Screen 
+          name="workout" 
+          component={WorkoutPlan} 
+        
+        />
            <Stack.Screen 
           name="TrainerList" 
-          component={TrainerListScreen}
- 
+          component={TrainerListScreen} 
         
+        />
+        <Stack.Screen
+          name="EditProfile"
+          component={EditProfileScreen}
+          
+        />
+         <Stack.Screen
+          name="Payment"
+          component={PaymentScreen}
+          
         />
         <Stack.Screen
           name="TrainerDetail"
