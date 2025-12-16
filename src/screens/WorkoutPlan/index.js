@@ -65,7 +65,6 @@ const WorkoutPlan = ({ navigation }) => {
                 </View>
             </ScrollView>
 
-            {/* Filter Modal */}
             <FilterModal
                 visible={showModal}
                 onClose={() => setShowModal(false)}

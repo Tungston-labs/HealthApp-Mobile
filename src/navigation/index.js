@@ -16,6 +16,9 @@ import TrainerListScreen from "../screens/TrainerList";
 import TrainerDetailScreen from "../screens/TrainerSingleView"
 import Welcome from '../screens/WelcomeScreens';
 import BMIResultScreen from '../screens/BMIResultScreen';
+import CreateAccount from '../screens/CreateAccountScreen';
+import ThankYouScreen from '../screens/ThankYouScreen';
+import ScheduleEmpty from '../screens/ScheduleEmpty';
 
 
 const Stack = createNativeStackNavigator();
@@ -66,6 +69,21 @@ export default function Navigation() {
         <Stack.Screen
           name="BMIResultScreen"
           component={BMIResultScreen}
+          
+        />
+        <Stack.Screen
+          name="CreateAccount"
+          component={CreateAccount}
+          
+        />
+        <Stack.Screen
+          name="ThankYouScreen"
+          component={ThankYouScreen}
+          
+        />
+        <Stack.Screen
+          name="ScheduleEmpty"
+          component={ScheduleEmpty}
           
         />
       </Stack.Navigator>

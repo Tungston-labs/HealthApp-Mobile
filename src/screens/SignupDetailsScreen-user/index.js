@@ -115,7 +115,7 @@ export default function SignupDetailsScreenUser() {
       <View style={styles.continueFixed}>
         <TouchableOpacity
           style={styles.continueBtn}
-          onPress={() => navigation.navigate("MainWizardScreen")}   // 👈 ADDED
+          onPress={() => navigation.navigate("MainWizardScreen")}   
         >
           <Text style={styles.continueText}>Continue</Text>
           <Ionicons

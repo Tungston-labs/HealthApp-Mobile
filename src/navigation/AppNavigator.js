@@ -18,7 +18,6 @@ const AppNavigator = () => {
             screenOptions={{ headerShown: false }}
         >
             <Tab.Screen name="Workout" component={WorkoutScreen} />
-
             <Tab.Screen name="Home" component={HomeScreen} />
             <Tab.Screen name="Tasks" component={TasksScreen} />
             <Tab.Screen name="Profile" component={ProfileScreen} />
