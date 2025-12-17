@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, SafeAreaView } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import styles from "./style";
 
 export default function ThankYouScreen() {
   const [showVerified, setShowVerified] = useState(false);
+  const navigation = useNavigation();
 
-  // Switch to verified UI after 2 seconds
+  // Step 1: Show verified screen after 2 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowVerified(true);
@@ -14,13 +16,20 @@ export default function ThankYouScreen() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Step 2: Move to Trainer tab after 1 second
+  useEffect(() => {
+    if (showVerified) {
+      const navTimer = setTimeout(() => {
+        navigation.replace("TrainerNavigator");
+      }, 1000);
+
+      return () => clearTimeout(navTimer);
+    }
+  }, [showVerified, navigation]);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.innerWrapper}>
-
-        {/* --------------------------------------------- */}
-        {/* SHOW THANK YOU SCREEN (FIRST 2 SECONDS) */}
-        {/* --------------------------------------------- */}
         {!showVerified && (
           <>
             <Image
@@ -32,19 +41,16 @@ export default function ThankYouScreen() {
 
             <Text style={styles.description}>
               Your account is under review and will Be{"\n"}
-              verified within <Text style={styles.boldText}>24 hours.</Text> Please
-              check back later.
+              verified within <Text style={styles.boldText}>24 hours.</Text>{" "}
+              Please check back later.
             </Text>
           </>
         )}
 
-        {/* --------------------------------------------- */}
-        {/* SHOW VERIFIED SCREEN AFTER 2 SECONDS */}
-        {/* --------------------------------------------- */}
         {showVerified && (
           <>
             <Image
-              source={require("../../Images/verified.png")} 
+              source={require("../../Images/verified.png")}
               style={styles.clockImage}
             />
 
@@ -57,7 +63,6 @@ export default function ThankYouScreen() {
             </Text>
           </>
         )}
-
       </View>
     </SafeAreaView>
   );
