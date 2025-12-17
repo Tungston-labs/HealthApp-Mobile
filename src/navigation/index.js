@@ -19,10 +19,11 @@ import Welcome from '../screens/WelcomeScreens';
 import BMIResultScreen from '../screens/BMIResultScreen';
 import WorkoutPlan from '../screens/WorkoutPlan';
 const Stack = createNativeStackNavigator();
+import { navigationRef } from "./navigationService";
 
 export default function Navigation() {
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Welcome">
 
         <Stack.Screen name="Login" component={LoginScreen}  />

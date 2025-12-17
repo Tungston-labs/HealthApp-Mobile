@@ -8,23 +8,22 @@ import GoalScreen from "../GoalScreen";
 import ConditionScreen from "../ConditionScreen";
 import WeightScreen from "../WeightScreen";
 import HeightScreen from "../HeightScreen";
+import { useSelector } from "react-redux";
 
 export default function MainWizardScreen() {
   const navigation = useNavigation();
   const [step, setStep] = useState(1);
-  const [gender, setGender] = useState(null);
+  const registration = useSelector(state => state.registration);
 
   const getScreenContent = () => {
     switch (step) {
       case 1:
         return (
           <GenderScreen
-            selectedGender={gender}
-            onSelectGender={(value) => {
-              setGender(value);
-              setStep(2);
-            }}
+            selectedGender={registration.gender}
+            onSelectGender={() => setStep(2)}
           />
+
         );
       case 2:
         return <AgeScreen />;
@@ -66,19 +65,69 @@ export default function MainWizardScreen() {
 
   const handleBack = () => {
     if (step === 1) {
-      navigation.goBack(); 
+      navigation.goBack();
     } else {
       setStep(step - 1);
     }
   };
+const handleNext = () => {
+  const reg = registration; // alias for clarity
 
-  const handleNext = () => {
-    if (step === 7) {
-      navigation.navigate("BMIResultScreen"); 
-    } else {
-      setStep(step + 1);
-    }
-  };
+  switch (step) {
+    case 1:
+      if (!reg.gender) {
+        alert("Select gender");
+        return;
+      }
+      break;
+
+    case 2:
+      if (!reg.age) {
+        alert("Select age");
+        return;
+      }
+      break;
+
+    case 3:
+      if (!reg.blood_group) {
+        alert("Select blood group");
+        return;
+      }
+      break;
+
+    case 4:
+      if (!reg.wellness_goal) {
+        alert("Select a goal");
+        return;
+      }
+      break;
+
+    case 5:
+      if (!reg.health_issues || reg.health_issues.length === 0) {
+        alert("Select at least one condition");
+        return;
+      }
+      break;
+
+    case 6:
+      if (!reg.weight) {
+        alert("Select weight");
+        return;
+      }
+      break;
+
+    default:
+      break;
+  }
+
+  if (step === 7) {
+    navigation.navigate("BMIResultScreen");
+  } else {
+    setStep(prev => prev + 1);
+  }
+};
+
+
 
   return (
     <MainLayout
