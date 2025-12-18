@@ -84,9 +84,8 @@ const buildRegisterPayload = (data) => ({
     ? data.health_issues[0] || "Other"
     : data.health_issues || "Other",
 
-  address: data.address
-    ? `${data.address.address}, ${data.address.landmark}, ${data.address.city} - ${data.address.pincode}`
-    : "",
+address: `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`,
+
 });
 
 

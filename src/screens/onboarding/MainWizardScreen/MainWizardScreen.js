@@ -71,7 +71,7 @@ export default function MainWizardScreen() {
     }
   };
 const handleNext = () => {
-  const reg = registration; // alias for clarity
+  const reg = registration;
 
   switch (step) {
     case 1:

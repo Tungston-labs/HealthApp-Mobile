@@ -18,7 +18,7 @@ export default function AgeScreen() {
 
   const ITEM_HEIGHT = 40;
   const VISIBLE_ITEMS = 5; 
-  const PADDING = (VISIBLE_ITEMS - 1) / 2 * ITEM_HEIGHT; // top & bottom
+  const PADDING = (VISIBLE_ITEMS - 1) / 2 * ITEM_HEIGHT;
 
   const [age, setAge] = useState(0);
 

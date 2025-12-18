@@ -46,7 +46,6 @@ const EditProfile = ({ navigation }) => {
         }}
       />
 
-      {/* Background curve: same params as ProfileScreen so the start position aligns */}
       <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
 
       <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: 0 }}>
@@ -57,7 +56,6 @@ const EditProfile = ({ navigation }) => {
           onBack={() => navigation.goBack()}
         />
 
-        {/* Use the same white-card styling so spacing/padding match the ProfileScreen */}
         <View style={styles.optionsWrapper}>
           <View style={styles.formWrapper}>
             <Text style={styles.label}>Name</Text>

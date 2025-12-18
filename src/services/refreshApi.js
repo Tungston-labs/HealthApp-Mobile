@@ -1,4 +1,3 @@
-// api/refreshApi.js
 import axios from "axios";
 
 const refreshApi = axios.create({

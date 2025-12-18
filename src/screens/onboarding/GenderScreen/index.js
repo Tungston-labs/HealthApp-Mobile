@@ -1,9 +1,19 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import styles from "./style";
+import { useDispatch, useSelector } from "react-redux";
+import { updateRegistration } from "../../../redux/slices/registrationSlice";
 
-export default function GenderScreen({ selectedGender, onSelectGender }) {
-  return (
+export default function GenderScreen({ onSelectGender }) {
+  const dispatch = useDispatch();
+  const selectedGender = useSelector(
+    (state) => state.registration.gender
+  );
+
+  const selectGender = (value) => {
+    dispatch(updateRegistration({ gender: value }));
+    onSelectGender?.(); // move to next step
+  };  return (
     <View style={styles.container}>
       
       <TouchableOpacity

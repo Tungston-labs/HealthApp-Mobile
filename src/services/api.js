@@ -34,7 +34,6 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
-// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -55,7 +54,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refresh = await getRefreshToken(); // Await here
+        const refresh = await getRefreshToken(); 
         if (!refresh) throw new Error("No refresh token");
 
         const res = await refreshApi.post("auth/token/refresh/", {
@@ -63,7 +62,7 @@ api.interceptors.response.use(
         });
 
         const newAccessToken = res.data.access;
-        await setAccessToken(newAccessToken); // Await here
+        await setAccessToken(newAccessToken); 
 
         api.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
         processQueue(null, newAccessToken);
