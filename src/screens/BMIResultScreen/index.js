@@ -78,11 +78,13 @@ const buildRegisterPayload = (data) => ({
   height: data.height?.toString(),
   weight: data.weight?.toString(),
 
-  wellness_goal: data.wellness_goal || "Other",
-
   health_issues: Array.isArray(data.health_issues)
-    ? data.health_issues[0] || "Other"
-    : data.health_issues || "Other",
+    ? data.health_issues
+    : [],
+
+  wellness_goal: Array.isArray(data.wellness_goal)
+    ? data.wellness_goal
+    : [],
 
 address: `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`,
 
@@ -108,28 +110,32 @@ address: `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${
   };
 
 
-  useEffect(() => {
-    if (registered) {
-      dispatch(resetRegistration());
-      dispatch(resetClientState());
+useEffect(() => {
+  if (registered) {
+    dispatch(resetRegistration());
+    dispatch(resetClientState());
 
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "workout" }],
-      });
-    }
-  }, [registered]);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "workout" }],
+    });
+  }
+}, [registered, dispatch, navigation]);
 
-  useEffect(() => {
-    if (error) {
-      const message =
-        typeof error === "string"
-          ? error
-          : error.message || "Registration failed";
 
-      Alert.alert("Registration failed", message);
-    }
-  }, [error]);
+
+useEffect(() => {
+  if (error && !registered) {
+    const message =
+      typeof error === "string"
+        ? error
+        : error.message || "Registration failed";
+
+    Alert.alert("Registration failed", message);
+  }
+}, [error, registered]);
+
+
 
 
 
@@ -270,3 +276,4 @@ address: `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${
     </View>
   );
 }
+  

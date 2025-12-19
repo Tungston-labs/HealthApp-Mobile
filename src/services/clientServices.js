@@ -1,6 +1,6 @@
 import api from "./api";
 
-export const registerClient = (data) =>
+export const registerClientApi = (data) =>
   api.post("client/register/", data);
 
 export const getClientProfile = () =>

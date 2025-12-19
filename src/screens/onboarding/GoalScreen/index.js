@@ -6,8 +6,9 @@ import { updateRegistration } from "../../../redux/slices/registrationSlice";
 
 export default function GoalScreen() {
   const dispatch = useDispatch();
+
   const selected = useSelector(
-    (state) => state.registration.wellness_goal
+    (state) => state.registration.wellness_goal || []
   );
 
   const goalGroups = [
@@ -20,8 +21,12 @@ export default function GoalScreen() {
     "Sleep better",
   ];
 
-  const selectGoal = (goal) => {
-    dispatch(updateRegistration({ wellness_goal: goal }));
+  const toggleGoal = (goal) => {
+    const updated = selected.includes(goal)
+      ? selected.filter((g) => g !== goal)
+      : [...selected, goal];
+
+    dispatch(updateRegistration({ wellness_goal: updated }));
   };
 
   return (
@@ -29,22 +34,26 @@ export default function GoalScreen() {
       <FlatList
         data={goalGroups}
         keyExtractor={(item) => item}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[
-              styles.card,
-              selected === item && styles.cardActive,
-            ]}
-            onPress={() => selectGoal(item)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.label}>{item}</Text>
+        renderItem={({ item }) => {
+          const isSelected = selected.includes(item);
 
-            <View style={styles.radioOuter}>
-              {selected === item && <View style={styles.radioInner} />}
-            </View>
-          </TouchableOpacity>
-        )}
+          return (
+            <TouchableOpacity
+              style={[
+                styles.card,
+                isSelected && styles.cardActive,
+              ]}
+              onPress={() => toggleGoal(item)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.label}>{item}</Text>
+
+              <View style={styles.radioOuter}>
+                {isSelected && <View style={styles.radioInner} />}
+              </View>
+            </TouchableOpacity>
+          );
+        }}
       />
     </View>
   );
