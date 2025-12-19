@@ -39,4 +39,31 @@ export default StyleSheet.create({
     fontWeight: "600",
     marginBottom: 12,
   },
+
+  /* 🔹 EMPTY STATE STYLES */
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 40,
+  },
+
+  emptyImage: {
+    width: 220,
+    height: 220,
+    marginBottom: 20,
+  },
+
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 6,
+  },
+
+  emptySubText: {
+    fontSize: 13,
+    color: "#777",
+    textAlign: "center",
+    lineHeight: 18,
+  },
 });

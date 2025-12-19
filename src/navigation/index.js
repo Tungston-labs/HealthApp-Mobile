@@ -24,6 +24,7 @@ import ScheduleEmpty from '../screens/ScheduleEmpty';
 import TermsAndConditions from '../screens/TermsAndConditionsScreen';
 import TrainerNavigator from './TrainerNavigator';
 import TrainerScheduleDetail from '../screens/TrainerScheduledetails';
+import TrainerEditProfile from '../screens/TrainerEditprofile';
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
@@ -116,6 +117,11 @@ export default function Navigation() {
         <Stack.Screen
           name="TrainerScheduleDetail"
           component={TrainerScheduleDetail}
+
+        />
+        <Stack.Screen
+          name="TrainerEditProfile"
+          component={TrainerEditProfile}
 
         />
       </Stack.Navigator>
