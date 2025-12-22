@@ -1,77 +1,81 @@
 import React, { useState } from 'react';
-import { View, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import Header from '../../components/Header';
 import styles from './style';
-import FilterModal from '../../components/FIlterModal/index';
+import FilterModal from '../../components/FIlterModal';
+import PlanCard from './PlanCard';
 
 const WorkoutPlan = ({ navigation }) => {
+  const [showModal, setShowModal] = useState(false);
 
-    const [showModal, setShowModal] = useState(false);
+  // Temporary static data (matches Django model)
+  const plans = [
+    {
+      id: 1,
+      plan_name: 'Swimming',
+      plan_type: '3_days',
+      single_price: 499,
+      image: require('../../../assets/swimming1.jpeg'),
+    },
+    {
+      id: 2,
+      plan_name: 'Gym Workout',
+      plan_type: '6_days',
+      single_price: 999,
+      image: require('../../../assets/gym.png'),
+    },
+    {
+      id: 3,
+      plan_name: 'Cycling',
+      plan_type: '3_days',
+      single_price: 399,
+      image: require('../../../assets/cycling.png'),
+    },
+    {
+      id: 4,
+      plan_name: 'Zumba',
+      plan_type: '6_days',
+      single_price: 799,
+      image: require('../../../assets/swimming2.png'),
+    },
+    {
+      id: 5,
+      plan_name: 'Boxing',
+      plan_type: '3_days',
+      single_price: 599,
+      image: require('../../../assets/boxing1.jpg'),
+    },
+  ];
 
-    return (
-        <>
-            <ScrollView style={styles.container}>
+  return (
+    <>
+<ScrollView
+  style={styles.container}
+  keyboardShouldPersistTaps="handled"
+>
+        <Header
+          username="Ajay"
+          subtitle="Your workout plans"
+          onNotificationPress={() => navigation.navigate('Notifications')}
+        />
 
-                {/* Header */}
-                <Header
-                    username="Ajay"
-                    subtitle="Your workout plans"
-                    onNotificationPress={() => navigation.navigate("Notifications")}
-                />
-
-                {/* Image Grid */}
-                <View style={styles.gridContainer}>
-
-                    <TouchableOpacity onPress={() => setShowModal(true)}>
-                        <Image
-                            source={require("../../../assets/swimming.png")}
-                            style={styles.imageBox}
-                            resizeMode="contain"
-                        />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => setShowModal(true)}>
-                        <Image
-                            source={require("../../../assets/gym.png")}
-                            style={styles.imageBox}
-                            resizeMode="contain"
-                        />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => setShowModal(true)}>
-                        <Image
-                            source={require("../../../assets/cycling.png")}
-                            style={styles.imageBox}
-                            resizeMode="contain"
-                        />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => setShowModal(true)}>
-                        <Image
-                            source={require("../../../assets/zumba.png")}
-                            style={styles.imageBox}
-                            resizeMode="contain"
-                        />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => setShowModal(true)}>
-                        <Image
-                            source={require("../../../assets/boxing.png")}
-                            style={styles.imageBox}
-                            resizeMode="contain"
-                        />
-                    </TouchableOpacity>
-
-                </View>
-            </ScrollView>
-
-            {/* Filter Modal */}
-            <FilterModal
-                visible={showModal}
-                onClose={() => setShowModal(false)}
+        <View style={styles.gridContainer}>
+          {plans.map(item => (
+            <PlanCard
+              key={item.id}
+              item={item}
+              onPress={() => {
+                console.log('CARD PRESSED');
+                setShowModal(true);
+              }}
             />
-        </>
-    );
+          ))}
+        </View>
+      </ScrollView>
+
+      <FilterModal visible={showModal} onClose={() => setShowModal(false)} />
+    </>
+  );
 };
 
 export default WorkoutPlan;

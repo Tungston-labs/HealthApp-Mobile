@@ -9,7 +9,7 @@ export const logoutApi = (refresh) =>
 export const refreshTokenApi = (refresh) =>
   api.post("auth/token/refresh/", { refresh });
 
-export const forgotPasswordStep1 = (payload) =>
+export const forgotPasswordStep = (payload) =>
   api.post("auth/forgot-password/step1/", payload);
 
 export const verifyOtp = (payload) =>

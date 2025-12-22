@@ -1,20 +1,31 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { loginApi } from "../../services/authServices";
 import { setToken } from "../../storage/asyncStorage";
-
+                                     
 export const loginClientThunk = createAsyncThunk(
   "auth/login",
   async (payload, { rejectWithValue }) => {
     try {
       const res = await loginApi(payload);
+
+      console.log("LOGIN STATUS ", res.status);
+      console.log("LOGIN DATA ", res.data);
+
       return res.data;
     } catch (err) {
+      console.log("LOGIN ERROR STATUS ", err?.response?.status);
+      console.log("LOGIN ERROR DATA ", err?.response?.data);
+
       return rejectWithValue(
-        err.response?.data?.message || "Login failed"
-      );
+  err?.response?.data?.email_or_phno?.[0] ||
+  err?.response?.data?.detail ||
+  "Invalid email or password"
+);
+
     }
   }
 );
+
 
 const authSlice = createSlice({
   name: "auth",

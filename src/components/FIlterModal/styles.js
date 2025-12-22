@@ -13,6 +13,10 @@ export default StyleSheet.create({
     borderRadius: 25,
     padding: 10,
   },
+  backdrop: {
+  ...StyleSheet.absoluteFillObject,
+},
+
 
   closeBtn: {
     position: "absolute",

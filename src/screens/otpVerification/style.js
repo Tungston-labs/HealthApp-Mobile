@@ -2,7 +2,7 @@ import { StyleSheet, Dimensions } from "react-native";
 const { width } = Dimensions.get("window");
 
 const scale = width / 375;   
-const boxSize = width * 0.13;
+const boxSize = width * 0.11;
 
 export default StyleSheet.create({
   container: {
@@ -31,24 +31,26 @@ export default StyleSheet.create({
     paddingHorizontal: 30,
   },
 
-  otpContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 40,
-  },
+otpContainer: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  marginTop: 40,
+  paddingHorizontal: 30, // padding from screen edges
+},
+otpBox: {
+  flex: 1,
+  marginHorizontal: 5,
+  height: boxSize + 20,
+  borderWidth: 2,
+  borderColor: "#000000",
+  borderRadius: 16,
+  textAlign: "center",
+  fontSize: 20,
+  color: "#000000",
+  backgroundColor: "#FFFFFF",
+  maxWidth: 50, // optional cap so boxes don't get too big
+},
 
-  otpBox: {
-    width: boxSize,
-    height: boxSize + 20, 
-    borderWidth: 2,
-    borderColor: "#000000",
-    borderRadius: 16,
-    marginHorizontal: 8,
-    textAlign: "center",
-    fontSize: 20,
-    color: "#000000",
-    backgroundColor: "#FFFFFF",
-  },
 
   submitBtn: {
     flexDirection: "row",
@@ -61,7 +63,7 @@ export default StyleSheet.create({
 
     alignSelf: "flex-end",     
     marginRight: 30,          
-    marginTop: 40,
+    marginTop: 20,
 
     elevation: 6,
     shadowColor: "#000",
