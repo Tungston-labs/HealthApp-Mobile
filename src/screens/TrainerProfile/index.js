@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import ProfileHeader from "../../components/ProfileHeader";
-import styles from "./styles";
+import styles from "./style";
 
 import { launchImageLibrary } from "react-native-image-picker";
 
@@ -18,10 +18,9 @@ import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
 // Modal
 import CommonActionModal from "../../components/ModalComponents";
 
-const ProfileScreen = ({ navigation }) => {
+const ProfileScreenTrainer = ({ navigation }) => {
   const userImg = require("../../../assets/trainer2.jpg");
   const [profileImage, setProfileImage] = useState(userImg);
-
   const [logoutVisible, setLogoutVisible] = useState(false);
 
   const handlePickImage = () => {
@@ -107,4 +106,4 @@ const ProfileScreen = ({ navigation }) => {
   );
 };
 
-export default ProfileScreen;
+export default ProfileScreenTrainer;

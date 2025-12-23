@@ -235,17 +235,17 @@ useEffect(() => {
               <View style={styles.legendItem}>
                 <View style={[styles.legendColor, { backgroundColor: "#84CDEE" }]} />
                 <Text style={styles.legendLabel}>Under Weight :</Text>
-                <Text style={styles.legendValue}>&lt; 18.5</Text>
+                <Text style={styles.legendValue}> 18.5</Text>
               </View>
 
               <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: "#78B060" }]} />
+                <View style={[styles.legendColor, { backgroundColor: "#FFDF32" }]} />
                 <Text style={styles.legendLabel}>Normal Weight :</Text>
                 <Text style={styles.legendValue}>18.5 - 24.9</Text>
               </View>
 
               <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: "#FFDF32" }]} />
+                <View style={[styles.legendColor, { backgroundColor: "#78B060" }]} />
                 <Text style={styles.legendLabel}>Over Weight :</Text>
                 <Text style={styles.legendValue}>25 - 29.9</Text>
               </View>
