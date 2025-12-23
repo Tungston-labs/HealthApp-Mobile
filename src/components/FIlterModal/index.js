@@ -42,7 +42,15 @@ const navigation = useNavigation();
             <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
               <Text style={styles.closeText}>✕</Text>
             </TouchableOpacity>
+            {/* DATE SECTION */}
+            <View style={styles.rowHeader}>
+              <Text style={styles.sectionTitle}>Select Date Slot</Text>
+            </View>
 
+            <CalendarPicker
+              selectedDate={selectedDate}
+              onSelect={(d) => setSelectedDate(d)}
+            />
             {/* SLOT SECTION */}
             <View style={styles.rowHeader}>
               <Text style={styles.sectionTitle}>Select Slot</Text>
@@ -99,15 +107,7 @@ const navigation = useNavigation();
               ))}
             </View>
     </ScrollView>
-            {/* DATE SECTION */}
-            <View style={styles.rowHeader}>
-              <Text style={styles.sectionTitle}>Select Date Slot</Text>
-            </View>
-
-            <CalendarPicker
-              selectedDate={selectedDate}
-              onSelect={(d) => setSelectedDate(d)}
-            />
+            
 
              <View style={styles.applyWrapper}>
       <TouchableOpacity
@@ -123,8 +123,6 @@ const navigation = useNavigation();
 
         </View>
 
-        {/* OUTSIDE TAP CLOSES MODAL */}
-        <Pressable style={styles.backdrop} onPress={onClose} />
 
       </View>
     </Modal>

@@ -13,10 +13,6 @@ export default StyleSheet.create({
     borderRadius: 25,
     padding: 10,
   },
-  backdrop: {
-  ...StyleSheet.absoluteFillObject,
-},
-
 
   closeBtn: {
     position: "absolute",
@@ -36,7 +32,7 @@ export default StyleSheet.create({
   sectionTitle: {
     fontFamily: "Segoe UI",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     marginTop: 20,
     marginBottom: 10,
   },
@@ -139,8 +135,6 @@ applyBtn: {
   width: 140,
   alignItems: "center",
 },
-
-
   applyText: {
     color: "#fff",
     fontSize: 16,

@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "./api";
 
 export const registerClientApi = (data) =>
@@ -14,3 +15,17 @@ export const listClients = (planId) =>
 
 export const dashboardCounts = () =>
   api.get("client/dashboard/counts/");
+export const planList = async () => {
+  const token = await AsyncStorage.getItem("access_token");
+
+
+  return api.get(
+    "plan/clientlist/",
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};

@@ -1,22 +1,14 @@
-// screens/WorkoutPlan/PlanCard.js
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import styles from "./style";
 
 const PlanCard = ({ item, onPress }) => {
   return (
- <TouchableOpacity
-  activeOpacity={0.9}
-  style={styles.card}
-  onPress={onPress}
->
-      {/* Background Image */}
+    <TouchableOpacity style={styles.card} onPress={onPress}>
       <Image
-        source={item.image}
+        source={{ uri: item.upload_file }}
         style={styles.cardImage}
         resizeMode="cover"
-          pointerEvents="none"
-
       />
 
       <View style={styles.overlay} />

@@ -5,6 +5,7 @@ import registrationReducer from './slices/registrationSlice';
 import ForgotPasswordReducer from './slices/forgotPasswordSlice';
 import VerifyOtpReducer from './slices/verifyOtpSlice';
 import ResetPasswordReducer from "./slices/resetPasswordSlice";
+import PlanReducer from "./slices/planSlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -13,5 +14,6 @@ export const store = configureStore({
     forgotpassword: ForgotPasswordReducer,
     verifyotp: VerifyOtpReducer,
     resetpassword:ResetPasswordReducer,
+    planList:PlanReducer,
   },
 });

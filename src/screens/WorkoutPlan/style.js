@@ -24,7 +24,6 @@ export default StyleSheet.create({
     borderRadius: 18,
     marginBottom: 16,
     overflow: "hidden",
-
     shadowColor: "#000",
     shadowOpacity: 0.12,
     shadowRadius: 8,

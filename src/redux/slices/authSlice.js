@@ -1,34 +1,32 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginApi } from "../../services/authServices";
-import { setToken } from "../../storage/asyncStorage";
-                                     
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { loginApi } from '../../services/authServices';
+import { setToken } from '../../storage/asyncStorage';
+
 export const loginClientThunk = createAsyncThunk(
-  "auth/login",
+  'auth/login',
   async (payload, { rejectWithValue }) => {
     try {
       const res = await loginApi(payload);
 
-      console.log("LOGIN STATUS ", res.status);
-      console.log("LOGIN DATA ", res.data);
+      console.log('LOGIN STATUS ', res.status);
+      console.log('LOGIN DATA ', res.data);
 
       return res.data;
     } catch (err) {
-      console.log("LOGIN ERROR STATUS ", err?.response?.status);
-      console.log("LOGIN ERROR DATA ", err?.response?.data);
+      console.log('LOGIN ERROR STATUS ', err?.response?.status);
+      console.log('LOGIN ERROR DATA ', err?.response?.data);
 
       return rejectWithValue(
-  err?.response?.data?.email_or_phno?.[0] ||
-  err?.response?.data?.detail ||
-  "Invalid email or password"
-);
-
+        err?.response?.data?.email_or_phno?.[0] ||
+          err?.response?.data?.detail ||
+          'Invalid email or password',
+      );
     }
-  }
+  },
 );
-
 
 const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState: {
     loading: false,
     isLoggedIn: false,
@@ -36,18 +34,18 @@ const authSlice = createSlice({
     error: null,
   },
   reducers: {
-    resetAuthState: (state) => {
+    resetAuthState: state => {
       state.loading = false;
       state.error = null;
     },
-    logout: (state) => {
+    logout: state => {
       state.isLoggedIn = false;
       state.user = null;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
-      .addCase(loginClientThunk.pending, (state) => {
+      .addCase(loginClientThunk.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -56,11 +54,15 @@ const authSlice = createSlice({
         state.isLoggedIn = true;
         state.user = action.payload?.user;
 
-        const token = action.payload?.token;
-        if (token) {
-          setToken(token.access, token.refresh);
+        const access = action.payload?.access;
+        const refresh = action.payload?.refresh;
+
+        if (access) {
+          setToken(access, refresh);
+          console.log('🟢 TOKEN SAVED FROM SLICE');
         }
       })
+
       .addCase(loginClientThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
