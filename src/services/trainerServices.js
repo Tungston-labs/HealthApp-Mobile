@@ -1,5 +1,12 @@
 import api from "./api";
 
+
+export const registerTrainerApi = (payload) => {
+  return api.post("trainer/", payload, {
+    skipAuth: true, 
+  });
+};
+
 export const getTrainerProfile = () =>
   api.get("trainer/profile/");
 

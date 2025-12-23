@@ -11,11 +11,6 @@ export const registerClientThunk = createAsyncThunk(
 
             return res.data;
         } catch (err) {
-            console.log("AXIOS FULL ERROR 👉", err);
-            console.log("AXIOS MESSAGE 👉", err.message);
-            console.log("AXIOS CONFIG 👉", err.config);
-            console.log("AXIOS REQUEST 👉", err.request);
-
             return rejectWithValue(err.response?.data || "Registration failed");
         }
     }

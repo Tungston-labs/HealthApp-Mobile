@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,37 +7,57 @@ import {
   SafeAreaView,
   ScrollView,
   Alert,
-} from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native";
-import { useDispatch, useSelector } from "react-redux";
-import { updateRegistration } from "../../redux/slices/registrationSlice";
-import styles from "./style";
+} from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateRegistration } from '../../redux/slices/registrationSlice';
+import styles from './style';
+import { getCurrentLocation } from '../../utils/location';
+import { reverseGeocode } from '../../utils/reverseGeocode';
 
 export default function SignupDetailsScreenUser() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const registration = useSelector((state) => state.registration);
+  const registration = useSelector(state => state.registration);
 
   const [showLocationFields, setShowLocationFields] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-
-  /** ✅ single handler */
-  const handleChange = (field) => (value) => {
+  const [location, setLocation] = useState('');
+  const handleChange = field => value => {
     dispatch(updateRegistration({ [field]: value }));
   };
 
-  /** ✅ validation reads Redux state */
   const handleContinue = () => {
     const { name, email, phno, password } = registration;
 
     if (!name || !email || !phno || !password) {
-      Alert.alert("Missing details", "Please fill all required fields");
+      Alert.alert('Missing details', 'Please fill all required fields');
       return;
     }
 
-    navigation.navigate("MainWizardScreen");
+    navigation.navigate('MainWizardScreen');
+  };
+  const handleUseLocation = async () => {
+    try {
+      const coords = await getCurrentLocation();
+      const address = await reverseGeocode(coords.latitude, coords.longitude);
+
+      setLocation(address);
+
+      dispatch(
+        updateRegistration({
+          address: address,
+        }),
+      );
+
+      Alert.alert('Success', '📍 Location fetched successfully');
+      console.log(' Location:', address);
+    } catch (err) {
+      console.log(' Location error:', err);
+      Alert.alert('Error', 'Unable to fetch location. Please try again.');
+    }
   };
 
   return (
@@ -46,7 +66,7 @@ export default function SignupDetailsScreenUser() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           flexGrow: 1,
-          justifyContent: "center",
+          justifyContent: 'center',
           paddingBottom: 120,
         }}
       >
@@ -58,7 +78,7 @@ export default function SignupDetailsScreenUser() {
           style={styles.input}
           placeholder="Enter Name"
           value={registration.name}
-          onChangeText={handleChange("name")}
+          onChangeText={handleChange('name')}
         />
 
         {/* EMAIL */}
@@ -69,7 +89,7 @@ export default function SignupDetailsScreenUser() {
             placeholder="Enter Email"
             value={registration.email}
             keyboardType="email-address"
-            onChangeText={handleChange("email")}
+            onChangeText={handleChange('email')}
           />
         </View>
 
@@ -81,7 +101,7 @@ export default function SignupDetailsScreenUser() {
             placeholder="Phone"
             value={registration.phno}
             keyboardType="phone-pad"
-            onChangeText={handleChange("phno")}
+            onChangeText={handleChange('phno')}
           />
         </View>
 
@@ -93,11 +113,11 @@ export default function SignupDetailsScreenUser() {
             placeholder="Password"
             secureTextEntry={!showPassword}
             value={registration.password}
-            onChangeText={handleChange("password")}
+            onChangeText={handleChange('password')}
           />
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
-              name={showPassword ? "eye-off-outline" : "eye-outline"}
+              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
               size={18}
               color="#777"
             />
@@ -108,10 +128,9 @@ export default function SignupDetailsScreenUser() {
         <View style={styles.locationRow}>
           <View style={styles.locationLeft}>
             <Ionicons name="location-outline" size={20} color="#777" />
-            <TouchableOpacity onPress={() => setShowLocationFields(true)}>
-              <Text style={styles.locationText}>
-                {showLocationFields ? "Use my location" : "Get my location"}
-              </Text>
+            <TouchableOpacity onPress={handleUseLocation}>
+            <Text style={styles.locationText}>Use my location</Text>
+
             </TouchableOpacity>
           </View>
 
@@ -133,33 +152,34 @@ export default function SignupDetailsScreenUser() {
                 style={[styles.input, styles.smallInput]}
                 placeholder="Pincode"
                 keyboardType="numeric"
-                onChangeText={handleChange("pincode")}
+                onChangeText={handleChange('pincode')}
               />
 
               <TextInput
                 style={[styles.input, styles.smallInput]}
                 placeholder="City/Town"
-                onChangeText={handleChange("city")}
+                onChangeText={handleChange('city')}
               />
             </View>
 
             <TextInput
               style={styles.input}
               placeholder="Landmark"
-              onChangeText={handleChange("landmark")}
+              onChangeText={handleChange('landmark')}
             />
 
             <TextInput
               style={styles.input}
               placeholder="Address"
-              onChangeText={handleChange("address")}
+              value={registration.address}
+              onChangeText={handleChange('address')}
             />
           </>
         )}
 
         <TouchableOpacity
           style={{ marginTop: 20 }}
-          onPress={() => navigation.navigate("Login")}
+          onPress={() => navigation.navigate('Login')}
         >
           <Text style={styles.backLogin}>Back to Log in</Text>
         </TouchableOpacity>

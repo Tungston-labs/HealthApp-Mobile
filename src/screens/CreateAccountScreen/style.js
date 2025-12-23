@@ -23,6 +23,20 @@ export default StyleSheet.create({
     fontWeight: "600",
     marginRight: 28,
   },
+profilePlaceholder: {
+  width: 80,
+  height: 80,
+  borderRadius: 40,
+  backgroundColor: '#eee',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+placeholderText: {
+  fontSize: 10,
+  color: '#888',
+  marginTop: 4,
+},
 
   profileRow: {
     flexDirection: "row",

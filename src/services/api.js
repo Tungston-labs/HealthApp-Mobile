@@ -1,4 +1,3 @@
-
 import axios from "axios";
 import {
   getAccessToken,
@@ -13,16 +12,28 @@ const api = axios.create({
   timeout: 15000,
   headers: {
     "Content-Type": "application/json",
+    Accept: "application/json",
   },
 });
 
-api.interceptors.request.use(async (config) => {
-  const token = await getAccessToken(); 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+
+api.interceptors.request.use(
+  async (config) => {
+   
+    if (config.skipAuth) {
+      return config;
+    }
+
+    const token = await getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 
 let isRefreshing = false;
 let failedQueue = [];
@@ -39,7 +50,17 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (originalRequest?.skipAuth) {
+      return Promise.reject(error);
+    }
+
+    if (!error.response) {
+      return Promise.reject({
+        message: "Network error. Please try again.",
+      });
+    }
+
+    if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       if (isRefreshing) {
@@ -54,7 +75,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refresh = await getRefreshToken(); 
+        const refresh = await getRefreshToken();
         if (!refresh) throw new Error("No refresh token");
 
         const res = await refreshApi.post("auth/token/refresh/", {
@@ -62,11 +83,12 @@ api.interceptors.response.use(
         });
 
         const newAccessToken = res.data.access;
-        await setAccessToken(newAccessToken); 
+        await setAccessToken(newAccessToken);
 
         api.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
         processQueue(null, newAccessToken);
 
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);

@@ -12,8 +12,8 @@ const WorkoutPlan = ({ navigation }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
 
-  const { plans, loading, error } = useSelector(state => state.planList);
-
+const { plans, loading, error } = useSelector(state => state.planList);
+const user = useSelector(state => state.auth?.user);
   useEffect(() => {
     dispatch(fetchPlansThunk());
   }, []);
@@ -22,7 +22,7 @@ const WorkoutPlan = ({ navigation }) => {
     <>
       <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
         <Header
-          username="Ajay"
+          username={user?.name||"User"}
           subtitle="Your workout plans"
           onNotificationPress={() => navigation.navigate("Notifications")}
         />

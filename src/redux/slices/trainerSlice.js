@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { availableTrainers } from "../../api/trainerServices";
+import { availableTrainers } from "../../services/trainerServices";
 
 export const fetchAvailableTrainers = createAsyncThunk(
   "trainer/available",
