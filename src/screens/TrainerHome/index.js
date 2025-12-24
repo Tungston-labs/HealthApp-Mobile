@@ -64,7 +64,7 @@ const TrainerHome = () => {
           </Text>
         </View>
       ) : (
-        // 🔹 SCHEDULE LIST
+
         <ScrollView showsVerticalScrollIndicator={false}>
           {schedules.map((item, index) => (
             <ScheduleCard
