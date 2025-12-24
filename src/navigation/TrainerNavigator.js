@@ -15,7 +15,7 @@ const TrainerNavigator = () => {
       screenOptions={{ headerShown: false }}
     >
       <Tab.Screen name="TrainerHome" component={TrainerHome} />
-      {/* <Tab.Screen name="TrainerSessions" component={TrainerSessions} /> */}
+      <Tab.Screen name="TrainerSessions" component={TrainerSessions} />
       <Tab.Screen name="ProfileScreenTrainer" component={ProfileScreenTrainer} />
     </Tab.Navigator>
   );

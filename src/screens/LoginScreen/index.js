@@ -12,6 +12,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import { loginClientThunk, resetAuthState } from "../../redux/slices/authSlice";
 import styles from "./style";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function LoginScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -28,6 +29,7 @@ const { loading, isLoggedIn, error } = useSelector(
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+   const isFocused = useIsFocused();
 
   const handleLogin = () => {
     if (!email || !password) {
@@ -44,22 +46,6 @@ const { loading, isLoggedIn, error } = useSelector(
 
   };
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "workout" }],
-      });
-    }
-  }, [isLoggedIn]);
-
-  useEffect(() => {
-  if (error && !isLoggedIn) {
-    Alert.alert("Login Failed", error);
-  }
-}, [error, isLoggedIn]);
-
-
 useEffect(() => {
   if (isLoggedIn) {
     navigation.reset({
@@ -69,13 +55,16 @@ useEffect(() => {
   }
 }, [isLoggedIn]);
 
-
-  useEffect(() => {
-    if (error) {
+useEffect(() => {
+  if (error && isFocused) {
+    setTimeout(() => {
       Alert.alert("Login Failed", error);
       dispatch(resetAuthState());
-    }
-  }, [error]);
+    }, 100);
+  }
+}, [error, isFocused]);
+
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -83,7 +72,6 @@ useEffect(() => {
         <Text style={styles.logoText}>LOGIN</Text>
       </View>
 
-      {/* EMAIL */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Email</Text>
 
@@ -106,7 +94,6 @@ useEffect(() => {
         </View>
       </View>
 
-      {/* PASSWORD */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Password</Text>
 

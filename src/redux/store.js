@@ -7,6 +7,7 @@ import VerifyOtpReducer from './slices/verifyOtpSlice';
 import ResetPasswordReducer from "./slices/resetPasswordSlice";
 import PlanReducer from "./slices/planSlice";
 import trainerRegistrationReducer from "./slices/trainerRegistrationSlice";
+import trainerPlanReducer from "./slices/trainerPlanSlice"
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -17,5 +18,7 @@ export const store = configureStore({
     resetpassword:ResetPasswordReducer,
     planList:PlanReducer,
     trainerReg:trainerRegistrationReducer,
+    trainerplan:trainerPlanReducer,
+    
   },
 });

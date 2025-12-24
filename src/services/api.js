@@ -19,7 +19,6 @@ const api = axios.create({
 
 api.interceptors.request.use(
   async (config) => {
-   
     if (config.skipAuth) {
       return config;
     }
@@ -33,6 +32,7 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
 
 
 let isRefreshing = false;
@@ -56,7 +56,7 @@ api.interceptors.response.use(
 
     if (!error.response) {
       return Promise.reject({
-        message: "Network error. Please try again.",
+        message: error.message || "Network error. Please try again.",
       });
     }
 

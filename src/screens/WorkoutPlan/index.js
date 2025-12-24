@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { View, ScrollView, ActivityIndicator } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import Header from "../../components/Header";
-import styles from "./style";
-import FilterModal from "../../components/FIlterModal";
-import PlanCard from "./PlanCard";
-import { fetchPlansThunk } from "../../redux/slices/planSlice";
-import { Text } from "react-native-svg";
+import React, { useEffect, useState } from 'react';
+import { View, ScrollView, ActivityIndicator } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import Header from '../../components/Header';
+import styles from './style';
+import FilterModal from '../../components/FIlterModal';
+import PlanCard from './PlanCard';
+import { fetchPlansThunk } from '../../redux/slices/planSlice';
+import { Text } from 'react-native-svg';
 
 const WorkoutPlan = ({ navigation }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
 
-const { plans, loading, error } = useSelector(state => state.planList);
-const user = useSelector(state => state.auth?.user);
+  const { plans, loading, error } = useSelector(state => state.planList);
+  const user = useSelector(state => state.auth?.user);
   useEffect(() => {
     dispatch(fetchPlansThunk());
   }, []);
@@ -22,9 +23,9 @@ const user = useSelector(state => state.auth?.user);
     <>
       <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
         <Header
-          username={user?.name||"User"}
+          username={user?.name || 'User'}
           subtitle="Your workout plans"
-          onNotificationPress={() => navigation.navigate("Notifications")}
+          onNotificationPress={() => navigation.navigate('Notifications')}
         />
 
         {loading && <ActivityIndicator size="large" />}
@@ -34,20 +35,23 @@ const user = useSelector(state => state.auth?.user);
           {plans.map(item => (
             <PlanCard
               key={item.id}
-              item={{
-                ...item,
-                image: { uri: item.upload_file }, 
+              item={{ ...item, image: { uri: item.upload_file } }}
+              onPress={() => {
+                setSelectedPlanId(item.id);
+                setShowModal(true);
               }}
-              onPress={() => setShowModal(true)}
             />
           ))}
         </View>
       </ScrollView>
 
-      <FilterModal visible={showModal} onClose={() => setShowModal(false)} />
+      <FilterModal
+        visible={showModal}
+        planId={selectedPlanId}
+        onClose={() => setShowModal(false)}
+      />
     </>
   );
 };
-
 
 export default WorkoutPlan;

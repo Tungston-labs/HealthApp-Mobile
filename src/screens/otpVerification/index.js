@@ -41,6 +41,7 @@ if (!email) {
     const otpString = otp.join("");
 if (otpString.length !== 6) {
   Alert.alert("Error", "Please enter a valid 6-digit OTP");
+  console.log("otp",otpString)
   return;
 }
 

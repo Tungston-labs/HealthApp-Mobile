@@ -17,8 +17,6 @@ export const dashboardCounts = () =>
   api.get("client/dashboard/counts/");
 export const planList = async () => {
   const token = await AsyncStorage.getItem("access_token");
-
-
   return api.get(
     "plan/clientlist/",
     {},

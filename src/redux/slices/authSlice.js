@@ -3,27 +3,31 @@ import { loginApi } from '../../services/authServices';
 import { setToken } from '../../storage/asyncStorage';
 
 export const loginClientThunk = createAsyncThunk(
-  'auth/login',
+  "auth/login",
   async (payload, { rejectWithValue }) => {
     try {
       const res = await loginApi(payload);
-
-      console.log('LOGIN STATUS ', res.status);
-      console.log('LOGIN DATA ', res.data);
-
       return res.data;
     } catch (err) {
-      console.log('LOGIN ERROR STATUS ', err?.response?.status);
-      console.log('LOGIN ERROR DATA ', err?.response?.data);
+      console.log("LOGIN ERROR FULL:", err);
 
-      return rejectWithValue(
-        err?.response?.data?.email_or_phno?.[0] ||
-          err?.response?.data?.detail ||
-          'Invalid email or password',
-      );
+      if (err.response) {
+        return rejectWithValue(
+          err.response.data?.detail ||
+          err.response.data?.email_or_phno?.[0] ||
+          "Invalid credentials"
+        );
+      }
+
+      if (err.request) {
+        return rejectWithValue("Server not reachable. Check network.");
+      }
+
+      return rejectWithValue("Something went wrong");
     }
-  },
+  }
 );
+
 
 const authSlice = createSlice({
   name: 'auth',
