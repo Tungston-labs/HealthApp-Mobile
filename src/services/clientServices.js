@@ -15,15 +15,7 @@ export const listClients = (planId) =>
 
 export const dashboardCounts = () =>
   api.get("client/dashboard/counts/");
-export const planList = async () => {
-  const token = await AsyncStorage.getItem("access_token");
-  return api.get(
-    "plan/clientlist/",
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+
+export const planList = () => {
+  return api.get("plan/clientlist/");
 };
