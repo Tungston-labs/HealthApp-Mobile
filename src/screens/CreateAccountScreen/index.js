@@ -14,15 +14,16 @@ import { getCurrentLocation } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerTrainerThunk } from '../../redux/slices/trainerRegistrationSlice';
+
 import { launchImageLibrary } from 'react-native-image-picker';
 import DOBPicker from './DOBPicker';
+import { uploadImageApi } from '../../services/trainerServices';
 export default function CreateAccountScreen({ navigation }) {
   const [images, setImages] = useState([]);
   const dispatch = useDispatch();
 
   const { loading, error, success } = useSelector(state => state.trainerReg);
-
-  const [name, setName] = useState('');
+const [isUploading, setIsUploading] = useState(false);  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phno, setPhno] = useState('');
   const [dob, setDob] = useState('');
@@ -34,6 +35,7 @@ export default function CreateAccountScreen({ navigation }) {
   const [fee, setFee] = useState('');
   const [password, setPassword] = useState('');
   const [profileImage, setProfileImage] = useState(null);
+  const [aadhaarImage, setAadhaarImage] = useState(null);
 
   const [genderOpen, setGenderOpen] = useState(false);
   const [genderValue, setGenderValue] = useState('');
@@ -68,6 +70,21 @@ export default function CreateAccountScreen({ navigation }) {
       },
     );
   };
+const handlePickAadhaarImage = () => {
+  launchImageLibrary(
+    {
+      mediaType: 'photo',
+      selectionLimit: 1,
+      quality: 0.8,
+    },
+    response => {
+      if (response.didCancel || response.errorCode) return;
+      if (response.assets?.length) {
+        setAadhaarImage(response.assets[0]);
+      }
+    },
+  );
+};
 
   const handleUseLocation = async () => {
     try {
@@ -76,10 +93,10 @@ export default function CreateAccountScreen({ navigation }) {
 
       setLocation(address);
 
-      alert('📍 Location fetched successfully');
-      console.log('📍 Location:', address);
+      alert(' Location fetched successfully');
+      console.log(' Location:', address);
     } catch (err) {
-      console.log('❌ Location error:', err);
+      console.log(' Location error:', err);
       alert('Unable to fetch location. Please try again.');
     }
   };
@@ -110,43 +127,68 @@ export default function CreateAccountScreen({ navigation }) {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
-    if (!name || !email || !phno || !password) {
-      alert('Please fill all required fields');
+const handleSubmit = async () => {
+  try {
+    if (!profileImage || !aadhaarImage || images.length === 0) {
+      alert("Please select all images first.");
       return;
     }
 
-    if (!genderValue || !expertiseValue) {
-      alert('Please select gender and expertise');
-      return;
-    }
-    if (!location) {
-      alert('Please select your location');
-      return;
-    }
-    const payload = {
-      name,
-      email,
-      phno,
-      dob,
-      gender: genderValue.toLowerCase(),
-      training_field: expertiseMap[expertiseValue],
-      section_timing: sectionTiming,
-      experience: experience ? Number(experience) : null,
-      location,
-      no_of_section: Number(sessions),
-      expecting_salary: Number(fee),
-      adar_number: aadhaar,
-      password,
-      certificates: [
-        'http://178.248.112.16:9001/media/certificates/97.jpg.webp',
-      ],
-      adar_image: 'http://178.248.112.16:9001/media/certificates/97.jpg.webp',
-    };
+    setIsUploading(true); 
 
-    console.log('🟡 TRAINER REGISTER PAYLOAD:', payload);
-    dispatch(registerTrainerThunk(payload));
-  };
+    console.log("Starting image uploads...");
+    
+    const profilePicUrl = await uploadImageApi(profileImage);
+    const adarImageUrl = await uploadImageApi(aadhaarImage);
+    
+    const certificateUrls = await Promise.all(
+      images.map(img => uploadImageApi(img))
+    );
+
+    // STEP 2: Prepare Final Data
+    const formData = new FormData();
+
+    formData.append("name", name);
+    formData.append("email", email.toLowerCase().trim());
+    formData.append("phno", phno);
+    formData.append("dob", dob);
+    formData.append("gender", genderValue.toLowerCase());
+    
+    formData.append("training_field", expertiseMap[expertiseValue]); 
+    
+    const formattedTiming = sectionTiming.split(' ')[0];
+    formData.append("section_timing", formattedTiming); 
+
+    formData.append("location", location);
+    formData.append("expecting_salary", fee);
+    formData.append("no_of_section", sessions);
+    formData.append("adar_number", aadhaar);
+    formData.append("experience", experience);
+    formData.append("password", password);
+
+    formData.append("profile_pic", profilePicUrl); 
+    formData.append("adar_image", adarImageUrl);
+    
+    certificateUrls.forEach(url => {
+      formData.append("certificates", url);
+    });
+
+    console.log("Image uploads complete. Sending registration...");
+
+    await dispatch(registerTrainerThunk(formData)).unwrap();
+    
+    alert("Trainer registered successfully 🎉");
+  } catch (error) {
+    console.log("REGISTRATION FAILED:", error);
+    alert("Error: " + (error.message || "Something went wrong"));
+  } finally {
+    setIsUploading(false); 
+  }
+};
+
+
+
+
   useEffect(() => {
     if (success) {
       navigation.navigate('ThankYouScreen');
@@ -160,7 +202,6 @@ export default function CreateAccountScreen({ navigation }) {
         contentContainerStyle={{ paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Back + Title */}
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={28} color="#000" />
@@ -244,7 +285,6 @@ export default function CreateAccountScreen({ navigation }) {
           )}
         </View>
 
-        {/* EXPERTISE DROPDOWN */}
         <View>
           <TouchableOpacity
             style={styles.dropdownRow}
@@ -277,17 +317,45 @@ export default function CreateAccountScreen({ navigation }) {
         <View style={styles.iconInputRow}>
           <DOBPicker value={dob} onChange={setDob} />
         </View>
+        
+       <View style={styles.iconInputRow}>
+  <Ionicons name="document-outline" size={20} color="#666" />
 
-        <View style={styles.iconInputRow}>
-          <Ionicons name="document-outline" size={20} color="#666" />
-          <TextInput
-            placeholder="Aadhaar Number"
-            placeholderTextColor="#888"
-            style={styles.inputFlex}
-            value={aadhaar}
-            onChangeText={setAadhaar}
-          />
-        </View>
+  <TextInput
+    placeholder="Aadhaar Number"
+    placeholderTextColor="#888"
+    style={styles.inputFlex}
+    value={aadhaar}
+    onChangeText={setAadhaar}
+  />
+
+  <TouchableOpacity
+    style={styles.uploadButton}
+    onPress={handlePickAadhaarImage}
+  >
+    <Ionicons name="cloud-upload-outline" size={18} color="#fff" />
+    <Text style={styles.uploadBtnText}>Upload</Text>
+  </TouchableOpacity>
+</View>
+
+{aadhaarImage && (
+  <View style={{ marginTop: 10 }}>
+    <View style={styles.uploadImageCard}>
+      <TouchableOpacity
+        style={styles.deleteBadge}
+        onPress={() => setAadhaarImage(null)}
+      >
+        <Ionicons name="close" size={16} color="#fff" />
+      </TouchableOpacity>
+
+      <Image
+        source={{ uri: aadhaarImage.uri }}
+        style={styles.uploadPreviewImg}
+      />
+    </View>
+  </View>
+)}
+
 
         <TouchableOpacity
           style={styles.useLocationBtn}
@@ -357,7 +425,7 @@ export default function CreateAccountScreen({ navigation }) {
 
         {/* Upload Section */}
         <View style={styles.uploadContainer}>
-          <Text style={styles.uploadTitle}>Upload Certificates & Aadhar</Text>
+          <Text style={styles.uploadTitle}>Upload Certificates </Text>
 
           <View style={styles.uploadBox}>
             <TouchableOpacity

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { loginApi } from '../../services/authServices';
 import { setToken } from '../../storage/asyncStorage';
+import api from '../../services/api';
 
 export const loginClientThunk = createAsyncThunk(
   "auth/login",
@@ -53,20 +54,24 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginClientThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        state.isLoggedIn = true;
-        state.user = action.payload?.user;
+     .addCase(loginClientThunk.fulfilled, (state, action) => {
+  state.loading = false;
+  state.isLoggedIn = true;
+  state.user = action.payload?.user;
 
-        const access = action.payload?.access;
-        const refresh = action.payload?.refresh;
+  console.log("DEBUG: Login Response Data ->", action.payload);
 
-        if (access) {
-          setToken(access, refresh);
-          console.log('🟢 TOKEN SAVED FROM SLICE');
-        }
-      })
+  const access = action.payload?.access || action.payload?.token || action.payload?.data?.access;
+  const refresh = action.payload?.refresh || action.payload?.data?.refresh;
 
+  if (access) {
+    setToken(access, refresh);
+    api.defaults.headers.Authorization = `Bearer ${access}`;
+    console.log('🟢 Token successfully captured and applied');
+  } else {
+    console.error('🔴 LOGIN SUCCESS BUT NO TOKEN FOUND IN RESPONSE. Check backend keys.');
+  }
+})
       .addCase(loginClientThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;

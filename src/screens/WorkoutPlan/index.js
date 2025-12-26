@@ -32,7 +32,7 @@ const WorkoutPlan = ({ navigation }) => {
         {error && <Text>{JSON.stringify(error)}</Text>}
 
         <View style={styles.gridContainer}>
-          {plans.map(item => (
+          {plans?.map(item => (
             <PlanCard
               key={item.id}
               item={{ ...item, image: { uri: item.upload_file } }}

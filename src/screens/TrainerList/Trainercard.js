@@ -13,7 +13,7 @@ const TrainerCard = ({ trainer, onBookNow }) => {
         <Image
           source={
             trainer.profile_image
-              ? { uri: trainer.profile_image }
+              ? { uri: trainer.profile_pic }
               : require('../../../assets/trainer1.jpg')
           }
           style={styles.trainerImg}
@@ -21,7 +21,11 @@ const TrainerCard = ({ trainer, onBookNow }) => {
 
         <TouchableOpacity
           style={styles.viewProfileBtn}
-          onPress={() => navigation.navigate('TrainerDetail', { trainer })}
+          onPress={() =>
+            navigation.navigate('TrainerDetail', {
+              trainerId: trainer.id,
+            })
+          }
         >
           <Text style={styles.viewProfileText}>View Profile</Text>
         </TouchableOpacity>
@@ -31,7 +35,7 @@ const TrainerCard = ({ trainer, onBookNow }) => {
         <Text style={styles.exp}>{trainer.experience} Years experience</Text>
         <View style={styles.ratingplan}>
           <View style={styles.priceRow}>
-            <Text style={styles.price}>₹ {trainer.price}</Text>
+            <Text style={styles.price}>₹ {trainer.single_price}</Text>
             <Text style={styles.plan}>/plan</Text>
           </View>
           <View style={styles.starrating}>
