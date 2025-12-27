@@ -16,7 +16,9 @@ const initialState = {
   email: "",
   phno: "",
   password: "",
+  profile_pic: null,
 };
+
 
 const registrationSlice = createSlice({
   name: "registration",

@@ -12,12 +12,13 @@ const TrainerCard = ({ trainer, onBookNow }) => {
       <View>
         <Image
           source={
-            trainer.profile_image
+            trainer.profile_pic
               ? { uri: trainer.profile_pic }
               : require('../../../assets/trainer1.jpg')
           }
           style={styles.trainerImg}
         />
+
 
         <TouchableOpacity
           style={styles.viewProfileBtn}
@@ -57,3 +58,4 @@ const TrainerCard = ({ trainer, onBookNow }) => {
 };
 
 export default TrainerCard;
+``

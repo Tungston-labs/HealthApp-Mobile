@@ -21,6 +21,43 @@ export default StyleSheet.create({
     marginBottom: 4,
     color: "#000000",
   },
+  profileRow: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+
+  profilePlaceholder: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+
+  profileImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    marginRight: 12,
+  },
+
+  nameInputWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    paddingBottom: 4,
+  },
+
+  nameInput: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 16,
+    color: '#000',
+  },
 
   subtitle: {
     fontSize: 17,
@@ -101,41 +138,40 @@ export default StyleSheet.create({
     color: "#7774F4",
     fontWeight: "600",
   },
-
   continueBtn: {
-  backgroundColor: "#7774F4",
-  paddingVertical: 14,
-  paddingHorizontal: 22,
-  borderRadius: 30,
-  marginTop: 25,
-  marginBottom: 40,
-  flexDirection: "row",
-  alignItems: "center",
-  gap: 5,
+    backgroundColor: "#7774F4",
+    paddingVertical: 14,
+    paddingHorizontal: 22,
+    borderRadius: 30,
+    marginTop: 25,
+    marginBottom: 40,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
 
-  shadowColor: "#000",
-  shadowOffset: { width: 0, height: -2 },
-  shadowOpacity: 0.25,
-  shadowRadius: 4,
-  elevation: 5,
-},
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
 
-continueText: {
-  color: "#fff",
-  fontSize: 17,
-  fontWeight: "800",
-  fontFamily: "Segoe UI",
-},
+  continueText: {
+    color: "#fff",
+    fontSize: 17,
+    fontWeight: "800",
+    fontFamily: "Segoe UI",
+  },
 
-arrowIcon: {
-  marginRight: -9,
-},
+  arrowIcon: {
+    marginRight: -9,
+  },
 
-continueFixed: {
-  position: "absolute",
-  bottom: 25,
-  right: 25,
-},
+  continueFixed: {
+    position: "absolute",
+    bottom: 25,
+    right: 25,
+  },
 
 
 });
