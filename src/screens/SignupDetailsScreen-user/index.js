@@ -15,16 +15,24 @@ import { updateRegistration } from '../../redux/slices/registrationSlice';
 import styles from './style';
 import { getCurrentLocation } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
-
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { Image } from 'react-native';
+import { uploadImageApi } from '../../services/trainerServices';
 export default function SignupDetailsScreenUser() {
   const navigation = useNavigation();
+  const [uploading, setUploading] = useState(false);
+
   const dispatch = useDispatch();
+  const profileImage = useSelector(
+    state => state.registration.profile_pic
+  );
 
   const registration = useSelector(state => state.registration);
 
   const [showLocationFields, setShowLocationFields] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [location, setLocation] = useState('');
+
   const handleChange = field => value => {
     dispatch(updateRegistration({ [field]: value }));
   };
@@ -39,6 +47,43 @@ export default function SignupDetailsScreenUser() {
 
     navigation.navigate('MainWizardScreen');
   };
+  const handlePickProfileImage = async () => {
+    launchImageLibrary(
+      { mediaType: 'photo', quality: 0.7 },
+      response => {
+        if (response.didCancel || !response.assets?.length) return;
+
+        const image = response.assets[0];
+
+        dispatch(
+          updateRegistration({
+            profile_pic: {
+              uri: image.uri,
+              type: image.type || 'image/jpeg',
+              name: image.fileName || 'profile.jpg',
+            },
+          })
+        );
+      }
+    );
+  };
+  const resolveProfileImage = () => {
+    if (!profileImage) return null;
+
+    // local image object
+    if (typeof profileImage === "object" && profileImage.uri) {
+      return { uri: profileImage.uri };
+    }
+
+    // backend image string
+    if (typeof profileImage === "string") {
+      return { uri: profileImage };
+    }
+
+    return null;
+  };
+
+
   const handleUseLocation = async () => {
     try {
       const coords = await getCurrentLocation();
@@ -73,15 +118,35 @@ export default function SignupDetailsScreenUser() {
         <Text style={styles.welcomeText}>Welcome to health app</Text>
         <Text style={styles.subtitle}>Enter basic details</Text>
 
-        {/* NAME */}
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Name"
-          value={registration.name}
-          onChangeText={handleChange('name')}
-        />
+        <View style={styles.profileRow}>
+          <TouchableOpacity onPress={handlePickProfileImage}>
+            {resolveProfileImage() ? (
+              <Image
+                source={resolveProfileImage()}
+                style={styles.profileImage}
+              />
+            ) : (
+              <View style={styles.profilePlaceholder}>
+                <Ionicons name="camera-outline" size={26} color="#777" />
+              </View>
+            )}
+          </TouchableOpacity>
 
-        {/* EMAIL */}
+
+          <View style={styles.nameInputWrapper}>
+            <Ionicons name="person-outline" size={18} color="#777" />
+            <TextInput
+              placeholder="Enter Name"
+              value={registration.name}
+              onChangeText={handleChange('name')}
+              placeholderTextColor="#888"
+              style={styles.nameInput}
+            />
+          </View>
+        </View>
+
+
+
         <View style={styles.inputRow}>
           <Ionicons name="mail-outline" size={18} color="#777" />
           <TextInput
@@ -93,7 +158,6 @@ export default function SignupDetailsScreenUser() {
           />
         </View>
 
-        {/* PHONE */}
         <View style={styles.inputRow}>
           <Ionicons name="call-outline" size={18} color="#777" />
           <TextInput
@@ -105,7 +169,6 @@ export default function SignupDetailsScreenUser() {
           />
         </View>
 
-        {/* PASSWORD */}
         <View style={styles.inputRow}>
           <Ionicons name="lock-closed-outline" size={18} color="#777" />
           <TextInput
@@ -124,12 +187,11 @@ export default function SignupDetailsScreenUser() {
           </TouchableOpacity>
         </View>
 
-        {/* LOCATION TOGGLE */}
         <View style={styles.locationRow}>
           <View style={styles.locationLeft}>
             <Ionicons name="location-outline" size={20} color="#777" />
             <TouchableOpacity onPress={handleUseLocation}>
-            <Text style={styles.locationText}>Use my location</Text>
+              <Text style={styles.locationText}>Use my location</Text>
 
             </TouchableOpacity>
           </View>
@@ -144,7 +206,6 @@ export default function SignupDetailsScreenUser() {
           )}
         </View>
 
-        {/* LOCATION FIELDS */}
         {showLocationFields && (
           <>
             <View style={styles.locationInputsRow}>

@@ -64,50 +64,67 @@ export default function BMIResultScreen({ navigation }) {
     bmiText = "Obesity";
     bmiColor = "#F5554A";
   }
-const buildRegisterPayload = (data) => ({
-  name: data.name,
-  email: data.email,
-  phno: data.phno,
-  password: data.password,
+const buildRegisterPayload = (data) => {
+  const formData = new FormData();
 
-  role: data.role || "user",
-  dob: data.dob,
-  gender: data.gender,
-  blood_group: data.blood_group,
+  formData.append("name", data.name);
+  formData.append("email", data.email);
+  formData.append("phno", data.phno);
+  formData.append("password", data.password);
+  formData.append("role", "user");
 
-  height: data.height?.toString(),
-  weight: data.weight?.toString(),
+  formData.append("dob", data.dob);
+  formData.append("gender", data.gender);
+  formData.append("blood_group", data.blood_group);
 
-  health_issues: Array.isArray(data.health_issues)
-    ? data.health_issues
-    : [],
+  // IMPORTANT: Decimal fields as STRING
+  formData.append("height", String(data.height));
+  formData.append("weight", String(data.weight));
 
-  wellness_goal: Array.isArray(data.wellness_goal)
-    ? data.wellness_goal
-    : [],
+  formData.append(
+    "address",
+    `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`
+  );
 
-address: `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`,
+  // JSONField → STRING
+  formData.append(
+    "health_issues",
+    JSON.stringify(data.health_issues || [])
+  );
 
-});
+  formData.append(
+    "wellness_goal",
+    JSON.stringify(data.wellness_goal || [])
+  );
+
+  // ImageField → FILE
+  if (data.profile_pic) {
+    formData.append("profile_pic", {
+      uri: data.profile_pic.uri,
+      type: data.profile_pic.type || "image/jpeg",
+      name: data.profile_pic.name || "profile.jpg",
+    });
+  }
+
+  return formData;
+};
 
 
 
-  const handleFinalSubmit = () => {
-    if (!registration.name || !registration.email || !registration.phno) {
-      Alert.alert("Incomplete profile", "Please complete signup details");
-      return;
-    }
 
-    if (!registration.height || !registration.weight) {
-      Alert.alert("Missing data", "Height & Weight required");
-      return;
-    }
 
-    const payload = buildRegisterPayload(registration);
-    console.log("REGISTER PAYLOAD 👉", payload);
 
-    dispatch(registerClientThunk(payload));
-  };
+const handleFinalSubmit = () => {
+  if (!registration.name || !registration.email || !registration.phno) {
+    Alert.alert("Incomplete profile", "Please complete signup details");
+    return;
+  }
+
+  const formData = buildRegisterPayload(registration);
+
+  console.log("REGISTER PAYLOAD 👉", formData);
+  dispatch(registerClientThunk(formData));
+};
 
 
 useEffect(() => {
