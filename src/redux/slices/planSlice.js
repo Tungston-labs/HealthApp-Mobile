@@ -6,12 +6,14 @@ export const fetchPlansThunk = createAsyncThunk(
   "plans/fetch",
   async (_, { rejectWithValue }) => {
     try {
-
       const res = await planList();
 
-      return res.data;
+      // ✅ return ONLY array
+      return res.data.data;
     } catch (err) {
-      return rejectWithValue(err?.response?.data || "Plan fetch failed");
+      return rejectWithValue(
+        err?.response?.data?.message || "Plan fetch failed"
+      );
     }
   }
 );
@@ -40,5 +42,6 @@ const planSlice = createSlice({
       });
   },
 });
+
 
 export default planSlice.reducer;
