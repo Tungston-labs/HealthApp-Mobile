@@ -1,29 +1,34 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { loginApi } from '../../services/authServices';
 import { setToken } from '../../storage/asyncStorage';
+import api from '../../services/api';
 
 export const loginClientThunk = createAsyncThunk(
-  'auth/login',
+  "auth/login",
   async (payload, { rejectWithValue }) => {
     try {
       const res = await loginApi(payload);
-
-      console.log('LOGIN STATUS ', res.status);
-      console.log('LOGIN DATA ', res.data);
-
       return res.data;
     } catch (err) {
-      console.log('LOGIN ERROR STATUS ', err?.response?.status);
-      console.log('LOGIN ERROR DATA ', err?.response?.data);
+      console.log("LOGIN ERROR FULL:", err);
 
-      return rejectWithValue(
-        err?.response?.data?.email_or_phno?.[0] ||
-          err?.response?.data?.detail ||
-          'Invalid email or password',
-      );
+      if (err.response) {
+        return rejectWithValue(
+          err.response.data?.detail ||
+          err.response.data?.email_or_phno?.[0] ||
+          "Invalid credentials"
+        );
+      }
+
+      if (err.request) {
+        return rejectWithValue("Server not reachable. Check network.");
+      }
+
+      return rejectWithValue("Something went wrong");
     }
-  },
+  }
 );
+
 
 const authSlice = createSlice({
   name: 'auth',
@@ -49,20 +54,24 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginClientThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        state.isLoggedIn = true;
-        state.user = action.payload?.user;
+     .addCase(loginClientThunk.fulfilled, (state, action) => {
+  state.loading = false;
+  state.isLoggedIn = true;
+  state.user = action.payload?.user;
 
-        const access = action.payload?.access;
-        const refresh = action.payload?.refresh;
+  console.log("DEBUG: Login Response Data ->", action.payload);
 
-        if (access) {
-          setToken(access, refresh);
-          console.log('🟢 TOKEN SAVED FROM SLICE');
-        }
-      })
+  const access = action.payload?.access || action.payload?.token || action.payload?.data?.access;
+  const refresh = action.payload?.refresh || action.payload?.data?.refresh;
 
+  if (access) {
+    setToken(access, refresh);
+    api.defaults.headers.Authorization = `Bearer ${access}`;
+    console.log('🟢 Token successfully captured and applied');
+  } else {
+    console.error('🔴 LOGIN SUCCESS BUT NO TOKEN FOUND IN RESPONSE. Check backend keys.');
+  }
+})
       .addCase(loginClientThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;

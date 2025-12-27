@@ -11,29 +11,28 @@ const api = axios.create({
   baseURL: "http://178.248.112.16:9001/api/",
   timeout: 15000,
   headers: {
-    "Content-Type": "application/json",
     Accept: "application/json",
   },
 });
 
+api.interceptors.request.use(async (config) => {
+  const token = await getAccessToken();
 
-api.interceptors.request.use(
-  async (config) => {
-   
-    if (config.skipAuth) {
-      return config;
-    }
+  if (token && !config.skipAuth) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
 
-    const token = await getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+  if (config.data instanceof FormData) {
 
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+    config.headers['Content-Type'] = 'multipart/form-data';
+    
 
+  } else {
+    config.headers['Content-Type'] = 'application/json';
+  }
+
+  return config;
+}, (error) => Promise.reject(error));
 
 let isRefreshing = false;
 let failedQueue = [];
@@ -56,7 +55,7 @@ api.interceptors.response.use(
 
     if (!error.response) {
       return Promise.reject({
-        message: "Network error. Please try again.",
+        message: error.message || "Network error. Please try again.",
       });
     }
 

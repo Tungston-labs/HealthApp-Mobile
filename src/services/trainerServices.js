@@ -1,26 +1,38 @@
 import api from "./api";
 
+export const uploadImageApi = async (file) => {
+  const formData = new FormData();
 
-export const registerTrainerApi = (payload) => {
-  return api.post("trainer/", payload, {
-    skipAuth: true, 
+  formData.append("file", {
+    uri: file.uri.startsWith("file://") ? file.uri : `file://${file.uri}`,
+    name: file.fileName || "image.jpg",
+    type: file.type || "image/jpeg",
+  });
+
+  const res = await api.post("trainer/upload-image/", formData, {
+    skipAuth: true,
+  });
+
+  return res.data.url;
+};
+
+
+export const registerTrainerApi = (formData) => {
+  return api.post("trainer/", formData, {
+    skipAuth: true,
+    headers: {
+      Accept: "application/json",
+      
+    },
   });
 };
 
-export const getTrainerProfile = () =>
-  api.get("trainer/profile/");
+export const fetchAvailableTrainersAPI = async (payload) => {
+  const response = await api.post("trainer/available-trainers/", payload);
+  return response.data;
+};
 
-export const editTrainerProfile = (data) =>
-  api.patch("trainer/profile/edit/", data);
-
-export const listTrainers = () =>
-  api.get("trainer/list/");
-
-export const availableTrainers = (payload) =>
-  api.post("trainer/available-trainers/", payload);
-
-export const trainerDetail = (id) =>
-  api.get(`trainer/detail/${id}/`);
-
-export const bookTrainer = (payload) =>
-  api.post("trainer/book-trainer/", payload);
+export const fetchTrainerDetailAPI = async (trainerId) => {
+  const response = await api.get(`trainer/detail/${trainerId}/`);
+  return response.data;
+};

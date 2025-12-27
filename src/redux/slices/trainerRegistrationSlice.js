@@ -1,23 +1,24 @@
-// trainerRegistrationSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { registerTrainerApi } from "../../services/trainerServices";
 
 export const registerTrainerThunk = createAsyncThunk(
   "trainer/register",
-  async (payload, { rejectWithValue }) => {
+  async (formData, { rejectWithValue }) => {
     try {
-      const response = await registerTrainerApi(payload);
+      const response = await registerTrainerApi(formData);
       return response.data;
-    } catch (err) {
-  console.log(" TRAINER REGISTER ERROR:", {
-    message: err.message,
-    status: err.response?.status,
-    data: err.response?.data,
-  });
-  return rejectWithValue(
-    err.response?.data || err.message || "Network error"
-  );
-}
+    } catch (error) {
+      console.log("TRAINER REGISTER ERROR FULL ↓↓↓");
+      if (error.response) {
+        console.log("STATUS:", error.response.status);
+        console.log("DATA:", error.response.data);
+      } else if (error.request) {
+        console.log("NO RESPONSE RECEIVED:", error.request);
+      } else {
+        console.log("ERROR MESSAGE:", error.message);
+      }
+      return rejectWithValue(error.message || "Registration failed");
+    }
   }
 );
 
@@ -30,16 +31,16 @@ const trainerRegistrationSlice = createSlice({
     data: null,
   },
   reducers: {
-    resetTrainerRegisterState: state => {
+    resetTrainerRegisterState: (state) => {
       state.loading = false;
       state.success = false;
       state.error = null;
       state.data = null;
     },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(registerTrainerThunk.pending, state => {
+      .addCase(registerTrainerThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -50,14 +51,10 @@ const trainerRegistrationSlice = createSlice({
       })
       .addCase(registerTrainerThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error =
-          typeof action.payload === "string"
-            ? action.payload
-            : action.payload?.message || "Registration failed";
+        state.error = action.payload || "Registration failed";
       });
   },
 });
 
 export const { resetTrainerRegisterState } = trainerRegistrationSlice.actions;
-
 export default trainerRegistrationSlice.reducer;

@@ -8,8 +8,7 @@ export const fetchPlansThunk = createAsyncThunk(
     try {
       const res = await planList();
 
-      // ✅ return ONLY array
-      return res.data.data;
+      return res.data?.data || [];
     } catch (err) {
       return rejectWithValue(
         err?.response?.data?.message || "Plan fetch failed"
@@ -17,6 +16,8 @@ export const fetchPlansThunk = createAsyncThunk(
     }
   }
 );
+
+
 
 const planSlice = createSlice({
   name: "plans",
@@ -34,8 +35,7 @@ const planSlice = createSlice({
       })
       .addCase(fetchPlansThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.plans = action.payload;
-      })
+       state.plans = action.payload;       })
       .addCase(fetchPlansThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
