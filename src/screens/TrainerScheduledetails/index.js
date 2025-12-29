@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  Modal,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
@@ -14,8 +15,18 @@ import TrainingProgressSelector from "../../components/TrainingProgressSelector"
 import SwipeButton from "../../components/Swipe";
 
 const TrainerScheduleDetail = () => {
-  const [detailsOpen, setDetailsOpen] = useState(true);
-  const [showNote, setShowNote] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [showNoteModal, setShowNoteModal] = useState(false);
+  const [noteText, setNoteText] = useState("");
+  const [savedNote, setSavedNote] = useState("");
+
+  const handleSubmitNote = () => {
+    if (noteText.trim()) {
+      setSavedNote(noteText);
+      setNoteText("");
+      setShowNoteModal(false);
+    }
+  };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -27,10 +38,10 @@ const TrainerScheduleDetail = () => {
         <Text style={styles.headerTitle}>Schedule Detail</Text>
       </View>
 
-      {/* Personal Details (Dropdown) */}
+      {/* Personal Details */}
       <PersonalDetailsCard
         isOpen={detailsOpen}
-        onToggle={() => setDetailsOpen(!detailsOpen)}
+        onToggle={() => setDetailsOpen(prev => !prev)}
       />
 
       {/* Location */}
@@ -48,27 +59,24 @@ const TrainerScheduleDetail = () => {
       <Text style={styles.sectionTitle}>Workout plan - GYM</Text>
       <Text style={styles.subText}>Workout type - Single</Text>
 
-      {/* Reused Calendar Component */}
+      {/* Training Progress */}
       <TrainingProgressSelector progressDay={1} progressTime="00:00" />
 
-      {/* Add Note */}
+      {/* Add Note Button */}
       <TouchableOpacity
         style={styles.addNoteBtn}
-        onPress={() => setShowNote(!showNote)}
+        onPress={() => setShowNoteModal(true)}
       >
         <Icon name="add" size={18} color="#fff" />
         <Text style={styles.addNoteText}>Add note</Text>
       </TouchableOpacity>
 
-      {showNote && (
+      {/* Saved Note Display */}
+      {savedNote ? (
         <View style={styles.noteBox}>
-          <TextInput
-            placeholder="Type your note here..."
-            multiline
-            style={styles.noteInput}
-          />
+          <Text style={styles.savedNoteText}>{savedNote}</Text>
         </View>
-      )}
+      ) : null}
 
       {/* Swipe Button */}
       <View style={styles.swipeWrapper}>
@@ -79,6 +87,41 @@ const TrainerScheduleDetail = () => {
           onSwipeSuccess={() => console.log("Session Ended")}
         />
       </View>
+
+      <Modal
+        visible={showNoteModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowNoteModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.closeIcon}
+              onPress={() => setShowNoteModal(false)}
+            >
+              <Icon name="close" size={22} />
+            </TouchableOpacity>
+
+            <Text style={styles.modalTitle}>Add a note</Text>
+
+            <TextInput
+              placeholder="Type your note here..."
+              multiline
+              value={noteText}
+              onChangeText={setNoteText}
+              style={styles.modalInput}
+            />
+
+            <TouchableOpacity
+              style={styles.submitBtn}
+              onPress={handleSubmitNote}
+            >
+              <Text style={styles.submitText}>Submit</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };

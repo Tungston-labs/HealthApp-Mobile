@@ -6,8 +6,8 @@ import styles from "./style";
 const TrainerBottomNav = ({ state, navigation }) => {
   const icons = {
     TrainerHome: "home-outline",
-    TrainerSessions: "barbell-outline",
-    TrainerProfile: "person-outline",
+    SessionBooking: "barbell-outline",
+    ProfileScreenTrainer: "person-outline",
   };
 
   return (
