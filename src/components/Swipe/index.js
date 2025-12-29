@@ -22,13 +22,13 @@ const SwipeButton = ({
   backgroundColor = '#E2E2FF',
   thumbColor = '#7774F4',
   borderRadius = 150,
-  textColor = '#000000',
+  textColor = '#000',
   fontSize = 18,
   icon,
   resetAfterSuccess = true,
   leftSpacing = 5,
 }) => {
-  const swipeThreshold = width - height - leftSpacing; 
+  const swipeThreshold = width - height - leftSpacing;
   const translateX = useSharedValue(0);
   const [swiped, setSwiped] = useState(false);
 
@@ -45,12 +45,22 @@ const SwipeButton = ({
   }, [onSwipeSuccess, resetAfterSuccess]);
 
   const panGesture = Gesture.Pan()
+    .activeOffsetX([-10, 10])   // ✅ ENABLE HORIZONTAL SWIPE
+    .failOffsetY([-10, 10])     // ✅ BLOCK VERTICAL SCROLL
     .onUpdate((event) => {
-      const translation = I18nManager.isRTL ? -event.translationX : event.translationX;
-      translateX.value = Math.min(Math.max(0, translation), swipeThreshold);
+      const translation = I18nManager.isRTL
+        ? -event.translationX
+        : event.translationX;
+
+      translateX.value = Math.min(
+        Math.max(0, translation),
+        swipeThreshold
+      );
     })
     .onEnd((event) => {
-      const shouldSwipe = translateX.value + event.velocityX * 0.1 > swipeThreshold * 0.7;
+      const shouldSwipe =
+        translateX.value + event.velocityX * 0.1 >
+        swipeThreshold * 0.7;
 
       if (shouldSwipe && !swiped) {
         translateX.value = withSpring(swipeThreshold);
@@ -89,10 +99,8 @@ const SwipeButton = ({
               animatedThumbStyle,
             ]}
           >
-            {icon ? (
-              icon
-            ) : (
-              <Ionicons name="chevron-forward" size={28} color="#ffffff" />
+            {icon || (
+              <Ionicons name="chevron-forward" size={28} color="#fff" />
             )}
           </Animated.View>
         </GestureDetector>
@@ -123,4 +131,3 @@ const styles = StyleSheet.create({
 });
 
 export default SwipeButton;
-

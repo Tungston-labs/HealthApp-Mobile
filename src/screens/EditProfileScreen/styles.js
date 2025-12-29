@@ -12,31 +12,33 @@ export default StyleSheet.create({
   },
 
   label: {
-    fontSize: 14,
-    color: "#555",
+    fontSize: 12,
+    color: "#777",
     marginBottom: 6,
     marginTop: 14,
   },
 
   input: {
     borderBottomWidth: 1,
-    borderColor: "#CFCFCF",
+    borderColor: "#DADADA",
     paddingVertical: 8,
-    fontSize: 16,
+    fontSize: 15,
     color: "#000",
   },
 
   locationBtn: {
-    backgroundColor: "#ECEBF6",
-    paddingVertical: 12,
-    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 14,
+    borderRadius: 30,
+    borderColor: "#DADADA",
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 26,
+    borderWidth:1,
   },
 
   locationText: {
-    color: "#6B4EFF",
-    fontSize: 16,
+    color: "#505050",
+    fontSize: 15,
     fontWeight: "600",
   },
 
@@ -49,7 +51,21 @@ export default StyleSheet.create({
   col: {
     width: "48%",
   },
-
+  
+  chipInput: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderColor: "#DADADA",
+    paddingVertical: 10,
+    justifyContent: "space-between",
+  },
+  
+  chipText: {
+    fontSize: 15,
+    color: "#000",
+  },
+   
   saveBtn: {
     backgroundColor: "#6B4EFF",
     paddingVertical: 15,
@@ -57,10 +73,11 @@ export default StyleSheet.create({
     alignItems: "center",
     marginVertical: 40,
   },
-
+  
   saveText: {
     color: "#FFF",
     fontSize: 18,
-    fontWeight: "70 0",
+    fontWeight: "600",
   },
+
 });
