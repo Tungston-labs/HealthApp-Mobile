@@ -70,15 +70,18 @@ useEffect(() => {
 
         <View style={styles.inputWrapper}>
           <Icon name="mail-outline" size={20} color="#8D8D8D" />
-          <TextInput
-            placeholder="Enter Email"
-            placeholderTextColor="#999"
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
+         <TextInput
+  placeholder="Enter Email"
+  placeholderTextColor="#999"
+  style={styles.input}
+  value={email}
+  onChangeText={setEmail}
+  autoCapitalize="none"
+  keyboardType="email-address"
+  returnKeyType="done"       
+  onSubmitEditing={handleContinue}  
+/>
+
         </View>
 
         <TouchableOpacity
