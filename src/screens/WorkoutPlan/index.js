@@ -19,9 +19,11 @@ const WorkoutPlan = ({ navigation }) => {
     dispatch(fetchPlansThunk());
   }, []);
 
+  console.log("PLANS 👉", plans);
+
   return (
     <>
-      <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView style={styles.container}>
         <Header
           username={user?.name || 'User'}
           subtitle="Your workout plans"
@@ -32,6 +34,10 @@ const WorkoutPlan = ({ navigation }) => {
         {error && <Text>{JSON.stringify(error)}</Text>}
 
         <View style={styles.gridContainer}>
+          {plans.length === 0 && !loading && (
+            <Text>No plans available</Text>
+          )}
+
           {plans.map(item => (
             <PlanCard
               key={item.id}

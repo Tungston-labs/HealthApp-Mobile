@@ -10,7 +10,9 @@ export const fetchPlansThunk = createAsyncThunk(
 
       return res.data?.data || [];
     } catch (err) {
-      return rejectWithValue(err?.response?.data || "Plan fetch failed");
+      return rejectWithValue(
+        err?.response?.data?.message || "Plan fetch failed"
+      );
     }
   }
 );
@@ -40,5 +42,6 @@ const planSlice = createSlice({
       });
   },
 });
+
 
 export default planSlice.reducer;

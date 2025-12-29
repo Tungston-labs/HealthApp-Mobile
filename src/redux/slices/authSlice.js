@@ -54,24 +54,25 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-     .addCase(loginClientThunk.fulfilled, (state, action) => {
-  state.loading = false;
-  state.isLoggedIn = true;
-  state.user = action.payload?.user;
+      .addCase(loginClientThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isLoggedIn = true;
 
-  console.log("DEBUG: Login Response Data ->", action.payload);
+        const user = action.payload?.data?.user;
+        const access = action.payload?.data?.access;
+        const refresh = action.payload?.data?.refresh;
 
-  const access = action.payload?.access || action.payload?.token || action.payload?.data?.access;
-  const refresh = action.payload?.refresh || action.payload?.data?.refresh;
+        state.user = user;
 
-  if (access) {
-    setToken(access, refresh);
-    api.defaults.headers.Authorization = `Bearer ${access}`;
-    console.log('🟢 Token successfully captured and applied');
-  } else {
-    console.error('🔴 LOGIN SUCCESS BUT NO TOKEN FOUND IN RESPONSE. Check backend keys.');
-  }
-})
+        if (access) {
+          setToken(access, refresh);
+          api.defaults.headers.Authorization = `Bearer ${access}`;
+          console.log("🟢 Token set successfully");
+        } else {
+          console.error("🔴 Login succeeded but token missing");
+        }
+      })
+
       .addCase(loginClientThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
