@@ -1,12 +1,14 @@
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-  card: {
-    backgroundColor: "#EEF0FF",
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 16,
-  },
+ card: {
+  backgroundColor: "#EEF0FF",
+  borderRadius: 20,
+  padding: 10,
+  paddingBottom: 36, // 👈 space for chevron
+  marginBottom: 16,
+  position: "relative", // 👈 REQUIRED
+},
 
   topRow: {
     flexDirection: "row",
@@ -14,8 +16,8 @@ export default StyleSheet.create({
   },
 
   avatar: {
-    width: 62,
-    height: 62,
+    width: 82,
+    height: 82,
     borderRadius: 16,
     marginRight: 12,
   },
@@ -25,15 +27,15 @@ export default StyleSheet.create({
   },
 
   name: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 20,
+    fontWeight: "700",
     color: "#000",
   },
 
   time: {
-    fontSize: 14,
-    color: "#444",
-    marginTop: 2,
+    fontSize: 16,
+    color: "#000",
+    marginTop: 5,
   },
 
   progressBadge: {
@@ -62,8 +64,9 @@ export default StyleSheet.create({
   },
 
   metaText: {
-    fontSize: 13,
+    fontSize: 14,
     color: "#000",
+    
   },
 
   dateRow: {
@@ -90,7 +93,7 @@ export default StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: "#DDD",
-    marginVertical: 14,
+    marginVertical: 6,
   },
 
   section: {
@@ -107,10 +110,20 @@ export default StyleSheet.create({
     flex: 1,
   },
 
-  arrow: {
-    alignSelf: "center",
-    marginTop: 8,
-  },
+ arrow: {
+  position: "absolute",
+  bottom: -18,           
+  left: "50%",
+  transform: [{ translateX: -18 }],
+  width: 30,
+  height: 30,
+  borderRadius: 18,
+  backgroundColor: "#6C63FF",
+  alignItems: "center",
+  justifyContent: "center",
+  elevation: 6,           
+},
  
+  
 
 });

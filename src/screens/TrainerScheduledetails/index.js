@@ -8,7 +8,7 @@ import {
   Modal,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-
+import { useNavigation } from "@react-navigation/native";
 import styles from "./style";
 import PersonalDetailsCard from "../../components/PersonalDetailsCard";
 import TrainingProgressSelector from "../../components/TrainingProgressSelector";
@@ -19,6 +19,7 @@ const TrainerScheduleDetail = () => {
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [savedNote, setSavedNote] = useState("");
+const navigation = useNavigation();
 
   const handleSubmitNote = () => {
     if (noteText.trim()) {
@@ -30,21 +31,17 @@ const TrainerScheduleDetail = () => {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity>
-          <Icon name="chevron-back" size={22} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Schedule Detail</Text>
-      </View>
+   <View style={styles.header}>
+  <TouchableOpacity onPress={() => navigation.goBack()}>
+    <Icon name="chevron-back" size={22} />
+  </TouchableOpacity>
 
-      {/* Personal Details */}
+  <Text style={styles.headerTitle}>Schedule Detail</Text>
+</View>
       <PersonalDetailsCard
         isOpen={detailsOpen}
         onToggle={() => setDetailsOpen(prev => !prev)}
       />
-
-      {/* Location */}
       <Text style={styles.mapHint}>Tap to open the map location.</Text>
 
       <View style={styles.locationBox}>
@@ -54,15 +51,9 @@ const TrainerScheduleDetail = () => {
           Ernakulam, Kerala 682024
         </Text>
       </View>
-
-      {/* Workout Plan */}
       <Text style={styles.sectionTitle}>Workout plan - GYM</Text>
       <Text style={styles.subText}>Workout type - Single</Text>
-
-      {/* Training Progress */}
       <TrainingProgressSelector progressDay={1} progressTime="00:00" />
-
-      {/* Add Note Button */}
       <TouchableOpacity
         style={styles.addNoteBtn}
         onPress={() => setShowNoteModal(true)}
@@ -70,15 +61,11 @@ const TrainerScheduleDetail = () => {
         <Icon name="add" size={18} color="#fff" />
         <Text style={styles.addNoteText}>Add note</Text>
       </TouchableOpacity>
-
-      {/* Saved Note Display */}
       {savedNote ? (
         <View style={styles.noteBox}>
           <Text style={styles.savedNoteText}>{savedNote}</Text>
         </View>
       ) : null}
-
-      {/* Swipe Button */}
       <View style={styles.swipeWrapper}>
         <SwipeButton
           title="Slide to start session"

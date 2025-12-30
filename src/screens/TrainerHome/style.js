@@ -17,7 +17,7 @@ export default StyleSheet.create({
 
   greeting: {
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: "900",
   },
 
   subTitle: {
@@ -66,4 +66,22 @@ export default StyleSheet.create({
     textAlign: "center",
     lineHeight: 18,
   },
+
+
+  headerCard: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  backgroundColor: "#fff",
+  padding: 16,
+  borderRadius: 20,
+
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 6 },
+  shadowOpacity: 0.08,
+  shadowRadius: 12,
+
+  elevation: 6,
+  marginBottom: 15,
+},
 });

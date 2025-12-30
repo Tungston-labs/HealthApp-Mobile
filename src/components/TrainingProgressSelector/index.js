@@ -33,7 +33,7 @@ const TrainingProgressSelector = ({ onDateSelect, progressDay = 1, progressTime 
 
     return (
         <View style={styles.container}>
-            {/* Day Progress Bar */}
+
             <View style={styles.dayBar}>
                 <Text style={styles.dayText}>Day {progressDay}</Text>
                 <View style={styles.timeRow}>
@@ -43,7 +43,7 @@ const TrainingProgressSelector = ({ onDateSelect, progressDay = 1, progressTime 
             </View>
       <Text style={styles.timeHeader}>Training Time 10:30</Text>
 
-            {/* Training Time Slots */}
+
             <FlatList
                 data={dates}
                 horizontal
