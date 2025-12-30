@@ -18,35 +18,56 @@ export default function ResetPasswordScreen({ navigation, route }) {
   const [showPassword, setShowPassword] = useState(false);
   const [confirmShowPassword, setConfirmShowPassword] = useState(false);
 
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmError, setConfirmError] = useState("");
+
   const dispatch = useDispatch();
-  const { loading, success, error } = useSelector((state) => state.resetpassword);
+  const { loading, error } = useSelector((state) => state.resetpassword);
 
-const handleReset = async () => {
-  if (!password || !confirmPassword) {
-    Alert.alert("Error", "Please fill all fields");
-    return;
-  }
+  // Password validation function
+  const validatePassword = (pass) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!pass) return "Password is required";
+    if (!regex.test(pass))
+      return "Password must be 8+ chars, include uppercase, lowercase, number & special char";
+    return "";
+  };
 
-  if (password !== confirmPassword) {
-    Alert.alert("Error", "Passwords do not match");
-    return;
-  }
+  // Confirm password validation
+  const validateConfirm = (confPass) => {
+    if (!confPass) return "Confirm password is required";
+    if (confPass !== password) return "Passwords do not match";
+    return "";
+  };
 
-  try {
-    await dispatch(
-      resetPasswordAction({
-        email: route.params.email,
-        password: password,
-        confirm_password: confirmPassword, 
-      })
-    ).unwrap();
+  const handleReset = async () => {
+    const pwdError = validatePassword(password);
+    const confError = validateConfirm(confirmPassword);
 
-    Alert.alert("Success", "Password reset successfully");
-    navigation.navigate("Login");
-  } catch (err) {
-    Alert.alert("Error", err.message || "Failed to reset password");
-  }
-};
+    setPasswordError(pwdError);
+    setConfirmError(confError);
+
+    if (pwdError || confError) return;
+
+    try {
+      await dispatch(
+        resetPasswordAction({
+          email: route.params.email,
+          password: password,
+          confirm_password: confirmPassword,
+        })
+      ).unwrap();
+
+      Alert.alert("Success", "Password reset successfully");
+      dispatch(resetState());
+      navigation.navigate("Login");
+    } catch (err) {
+      Alert.alert(
+        "Error",
+        err?.message || JSON.stringify(err) || "Failed to reset password"
+      );
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -64,7 +85,10 @@ const handleReset = async () => {
             secureTextEntry={!showPassword}
             style={styles.input}
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => {
+              setPassword(text);
+              setPasswordError(validatePassword(text));
+            }}
           />
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
@@ -74,6 +98,9 @@ const handleReset = async () => {
             />
           </TouchableOpacity>
         </View>
+        {passwordError ? (
+          <Text style={{ color: "red", marginTop: 5 }}>{passwordError}</Text>
+        ) : null}
       </View>
 
       <View style={styles.inputContainer}>
@@ -86,7 +113,10 @@ const handleReset = async () => {
             secureTextEntry={!confirmShowPassword}
             style={styles.input}
             value={confirmPassword}
-            onChangeText={setConfirmPassword}
+            onChangeText={(text) => {
+              setConfirmPassword(text);
+              setConfirmError(validateConfirm(text));
+            }}
           />
           <TouchableOpacity onPress={() => setConfirmShowPassword(!confirmShowPassword)}>
             <Ionicons
@@ -96,6 +126,9 @@ const handleReset = async () => {
             />
           </TouchableOpacity>
         </View>
+        {confirmError ? (
+          <Text style={{ color: "red", marginTop: 5 }}>{confirmError}</Text>
+        ) : null}
       </View>
 
       <TouchableOpacity
@@ -114,6 +147,14 @@ const handleReset = async () => {
         <Text style={styles.back}>Back to </Text>
         <Text style={styles.loginLink}>Log in</Text>
       </TouchableOpacity>
+
+      {error && (
+        <View style={{ marginTop: 10 }}>
+          <Text style={{ color: "red" }}>
+            {typeof error === "string" ? error : JSON.stringify(error)}
+          </Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 }

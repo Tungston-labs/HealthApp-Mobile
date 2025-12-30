@@ -1,17 +1,17 @@
-// redux/slices/resetPasswordSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { resetPassword } from "../../services/authServices";
 
+// Async thunk for reset password
 export const resetPasswordAction = createAsyncThunk(
   "resetPassword/reset",
   async (payload, { rejectWithValue }) => {
     try {
-      console.log("Reset password payload:", payload); 
+      console.log("Reset password payload:", payload);
       const response = await resetPassword(payload);
-      console.log("Reset password response:", response.data); 
+      console.log("Reset password response:", response.data);
       return response.data;
     } catch (error) {
-      console.log("Reset password error:", error); 
+      console.log("Reset password error:", error.response?.data || error.message);
       if (error.response && error.response.data) {
         return rejectWithValue(error.response.data);
       } else if (error.message) {
@@ -22,8 +22,6 @@ export const resetPasswordAction = createAsyncThunk(
     }
   }
 );
-
-
 
 const resetPasswordSlice = createSlice({
   name: "resetPassword",
