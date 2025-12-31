@@ -2,12 +2,18 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   container: {
-    backgroundColor: "#e0e0e0",
+    backgroundColor: "#E5E5E5",
     overflow: "hidden",
   },
-  gradientWrapper: {
+
+  shimmerWrapper: {
     position: "absolute",
+    width: "150%",
     height: "100%",
-    width: "200%",
+  },
+
+  gradient: {
+    width: "100%",
+    height: "100%",
   },
 });

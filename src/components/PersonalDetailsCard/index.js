@@ -16,7 +16,6 @@ const PersonalDetailsCard = ({
 }) => {
   return (
     <View style={styles.card}>
-      {/* TOP ROW */}
       <View style={styles.topRow}>
         <Image source={data?.profile_pic_url} style={styles.avatar} />
 

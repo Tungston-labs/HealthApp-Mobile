@@ -38,6 +38,7 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 12,
+     marginTop: 12,
   },
 
   /* 🔹 EMPTY STATE STYLES */
