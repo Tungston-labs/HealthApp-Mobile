@@ -2,7 +2,6 @@ import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./style";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialCommunityIcons";
 const PersonalDetailsCard = ({ isOpen, onToggle }) => {
     return (
