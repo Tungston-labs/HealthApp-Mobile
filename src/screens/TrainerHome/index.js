@@ -11,7 +11,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import ScheduleCard from '../../components/ScheduleCard';
 import styles from './style';
-
+import TrainingProgressCard from '../../components/ProgressBar';
 import { format, parse } from 'date-fns';
 import Skeleton from '../../components/Skelton';
 import Toast from 'react-native-toast-message';
@@ -54,6 +54,7 @@ const TrainerHome = () => {
           <Text style={styles.subTitle}>Gym</Text>
         </View>
 
+
         <TouchableOpacity
           style={styles.bell}
           onPress={goToNotifications}
@@ -62,6 +63,9 @@ const TrainerHome = () => {
           <Icon name="notifications-outline" size={20} />
         </TouchableOpacity>
       </View>
+
+<TrainingProgressCard />
+
 
       <Text style={styles.sectionTitle}>Today's Schedule</Text>
 

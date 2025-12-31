@@ -1,56 +1,77 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, View, StyleSheet } from "react-native";
+import { Animated, View } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import styles from "./style";
+
 const Skeleton = ({
   width = "100%",
   height = 16,
-  borderRadius = 6,
-  margin = 6,
+  borderRadius = 8,
+  marginVertical = 6,
 }) => {
   const shimmer = useRef(new Animated.Value(0)).current;
+  const pulse = useRef(new Animated.Value(0.6)).current;
 
   useEffect(() => {
+    // Shimmer movement
     Animated.loop(
       Animated.timing(shimmer, {
         toValue: 1,
-        duration: 1600,
-        easing: (t) => t * t * (3 - 2 * t),
+        duration: 1400,
         useNativeDriver: true,
       })
+    ).start();
+
+    // Pulse animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulse, {
+          toValue: 0.6,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ])
     ).start();
   }, []);
 
   const translateX = shimmer.interpolate({
     inputRange: [0, 1],
-    outputRange: [-200, 200],  
+    outputRange: [-250, 250],
   });
 
   return (
-    <View
+    <Animated.View
       style={[
         styles.container,
         {
           width,
           height,
           borderRadius,
-          margin,
+          marginVertical,
+          opacity: pulse,
         },
       ]}
     >
       <Animated.View
-        style={[styles.gradientWrapper, { transform: [{ translateX }] }]}
+        style={[
+          styles.shimmerWrapper,
+          { transform: [{ translateX }] },
+        ]}
       >
         <LinearGradient
-          colors={["#e0e0e0", "#ffffff90", "#e0e0e0"]}
+          colors={["#E5E5E5", "#FFFFFF", "#E5E5E5"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
-          style={StyleSheet.absoluteFill}
+          style={styles.gradient}
         />
       </Animated.View>
-    </View>
+    </Animated.View>
   );
 };
-
 
 export default Skeleton;

@@ -82,8 +82,8 @@ export default StyleSheet.create({
   },
 
   swipeWrapper: {
-    marginTop:50,
-    marginBottom: 40,
+    marginTop:20,
+    marginBottom: 20,
   },
 
   modalOverlay: {

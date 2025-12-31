@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './style';
 import PersonalDetailsCard from '../../components/PersonalDetailsCard';
 import TrainingProgressSelector from '../../components/TrainingProgressSelector';
-import SwipeButton from '../../components/Swipe';
+import ClickButton from '../../components/Swipe';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useGetTrainerSlotBookingByIdQuery } from '../../redux/api/trainer/scheduleApi';
 
@@ -40,7 +40,6 @@ const TrainerScheduleDetail = () => {
   };
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onBackPress}>
           <Icon name="chevron-back" size={22} />
@@ -57,6 +56,16 @@ const TrainerScheduleDetail = () => {
         isOpen={detailsOpen}
         onToggle={() => setDetailsOpen(prev => !prev)}
       />
+
+       <View style={styles.swipeWrapper}>
+        
+        <ClickButton
+          title="Click to Start Session"
+          successTitle=" Click to End Session "
+          width={340}
+          onSwipeSuccess={() => console.log('Session Ended')}
+        />
+      </View>
       <Text style={styles.mapHint}>Tap to open the map location.</Text>
 
       <View style={styles.locationBox}>
@@ -90,15 +99,6 @@ const TrainerScheduleDetail = () => {
           <Text style={styles.savedNoteText}>{savedNote}</Text>
         </View>
       ) : null}
-      <View style={styles.swipeWrapper}>
-        <SwipeButton
-          title="Slide to start session"
-          successTitle="Session Ended"
-          width={340}
-          onSwipeSuccess={() => console.log('Session Ended')}
-        />
-      </View>
-
       <Modal
         visible={showNoteModal}
         transparent
