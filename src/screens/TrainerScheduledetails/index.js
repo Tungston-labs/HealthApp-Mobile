@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,12 @@ import PersonalDetailsCard from '../../components/PersonalDetailsCard';
 import TrainingProgressSelector from '../../components/TrainingProgressSelector';
 import SwipeButton from '../../components/Swipe';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useGetTrainerSlotBookingByIdQuery } from '../../redux/api/trainer/scheduleApi';
+import {
+  useAddTrainerNoteMutation,
+  useGetTrainerNotesQuery,
+  useGetTrainerSlotBookingByIdQuery,
+} from '../../redux/api/trainer/scheduleApi';
+import Toast from 'react-native-toast-message';
 
 const TrainerScheduleDetail = () => {
   const route = useRoute();
@@ -22,19 +27,51 @@ const TrainerScheduleDetail = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [noteText, setNoteText] = useState('');
-  const [savedNote, setSavedNote] = useState('');
   const navigation = useNavigation();
 
   const { data, isLoading, isFetching, error, refetch } =
     useGetTrainerSlotBookingByIdQuery(id);
-  console.log(data, isLoading, isFetching, error, refetch);
-  const handleSubmitNote = () => {
-    if (noteText.trim()) {
-      setSavedNote(noteText);
+
+  const [addNote, { isLoading: isSaving }] = useAddTrainerNoteMutation();
+
+  const {
+    data: notesData,
+    refetch: refetchNotes,
+    isLoading: notesloading,
+    isFetching: notesFetching,
+    error: notesError,
+  } = useGetTrainerNotesQuery(id);
+
+  console.log(notesData, notesloading, notesFetching, notesError);
+
+  useEffect(() => {
+    if (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to load data',
+        text2: error?.data?.message || 'Unable to fetch schedule',
+      });
+    }
+  }, [error]);
+
+  const handleSubmitNote = async () => {
+    if (!noteText.trim()) return;
+
+    try {
+      await addNote({ id, note: noteText }).unwrap();
+
       setNoteText('');
       setShowNoteModal(false);
+    } catch (err) {
+      console.log(err);
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to save note',
+        text2: err?.data?.message || 'Something went wrong. Please try again.',
+      });
     }
   };
+
   const onBackPress = () => {
     navigation.navigate('TrainerNavigator', { screen: 'TrainerHome' });
   };
@@ -54,6 +91,8 @@ const TrainerScheduleDetail = () => {
           count: data?.total_sessions || 0,
           total: data?.session_number || 0,
         }}
+        startDate={data?.date}
+        endDate={data?.last_date}
         isOpen={detailsOpen}
         onToggle={() => setDetailsOpen(prev => !prev)}
       />
@@ -72,7 +111,7 @@ const TrainerScheduleDetail = () => {
 
       {/* Training Progress */}
       <TrainingProgressSelector
-        progressDay={1}
+        progressDay={data?.day_label || 'Day 1'}
         progressTime="00:00"
         time={data?.time}
       />
@@ -85,11 +124,23 @@ const TrainerScheduleDetail = () => {
         <Icon name="add" size={18} color="#fff" />
         <Text style={styles.addNoteText}>Add note</Text>
       </TouchableOpacity>
-      {savedNote ? (
+      {/* {notesData?.length > 0 && (
         <View style={styles.noteBox}>
-          <Text style={styles.savedNoteText}>{savedNote}</Text>
+          {notesData.map((item, idx) => (
+            <Text key={idx} style={styles.savedNoteText}>
+              {item?.notes}
+            </Text>
+          ))}
         </View>
-      ) : null}
+      )} */}
+      {notesData && (
+        <View style={styles.noteBox}>
+            <Text style={styles.savedNoteText}>
+              {notesData?.notes}
+            </Text>
+        </View>
+      )}
+
       <View style={styles.swipeWrapper}>
         <SwipeButton
           title="Slide to start session"
@@ -125,10 +176,13 @@ const TrainerScheduleDetail = () => {
             />
 
             <TouchableOpacity
-              style={styles.submitBtn}
+              style={[styles.submitBtn, isSaving && { opacity: 0.6 }]}
               onPress={handleSubmitNote}
+              disabled={isSaving}
             >
-              <Text style={styles.submitText}>Submit</Text>
+              <Text style={styles.submitText}>
+                {isSaving ? 'Saving...' : 'Submit'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

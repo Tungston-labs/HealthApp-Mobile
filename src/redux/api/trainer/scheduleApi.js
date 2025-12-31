@@ -8,7 +8,7 @@ export const scheduleApi = createApi({
     axiosInstance: api,
     baseUrl: '/', // axios already has baseURL
   }),
-  tagTypes: ['TodaysSections', 'SlotBooking'],
+  tagTypes: ['TodaysSections', 'SlotBooking','Notes'],
   endpoints: builder => ({
     getTodaysSchedules: builder.query({
       query: () => ({
@@ -27,7 +27,28 @@ export const scheduleApi = createApi({
       providesTags: (result, err, id) => [{ type: 'SlotBooking', id }],
       keepUnusedDataFor: 30,
     }),
+
+    getTrainerNotes: builder.query({
+      query: id => ({
+        url: `trainer/booking/${id}/note/`,
+        method: 'GET',
+      }),
+      providesTags: (result, err, id) => [{ type: 'Notes', id }],
+    }),
+
+    addTrainerNote: builder.mutation({
+      query: ({ note, id }) => ({
+        url: `trainer/booking/${id}/add-note/`,
+        method: 'POST',
+        data: { note },
+      }),
+      invalidatesTags: (result, err, { id }) => [{ type: 'Notes', id }],
+    }),
   }),
 });
-
-export const { useGetTodaysSchedulesQuery,useGetTrainerSlotBookingByIdQuery } = scheduleApi;
+export const {
+  useGetTodaysSchedulesQuery,
+  useGetTrainerSlotBookingByIdQuery,
+  useGetTrainerNotesQuery,
+  useAddTrainerNoteMutation,
+} = scheduleApi;
