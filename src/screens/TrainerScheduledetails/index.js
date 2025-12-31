@@ -8,7 +8,6 @@ import {
   Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-
 import styles from './style';
 import PersonalDetailsCard from '../../components/PersonalDetailsCard';
 import TrainingProgressSelector from '../../components/TrainingProgressSelector';
@@ -18,8 +17,10 @@ import {
   useAddTrainerNoteMutation,
   useGetTrainerNotesQuery,
   useGetTrainerSlotBookingByIdQuery,
+  useStartTrainerSessionMutation,
 } from '../../redux/api/trainer/scheduleApi';
 import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TrainerScheduleDetail = () => {
   const route = useRoute();
@@ -31,7 +32,7 @@ const TrainerScheduleDetail = () => {
 
   const { data, isLoading, isFetching, error, refetch } =
     useGetTrainerSlotBookingByIdQuery(id);
-
+console.log({data})
   const [addNote, { isLoading: isSaving }] = useAddTrainerNoteMutation();
 
   const {
@@ -72,6 +73,33 @@ const TrainerScheduleDetail = () => {
     }
   };
 
+  const [startSession, { isLoading:isSessionStarting }] = useStartTrainerSessionMutation();
+
+  const handleStartSession = async () => {
+    try {
+      const res = await startSession(id).unwrap();
+
+      await AsyncStorage.setItem(
+        'active_session',
+        JSON.stringify({
+          session_id: id,
+          started_at: Date.now(),
+          duration: data?.training_time?.duration_minutes || 0,
+        }),
+      );
+
+      Toast.show({
+        type: 'success',
+        text1: 'Session Started',
+      });
+    } catch (error) {
+      console.log(error)
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to start session',
+      });
+    }
+  };
   const onBackPress = () => {
     navigation.navigate('TrainerNavigator', { screen: 'TrainerHome' });
   };
@@ -101,7 +129,7 @@ const TrainerScheduleDetail = () => {
           title="Click to Start Session"
           successTitle=" Click to End Session "
           width={340}
-          onSwipeSuccess={() => console.log('Session Ended')}
+          onPress={handleStartSession}
         />
       </View>
       <Text style={styles.mapHint}>Tap to open the map location.</Text>
@@ -132,20 +160,16 @@ const TrainerScheduleDetail = () => {
         <Icon name="add" size={18} color="#fff" />
         <Text style={styles.addNoteText}>Add note</Text>
       </TouchableOpacity>
-      {/* {notesData?.length > 0 && (
-        <View style={styles.noteBox}>
-          {notesData.map((item, idx) => (
+
+      {notesData?.notes?.length > 0 &&
+        notesData?.notes?.map((item, idx) => (
+          <View style={styles.noteBox}>
             <Text key={idx} style={styles.savedNoteText}>
-              {item?.notes}
+              {item?.note}
             </Text>
-          ))}
-        </View>
-      )} */}
-      {notesData && (
-        <View style={styles.noteBox}>
-          <Text style={styles.savedNoteText}>{notesData?.notes}</Text>
-        </View>
-      )}
+          </View>
+        ))}
+
       {/* 
       <View style={styles.swipeWrapper}>
         <SwipeButton

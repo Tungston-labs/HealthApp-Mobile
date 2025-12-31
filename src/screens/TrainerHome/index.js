@@ -16,6 +16,7 @@ import { format, parse } from 'date-fns';
 import Skeleton from '../../components/Skelton';
 import Toast from 'react-native-toast-message';
 import { useGetTodaysSchedulesQuery } from '../../redux/api/trainer/scheduleApi';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TrainerHome = () => {
   const navigation = useNavigation();
@@ -27,7 +28,7 @@ const TrainerHome = () => {
     isFetching,
     refetch,
   } = useGetTodaysSchedulesQuery();
-
+console.log({schedules})
   const goToScheduleDetail = id => {
     navigation.navigate('TrainerScheduleDetail', { id });
   };
@@ -45,6 +46,14 @@ const TrainerHome = () => {
       });
     }
   }, [error]);
+useEffect(() => {
+  const checkStoredSession = async () => {
+    const stored = await AsyncStorage.getItem('active_session');
+    console.log('STORED ACTIVE SESSION:', stored);
+  };
+
+  checkStoredSession();
+}, []);
 
   return (
     <View style={styles.container}>
@@ -53,7 +62,6 @@ const TrainerHome = () => {
           <Text style={styles.greeting}>Hi, John</Text>
           <Text style={styles.subTitle}>Gym</Text>
         </View>
-
 
         <TouchableOpacity
           style={styles.bell}
@@ -64,8 +72,7 @@ const TrainerHome = () => {
         </TouchableOpacity>
       </View>
 
-<TrainingProgressCard />
-
+      <TrainingProgressCard />
 
       <Text style={styles.sectionTitle}>Today's Schedule</Text>
 

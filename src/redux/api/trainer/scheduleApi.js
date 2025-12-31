@@ -44,11 +44,19 @@ export const scheduleApi = createApi({
       }),
       invalidatesTags: (result, err, { id }) => [{ type: 'Notes', id }],
     }),
+
+    startTrainerSession: builder.mutation({
+      query: id => ({
+        url: 'section/start-training/',
+        method: 'POST',
+        data: { booking_id:id },
+      }),
+    }),
   }),
 });
 export const {
   useGetTodaysSchedulesQuery,
   useGetTrainerSlotBookingByIdQuery,
   useGetTrainerNotesQuery,
-  useAddTrainerNoteMutation,
+  useAddTrainerNoteMutation,useStartTrainerSessionMutation
 } = scheduleApi;
