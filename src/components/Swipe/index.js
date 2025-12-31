@@ -1,133 +1,104 @@
-import React, { useState, useCallback } from 'react';
-import { I18nManager, StyleSheet, Text, View } from 'react-native';
-import {
-  GestureHandlerRootView,
-  GestureDetector,
-  Gesture,
-} from 'react-native-gesture-handler';
+import React, { useState } from "react";
+import { StyleSheet, Text, Pressable, View } from "react-native";
 import Animated, {
-  runOnJS,
-  useAnimatedStyle,
   useSharedValue,
+  useAnimatedStyle,
   withSpring,
-} from 'react-native-reanimated';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-
-const SwipeButton = ({
-  width = 320,
-  height = 55,
-  title = 'Swipe to punch in',
-  successTitle = 'Punched In',
-  onSwipeSuccess,
-  backgroundColor = '#E2E2FF',
-  thumbColor = '#7774F4',
-  borderRadius = 150,
-  textColor = '#000',
-  fontSize = 18,
-  icon,
-  resetAfterSuccess = true,
-  leftSpacing = 5,
-}) => {
-  const swipeThreshold = width - height - leftSpacing;
-  const translateX = useSharedValue(0);
-  const [swiped, setSwiped] = useState(false);
-
-  const handleSwipeSuccess = useCallback(() => {
-    setSwiped(true);
-    onSwipeSuccess?.();
-
-    if (resetAfterSuccess) {
-      setTimeout(() => {
-        translateX.value = withSpring(0);
-        runOnJS(setSwiped)(false);
-      }, 1500);
-    }
-  }, [onSwipeSuccess, resetAfterSuccess]);
-
-  const panGesture = Gesture.Pan()
-    .activeOffsetX([-10, 10])   // ✅ ENABLE HORIZONTAL SWIPE
-    .failOffsetY([-10, 10])     // ✅ BLOCK VERTICAL SCROLL
-    .onUpdate((event) => {
-      const translation = I18nManager.isRTL
-        ? -event.translationX
-        : event.translationX;
-
-      translateX.value = Math.min(
-        Math.max(0, translation),
-        swipeThreshold
-      );
-    })
-    .onEnd((event) => {
-      const shouldSwipe =
-        translateX.value + event.velocityX * 0.1 >
-        swipeThreshold * 0.7;
-
-      if (shouldSwipe && !swiped) {
-        translateX.value = withSpring(swipeThreshold);
-        runOnJS(handleSwipeSuccess)();
-      } else {
-        translateX.value = withSpring(0);
-      }
-    });
-
-  const animatedThumbStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value + leftSpacing }],
-  }));
-
-  return (
-    <GestureHandlerRootView>
-      <View
-        style={[
-          styles.container,
-          { width, height, backgroundColor, borderRadius },
-        ]}
-      >
-        <Text style={[styles.label, { color: textColor, fontSize }]}>
-          {swiped ? successTitle : title}
-        </Text>
-
-        <GestureDetector gesture={panGesture}>
-          <Animated.View
-            style={[
-              styles.thumb,
-              {
-                width: height - 10,
-                height: height - 10,
-                borderRadius: height / 2,
-                backgroundColor: thumbColor,
-              },
-              animatedThumbStyle,
-            ]}
-          >
-            {icon || (
-              <Ionicons name="chevron-forward" size={28} color="#fff" />
-            )}
-          </Animated.View>
-        </GestureDetector>
-      </View>
-    </GestureHandlerRootView>
-  );
-};
+  withTiming,
+  interpolateColor,
+} from "react-native-reanimated";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    overflow: 'hidden',
-    alignSelf: 'center',
-    marginVertical: -35,
+  button: {
+    alignSelf: "center",
+    justifyContent: "center",
+    elevation: 4,
   },
-  label: {
-    position: 'absolute',
-    left: '25%',
-    fontFamily: 'Montserrat_700Bold',
-    zIndex: 10,
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  thumb: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    zIndex: 5,
+  text: {
+    fontFamily: "Montserrat_700Bold",
   },
 });
 
-export default SwipeButton;
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+const ClickButton = ({
+  width = 320,
+  height = 50,
+  title = "Punch In",
+  successTitle = "Punched In",
+  onPress,
+  backgroundColor ="#7774F4" ,
+  activeColor = "#E2E2FF",
+  textColor = "#fff",
+  fontSize = 17,
+  borderRadius = 150,
+  icon = "finger-print-outline",
+  resetAfterSuccess = true,
+}) => {
+  const scale = useSharedValue(1);
+  const progress = useSharedValue(0);
+  const [pressed, setPressed] = useState(false);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    backgroundColor: interpolateColor(
+      progress.value,
+      [0, 1],
+      [backgroundColor, activeColor]
+    ),
+  }));
+
+  const handlePress = () => {
+    setPressed(true);
+    onPress?.();
+
+    progress.value = withTiming(1, { duration: 300 });
+
+    if (resetAfterSuccess) {
+      setTimeout(() => {
+        progress.value = withTiming(0, { duration: 300 });
+        setPressed(false);
+      }, 1500);
+    }
+  };
+
+  return (
+    <AnimatedPressable
+      onPressIn={() => (scale.value = withSpring(0.95))}
+      onPressOut={() => (scale.value = withSpring(1))}
+      onPress={handlePress}
+      style={[
+        styles.button,
+        { width, height, borderRadius },
+        animatedStyle,
+      ]}
+    >
+      <View style={styles.content}>
+        {icon && (
+          <Ionicons
+            name={icon}
+            size={22}
+            color={pressed ? "#000" : textColor}
+            style={{ marginRight: 8 }}
+          />
+        )}
+        <Text
+          style={[
+            styles.text,
+            { color: pressed ? "#000" : textColor, fontSize },
+          ]}
+        >
+          {pressed ? successTitle : title}
+        </Text>
+      </View>
+    </AnimatedPressable>
+  );
+};
+
+export default ClickButton;
