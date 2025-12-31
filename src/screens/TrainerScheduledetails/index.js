@@ -32,7 +32,6 @@ const TrainerScheduleDetail = () => {
 
   const { data, isLoading, isFetching, error, refetch } =
     useGetTrainerSlotBookingByIdQuery(id);
-console.log({data})
   const [addNote, { isLoading: isSaving }] = useAddTrainerNoteMutation();
 
   const {
@@ -43,7 +42,6 @@ console.log({data})
     error: notesError,
   } = useGetTrainerNotesQuery(id);
 
-  console.log(notesData, notesloading, notesFetching, notesError);
 
   useEffect(() => {
     if (error) {
