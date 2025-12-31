@@ -124,4 +124,15 @@ innerShadow: {
     fontWeight: "700",
     color: "#6C63FF",
   },
+
+    backToLogin: {
+    color: "#444",
+    marginTop: 25,
+    fontSize: 14,
+  },
+
+  loginText: {
+    color: "#7774F4",
+    fontWeight: "600",
+  },
 });

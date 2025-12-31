@@ -31,27 +31,24 @@ export default function OtpScreen({ navigation, route }) {
     const newOtp = [...otp];
 
     if (text.length > 1) {
-      // Handle paste
       const textArray = text.split("").slice(0, 6);
       textArray.forEach((digit, idx) => {
         newOtp[idx] = digit;
       });
       setOtp(newOtp);
 
-      // Focus last box
       const nextIndex = Math.min(textArray.length, 5);
       inputRefs.current[nextIndex].focus();
     } else {
       newOtp[index] = text;
       setOtp(newOtp);
 
-      // Move forward
       if (text && index < otp.length - 1) {
         inputRefs.current[index + 1].focus();
       }
     }
 
-    // Auto-submit if all boxes filled
+
     const otpString = newOtp.join("");
     if (otpString.length === 6 && !newOtp.includes("")) {
       handleSubmit(otpString);
