@@ -18,33 +18,37 @@ export default function LoginScreen({ navigation }) {
   const dispatch = useDispatch();
 
 const { loading, isLoggedIn, error } = useSelector(
-  (state) => state.auth || {
-    loading: false,
-    isLoggedIn: false,
-    error: null,
-  }
+  (state) => state.auth
 );
+
 
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-   const isFocused = useIsFocused();
+  const isFocused = useIsFocused();
 
-  const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Email and password are required");
-      return;
-    }
+const handleLogin = () => {
+  if (loading) return;
 
-   dispatch(
-  loginClientThunk({
-    email_or_phno: email, 
-    password,
-  })
-);
+  if (!email || !password) {
+    Alert.alert("Error", "Email and password are required");
+    return;
+  }
 
-  };
+  dispatch(
+    loginClientThunk({
+      email_or_phno: email.trim(),
+      password,
+    })
+  );
+};
+
+useEffect(() => {
+  if (isFocused) {
+    dispatch(resetAuthState());
+  }
+}, [isFocused]);
 
 useEffect(() => {
   if (isLoggedIn) {
@@ -55,14 +59,24 @@ useEffect(() => {
   }
 }, [isLoggedIn]);
 
-useEffect(() => {
-  if (error && isFocused) {
-    setTimeout(() => {
-      Alert.alert("Login Failed", error);
-      dispatch(resetAuthState());
-    }, 100);
-  }
-}, [error, isFocused]);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "workout" }],
+      });
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (error && isFocused) {
+      setTimeout(() => {
+        Alert.alert("Login Failed", error);
+        dispatch(resetAuthState());
+      }, 100);
+    }
+  }, [error, isFocused]);
 
 
 

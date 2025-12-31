@@ -1,19 +1,19 @@
+// api.js
 import axios from "axios";
 import {
   getAccessToken,
   getRefreshToken,
   setAccessToken,
+  setRefreshToken,
+  clearTokens,
 } from "../storage/asyncStorage";
-import refreshApi from "./refreshApi";
 import { forceLogout } from "../utils/forceLogout";
 
 const api = axios.create({
   baseURL: "http://178.248.112.16:9001/api/",
-  timeout: 15000,
-  headers: {
-    Accept: "application/json",
-  },
+  timeout: 30000,
 });
+
 
 api.interceptors.request.use(async (config) => {
   const token = await getAccessToken();
@@ -23,52 +23,48 @@ api.interceptors.request.use(async (config) => {
   }
 
   if (config.data instanceof FormData) {
-
-    config.headers['Content-Type'] = 'multipart/form-data';
-    
-
+    delete config.headers["Content-Type"];
   } else {
-    config.headers['Content-Type'] = 'application/json';
+    config.headers["Content-Type"] = "application/json";
   }
 
   return config;
-}, (error) => Promise.reject(error));
+});
+
+
 
 let isRefreshing = false;
 let failedQueue = [];
 
 const processQueue = (error, token = null) => {
-  failedQueue.forEach((prom) => {
-    error ? prom.reject(error) : prom.resolve(token);
-  });
+  failedQueue.forEach((prom) =>
+    error ? prom.reject(error) : prom.resolve(token)
+  );
   failedQueue = [];
 };
+
 
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    if (originalRequest?.skipAuth) {
-      return Promise.reject(error);
-    }
-
-    if (!error.response) {
-      return Promise.reject({
-        message: error.message || "Network error. Please try again.",
-      });
-    }
-
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.skipAuth
+    ) {
       originalRequest._retry = true;
 
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return api(originalRequest);
-        });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
       }
 
       isRefreshing = true;
@@ -77,20 +73,24 @@ api.interceptors.response.use(
         const refresh = await getRefreshToken();
         if (!refresh) throw new Error("No refresh token");
 
-        const res = await refreshApi.post("auth/token/refresh/", {
-          refresh,
-        });
+        const { data } = await axios.post(
+          `${api.defaults.baseURL}auth/token/refresh/`,
+          { refresh }
+        );
 
-        const newAccessToken = res.data.access;
-        await setAccessToken(newAccessToken);
+        await setAccessToken(data.access);
 
-        api.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
-        processQueue(null, newAccessToken);
+        if (data.refresh) {
+          await setRefreshToken(data.refresh);
+        }
 
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        processQueue(null, data.access);
+
+        originalRequest.headers.Authorization = `Bearer ${data.access}`;
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);
+        await clearTokens();
         forceLogout();
         return Promise.reject(err);
       } finally {

@@ -137,9 +137,9 @@ export default function SelectRoleScreen() {
     }
 
     if (selected === "trainer") {
-      navigation.navigate("CreateAccount");   // 👈 Trainer → CreateAccount
+      navigation.navigate("CreateAccount");   //  Trainer → CreateAccount
     } else if (selected === "user") {
-      navigation.navigate("SignupDetailsScreenUser"); // 👈 User → User Signup
+      navigation.navigate("SignupDetailsScreenUser"); //  User → User Signup
     }
   };
 
@@ -214,7 +214,7 @@ export default function SelectRoleScreen() {
       <View style={styles.continueFixed}>
         <TouchableOpacity
           style={styles.continueBtn}
-          onPress={handleContinue}  // ✅ Corrected navigation handler
+          onPress={handleContinue}  
         >
           <Text style={styles.continueText}>Continue</Text>
           <Ionicons

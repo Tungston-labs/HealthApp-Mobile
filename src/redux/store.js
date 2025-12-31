@@ -20,7 +20,7 @@ export const store = configureStore({
     resetpassword:ResetPasswordReducer,
     planList:PlanReducer,
     trainerReg:trainerRegistrationReducer,
-    trainerplan:trainerPlanReducer,
+    trainer:trainerPlanReducer,
     trainerDetail:trainerDetailReducer,
     
   },

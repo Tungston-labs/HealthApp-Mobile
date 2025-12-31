@@ -8,17 +8,18 @@ export const registerTrainerThunk = createAsyncThunk(
       const response = await registerTrainerApi(formData);
       return response.data;
     } catch (error) {
-      console.log("TRAINER REGISTER ERROR FULL ↓↓↓");
-      if (error.response) {
-        console.log("STATUS:", error.response.status);
-        console.log("DATA:", error.response.data);
-      } else if (error.request) {
-        console.log("NO RESPONSE RECEIVED:", error.request);
-      } else {
-        console.log("ERROR MESSAGE:", error.message);
-      }
-      return rejectWithValue(error.message || "Registration failed");
-    }
+  console.log("TRAINER REGISTER ERROR FULL ↓↓↓");
+  console.log("AXIOS ERROR OBJECT", error.toJSON ? error.toJSON() : error);
+  if (error.response) {
+    console.log("STATUS:", error.response.status);
+    console.log("DATA:", error.response.data);
+  } else if (error.request) {
+    console.log("NO RESPONSE RECEIVED:", error.request);
+  } else {
+    console.log("ERROR MESSAGE:", error.message);
+  }
+  return rejectWithValue(error.message || "Registration failed");
+}
   }
 );
 
