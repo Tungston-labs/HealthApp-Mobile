@@ -40,7 +40,7 @@ export const fetchTrainerDetailAPI = async (trainerId) => {
 
 
 const getTrainerBookings = async ({ page = 1, date = null }) => {
-  let url = `/trainer/bookings/?page=${page}`;
+  let url = `section/trainer/bookings/?page=${page}`;
 
   if (date) {
     url += `&date=${date}`; // YYYY-MM-DD

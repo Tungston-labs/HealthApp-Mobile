@@ -22,7 +22,8 @@ const SessionBooking = () => {
         bookings,
         isLoading,
         next,
-    } = useSelector((state) => state.trainer);
+    } = useSelector((state) => state.trainerUpcomingSessions);
+
 
     const [activeTab, setActiveTab] = useState("booking");
     const [calendarVisible, setCalendarVisible] = useState(false);
@@ -89,14 +90,21 @@ const SessionBooking = () => {
                         )}
 
                         {bookings.map((item) => (
-                            <SessionCard
-                                key={item.id}
-                                date={item.date}
-                                time={item.time_label}
-                                clientName={item.client.name}
-                                status={item.status}
-                            />
-                        ))}
+  <SessionCard
+    key={item.id}
+    clientName={item.client.name}
+    date={item.date}
+    time={item.time_label}
+    endDate={item.session_end_date}
+    status={item.status}
+
+    /* ✅ USE API VALUES */
+    sessionCount={item.session_number}
+    totalSessions={item.total_sessions}
+  />
+))}
+
+
                     </>
                 )}
 

@@ -1,4 +1,3 @@
-// src/features/trainer/trainerSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import trainerService from "../../services/trainerServices";
 
@@ -45,12 +44,13 @@ const trainerSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(fetchTrainerBookings.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.bookings = action.payload.results.bookings;
-        state.count = action.payload.count;
-        state.next = action.payload.next;
-        state.previous = action.payload.previous;
-      })
+  state.isLoading = false;
+  state.bookings = action.payload.results;     // ✅ FIX
+  state.count = action.payload.total_items;    // ✅ FIX
+  state.next = action.payload.next;
+  state.previous = action.payload.previous;
+})
+
       .addCase(fetchTrainerBookings.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;

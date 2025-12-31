@@ -9,6 +9,8 @@ import PlanReducer from "./slices/planSlice";
 import trainerRegistrationReducer from "./slices/trainerRegistrationSlice";
 import trainerPlanReducer from "./slices/trainerPlanSlice";
 import trainerDetailReducer from "./slices/trainerDetailSlice";
+import trainerUpcomingSessionsReducer from "./slices/trainerUpcomingSessions";
+
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +24,7 @@ export const store = configureStore({
     trainerReg:trainerRegistrationReducer,
     trainerplan:trainerPlanReducer,
     trainerDetail:trainerDetailReducer,
+    trainerUpcomingSessions: trainerUpcomingSessionsReducer,
     
   },
 });
