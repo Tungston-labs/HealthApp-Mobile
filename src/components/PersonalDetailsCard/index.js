@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './style';
+import MaterialIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format, parse } from 'date-fns';
 
 const PersonalDetailsCard = ({ isOpen, onToggle, data, time, progress }) => {
@@ -9,10 +10,7 @@ const PersonalDetailsCard = ({ isOpen, onToggle, data, time, progress }) => {
     <View style={styles.card}>
       {/* TOP ROW */}
       <View style={styles.topRow}>
-        <Image
-          source={data?.profile_pic_url}
-          style={styles.avatar}
-        />
+        <Image source={data?.profile_pic_url} style={styles.avatar} />
 
         <View style={styles.info}>
           <Text style={styles.name}>{data?.name}</Text>
@@ -29,8 +27,6 @@ const PersonalDetailsCard = ({ isOpen, onToggle, data, time, progress }) => {
           </Text>
         </View>
       </View>
-
-      {/* META INFO (ALWAYS VISIBLE) */}
       <View style={styles.metaRow}>
         <View style={styles.metaItem}>
           <Icon name="water-outline" size={16} />
@@ -43,12 +39,11 @@ const PersonalDetailsCard = ({ isOpen, onToggle, data, time, progress }) => {
         </View>
 
         <View style={styles.metaItem}>
-          <Icon name="scale-outline" size={16} />
+          <MaterialIcons name="human-male-height" size={16} color="#666" />
           <Text style={styles.metaText}>{data?.height}</Text>
         </View>
       </View>
-
-      {/* DATE ROW */}
+      <View style={styles.divider} />
       <View style={styles.dateRow}>
         <View style={styles.dateBlock}>
           <Text style={styles.label}>Start date</Text>
@@ -61,7 +56,6 @@ const PersonalDetailsCard = ({ isOpen, onToggle, data, time, progress }) => {
         </View>
       </View>
 
-      {/* EXPANDED CONTENT */}
       {isOpen && (
         <>
           <View style={styles.divider} />
@@ -70,7 +64,7 @@ const PersonalDetailsCard = ({ isOpen, onToggle, data, time, progress }) => {
             <Text style={styles.label}>Workout Goals</Text>
             <Text style={styles.value}>need to change</Text>
           </View>
-
+          <View style={styles.divider} />
           <View style={styles.section}>
             <Text style={styles.label}>
               Have any (Health condition / injury)
@@ -87,28 +81,26 @@ const PersonalDetailsCard = ({ isOpen, onToggle, data, time, progress }) => {
               <Text style={styles.label}>City / Town</Text>
               <Text style={styles.value}>need to change</Text>
             </View>
-
-            <View style={styles.divider} />
           </View>
-
+          <View style={styles.divider} />
           <View style={styles.section}>
             <Text style={styles.label}>Landmark</Text>
             <Text style={styles.value}>need to change</Text>
           </View>
-
+          <View style={styles.divider} />
           <View style={styles.section}>
             <Text style={styles.label}>Address</Text>
-            <Text style={styles.value}>{data?.address} </Text>
+            <Text style={styles.value}>{data?.address}</Text>
           </View>
+          <View style={styles.divider} />
         </>
       )}
 
-      {/* ARROW */}
       <TouchableOpacity style={styles.arrow} onPress={onToggle}>
         <Icon
           name={isOpen ? 'chevron-up' : 'chevron-down'}
           size={22}
-          color="#6C63FF"
+          color="#FFF"
         />
       </TouchableOpacity>
     </View>

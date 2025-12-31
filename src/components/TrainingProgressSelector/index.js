@@ -26,7 +26,7 @@ const TrainingProgressSelector = ({
   onDateSelect,
   progressDay = 1,
   progressTime = '00:00 Hrs',
-  time
+  time,
 }) => {
   const [selectedDateIndex, setSelectedDateIndex] = useState(0);
   const [dates, setDates] = useState([]);
@@ -45,7 +45,6 @@ const TrainingProgressSelector = ({
 
   return (
     <View style={styles.container}>
-      {/* Day Progress Bar */}
       <View style={styles.dayBar}>
         <Text style={styles.dayText}>Day {progressDay}</Text>
         <View style={styles.timeRow}>
@@ -58,7 +57,6 @@ const TrainingProgressSelector = ({
         {time ? format(parse(time, 'HH:mm:ss', new Date()), 'HH:mm') : '00:00'}
       </Text>
 
-      {/* Training Time Slots */}
       <FlatList
         data={dates}
         horizontal

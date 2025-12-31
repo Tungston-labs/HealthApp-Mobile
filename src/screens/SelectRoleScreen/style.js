@@ -165,7 +165,7 @@ export default StyleSheet.create({
     fontWeight: "700",
     color: "#000",
     lineHeight: 24,
-     fontFamily: "Segoe UI",
+    fontFamily: "Segoe UI",
   },
 
   subText: {

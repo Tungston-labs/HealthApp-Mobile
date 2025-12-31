@@ -48,7 +48,7 @@ const TrainerHome = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={styles.headerCard}>
         <View>
           <Text style={styles.greeting}>Hi, John</Text>
           <Text style={styles.subTitle}>Gym</Text>

@@ -47,8 +47,6 @@ const TrainerScheduleDetail = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Schedule Detail</Text>
       </View>
-
-      {/* Personal Details */}
       <PersonalDetailsCard
         data={data?.client}
         time={data?.time}
@@ -59,8 +57,6 @@ const TrainerScheduleDetail = () => {
         isOpen={detailsOpen}
         onToggle={() => setDetailsOpen(prev => !prev)}
       />
-
-      {/* Location */}
       <Text style={styles.mapHint}>Tap to open the map location.</Text>
 
       <View style={styles.locationBox}>
@@ -75,7 +71,11 @@ const TrainerScheduleDetail = () => {
       <Text style={styles.subText}>Workout type - {data?.plan?.plan_type}</Text>
 
       {/* Training Progress */}
-      <TrainingProgressSelector progressDay={1} progressTime="00:00" time={data?.time}/>
+      <TrainingProgressSelector
+        progressDay={1}
+        progressTime="00:00"
+        time={data?.time}
+      />
 
       {/* Add Note Button */}
       <TouchableOpacity
@@ -85,15 +85,11 @@ const TrainerScheduleDetail = () => {
         <Icon name="add" size={18} color="#fff" />
         <Text style={styles.addNoteText}>Add note</Text>
       </TouchableOpacity>
-
-      {/* Saved Note Display */}
       {savedNote ? (
         <View style={styles.noteBox}>
           <Text style={styles.savedNoteText}>{savedNote}</Text>
         </View>
       ) : null}
-
-      {/* Swipe Button */}
       <View style={styles.swipeWrapper}>
         <SwipeButton
           title="Slide to start session"
