@@ -21,8 +21,8 @@ export default StyleSheet.create({
   },
 
   mapHint: {
-    fontSize: 12,
-    color: "#777",
+    fontSize: 14,
+    color: "#000",
     marginVertical: 8,
   },
 
@@ -36,7 +36,7 @@ export default StyleSheet.create({
 
   locationText: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 14,
     color: "#0085F7",
   },
 
@@ -82,7 +82,7 @@ export default StyleSheet.create({
   },
 
   swipeWrapper: {
-    marginTop: 20,
+    marginTop:50,
     marginBottom: 40,
   },
 

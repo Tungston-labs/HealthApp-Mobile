@@ -55,7 +55,6 @@ const SessionBooking = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* SINGLE SCROLLVIEW (KEY FIX) */}
             <ScrollView showsVerticalScrollIndicator={false}>
 
                 {activeTab === "booking" && (

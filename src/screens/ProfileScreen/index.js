@@ -45,7 +45,6 @@ const ProfileScreen = ({ navigation }) => {
 
   const handleLogout = () => {
     setLogoutVisible(false);
-
     navigation.replace("Login");
   };
 

@@ -11,15 +11,14 @@ export default StyleSheet.create({
   toggleWrapper: {
     flexDirection: "row",
     backgroundColor: "#F6F6F6",
-    borderRadius: 22,
-    padding: 6,
+    borderRadius: 20,
     marginBottom: 20,
   },
 
   toggleBtn: {
     flex: 1,
     paddingVertical: 15,
-    borderRadius: 18,
+    borderRadius: 30,
     alignItems: "center",
   },
 
@@ -28,19 +27,19 @@ export default StyleSheet.create({
   },
 
   toggleText: {
-    fontSize: 13,
+    fontSize: 15,
     color: "#9A9A9A",
-    fontWeight: "500",
+
   },
 
   activeToggleText: {
     color: "#FFFFFF",
-    fontWeight: "600",
+    fontWeight: "800",
   },
 
   sectionTitle: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: "800",
     marginBottom: 12,
   },
 

@@ -32,25 +32,25 @@ const TrainerHome = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Hi, John</Text>
-          <Text style={styles.subTitle}>Gym</Text>
-        </View>
+     <View style={styles.headerCard}>
+  <View>
+    <Text style={styles.greeting}>Hi, John</Text>
+    <Text style={styles.subTitle}>Gym</Text>
+  </View>
 
-        <TouchableOpacity
-          style={styles.bell}
-          onPress={goToNotifications}
-          activeOpacity={0.7}
-        >
-          <Icon name="notifications-outline" size={20} />
-        </TouchableOpacity>
-      </View>
+  <TouchableOpacity
+    style={styles.bell}
+    onPress={goToNotifications}
+    activeOpacity={0.7}
+  >
+    <Icon name="notifications-outline" size={20} />
+  </TouchableOpacity>
+</View>
+
 
       <Text style={styles.sectionTitle}>Today's Schedule</Text>
 
       {schedules.length === 0 ? (
-        // 🔹 EMPTY STATE
         <View style={styles.emptyContainer}>
           <Image
             source={require("../../Images/empty.png")}
