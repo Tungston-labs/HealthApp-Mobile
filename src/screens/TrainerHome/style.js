@@ -41,7 +41,6 @@ export default StyleSheet.create({
      marginTop: 12,
   },
 
-  /* 🔹 EMPTY STATE STYLES */
   emptyContainer: {
     flex: 1,
     alignItems: "center",

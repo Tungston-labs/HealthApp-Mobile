@@ -33,7 +33,6 @@ const TrainerEditProfile = ({ navigation }) => {
     <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
-      {/* White panel */}
       <View
         style={{
           position: "absolute",
@@ -45,7 +44,6 @@ const TrainerEditProfile = ({ navigation }) => {
         }}
       />
 
-      {/* Background curve */}
       <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
 
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -57,15 +55,12 @@ const TrainerEditProfile = ({ navigation }) => {
         />
 
         <View style={styles.formWrapper}>
-          {/* Name */}
           <Text style={styles.label}>Name</Text>
           <TextInput
             style={styles.input}
             value={form.name}
             onChangeText={(v) => handleChange("name", v)}
           />
-
-          {/* Email + Phone */}
           <View style={styles.row}>
             <View style={styles.col}>
               <Text style={styles.label}>E-mail ID</Text>
@@ -86,7 +81,6 @@ const TrainerEditProfile = ({ navigation }) => {
             </View>
           </View>
 
-          {/* DOB */}
           <Text style={styles.label}>Date of Birth</Text>
           <TextInput
             style={styles.input}
@@ -94,7 +88,7 @@ const TrainerEditProfile = ({ navigation }) => {
             onChangeText={(v) => handleChange("dob", v)}
           />
 
-          {/* Aadhaar */}
+
           <Text style={styles.label}>Aadhaar Number</Text>
           <TextInput
             style={styles.input}
@@ -102,12 +96,11 @@ const TrainerEditProfile = ({ navigation }) => {
             onChangeText={(v) => handleChange("aadhaar", v)}
           />
 
-          {/* Location Button */}
+
           <TouchableOpacity style={styles.locationBtn}>
             <Text style={styles.locationText}>Use my location</Text>
           </TouchableOpacity>
 
-          {/* Pincode + City */}
           <View style={styles.row}>
             <View style={styles.col}>
               <Text style={styles.label}>Pin code</Text>
@@ -128,7 +121,6 @@ const TrainerEditProfile = ({ navigation }) => {
             </View>
           </View>
 
-          {/* Landmark */}
           <Text style={styles.label}>Landmark</Text>
           <TextInput
             style={styles.input}
@@ -136,7 +128,7 @@ const TrainerEditProfile = ({ navigation }) => {
             onChangeText={(v) => handleChange("landmark", v)}
           />
 
-          {/* Address */}
+         
           <Text style={styles.label}>Address</Text>
           <TextInput
             style={styles.input}
@@ -144,7 +136,6 @@ const TrainerEditProfile = ({ navigation }) => {
             onChangeText={(v) => handleChange("address", v)}
           />
 
-          {/* Save */}
           <View style={styles.saveWrapper}>
             <TouchableOpacity style={styles.saveBtn}>
               <Text style={styles.saveText}>Save</Text>

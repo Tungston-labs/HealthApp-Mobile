@@ -77,7 +77,6 @@ const buildRegisterPayload = (data) => {
   formData.append("gender", data.gender);
   formData.append("blood_group", data.blood_group);
 
-  // IMPORTANT: Decimal fields as STRING
   formData.append("height", String(data.height));
   formData.append("weight", String(data.weight));
 
@@ -85,8 +84,6 @@ const buildRegisterPayload = (data) => {
     "address",
     `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`
   );
-
-  // JSONField → STRING
   formData.append(
     "health_issues",
     JSON.stringify(data.health_issues || [])
@@ -97,7 +94,6 @@ const buildRegisterPayload = (data) => {
     JSON.stringify(data.wellness_goal || [])
   );
 
-  // ImageField → FILE
   if (data.profile_pic) {
     formData.append("profile_pic", {
       uri: data.profile_pic.uri,
@@ -108,11 +104,6 @@ const buildRegisterPayload = (data) => {
 
   return formData;
 };
-
-
-
-
-
 
 const handleFinalSubmit = () => {
   if (!registration.name || !registration.email || !registration.phno) {
@@ -139,8 +130,6 @@ useEffect(() => {
   }
 }, [registered, dispatch, navigation]);
 
-
-
 useEffect(() => {
   if (error && !registered) {
     const message =
@@ -151,11 +140,6 @@ useEffect(() => {
     Alert.alert("Registration failed", message);
   }
 }, [error, registered]);
-
-
-
-
-
   return (
     <View style={styles.container}>
       <View style={styles.topBackground} />
@@ -166,7 +150,6 @@ useEffect(() => {
         <View style={styles.card}>
           <View style={styles.cardInner}>
 
-            {/* ==== BMI CIRCLE ==== */}
             <View style={styles.circleContainer}>
               <Svg width="180" height="180" style={styles.svgRotate}>
                 <Circle
@@ -210,7 +193,7 @@ useEffect(() => {
               />
             </View>
 
-            {/* ==== SCALE ==== */}
+
             <View style={styles.scaleWrapper}>
               {[
                 ...Array(10).fill("#84CDEE"),
@@ -222,7 +205,7 @@ useEffect(() => {
               ))}
             </View>
 
-            {/* ==== INFO ==== */}
+ 
             <View style={styles.infoRow}>
               <View style={styles.infoItem}>
                 <Text style={styles.infoValue}>
@@ -247,7 +230,7 @@ useEffect(() => {
               </View>
             </View>
 
-            {/* ==== LEGEND ==== */}
+
             <View style={styles.legendWrapper}>
               <View style={styles.legendItem}>
                 <View style={[styles.legendColor, { backgroundColor: "#84CDEE" }]} />

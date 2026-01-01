@@ -15,7 +15,7 @@ const SingleSession = ({ route }) => {
     numSessions: "12",
     workoutType: "Gym",
     rating: "4.5",
-    image:"../../../assets/trainer3.jpg",
+    image: "../../../assets/trainer3.jpg",
   };
 
   return (
@@ -26,23 +26,23 @@ const SingleSession = ({ route }) => {
         source={require("../../../assets/trainer2.jpg")}
         style={styles.topImage}
       />
-<View style={styles.infoRowWrapper}>
-  <TrainerInfoCard
-    name={session.name}
-    experience={session.experience}
-    sessionTiming={session.sessionTiming}
-    numSessions={session.numSessions}
-    workoutType={session.workoutType}
-    image={require("../../../assets/trainer2.jpg")}
-  />
+      <View style={styles.infoRowWrapper}>
+        <TrainerInfoCard
+          name={session.name}
+          experience={session.experience}
+          sessionTiming={session.sessionTiming}
+          numSessions={session.numSessions}
+          workoutType={session.workoutType}
+          image={require("../../../assets/trainer2.jpg")}
+        />
 
-  <View style={styles.ratingBox}>
-    <Icon name="star" size={20} color="#F4C430" />
-    <Text style={styles.ratingText}>4.6</Text>
-  </View>
-</View>
+        <View style={styles.ratingBox}>
+          <Icon name="star" size={20} color="#F4C430" />
+          <Text style={styles.ratingText}>4.6</Text>
+        </View>
+      </View>
 
-     
+
 
       <TrainingProgressSelector
         progressDay={1}

@@ -13,7 +13,6 @@ const Skeleton = ({
   const pulse = useRef(new Animated.Value(0.6)).current;
 
   useEffect(() => {
-    // Shimmer movement
     Animated.loop(
       Animated.timing(shimmer, {
         toValue: 1,
@@ -21,8 +20,6 @@ const Skeleton = ({
         useNativeDriver: true,
       })
     ).start();
-
-    // Pulse animation
     Animated.loop(
       Animated.sequence([
         Animated.timing(pulse, {

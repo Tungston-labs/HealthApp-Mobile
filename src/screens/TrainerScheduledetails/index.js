@@ -58,7 +58,7 @@ const TrainerScheduleDetail = () => {
       />
 
        <View style={styles.swipeWrapper}>
-        
+
         <ClickButton
           title="Click to Start Session"
           successTitle=" Click to End Session "
@@ -72,21 +72,15 @@ const TrainerScheduleDetail = () => {
         <Icon name="location" size={18} color="#FF3B30" />
         <Text style={styles.locationText}>{data?.client?.address}</Text>
       </View>
-
-      {/* Workout Plan */}
       <Text style={styles.sectionTitle}>
         Workout plan - {data?.plan?.plan_name}
       </Text>
       <Text style={styles.subText}>Workout type - {data?.plan?.plan_type}</Text>
-
-      {/* Training Progress */}
       <TrainingProgressSelector
         progressDay={1}
         progressTime="00:00"
         time={data?.time}
       />
-
-      {/* Add Note Button */}
       <TouchableOpacity
         style={styles.addNoteBtn}
         onPress={() => setShowNoteModal(true)}

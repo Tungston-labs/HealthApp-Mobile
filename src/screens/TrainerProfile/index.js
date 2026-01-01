@@ -9,13 +9,8 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import ProfileHeader from "../../components/ProfileHeader";
 import styles from "./style";
-
 import { launchImageLibrary } from "react-native-image-picker";
-
-// Curve
 import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
-
-// Modal
 import CommonActionModal from "../../components/ModalComponents";
 
 const ProfileScreenTrainer = ({ navigation }) => {

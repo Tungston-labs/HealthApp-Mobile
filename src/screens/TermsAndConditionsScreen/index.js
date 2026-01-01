@@ -19,7 +19,6 @@ const TermsAndConditions = () => {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
         <View style={styles.headerRow}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
@@ -32,7 +31,6 @@ const TermsAndConditions = () => {
           <Text style={styles.title}>Terms & Conditions</Text>
         </View>
 
-        {/* Intro */}
         <Text style={styles.paragraph}>
           Infit App is an online platform that connects fitness enthusiasts with
           professional trainers for personalized workout plans, diet programs,
@@ -41,7 +39,7 @@ const TermsAndConditions = () => {
           Conditions.
         </Text>
 
-        {/* User Section */}
+  
         <Text style={styles.subTitle}>User</Text>
         <View style={styles.underline} />
 
@@ -69,7 +67,6 @@ const TermsAndConditions = () => {
           resulting from participation in training programs.
         </Text>
 
-        {/* Trainer Section */}
         <Text style={styles.subTitle}>Trainer</Text>
         <View style={styles.underline} />
 
