@@ -27,7 +27,6 @@ const TrainerHome = () => {
     isFetching,
     refetch,
   } = useGetTodaysSchedulesQuery();
-
   const goToScheduleDetail = id => {
     navigation.navigate('TrainerScheduleDetail', { id });
   };
@@ -54,7 +53,6 @@ const TrainerHome = () => {
           <Text style={styles.subTitle}>Gym</Text>
         </View>
 
-
         <TouchableOpacity
           style={styles.bell}
           onPress={goToNotifications}
@@ -64,8 +62,7 @@ const TrainerHome = () => {
         </TouchableOpacity>
       </View>
 
-<TrainingProgressCard />
-
+      <TrainingProgressCard />
 
       <Text style={styles.sectionTitle}>Today's Schedule</Text>
 
