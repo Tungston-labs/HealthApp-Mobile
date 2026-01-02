@@ -55,3 +55,11 @@ const trainerService = {
 };
 
 export default trainerService;
+
+
+// trainer session history
+
+export const fetchTrainerHistory = async (page = 1) => {
+  const response = await api.get(`section/trainer/history/?page=${page}`);
+  return response.data;
+};
