@@ -8,7 +8,7 @@ export default StyleSheet.create({
     dayBar: {
         backgroundColor: "#7774F4",
         borderRadius: 10,
-        padding: 16,
+        padding: 12,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
@@ -16,7 +16,8 @@ export default StyleSheet.create({
     },
     dayText: {
         color: "#fff",
-        fontWeight: "600",
+        fontWeight: "700",
+         fontSize: 16,
     },
     timeRow: {
         flexDirection: "row",
@@ -25,7 +26,7 @@ export default StyleSheet.create({
 
   timeHeader: {
     fontSize: 16,
-    marginTop: 10,
+    // marginTop: 10,
     fontWeight: "700",
     color: "#000",
     fontFamily: "SegoeUI",
@@ -36,9 +37,9 @@ export default StyleSheet.create({
     },
     slotCard: {
         backgroundColor: "#DFDEF3",
-        width: 50,
+        width: 40,
         height: 60,
-        borderRadius: 8,
+        borderRadius: 4,
         justifyContent: "center",
         alignItems: "center",
         marginRight: 8,
@@ -57,5 +58,24 @@ export default StyleSheet.create({
     activeSlotText: {
         color: "#fff",
     },
+
+    sliderWrapper: {
+  marginTop: 6,
+},
+
+track: {
+  height: 2,
+  backgroundColor: "#000",
+  marginTop: 6,
+  position: "relative",
+},
+
+indicator: {
+  position: "absolute",
+  height: 2,
+  width: 40,
+  backgroundColor: "#000",
+},
+
 });
 

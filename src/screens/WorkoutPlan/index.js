@@ -1,76 +1,64 @@
-import React, { useState } from 'react';
-import { View, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, ScrollView, ActivityIndicator } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import Header from '../../components/Header';
 import styles from './style';
-import FilterModal from '../../components/FIlterModal/index';
+import FilterModal from '../../components/FIlterModal';
+import PlanCard from './PlanCard';
+import { fetchPlansThunk } from '../../redux/slices/planSlice';
+import { Text } from 'react-native-svg';
 
 const WorkoutPlan = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const [showModal, setShowModal] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
 
-    const [showModal, setShowModal] = useState(false);
+  const { plans, loading, error } = useSelector(state => state.planList);
+  const user = useSelector(state => state.auth?.user);
+  useEffect(() => {
+    dispatch(fetchPlansThunk());
+  }, []);
 
-    return (
-        <>
-            <ScrollView style={styles.container}>
+  console.log("PLANS 👉", plans);
 
-                {/* Header */}
-                <Header
-                    username="Ajay"
-                    subtitle="Your workout plans"
-                    onNotificationPress={() => navigation.navigate("Notifications")}
-                />
+  return (
+    <>
+      <ScrollView style={styles.container}>
+        <Header
+          username={user?.name || 'User'}
+          subtitle="Your workout plans"
+          onNotificationPress={() => navigation.navigate('Notifications')}
+        />
 
-                {/* Image Grid */}
-                <View style={styles.gridContainer}>
+        {loading && <ActivityIndicator size="large" />}
+        {error && <Text>{JSON.stringify(error)}</Text>}
 
-                    <TouchableOpacity onPress={() => setShowModal(true)}>
-                        <Image
-                            source={require("../../../assets/swimming.png")}
-                            style={styles.imageBox}
-                            resizeMode="contain"
-                        />
-                    </TouchableOpacity>
+        <View style={styles.gridContainer}>
+          {plans.length === 0 && !loading && (
+            <Text>No plans available</Text>
+          )}
 
-                    <TouchableOpacity onPress={() => setShowModal(true)}>
-                        <Image
-                            source={require("../../../assets/gym.png")}
-                            style={styles.imageBox}
-                            resizeMode="contain"
-                        />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => setShowModal(true)}>
-                        <Image
-                            source={require("../../../assets/cycling.png")}
-                            style={styles.imageBox}
-                            resizeMode="contain"
-                        />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => setShowModal(true)}>
-                        <Image
-                            source={require("../../../assets/zumba.png")}
-                            style={styles.imageBox}
-                            resizeMode="contain"
-                        />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => setShowModal(true)}>
-                        <Image
-                            source={require("../../../assets/boxing.png")}
-                            style={styles.imageBox}
-                            resizeMode="contain"
-                        />
-                    </TouchableOpacity>
-
-                </View>
-            </ScrollView>
-
-            <FilterModal
-                visible={showModal}
-                onClose={() => setShowModal(false)}
+          {plans.map(item => (
+            <PlanCard
+              key={item.id}
+              item={item}
+              onPress={() => {
+                setSelectedPlanId(item.id);
+                setShowModal(true);
+              }}
             />
-        </>
-    );
+          ))}
+
+        </View>
+      </ScrollView>
+
+      <FilterModal
+        visible={showModal}
+        planId={selectedPlanId}
+        onClose={() => setShowModal(false)}
+      />
+    </>
+  );
 };
 
 export default WorkoutPlan;

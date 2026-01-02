@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, FlatList } from "react-native";
 import styles from "./style";
+import { useDispatch, useSelector } from "react-redux";
+import { updateRegistration } from "../../../redux/slices/registrationSlice";
 
 export default function AgeScreen() {
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -9,27 +11,40 @@ export default function AgeScreen() {
     "July", "August", "September", "October", "November", "December",
   ];
   const years = Array.from({ length: 50 }, (_, i) => 1980 + i);
-
+  const dispatch=useDispatch();
   const [selectedDay, setSelectedDay] = useState(0);
   const [selectedMonth, setSelectedMonth] = useState(0);
   const [selectedYear, setSelectedYear] = useState(years.length - 1);
 
   const ITEM_HEIGHT = 40;
   const VISIBLE_ITEMS = 5; 
-  const PADDING = (VISIBLE_ITEMS - 1) / 2 * ITEM_HEIGHT; // top & bottom
+  const PADDING = (VISIBLE_ITEMS - 1) / 2 * ITEM_HEIGHT;
 
   const [age, setAge] = useState(0);
 
-  useEffect(() => {
-    const birthday = new Date(years[selectedYear], selectedMonth, selectedDay + 1);
-    const today = new Date();
+ useEffect(() => {
+  const birthday = new Date(
+    years[selectedYear],
+    selectedMonth,
+    selectedDay + 1
+  );
 
-    let diff = today.getFullYear() - birthday.getFullYear();
-    const m = today.getMonth() - birthday.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthday.getDate())) diff--;
+  const today = new Date();
+  let diff = today.getFullYear() - birthday.getFullYear();
+  const m = today.getMonth() - birthday.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthday.getDate())) diff--;
 
-    setAge(diff >= 0 ? diff : 0);
-  }, [selectedDay, selectedMonth, selectedYear]);
+  const finalAge = diff >= 0 ? diff : 0;
+  setAge(finalAge);
+
+  dispatch(
+    updateRegistration({
+      dob: birthday.toISOString().split("T")[0],
+      age: finalAge,
+    })
+  );
+}, [selectedDay, selectedMonth, selectedYear]);
+
 
   const onScrollEnd = (event, setItem, length) => {
     const index = Math.round(event.nativeEvent.contentOffset.y / ITEM_HEIGHT);

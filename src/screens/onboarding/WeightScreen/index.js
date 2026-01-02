@@ -1,37 +1,52 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   Dimensions,
-} from "react-native";
-import styles from "./style";
+} from 'react-native';
+import styles from './style';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateRegistration } from '../../../redux/slices/registrationSlice';
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function WeightScreen() {
+  const dispatch = useDispatch();
+
+  const { weight, weightUnit } = useSelector(state => state.registration);
+
   const MIN = 0;
   const MAX = 200;
   const ITEM_WIDTH = 8;
   const scrollRef = useRef(null);
 
-  const [unit, setUnit] = useState("KG");
-  const [kgValue, setKgValue] = useState(55);
+  const [unit, setUnit] = useState(weightUnit || 'KG');
+  const [kgValue, setKgValue] = useState(weight ?? 55);
 
   const numbers = Array.from({ length: MAX - MIN + 1 }, (_, i) => MIN + i);
-
   const sidePadding = SCREEN_WIDTH / 2 - ITEM_WIDTH / 2;
 
-  const toLbs = (kg) => Math.round(kg * 2.20462);
-  const displayedValue = unit === "KG" ? kgValue : toLbs(kgValue);
+  const toLbs = kg => Math.round(kg * 2.20462);
+  const displayedValue = unit === 'KG' ? kgValue : toLbs(kgValue);
 
-  const onScroll = (e) => {
+  // 🔹 Scroll handler
+  const onScroll = e => {
     const x = e.nativeEvent.contentOffset.x;
     const index = Math.round(x / ITEM_WIDTH);
     const clamped = Math.max(0, Math.min(numbers.length - 1, index));
 
-    if (clamped !== kgValue) setKgValue(clamped);
+    if (clamped !== kgValue) {
+      setKgValue(clamped);
+
+      dispatch(
+        updateRegistration({
+          weight: clamped,
+          weightUnit: unit,
+        }),
+      );
+    }
   };
 
   useEffect(() => {
@@ -43,7 +58,17 @@ export default function WeightScreen() {
     }
   }, []);
 
-  // ---- NEW CLEAN NUMBER LOGIC (matches first screenshot) ----
+  const changeUnit = newUnit => {
+    setUnit(newUnit);
+
+    dispatch(
+      updateRegistration({
+        weight: kgValue,
+        weightUnit: newUnit,
+      }),
+    );
+  };
+
   const leftValue = kgValue - 5 >= 0 ? kgValue - 5 : 0;
   const rightValue = kgValue + 5 <= 200 ? kgValue + 5 : 200;
 
@@ -52,32 +77,42 @@ export default function WeightScreen() {
       {/* Toggle */}
       <View style={styles.toggleWrapper}>
         <TouchableOpacity
-          style={[styles.toggleBtn, unit === "KG" && styles.activeToggle]}
-          onPress={() => setUnit("KG")}
+          style={[styles.toggleBtn, unit === 'KG' && styles.activeToggle]}
+          onPress={() => changeUnit('KG')}
         >
-          <Text style={[styles.toggleText, unit === "KG" && styles.activeToggleText]}>
+          <Text
+            style={[
+              styles.toggleText,
+              unit === 'KG' && styles.activeToggleText,
+            ]}
+          >
             KG
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.toggleBtn, unit === "LBS" && styles.activeToggle]}
-          onPress={() => setUnit("LBS")}
+          style={[styles.toggleBtn, unit === 'LBS' && styles.activeToggle]}
+          onPress={() => changeUnit('LBS')}
         >
-          <Text style={[styles.toggleText, unit === "LBS" && styles.activeToggleText]}>
+          <Text
+            style={[
+              styles.toggleText,
+              unit === 'LBS' && styles.activeToggleText,
+            ]}
+          >
             LBS
           </Text>
         </TouchableOpacity>
       </View>
 
-      {/* FIXED — EXACT LIKE FIRST IMAGE */}
+      {/* Top numbers */}
       <View style={styles.topNumbersRow}>
         <Text style={styles.sideNumber}>{leftValue}</Text>
         <Text style={styles.centerNumber}>{kgValue}</Text>
         <Text style={styles.sideNumber}>{rightValue}</Text>
       </View>
 
-      {/* Purple ruler */}
+      {/* Ruler */}
       <View style={styles.rulerWrapper}>
         <ScrollView
           ref={scrollRef}
@@ -92,15 +127,15 @@ export default function WeightScreen() {
             paddingRight: sidePadding,
           }}
         >
-          {numbers.map((num) => {
+          {numbers.map(num => {
             const isBig = num % 5 === 0;
             return (
               <View
                 key={num}
                 style={{
                   width: ITEM_WIDTH,
-                  justifyContent: "center",
-                  alignItems: "center",
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <View
@@ -117,12 +152,12 @@ export default function WeightScreen() {
         <View style={styles.centerLine} pointerEvents="none" />
       </View>
 
-      {/* Green pointer */}
+      {/* Pointer */}
       <View style={styles.pointerWrapper}>
         <View style={styles.greenPointer} />
       </View>
 
-      {/* Selected number */}
+      {/* Selected value */}
       <View style={styles.bigValueWrapper}>
         <Text style={styles.bigValue}>{displayedValue}</Text>
         <Text style={styles.bigUnit}>{unit}</Text>

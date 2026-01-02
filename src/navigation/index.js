@@ -26,10 +26,11 @@ import TrainerNavigator from './TrainerNavigator';
 import TrainerScheduleDetail from '../screens/TrainerScheduledetails';
 import TrainerEditProfile from '../screens/TrainerEditprofile';
 const Stack = createNativeStackNavigator();
+import { navigationRef } from "./navigationService";
 
 export default function Navigation() {
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Welcome">
 
         <Stack.Screen name="Login" component={LoginScreen} />

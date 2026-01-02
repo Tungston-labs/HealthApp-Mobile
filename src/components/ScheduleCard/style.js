@@ -1,44 +1,44 @@
-import { StyleSheet, Dimensions } from "react-native";
-
-const { width } = Dimensions.get("window");
+import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   wrapper: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 20,
+    alignItems: "center",
+    marginBottom: 18,
   },
 
+  /* Timeline dot */
   timelineDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#7774F4",
-    marginTop: 48,
+    borderWidth: 1.5,
+    borderColor: "#6C63FF",
     marginRight: 12,
   },
 
+  /* Card */
   card: {
     flex: 1,
     flexDirection: "row",
     backgroundColor: "#EDEDFF",
-    borderRadius: 18,
-    padding: 14,
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     alignItems: "center",
   },
 
   time: {
-    color: "#7774F4",
-    fontWeight: "600",
+    width: 48,
+    color: "#6C63FF",
     fontSize: 14,
-    width: 50,
+    fontWeight: "600",
   },
 
   avatar: {
-    width: 75,
-    height: 75,
-    borderRadius: 16,
+    width: 70,
+    height: 70,
+    borderRadius: 12,
     marginHorizontal: 10,
   },
 
@@ -47,15 +47,15 @@ export default StyleSheet.create({
   },
 
   name: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: 14,
+    fontWeight: "700",
     color: "#000",
   },
 
   metaRow: {
     flexDirection: "row",
-    marginTop: 4,
-    gap: 12,
+    marginTop: 6,
+    gap: 30,
   },
 
   metaText: {
@@ -64,12 +64,12 @@ export default StyleSheet.create({
   },
 
   progressBadge: {
+    marginTop: 6,
     alignSelf: "flex-start",
     backgroundColor: "#D7DBFF",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
-    marginTop: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
   },
 
   progressText: {
@@ -77,4 +77,10 @@ export default StyleSheet.create({
     color: "#6C63FF",
     fontWeight: "600",
   },
+
+metaItem: {
+  flexDirection: "row",
+  alignItems: "center",
+  gap: 4, // if RN < 0.71, use marginRight
+},
 });

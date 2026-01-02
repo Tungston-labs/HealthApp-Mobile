@@ -1,22 +1,52 @@
-import React from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./style";
+import { useSelector, useDispatch } from "react-redux";
+import { Alert } from "react-native";
+import { registerClientThunk, resetClientState } from "../../redux/slices/clientSlice";
+import { resetRegistration } from "../../redux/slices/registrationSlice";
 
 export default function BMIResultScreen({ navigation }) {
-  const weight = 65;
-  const height = 170;
-  const age = 26;
-  const gender = "Male";
+  const {
+    weight,
+    weightUnit,
+    height,
+    age,
+    gender,
+  } = useSelector((state) => state.registration);
+  const dispatch = useDispatch();
 
-  const bmi = (weight / ((height / 100) * (height / 100))).toFixed(1);
+  const registration = useSelector(
+    (state) => state.registration
+  );
+
+  const { loading, registered, error } = useSelector(
+    (state) => state.client
+  );
+
+  const weightInKg =
+    weightUnit === "LBS" ? weight * 0.453592 : weight;
+
+  const heightInMeters = height / 100;
+  if (!weight || !height) {
+    return null;
+  }
+
+  const bmi = (
+    weightInKg /
+    (heightInMeters * heightInMeters)
+  ).toFixed(1);
+
   const bmiValue = parseFloat(bmi);
+
   const progress = Math.min((bmiValue / 40) * 100, 100);
   const radius = 70;
   const strokeWidth = 12;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (circumference * progress) / 100;
+  const strokeDashoffset =
+    circumference - (circumference * progress) / 100;
 
   let bmiText = "";
   let bmiColor = "";
@@ -34,6 +64,97 @@ export default function BMIResultScreen({ navigation }) {
     bmiText = "Obesity";
     bmiColor = "#F5554A";
   }
+const buildRegisterPayload = (data) => {
+  const formData = new FormData();
+
+  formData.append("name", data.name);
+  formData.append("email", data.email);
+  formData.append("phno", data.phno);
+  formData.append("password", data.password);
+  formData.append("role", "user");
+
+  formData.append("dob", data.dob);
+  formData.append("gender", data.gender);
+  formData.append("blood_group", data.blood_group);
+
+  // IMPORTANT: Decimal fields as STRING
+  formData.append("height", String(data.height));
+  formData.append("weight", String(data.weight));
+
+  formData.append(
+    "address",
+    `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`
+  );
+
+  // JSONField → STRING
+  formData.append(
+    "health_issues",
+    JSON.stringify(data.health_issues || [])
+  );
+
+  formData.append(
+    "wellness_goal",
+    JSON.stringify(data.wellness_goal || [])
+  );
+
+  // ImageField → FILE
+  if (data.profile_pic) {
+    formData.append("profile_pic", {
+      uri: data.profile_pic.uri,
+      type: data.profile_pic.type || "image/jpeg",
+      name: data.profile_pic.name || "profile.jpg",
+    });
+  }
+
+  return formData;
+};
+
+
+
+
+
+
+const handleFinalSubmit = () => {
+  if (!registration.name || !registration.email || !registration.phno) {
+    Alert.alert("Incomplete profile", "Please complete signup details");
+    return;
+  }
+
+  const formData = buildRegisterPayload(registration);
+
+  console.log("REGISTER PAYLOAD 👉", formData);
+  dispatch(registerClientThunk(formData));
+};
+
+
+useEffect(() => {
+  if (registered) {
+    dispatch(resetRegistration());
+    dispatch(resetClientState());
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "workout" }],
+    });
+  }
+}, [registered, dispatch, navigation]);
+
+
+
+useEffect(() => {
+  if (error && !registered) {
+    const message =
+      typeof error === "string"
+        ? error
+        : error.message || "Registration failed";
+
+    Alert.alert("Registration failed", message);
+  }
+}, [error, registered]);
+
+
+
+
 
   return (
     <View style={styles.container}>
@@ -73,15 +194,23 @@ export default function BMIResultScreen({ navigation }) {
               <Text style={styles.bmiValue}>{bmi}</Text>
             </View>
 
-            <Text style={styles.bmiMessage}>You have {bmiText} Body Weight!</Text>
+            <Text style={styles.bmiMessage}>
+              You have {bmiText} Body Weight!
+            </Text>
 
-            <View style={[styles.chipWrapper]}>
+            <View style={styles.chipWrapper}>
               <View style={[styles.chip, { backgroundColor: bmiColor }]}>
                 <Text style={styles.chipText}>{bmiText}</Text>
               </View>
-              <View style={[styles.chipArrow, { borderTopColor: bmiColor }]} />
+              <View
+                style={[
+                  styles.chipArrow,
+                  { borderTopColor: bmiColor },
+                ]}
+              />
             </View>
 
+            {/* ==== SCALE ==== */}
             <View style={styles.scaleWrapper}>
               {[
                 ...Array(10).fill("#84CDEE"),
@@ -93,11 +222,12 @@ export default function BMIResultScreen({ navigation }) {
               ))}
             </View>
 
-            <View style={styles.divider} />
-
+            {/* ==== INFO ==== */}
             <View style={styles.infoRow}>
               <View style={styles.infoItem}>
-                <Text style={styles.infoValue}>{weight} kg</Text>
+                <Text style={styles.infoValue}>
+                  {weight} {weightUnit.toLowerCase()}
+                </Text>
                 <Text style={styles.infoLabel}>Weight</Text>
               </View>
 
@@ -117,6 +247,7 @@ export default function BMIResultScreen({ navigation }) {
               </View>
             </View>
 
+            {/* ==== LEGEND ==== */}
             <View style={styles.legendWrapper}>
               <View style={styles.legendItem}>
                 <View style={[styles.legendColor, { backgroundColor: "#84CDEE" }]} />
@@ -125,13 +256,13 @@ export default function BMIResultScreen({ navigation }) {
               </View>
 
               <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: "#78B060" }]} />
+                <View style={[styles.legendColor, { backgroundColor: "#FFDF32" }]} />
                 <Text style={styles.legendLabel}>Normal Weight :</Text>
                 <Text style={styles.legendValue}>18.5 - 24.9</Text>
               </View>
 
               <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: "#FFDF32" }]} />
+                <View style={[styles.legendColor, { backgroundColor: "#78B060" }]} />
                 <Text style={styles.legendLabel}>Over Weight :</Text>
                 <Text style={styles.legendValue}>25 - 29.9</Text>
               </View>
@@ -142,17 +273,24 @@ export default function BMIResultScreen({ navigation }) {
                 <Text style={styles.legendValue}>30 - 39.9</Text>
               </View>
             </View>
+
           </View>
         </View>
       </ScrollView>
 
       <TouchableOpacity
         style={styles.floatingButton}
-        onPress={() => navigation.navigate("workout")}
+        onPress={handleFinalSubmit}
+        disabled={loading}
       >
-        <Ionicons name="chevron-forward" size={28} color="#fff" />
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Ionicons name="chevron-forward" size={28} color="#fff" />
+        )}
       </TouchableOpacity>
+
     </View>
   );
 }
-
+  

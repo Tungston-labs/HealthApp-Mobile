@@ -7,7 +7,6 @@ export default function ThankYouScreen() {
   const [showVerified, setShowVerified] = useState(false);
   const navigation = useNavigation();
 
-  // Step 1: Show verified screen after 2 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowVerified(true);
@@ -15,8 +14,6 @@ export default function ThankYouScreen() {
 
     return () => clearTimeout(timer);
   }, []);
-
-  // Step 2: Move to Trainer tab after 1 second
   useEffect(() => {
     if (showVerified) {
       const navTimer = setTimeout(() => {
