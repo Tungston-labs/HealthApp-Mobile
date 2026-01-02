@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import styles from "./style";
-
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 const ScheduleCard = ({
   time,
   name,
@@ -18,7 +18,6 @@ const ScheduleCard = ({
       style={styles.wrapper}
     >
       <View style={styles.timelineDot} />
-
       <View style={styles.card}>
         <Text style={styles.time}>{time}</Text>
 
@@ -28,9 +27,17 @@ const ScheduleCard = ({
           <Text style={styles.name}>{name}</Text>
 
           <View style={styles.metaRow}>
-            <Text style={styles.metaText}>{weight} KG</Text>
-            <Text style={styles.metaText}>{rating}</Text>
+
+            <View style={styles.metaItem}>
+              <Icon name="weight-lifter" size={16} color="#666" />
+              <Text style={styles.metaText}>{weight} KG</Text>
+            </View>
+            <View style={styles.metaItem}>
+              <Icon name="human-male-height" size={16} color="#666" />
+              <Text style={styles.metaText}>{rating}</Text>
+            </View>
           </View>
+
 
           <View style={styles.progressBadge}>
             <Text style={styles.progressText}>{progress}</Text>

@@ -11,7 +11,7 @@ const api = axios.create({
   baseURL: "http://178.248.112.16:9001/api/",
   timeout: 15000,
   headers: {
-    Accept: "application/json",
+  Accept: "application/json",
   },
 });
 

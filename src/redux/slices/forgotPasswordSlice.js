@@ -6,18 +6,11 @@ export const forgotPasswordThunk = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await forgotPasswordStep(payload);
+      return response.data;
 
-      if (response?.data?.detail) {
-        return response.data;
-      }
-
-      return rejectWithValue("Failed to send OTP");
     } catch (error) {
-      if (error?.response?.status === 200) {
-        return { detail: "OTP sent to email" };
-      }
-
       const data = error?.response?.data;
+
 
       return rejectWithValue(
         data?.detail ||
@@ -48,15 +41,20 @@ const forgotPasswordSlice = createSlice({
     builder
       .addCase(forgotPasswordThunk.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.success = false;
+        state.error = null;      
       })
       .addCase(forgotPasswordThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.message = action.payload.detail;
+        state.message =
+          action.payload?.detail ||
+          "OTP sent successfully";
+        state.error = null;     
       })
       .addCase(forgotPasswordThunk.rejected, (state, action) => {
         state.loading = false;
+        state.success = false;
         state.error = action.payload;
       });
   },

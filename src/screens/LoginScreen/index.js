@@ -24,8 +24,6 @@ const { loading, isLoggedIn,user, error } = useSelector(
     error: null,
   }
 );
-
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -43,10 +41,7 @@ const { loading, isLoggedIn,user, error } = useSelector(
     password,
   })
 );
-
   };
-
-
 useEffect(() => {
   if (isLoggedIn && user) {
     if (user.role === "trainer") {
@@ -62,8 +57,6 @@ useEffect(() => {
     }
   }
 }, [isLoggedIn, user]);
-
-
 useEffect(() => {
   if (error && isFocused) {
     setTimeout(() => {
@@ -72,18 +65,13 @@ useEffect(() => {
     }, 100);
   }
 }, [error, isFocused]);
-
-
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
         <Text style={styles.logoText}>LOGIN</Text>
       </View>
-
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Email</Text>
-
         <View style={styles.inputWrapper}>
           <Ionicons
             name="mail-outline"
@@ -102,10 +90,8 @@ useEffect(() => {
           />
         </View>
       </View>
-
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Password</Text>
-
         <View style={styles.inputWrapper}>
           <Ionicons
             name="key-outline"
@@ -121,11 +107,9 @@ useEffect(() => {
             value={password}
             onChangeText={setPassword}
           />
-
           <TouchableOpacity
             onPress={() => setShowPassword(!showPassword)}
-            style={styles.eyeIconWrapper}
-          >
+            style={styles.eyeIconWrapper}>
             <Ionicons
               name={showPassword ? "eye-off-outline" : "eye-outline"}
               size={20}
@@ -133,21 +117,16 @@ useEffect(() => {
             />
           </TouchableOpacity>
         </View>
-
         <TouchableOpacity
-          onPress={() => navigation.navigate("ForgotPassword")}
-        >
+          onPress={() => navigation.navigate("ForgotPassword")}>
           <Text style={styles.forgotPassword}>Forgot password?</Text>
         </TouchableOpacity>
       </View>
-
-      {/* LOGIN BUTTON */}
       <View style={styles.loginBtnWrapper}>
         <TouchableOpacity
           style={styles.loginBtn}
           onPress={handleLogin}
-          disabled={loading}
-        >
+          disabled={loading} >
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
@@ -155,13 +134,10 @@ useEffect(() => {
           )}
         </TouchableOpacity>
       </View>
-
-      {/* FOOTER */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>Don't have an account?</Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate("SelectRoleScreen")}
-        >
+          onPress={() => navigation.navigate("SelectRoleScreen")}>
           <Text style={styles.signUp}> Sign Up</Text>
         </TouchableOpacity>
       </View>
