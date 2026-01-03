@@ -8,13 +8,13 @@ export const scheduleApi = createApi({
     axiosInstance: api,
     baseUrl: '/', // axios already has baseURL
   }),
-  tagTypes: ['UpcomingSessions', 'SlotBooking', 'Notes'],
+  tagTypes: ['UpcomingSessions', 'SlotBooking', 'Notes', 'ActiveSession'],
   endpoints: builder => ({
     getUpcomingSchedules: builder.query({
       query: ({ page = 1, limit = 10 }) => ({
         url: 'section/trainer/bookings/',
         method: 'GET',
-        params: { page, page_size:limit },
+        params: { page, page_size: limit },
       }),
       serializeQueryArgs: ({ endpointName }) => endpointName,
       merge: (currentCache, newData) => {
@@ -76,13 +76,46 @@ export const scheduleApi = createApi({
         method: 'POST',
         data: { booking_id: id },
       }),
+      invalidatesTags: ['ActiveSession', 'UpcomingSessions'],
+    }),
+
+    endTrainerSession: builder.mutation({
+      query: id => ({
+        url: `section/end-training/`,
+        method: 'POST',
+        data: { booking_id: id },
+      }),
+    }),
+
+    getOngoingSession: builder.query({
+      query: () => ({
+        url: 'trainer/ongoing-sessions/',
+        method: 'GET',
+      }),
+      transformResponse: response => {
+        if (response?.message === 'No ongoing session') {
+          return null;
+        }
+
+        return {
+          session_id: response.session_id,
+          started_at: new Date(response.session_start_apihit_time).getTime(),
+          duration: Number(response.session_duration?.value || 0),
+        };
+      },
+      providesTags: ['ActiveSession'],
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
     }),
   }),
 });
+
 export const {
   useGetUpcomingSchedulesQuery,
   useGetTrainerSlotBookingByIdQuery,
   useGetTrainerNotesQuery,
   useAddTrainerNoteMutation,
   useStartTrainerSessionMutation,
+  useGetOngoingSessionQuery,
+  useEndTrainerSessionMutation,
 } = scheduleApi;

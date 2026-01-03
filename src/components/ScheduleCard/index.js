@@ -58,10 +58,6 @@ const ScheduleCard = ({
               </>
             )}
           </TouchableOpacity>
-
-          {/* <View style={styles.progressBadge}>
-            <Text style={styles.progressText}>{progress}</Text>
-          </View> */}
         </View>
       </View>
     </TouchableOpacity>

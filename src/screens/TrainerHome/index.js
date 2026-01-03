@@ -5,21 +5,29 @@ import { useNavigation } from '@react-navigation/native';
 import ScheduleCard from '../../components/ScheduleCard';
 import styles from './style';
 import TrainingProgressCard from '../../components/ProgressBar';
-import { format, parse } from 'date-fns';
+import { format, isToday, parse, parseISO } from 'date-fns';
 import Skeleton from '../../components/Skelton';
 import Toast from 'react-native-toast-message';
 import { useGetUpcomingSchedulesQuery } from '../../redux/api/trainer/scheduleApi';
 import { useStartSession } from '../../hooks/useStartSession';
 import { useActiveSession } from '../../hooks/useActiveSession';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEndSession } from '../../hooks/useEndSession';
 const TrainerHome = () => {
-  const navigation = useNavigation();
   const [page, setPage] = useState(1);
   const limit = 10;
-  // (async () => await AsyncStorage.removeItem('active_session'))();
-  const { activeSession, setActiveSession } = useActiveSession();
+  const navigation = useNavigation();
+
+  const {
+    activeSession,
+    setActiveSession,
+    loading: isActiveSessionLoading,
+    reload: fetchActiveSession,
+    clearSession: clearActiveSession,
+  } = useActiveSession();
+
   const { handleStartSession, isLoading: isSessionStarting } =
     useStartSession();
+  const { handleEndSession, isLoading: isEnding } = useEndSession();
 
   const {
     data: schedules,
@@ -28,7 +36,7 @@ const TrainerHome = () => {
     isFetching,
     refetch,
   } = useGetUpcomingSchedulesQuery({ page, limit });
-console.log({schedules})
+
   const goToScheduleDetail = id => {
     navigation.navigate('TrainerScheduleDetail', { id });
   };
@@ -53,21 +61,41 @@ console.log({schedules})
     }
   };
 
-  const onSessionStart = async (id, duration) => {
-    if (activeSession || isSessionStarting) return;
+  const onSessionStart = async id => {
+    if (activeSession || isSessionStarting || isActiveSessionLoading) return;
 
-    const success = await handleStartSession({ id, duration });
+    const success = await handleStartSession({ id });
     if (success) {
-      setActiveSession({
-        session_id: id,
-        started_at: Date.now(),
-        duration,
+      setActiveSession(success);
+
+      fetchActiveSession();
+    }
+  };
+
+  const onEndSession = async () => {
+    if (!activeSession || isEnding) return;
+
+    const success = await handleEndSession(activeSession.session_id);
+    if (success) {
+      await clearActiveSession();
+      fetchActiveSession();
+      Toast.show({
+        type: 'success',
+        text1: 'Session ended successfully',
+        text2: 'Your session has been ended.',
       });
     }
   };
 
+  const isScheduleToday = date => {
+    if (!date) return false;
+    return isToday(parseISO(date));
+  };
+
   const renderItem = useCallback(
     ({ item }) => {
+      const canStartToday = isScheduleToday(item?.date);
+
       return (
         <ScheduleCard
           time={
@@ -80,15 +108,14 @@ console.log({schedules})
           height={item?.client?.height}
           weight={item?.client?.weight}
           onPress={goToScheduleDetail}
-          onStart={() =>
-            onSessionStart(item.id, item?.section_timing?.value || 0)
-          }
-          disabled={!!activeSession}
+          onStart={() => onSessionStart(item.id)}
+          disabled={isActiveSessionLoading || !!activeSession || !canStartToday}
+          /////////////------need to check this becuse the activesection may be null at the time of laoding-----//////////////////////////
           loading={isSessionStarting && activeSession?.session_id === item.id}
         />
       );
     },
-    [activeSession, isSessionStarting],
+    [activeSession, isSessionStarting, isActiveSessionLoading],
   );
 
   return (
@@ -108,7 +135,12 @@ console.log({schedules})
         </TouchableOpacity>
       </View>
 
-      {activeSession && <TrainingProgressCard session={activeSession} />}
+      {activeSession && (
+        <TrainingProgressCard
+          session={activeSession}
+          onEndSession={onEndSession}
+        />
+      )}
       <Text style={styles.sectionTitle}>Upcoming Sessions</Text>
       {isLoading && page === 1 ? (
         Array.from({ length: 5 }).map((_, index) => (
@@ -127,7 +159,7 @@ console.log({schedules})
             refetch();
           }}
           ListFooterComponent={
-            isFetching && page > 1 ? <Skeleton height={80} /> : null
+            isFetching && page > 1 ? <Skeleton height={100} /> : null
           }
           ListEmptyComponent={
             !isLoading && (
