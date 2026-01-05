@@ -1,21 +1,45 @@
-import React, { useEffect, useState } from 'react';
+// components/ProgressBar.js (TrainingProgressCard)
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './styles';
 
-const TrainingProgressCard = ({ session,onEndSession }) => {
+const TrainingProgressCard = ({ session, onEndSession }) => {
   const [elapsed, setElapsed] = useState(0);
+  const intervalRef = useRef(null);
+
+  const safeStartedAt = session?.started_at
+    ? Math.min(Number(session.started_at), Date.now())
+    : null;
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const diff = Math.floor((Date.now() - session.started_at) / 1000);
-      setElapsed(Math.max(diff, 0));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [session.started_at]);
+    if (!safeStartedAt) {
+      setElapsed(0);
+      return;
+    }
 
-  const totalSeconds = Math.max(Number(session.duration) * 60, 1);
-  const progress = Math.min(elapsed / totalSeconds, 1);
+    const updateElapsed = () => {
+      const diff = Math.floor((Date.now() - safeStartedAt) / 1000);
+      setElapsed(Math.max(diff, 0));
+    };
+
+    updateElapsed();
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(updateElapsed, 1000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [safeStartedAt, session?.session_id]);
+
+  const durationValue = Number(session?.duration ?? 0);
+  const totalSeconds =
+    durationValue > 0 ? durationValue * 60 : Math.max(elapsed + 1, 1);
+
+  const progress = Math.min(Math.max(elapsed / totalSeconds, 0), 1);
 
   const formatTime = s => {
     const h = String(Math.floor(s / 3600)).padStart(2, '0');
@@ -36,7 +60,7 @@ const TrainingProgressCard = ({ session,onEndSession }) => {
         <View
           style={[
             styles.progressFill,
-            { width: `${Math.min(Math.max(progress, 0), 1) * 100}%` },
+            { width: `${progress * 100}%` },
           ]}
         />
       </View>

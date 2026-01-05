@@ -1,21 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, FlatList } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
-import ScheduleCard from '../../components/ScheduleCard';
-import styles from './style';
-import TrainingProgressCard from '../../components/ProgressBar';
-import { format, isToday, parse, parseISO } from 'date-fns';
-import Skeleton from '../../components/Skelton';
 import Toast from 'react-native-toast-message';
 import { useGetUpcomingSchedulesQuery } from '../../redux/api/trainer/scheduleApi';
-import { useStartSession } from '../../hooks/useStartSession';
-import { useActiveSession } from '../../hooks/useActiveSession';
-import { useEndSession } from '../../hooks/useEndSession';
-const TrainerHome = () => {
+import { useStartSession } from '../../hooks/trainer/useStartSession';
+import { useActiveSession } from '../../hooks/trainer/useActiveSession';
+import { useEndSession } from '../../hooks/trainer/useEndSession';
+import TrainerHomeVeiw from './TrainerHomeVeiw';
+const TrainerHomeContainer = () => {
+  const [isManualRefreshLoading, setIsManualRefreshLoading] = useState(false);
   const [page, setPage] = useState(1);
   const limit = 10;
-  const navigation = useNavigation();
 
   const {
     activeSession,
@@ -31,48 +24,63 @@ const TrainerHome = () => {
 
   const {
     data: schedules,
-    error,
-    isLoading,
-    isFetching,
-    refetch,
+    error: schedulesError,
+    isLoading: isSchedulesLoading,
+    isFetching: isSchedulesFetching,
+    refetch: refetchSchedules,
   } = useGetUpcomingSchedulesQuery({ page, limit });
 
-  const goToScheduleDetail = id => {
-    navigation.navigate('TrainerScheduleDetail', { id });
-  };
-
-  const goToNotifications = () => {
-    navigation.navigate('Notifications');
-  };
-
   useEffect(() => {
-    if (error) {
+    if (schedulesError) {
       Toast.show({
         type: 'error',
         text1: 'Error loading schedules',
-        text2: error || 'Something went wrong. Please try again.',
+        text2: schedulesError || 'Something went wrong. Please try again.',
       });
     }
-  }, [error]);
+  }, [schedulesError]);
 
-  const loadMore = () => {
-    if (schedules?.current_page < schedules?.total_pages && !isFetching) {
+  const handleManualRefresh = useCallback(async () => {
+    setIsManualRefreshLoading(true);
+    setPage(1);
+
+    try {
+      await refetchSchedules({ force: true });
+    } finally {
+      setIsManualRefreshLoading(false);
+    }
+  }, [refetchSchedules, setPage]);
+
+  const loadMore = useCallback(() => {
+    if (
+      schedules?.current_page < schedules?.total_pages &&
+      !isSchedulesFetching
+    ) {
       setPage(prev => prev + 1);
     }
-  };
+  }, [schedules, isSchedulesFetching]);
 
-  const onSessionStart = async id => {
-    if (activeSession || isSessionStarting || isActiveSessionLoading) return;
+  const onSessionStart = useCallback(
+    async id => {
+      if (activeSession || isSessionStarting || isActiveSessionLoading) return;
 
-    const success = await handleStartSession({ id });
-    if (success) {
-      setActiveSession(success);
+      const success = await handleStartSession({ id });
+      if (success) {
+        setActiveSession(success);
+        fetchActiveSession();
+      }
+    },
+    [
+      activeSession,
+      isSessionStarting,
+      isActiveSessionLoading,
+      handleStartSession,
+      setActiveSession,
+      fetchActiveSession,
+    ],
+  );
 
-      fetchActiveSession();
-    }
-  };
-
-  const onEndSession = async () => {
+  const onEndSession = useCallback(async () => {
     if (!activeSession || isEnding) return;
 
     const success = await handleEndSession(activeSession.session_id);
@@ -85,102 +93,30 @@ const TrainerHome = () => {
         text2: 'Your session has been ended.',
       });
     }
-  };
-
-  const isScheduleToday = date => {
-    if (!date) return false;
-    return isToday(parseISO(date));
-  };
-
-  const renderItem = useCallback(
-    ({ item }) => {
-      const canStartToday = isScheduleToday(item?.date);
-
-      return (
-        <ScheduleCard
-          time={
-            item?.time
-              ? format(parse(item.time, 'HH:mm:ss', new Date()), 'HH:mm')
-              : '00:00'
-          }
-          name={item?.client?.name}
-          image={item?.client?.profile_pic_url}
-          height={item?.client?.height}
-          weight={item?.client?.weight}
-          onPress={goToScheduleDetail}
-          onStart={() => onSessionStart(item.id)}
-          disabled={isActiveSessionLoading || !!activeSession || !canStartToday}
-          /////////////------need to check this becuse the activesection may be null at the time of laoding-----//////////////////////////
-          loading={isSessionStarting && activeSession?.session_id === item.id}
-        />
-      );
-    },
-    [activeSession, isSessionStarting, isActiveSessionLoading],
-  );
+  }, [
+    activeSession,
+    isEnding,
+    handleEndSession,
+    clearActiveSession,
+    fetchActiveSession,
+  ]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerCard}>
-        <View>
-          <Text style={styles.greeting}>Hi, John</Text>
-          <Text style={styles.subTitle}>Gym</Text>
-        </View>
-
-        <TouchableOpacity
-          style={styles.bell}
-          onPress={goToNotifications}
-          activeOpacity={0.7}
-        >
-          <Icon name="notifications-outline" size={20} />
-        </TouchableOpacity>
-      </View>
-
-      {activeSession && (
-        <TrainingProgressCard
-          session={activeSession}
-          onEndSession={onEndSession}
-        />
-      )}
-      <Text style={styles.sectionTitle}>Upcoming Sessions</Text>
-      {isLoading && page === 1 ? (
-        Array.from({ length: 5 }).map((_, index) => (
-          <Skeleton key={index} height={100} borderRadius={15} margin={10} />
-        ))
-      ) : (
-        <FlatList
-          data={schedules?.results || []}
-          keyExtractor={item => item.id.toString()}
-          renderItem={renderItem}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.6}
-          refreshing={isFetching && page === 1}
-          onRefresh={() => {
-            setPage(1);
-            refetch();
-          }}
-          ListFooterComponent={
-            isFetching && page > 1 ? <Skeleton height={100} /> : null
-          }
-          ListEmptyComponent={
-            !isLoading && (
-              <View style={styles.emptyContainer}>
-                <Image
-                  source={require('../../Images/empty.png')}
-                  style={styles.emptyImage}
-                  resizeMode="contain"
-                />
-                <Text style={styles.emptyTitle}>Your schedule is empty</Text>
-                <Text style={styles.emptySubText}>
-                  Users will book your training slots{'\n'}stay tuned.
-                </Text>
-              </View>
-            )
-          }
-          showsVerticalScrollIndicator={false}
-        />
-      )}
-    </View>
+    <TrainerHomeVeiw
+      activeSession={activeSession}
+      onEndSession={onEndSession}
+      isSchedulesLoading={isSchedulesLoading}
+      page={page}
+      schedules={schedules}
+      loadMore={loadMore}
+      isSchedulesFetching={isSchedulesFetching}
+      onSessionStart={onSessionStart}
+      isSessionStarting={isSessionStarting}
+      isActiveSessionLoading={isActiveSessionLoading}
+      isManualRefreshLoading={isManualRefreshLoading}
+      onRefresh={handleManualRefresh}
+    />
   );
 };
 
-export default TrainerHome;
+export default TrainerHomeContainer;
