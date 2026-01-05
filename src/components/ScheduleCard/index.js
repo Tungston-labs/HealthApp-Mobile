@@ -8,7 +8,6 @@ const ScheduleCard = ({
   image,
   weight,
   height,
-  progress,
   onPress,
   onStart,
   loading,
@@ -17,7 +16,7 @@ const ScheduleCard = ({
   return (
     <TouchableOpacity
       activeOpacity={0.85}
-      onPress={onPress}
+      onPress={() => onPress?.()}
       style={styles.wrapper}
     >
       <View style={styles.timelineDot} />
@@ -40,7 +39,7 @@ const ScheduleCard = ({
             </View>
           </View>
           <TouchableOpacity
-            onPress={onStart}
+            onPress={() => onStart?.()}
             disabled={disabled || loading}
             style={[
               styles.startBtn,
@@ -51,9 +50,7 @@ const ScheduleCard = ({
               <Text style={styles.startText}>Starting...</Text>
             ) : (
               <>
-                <Text style={styles.startText}>
-                  Start
-                </Text>
+                <Text style={styles.startText}>Start</Text>
                 <Icon name="play" size={20} color="#fff" />
               </>
             )}
