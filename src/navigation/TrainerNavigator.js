@@ -1,7 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import TrainerBottomNav from "../components/TrainerBottomNav";
-
 import TrainerHome from "../screens/TrainerHome";
 import SessionBooking from "../screens/SessionBooking";
 import ProfileScreenTrainer from "../screens/TrainerProfile";

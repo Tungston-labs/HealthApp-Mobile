@@ -10,7 +10,7 @@ import { fetchAvailableTrainersThunk } from "../../redux/slices/trainerPlanSlice
 const TrainerListScreen = () => {
   const dispatch = useDispatch();
   const { trainers, plan, loading, error } = useSelector(
-    (state) => state.trainerplan  
+    (state) => state.trainerplan
   );
 
   const [selectedTrainer, setSelectedTrainer] = useState(null);
