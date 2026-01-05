@@ -1,10 +1,10 @@
 // components/ProgressBar.js (TrainingProgressCard)
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './styles';
 
-const TrainingProgressCard = ({ session, onEndSession }) => {
+const TrainingProgressCard = ({ session, onEndSession, isEndingSession }) => {
   const [elapsed, setElapsed] = useState(0);
   const intervalRef = useRef(null);
 
@@ -57,12 +57,7 @@ const TrainingProgressCard = ({ session, onEndSession }) => {
       </View>
 
       <View style={styles.progressContainer}>
-        <View
-          style={[
-            styles.progressFill,
-            { width: `${progress * 100}%` },
-          ]}
-        />
+        <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
       </View>
 
       <View style={styles.footer}>
@@ -70,8 +65,13 @@ const TrainingProgressCard = ({ session, onEndSession }) => {
           style={styles.endButton}
           onPress={onEndSession}
           activeOpacity={0.8}
+          disabled={isEndingSession}
         >
-          <Text style={styles.endButtonText}>End Session</Text>
+          {isEndingSession ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <Text style={styles.endButtonText}>End Session</Text>
+          )}
         </TouchableOpacity>
 
         <View style={styles.timeRow}>

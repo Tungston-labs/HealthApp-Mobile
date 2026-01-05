@@ -18,7 +18,7 @@ const TrainerHomeVeiw = ({
   isSessionStarting,
   isActiveSessionLoading,
   isManualRefreshLoading,
-  onRefresh,
+  onRefresh,startingSessionId,isEndingSession
 }) => {
   const navigation = useNavigation();
 
@@ -50,12 +50,11 @@ const TrainerHomeVeiw = ({
           onPress={() => goToScheduleDetail(item.id)}
           onStart={() => onSessionStart(item.id)}
           disabled={isActiveSessionLoading || !!activeSession || !canStartToday}
-          /////////////------need to check this becuse the activesection may be null at the time of laoding-----//////////////////////////
-          loading={isSessionStarting && activeSession?.session_id === item.id}
+          loading={isSessionStarting && startingSessionId === item.id}
         />
       );
     },
-    [activeSession, isSessionStarting, isActiveSessionLoading, onSessionStart],
+    [activeSession, isSessionStarting, isActiveSessionLoading, onSessionStart,startingSessionId],
   );
 
   return (
@@ -71,6 +70,7 @@ const TrainerHomeVeiw = ({
           <TrainingProgressCard
             session={activeSession}
             onEndSession={onEndSession}
+            isEndingSession={isEndingSession}
           />
         )}
         <Text style={styles.sectionTitle}>Upcoming Sessions</Text>

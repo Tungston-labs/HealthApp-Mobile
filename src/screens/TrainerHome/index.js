@@ -7,6 +7,8 @@ import { useEndSession } from '../../hooks/trainer/useEndSession';
 import TrainerHomeVeiw from './TrainerHomeVeiw';
 const TrainerHomeContainer = () => {
   const [isManualRefreshLoading, setIsManualRefreshLoading] = useState(false);
+  const [startingSessionId, setStartingSessionId] = useState(null);
+
   const [page, setPage] = useState(1);
   const limit = 10;
 
@@ -63,8 +65,11 @@ const TrainerHomeContainer = () => {
   const onSessionStart = useCallback(
     async id => {
       if (activeSession || isSessionStarting || isActiveSessionLoading) return;
+    setStartingSessionId(id);
 
       const success = await handleStartSession({ id });
+          setStartingSessionId(null);
+
       if (success) {
         setActiveSession(success);
         fetchActiveSession();
@@ -115,6 +120,8 @@ const TrainerHomeContainer = () => {
       isActiveSessionLoading={isActiveSessionLoading}
       isManualRefreshLoading={isManualRefreshLoading}
       onRefresh={handleManualRefresh}
+      startingSessionId={startingSessionId}
+      isEndingSession={isEnding}
     />
   );
 };
