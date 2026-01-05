@@ -136,19 +136,8 @@ const TrainerScheduleDetail = () => {
         <Text style={styles.locationText}>{data?.client?.address}</Text>
       </View>
 
-      {/* Workout Plan */}
-      <Text style={styles.sectionTitle}>
-        Workout plan - {data?.plan?.plan_name}
-      </Text>
-      <Text style={styles.subText}>Workout type - {data?.plan?.plan_type}</Text>
-
-      {/* Training Progress */}
-      <TrainingProgressSelector
-        progressDay={data?.day_label || 'Day 1'}
-        progressTime="00:00"
-        time={data?.time}
-      />
-
+    
+    
       <TouchableOpacity
         style={styles.addNoteBtn}
         onPress={() => setShowNoteModal(true)}
