@@ -7,6 +7,8 @@ const TrainerBottomNav = ({ state, navigation }) => {
   const icons = {
     TrainerHome: "home-outline",
     SessionBooking: "barbell-outline",
+
+    Session: "grid-outline",
     ProfileScreenTrainer: "person-outline",
   };
 

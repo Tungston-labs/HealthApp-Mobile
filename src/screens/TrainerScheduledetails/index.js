@@ -42,7 +42,6 @@ const TrainerScheduleDetail = () => {
     error: notesError,
   } = useGetTrainerNotesQuery(id);
 
-
   useEffect(() => {
     if (error) {
       Toast.show({
@@ -71,7 +70,7 @@ const TrainerScheduleDetail = () => {
     }
   };
 
-  const [startSession, { isLoading:isSessionStarting }] = useStartTrainerSessionMutation();
+  const [startSession, { isLoading: isSessionStarting }] = useStartTrainerSessionMutation();
 
   const handleStartSession = async () => {
     try {
@@ -150,7 +149,6 @@ const TrainerScheduleDetail = () => {
         time={data?.time}
       />
 
-      {/* Add Note Button */}
       <TouchableOpacity
         style={styles.addNoteBtn}
         onPress={() => setShowNoteModal(true)}
@@ -167,16 +165,6 @@ const TrainerScheduleDetail = () => {
             </Text>
           </View>
         ))}
-
-      {/* 
-      <View style={styles.swipeWrapper}>
-        <SwipeButton
-          title="Slide to start session"
-          successTitle="Session Ended"
-          width={340}
-          onSwipeSuccess={() => console.log('Session Ended')}
-        />
-      </View> */}
 
       <Modal
         visible={showNoteModal}
@@ -220,3 +208,5 @@ const TrainerScheduleDetail = () => {
 };
 
 export default TrainerScheduleDetail;
+
+
