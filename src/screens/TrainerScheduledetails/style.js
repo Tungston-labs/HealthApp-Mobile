@@ -5,7 +5,7 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     padding: 16,
-    paddingTop:60,
+    paddingTop: 60,
   },
 
   header: {
@@ -21,8 +21,8 @@ export default StyleSheet.create({
   },
 
   mapHint: {
-    fontSize: 12,
-    color: "#777",
+    fontSize: 14,
+    color: "#000",
     marginVertical: 8,
   },
 
@@ -36,7 +36,7 @@ export default StyleSheet.create({
 
   locationText: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 14,
     color: "#0085F7",
   },
 
@@ -58,7 +58,7 @@ export default StyleSheet.create({
     backgroundColor: "#6C63FF",
     paddingHorizontal: 18,
     paddingVertical: 10,
-    borderRadius: 20,
+    borderRadius: 14,
     alignItems: "center",
     gap: 6,
     marginVertical: 14,
@@ -73,15 +73,62 @@ export default StyleSheet.create({
     backgroundColor: "#F2F2FF",
     borderRadius: 12,
     padding: 12,
+    marginBottom: 10,
   },
 
-  noteInput: {
-    minHeight: 80,
-    textAlignVertical: "top",
+  savedNoteText: {
+    fontSize: 14,
+    color: "#333",
   },
 
   swipeWrapper: {
+    marginTop:20,
+    marginBottom: 20,
+  },
+
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.3)",
+  },
+
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+
+  closeIcon: {
+    alignSelf: "center",
+    marginBottom: 10,
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 12,
+  },
+
+  modalInput: {
+    backgroundColor: "#F2F2FF",
+    borderRadius: 12,
+    padding: 12,
+    minHeight: 120,
+    textAlignVertical: "top",
+  },
+
+  submitBtn: {
+    backgroundColor: "#6C63FF",
+    paddingVertical: 14,
+    borderRadius: 25,
+    alignItems: "center",
     marginTop: 20,
-    marginBottom: 40,
+  },
+
+  submitText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 16,
   },
 });

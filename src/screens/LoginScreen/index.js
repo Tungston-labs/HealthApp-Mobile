@@ -17,12 +17,13 @@ import { useIsFocused } from "@react-navigation/native";
 export default function LoginScreen({ navigation }) {
   const dispatch = useDispatch();
 
-const { loading, isLoggedIn, error } = useSelector(
-  (state) => state.auth
+const { loading, isLoggedIn,user, error } = useSelector(
+  (state) => state.auth || {
+    loading: false,
+    isLoggedIn: false,
+    error: null,
+  }
 );
-
-
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -31,64 +32,43 @@ const { loading, isLoggedIn, error } = useSelector(
 const handleLogin = () => {
   if (loading) return;
 
-  if (!email || !password) {
-    Alert.alert("Error", "Email and password are required");
-    return;
-  }
-
-  dispatch(
-    loginClientThunk({
-      email_or_phno: email.trim(),
-      password,
-    })
-  );
-};
-
+   dispatch(
+  loginClientThunk({
+    email_or_phno: email, 
+    password,
+  })
+);
+  };
 useEffect(() => {
-  if (isFocused) {
-    dispatch(resetAuthState());
-  }
-}, [isFocused]);
-
-useEffect(() => {
-  if (isLoggedIn) {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "workout" }],
-    });
-  }
-}, [isLoggedIn]);
-
-
-  useEffect(() => {
-    if (isLoggedIn) {
+  if (isLoggedIn && user) {
+    if (user.role === "trainer") {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "TrainerNavigator" }],
+      });
+    } else {
       navigation.reset({
         index: 0,
         routes: [{ name: "workout" }],
       });
     }
-  }, [isLoggedIn]);
-
-  useEffect(() => {
-    if (error && isFocused) {
-      setTimeout(() => {
-        Alert.alert("Login Failed", error);
-        dispatch(resetAuthState());
-      }, 100);
-    }
-  }, [error, isFocused]);
-
-
-
+  }
+}, [isLoggedIn, user]);
+useEffect(() => {
+  if (error && isFocused) {
+    setTimeout(() => {
+      Alert.alert("Login Failed", error);
+      dispatch(resetAuthState());
+    }, 100);
+  }
+}, [error, isFocused]);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
         <Text style={styles.logoText}>LOGIN</Text>
       </View>
-
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Email</Text>
-
         <View style={styles.inputWrapper}>
           <Ionicons
             name="mail-outline"
@@ -107,10 +87,8 @@ useEffect(() => {
           />
         </View>
       </View>
-
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Password</Text>
-
         <View style={styles.inputWrapper}>
           <Ionicons
             name="key-outline"
@@ -126,11 +104,9 @@ useEffect(() => {
             value={password}
             onChangeText={setPassword}
           />
-
           <TouchableOpacity
             onPress={() => setShowPassword(!showPassword)}
-            style={styles.eyeIconWrapper}
-          >
+            style={styles.eyeIconWrapper}>
             <Ionicons
               name={showPassword ? "eye-off-outline" : "eye-outline"}
               size={20}
@@ -138,21 +114,16 @@ useEffect(() => {
             />
           </TouchableOpacity>
         </View>
-
         <TouchableOpacity
-          onPress={() => navigation.navigate("ForgotPassword")}
-        >
+          onPress={() => navigation.navigate("ForgotPassword")}>
           <Text style={styles.forgotPassword}>Forgot password?</Text>
         </TouchableOpacity>
       </View>
-
-      {/* LOGIN BUTTON */}
       <View style={styles.loginBtnWrapper}>
         <TouchableOpacity
           style={styles.loginBtn}
           onPress={handleLogin}
-          disabled={loading}
-        >
+          disabled={loading} >
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
@@ -160,13 +131,10 @@ useEffect(() => {
           )}
         </TouchableOpacity>
       </View>
-
-      {/* FOOTER */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>Don't have an account?</Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate("SelectRoleScreen")}
-        >
+          onPress={() => navigation.navigate("SelectRoleScreen")}>
           <Text style={styles.signUp}> Sign Up</Text>
         </TouchableOpacity>
       </View>

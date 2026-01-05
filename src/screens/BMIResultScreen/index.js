@@ -64,67 +64,50 @@ export default function BMIResultScreen({ navigation }) {
     bmiText = "Obesity";
     bmiColor = "#F5554A";
   }
-const buildRegisterPayload = (data) => {
-  const formData = new FormData();
+const buildRegisterPayload = (data) => ({
+  name: data.name,
+  email: data.email,
+  phno: data.phno,
+  password: data.password,
 
-  formData.append("name", data.name);
-  formData.append("email", data.email);
-  formData.append("phno", data.phno);
-  formData.append("password", data.password);
-  formData.append("role", "user");
+  role: data.role || "user",
+  dob: data.dob,
+  gender: data.gender,
+  blood_group: data.blood_group,
 
-  formData.append("dob", data.dob);
-  formData.append("gender", data.gender);
-  formData.append("blood_group", data.blood_group);
+  height: data.height?.toString(),
+  weight: data.weight?.toString(),
 
-  // IMPORTANT: Decimal fields as STRING
-  formData.append("height", String(data.height));
-  formData.append("weight", String(data.weight));
+  health_issues: Array.isArray(data.health_issues)
+    ? data.health_issues
+    : [],
 
-  formData.append(
-    "address",
-    `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`
-  );
+  wellness_goal: Array.isArray(data.wellness_goal)
+    ? data.wellness_goal
+    : [],
 
-  // JSONField → STRING
-  formData.append(
-    "health_issues",
-    JSON.stringify(data.health_issues || [])
-  );
+address: `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`,
 
-  formData.append(
-    "wellness_goal",
-    JSON.stringify(data.wellness_goal || [])
-  );
-
-  // ImageField → FILE
-  if (data.profile_pic) {
-    formData.append("profile_pic", {
-      uri: data.profile_pic.uri,
-      type: data.profile_pic.type || "image/jpeg",
-      name: data.profile_pic.name || "profile.jpg",
-    });
-  }
-
-  return formData;
-};
+});
 
 
 
+  const handleFinalSubmit = () => {
+    if (!registration.name || !registration.email || !registration.phno) {
+      Alert.alert("Incomplete profile", "Please complete signup details");
+      return;
+    }
 
+    if (!registration.height || !registration.weight) {
+      Alert.alert("Missing data", "Height & Weight required");
+      return;
+    }
 
+    const payload = buildRegisterPayload(registration);
+    console.log("REGISTER PAYLOAD 👉", payload);
 
-const handleFinalSubmit = () => {
-  if (!registration.name || !registration.email || !registration.phno) {
-    Alert.alert("Incomplete profile", "Please complete signup details");
-    return;
-  }
-
-  const formData = buildRegisterPayload(registration);
-
-  console.log("REGISTER PAYLOAD 👉", formData);
-  dispatch(registerClientThunk(formData));
-};
+    dispatch(registerClientThunk(payload));
+  };
 
 
 useEffect(() => {
@@ -252,17 +235,17 @@ useEffect(() => {
               <View style={styles.legendItem}>
                 <View style={[styles.legendColor, { backgroundColor: "#84CDEE" }]} />
                 <Text style={styles.legendLabel}>Under Weight :</Text>
-                <Text style={styles.legendValue}> 18.5</Text>
+                <Text style={styles.legendValue}>&lt; 18.5</Text>
               </View>
 
               <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: "#FFDF32" }]} />
+                <View style={[styles.legendColor, { backgroundColor: "#78B060" }]} />
                 <Text style={styles.legendLabel}>Normal Weight :</Text>
                 <Text style={styles.legendValue}>18.5 - 24.9</Text>
               </View>
 
               <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: "#78B060" }]} />
+                <View style={[styles.legendColor, { backgroundColor: "#FFDF32" }]} />
                 <Text style={styles.legendLabel}>Over Weight :</Text>
                 <Text style={styles.legendValue}>25 - 29.9</Text>
               </View>

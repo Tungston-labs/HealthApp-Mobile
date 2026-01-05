@@ -54,28 +54,25 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-   .addCase(loginClientThunk.fulfilled, (state, action) => {
-  state.loading = false;
+      .addCase(loginClientThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isLoggedIn = true;
 
-  const payload = action.payload;
-  const access = payload?.access || payload?.data?.access || payload?.token;
-  const refresh = payload?.refresh || payload?.data?.refresh;
-  const user = payload?.user || payload?.data?.user;
+        const user = action.payload?.data?.user;
+        const access = action.payload?.data?.access;
+        const refresh = action.payload?.data?.refresh;
 
-  if (access) {
-    state.isLoggedIn = true;
-    state.user = user;
-    state.error = null;
+        state.user = user;
 
-    setToken(access, refresh);
+        if (access) {
+          setToken(access, refresh);
+          api.defaults.headers.Authorization = `Bearer ${access}`;
+          console.log("🟢 Token set successfully");
+        } else {
+          console.error("🔴 Login succeeded but token missing");
+        }
+      })
 
-    api.defaults.headers.Authorization = `Bearer ${access}`;
-    
-  } else {
-    state.isLoggedIn = false;
-    state.error = "Server error: Token missing in response";
-  }
-})
       .addCase(loginClientThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;

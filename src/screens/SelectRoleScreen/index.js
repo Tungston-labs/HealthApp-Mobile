@@ -1,118 +1,4 @@
-// import React, { useState } from "react";
-// import {
-//   View,
-//   Text,
-//   TouchableOpacity,
-//   ImageBackground,
-//   SafeAreaView,
-//   Animated,
-//   Alert,
-// } from "react-native";
-// import Ionicons from "react-native-vector-icons/Ionicons";
-// import { useNavigation } from "@react-navigation/native";
-// import styles from "./style";
-
-// export default function SelectRoleScreen() {
-//   const navigation = useNavigation();
-//   const [selected, setSelected] = useState(null);
-
-//   const handleContinue = () => {
-//     if (!selected) {
-//       Alert.alert("Select a role", "Please choose a role before continuing.");
-//       return;
-//     }
-//     if (selected === "user") {
-//       navigation.navigate("SignupDetailsScreenUser");
-//     } else if (selected === "trainer") {
-//       navigation.navigate("SignupDetailsScreenTrainer");
-//     }
-//   };
-
-//   return (
-//     <SafeAreaView style={styles.container}>
-
-//       <View style={styles.topHeader}>
-//         <TouchableOpacity
-//           onPress={() => navigation.goBack()}
-//           style={styles.backBtn}
-//         >
-//           <Ionicons name="chevron-back" size={28} color="#000" />
-//         </TouchableOpacity>
-
-//         <Text style={styles.headerTitle}>Sign up as</Text>
-//       </View>
-
-//       <View style={styles.centerWrapper}>
-
-//         <Text style={styles.subtitle}>
-//           Choose your role to create{"\n"}the right experience for you.
-//         </Text>
-
-//         <Text style={styles.subText}>Join as a User or Trainer.</Text>
-
-//         <View style={styles.cardRow}>
-
-//           <Animated.View
-//             style={[
-//               styles.card,
-//               selected === "trainer" && styles.activeCard
-//             ]}
-//           >
-//             <TouchableOpacity
-//               activeOpacity={0.9}
-//               onPress={() => setSelected("trainer")}
-//               style={{ flex: 1 }}
-//             >
-//               <ImageBackground
-//                 source={require("../../../assets/trainer.png")}
-//                 style={styles.cardImage}
-//                 imageStyle={styles.cardImageStyle}
-//               >
-//                 <Text style={styles.cardLabel}>Trainer</Text>
-//               </ImageBackground>
-//             </TouchableOpacity>
-//           </Animated.View>
-
-//           <Animated.View
-//             style={[
-//               styles.card,
-//               selected === "user" && styles.activeCard
-//             ]}
-//           >
-//             <TouchableOpacity
-//               activeOpacity={0.9}
-//               onPress={() => setSelected("user")}
-//               style={{ flex: 1 }}
-//             >
-//               <ImageBackground
-//                 source={require("../../../assets/user2.png")}
-//                 style={styles.cardImage}
-//                 imageStyle={styles.cardImageStyle}
-//               >
-//                 <Text style={styles.cardLabel}>User</Text>
-//               </ImageBackground>
-//             </TouchableOpacity>
-//           </Animated.View>
-//         </View>
-//       </View>
-//       <View style={styles.continueFixed}>
-//         <TouchableOpacity
-//           style={styles.continueBtn}
-//           onPress={() => navigation.navigate("SignupDetailsScreenUser")}   // 👈 ADDED
-//         >
-//           <Text style={styles.continueText}>Continue</Text>
-//           <Ionicons
-//             name="chevron-forward"
-//             size={20}
-//             color="#fff"
-//             style={styles.arrowIcon}
-//           />
-//         </TouchableOpacity>
-//       </View>
-//     </SafeAreaView>
-//   );
-// }
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -130,22 +16,36 @@ export default function SelectRoleScreen() {
   const navigation = useNavigation();
   const [selected, setSelected] = useState(null);
 
-  const handleContinue = () => {
-    if (!selected) {
-      Alert.alert("Select a role", "Please choose a role before continuing.");
-      return;
-    }
+  // Animated scale values
+  const trainerScale = useRef(new Animated.Value(1)).current;
+  const userScale = useRef(new Animated.Value(1)).current;
 
-    if (selected === "trainer") {
-      navigation.navigate("CreateAccount");   //  Trainer → CreateAccount
-    } else if (selected === "user") {
-      navigation.navigate("SignupDetailsScreenUser"); //  User → User Signup
+  const selectRole = (role) => {
+    setSelected(role);
+
+    // Animate scale for trainer card
+    Animated.spring(trainerScale, {
+      toValue: role === "trainer" ? 1.08 : 1,
+      useNativeDriver: true,
+    }).start();
+
+    // Animate scale for user card
+    Animated.spring(userScale, {
+      toValue: role === "user" ? 1.08 : 1,
+      useNativeDriver: true,
+    }).start();
+
+    // Immediately navigate after selection
+    if (role === "trainer") {
+      navigation.navigate("CreateAccount"); 
+    } else if (role === "user") {
+      navigation.navigate("SignupDetailsScreenUser");
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-
+      {/* Top Header */}
       <View style={styles.topHeader}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -157,25 +57,26 @@ export default function SelectRoleScreen() {
         <Text style={styles.headerTitle}>Sign up as</Text>
       </View>
 
+      {/* Center Content */}
       <View style={styles.centerWrapper}>
-
         <Text style={styles.subtitle}>
           Choose your role to create{"\n"}the right experience for you.
         </Text>
-
         <Text style={styles.subText}>Join as a User or Trainer.</Text>
 
+        {/* Role Cards */}
         <View style={styles.cardRow}>
-
+          {/* Trainer Card */}
           <Animated.View
             style={[
               styles.card,
-              selected === "trainer" && styles.activeCard
+              selected === "trainer" && styles.activeCard,
+              { transform: [{ scale: trainerScale }] },
             ]}
           >
             <TouchableOpacity
               activeOpacity={0.9}
-              onPress={() => setSelected("trainer")}
+              onPress={() => selectRole("trainer")}
               style={{ flex: 1 }}
             >
               <ImageBackground
@@ -188,15 +89,17 @@ export default function SelectRoleScreen() {
             </TouchableOpacity>
           </Animated.View>
 
+          {/* User Card */}
           <Animated.View
             style={[
               styles.card,
-              selected === "user" && styles.activeCard
+              selected === "user" && styles.activeCard,
+              { transform: [{ scale: userScale }] },
             ]}
           >
             <TouchableOpacity
               activeOpacity={0.9}
-              onPress={() => setSelected("user")}
+              onPress={() => selectRole("user")}
               style={{ flex: 1 }}
             >
               <ImageBackground
@@ -209,21 +112,6 @@ export default function SelectRoleScreen() {
             </TouchableOpacity>
           </Animated.View>
         </View>
-      </View>
-
-      <View style={styles.continueFixed}>
-        <TouchableOpacity
-          style={styles.continueBtn}
-          onPress={handleContinue}  
-        >
-          <Text style={styles.continueText}>Continue</Text>
-          <Ionicons
-            name="chevron-forward"
-            size={20}
-            color="#fff"
-            style={styles.arrowIcon}
-          />
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

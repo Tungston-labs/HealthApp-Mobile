@@ -11,11 +11,17 @@ import { forceLogout } from "../utils/forceLogout";
 
 const api = axios.create({
   baseURL: "http://178.248.112.16:9001/api/",
-  timeout: 30000,
+  timeout: 15000,
+  headers: {
+    Accept: "application/json",
+  },
 });
 
 
 api.interceptors.request.use(async (config) => {
+  console.log("API INTERCEPTOR HIT 👉", config.url);
+  console.log("DATA INSTANCEOF FORMDATA 👉", config.data instanceof FormData);
+
   const token = await getAccessToken();
 
   if (token && !config.skipAuth) {
@@ -23,13 +29,14 @@ api.interceptors.request.use(async (config) => {
   }
 
   if (config.data instanceof FormData) {
-    delete config.headers["Content-Type"];
+    config.headers['Content-Type'] = 'multipart/form-data';
   } else {
     config.headers["Content-Type"] = "application/json";
   }
 
   return config;
 });
+
 
 
 

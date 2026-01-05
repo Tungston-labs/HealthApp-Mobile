@@ -66,7 +66,7 @@ const ProfileScreenTrainer = ({ navigation }) => {
         <View style={styles.optionsWrapper}>
           <TouchableOpacity
             style={styles.optionRow}
-            onPress={() => navigation.navigate("EditProfile")}
+            onPress={() => navigation.navigate("TrainerEditProfile")}
           >
             <Icon name="person-outline" size={20} color="#111" />
             <Text style={styles.optionText}>Edit profile</Text>
