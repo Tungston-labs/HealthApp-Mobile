@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Platform } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./style";
@@ -64,50 +64,72 @@ export default function BMIResultScreen({ navigation }) {
     bmiText = "Obesity";
     bmiColor = "#F5554A";
   }
-const buildRegisterPayload = (data) => ({
-  name: data.name,
-  email: data.email,
-  phno: data.phno,
-  password: data.password,
 
-  role: data.role || "user",
-  dob: data.dob,
-  gender: data.gender,
-  blood_group: data.blood_group,
+const buildRegisterPayload = (data) => {
+  const formData = new FormData();
 
-  height: data.height?.toString(),
-  weight: data.weight?.toString(),
+  // Basic fields
+  formData.append("name", data.name);
+  formData.append("email", data.email);
+  formData.append("phno", data.phno);
+  formData.append("password", data.password);
+  formData.append("role", data.role || "user");
+  formData.append("dob", data.dob);
+  formData.append("gender", data.gender);
+  formData.append("blood_group", data.blood_group);
+  formData.append("height", String(data.height));
+  formData.append("weight", String(data.weight));
+  formData.append(
+    "address",
+    `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`
+  );
 
-  health_issues: Array.isArray(data.health_issues)
-    ? data.health_issues
-    : [],
+  // Arrays
+  formData.append(
+    "health_issues",
+    JSON.stringify(Array.isArray(data.health_issues) ? data.health_issues : [])
+  );
+  formData.append(
+    "wellness_goal",
+    JSON.stringify(Array.isArray(data.wellness_goal) ? data.wellness_goal : [])
+  );
 
-  wellness_goal: Array.isArray(data.wellness_goal)
-    ? data.wellness_goal
-    : [],
-
-address: `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`,
-
-});
-
-
-
-  const handleFinalSubmit = () => {
-    if (!registration.name || !registration.email || !registration.phno) {
-      Alert.alert("Incomplete profile", "Please complete signup details");
-      return;
+  // Profile picture
+  if (data.profile_pic) {
+    let uri = data.profile_pic.uri;
+    if (Platform.OS === "android" && !uri.startsWith("file://")) {
+      uri = "file://" + uri;
     }
 
-    if (!registration.height || !registration.weight) {
-      Alert.alert("Missing data", "Height & Weight required");
-      return;
-    }
+    formData.append("profile_pic", {
+      uri,
+      type: data.profile_pic.type || "image/jpeg",
+      name: data.profile_pic.fileName || "profile.jpg",
+    });
+  }
 
-    const payload = buildRegisterPayload(registration);
-    console.log("REGISTER PAYLOAD 👉", payload);
+  return formData;
+};
 
-    dispatch(registerClientThunk(payload));
-  };
+
+
+const handleFinalSubmit = () => {
+  if (!registration.name || !registration.email || !registration.phno) {
+    Alert.alert("Incomplete profile", "Please complete signup details");
+    return;
+  }
+
+  if (!registration.height || !registration.weight) {
+    Alert.alert("Missing data", "Height & Weight required");
+    return;
+  }
+
+  const formData = buildRegisterPayload(registration);
+  console.log("REGISTER PAYLOAD 👉", formData);
+
+  dispatch(registerClientThunk(formData));
+};
+
 
 
 useEffect(() => {
