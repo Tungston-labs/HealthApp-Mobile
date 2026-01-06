@@ -1,4 +1,3 @@
-// components/ProgressBar.js (TrainingProgressCard)
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
