@@ -17,54 +17,59 @@ import { useIsFocused } from "@react-navigation/native";
 export default function LoginScreen({ navigation }) {
   const dispatch = useDispatch();
 
-const { loading, isLoggedIn,user, error } = useSelector(
-  (state) => state.auth || {
-    loading: false,
-    isLoggedIn: false,
-    error: null,
-  }
-);
+  const { loading, isLoggedIn, user, error } = useSelector(
+    (state) => state.auth || {
+      loading: false,
+      isLoggedIn: false,
+      error: null,
+    }
+  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-   const isFocused = useIsFocused();
+  const isFocused = useIsFocused();
 
   const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Email and password are required");
-      return;
-    }
+    if (loading) return;
 
-   dispatch(
-  loginClientThunk({
-    email_or_phno: email, 
-    password,
-  })
-);
+    dispatch(
+      loginClientThunk({
+        email_or_phno: email,
+        password,
+      })
+    );
   };
-useEffect(() => {
-  if (isLoggedIn && user) {
-    if (user.role === "trainer") {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "TrainerNavigator" }],
-      });
-    } else {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "workout" }],
-      });
+  useEffect(() => {
+    if (isLoggedIn && user) {
+      if (user.role === "trainer") {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "TrainerNavigator" }],
+        });
+      } else {
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: "MainApp",
+              params: {
+                screen: "workout",
+              },
+            },
+          ],
+        });
+
+      }
     }
-  }
-}, [isLoggedIn, user]);
-useEffect(() => {
-  if (error && isFocused) {
-    setTimeout(() => {
-      Alert.alert("Login Failed", error);
-      dispatch(resetAuthState());
-    }, 100);
-  }
-}, [error, isFocused]);
+  }, [isLoggedIn, user]);
+  useEffect(() => {
+    if (error && isFocused) {
+      setTimeout(() => {
+        Alert.alert("Login Failed", error);
+        dispatch(resetAuthState());
+      }, 100);
+    }
+  }, [error, isFocused]);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>

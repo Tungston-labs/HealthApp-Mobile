@@ -13,7 +13,7 @@ const BottomNav = ({ state, descriptors, navigation }) => {
 
         // Icons for each tab
         const icons = {
-          Upcoming: "home-outline",
+          workout: "home-outline",
           profilesection: "barbell-outline",
           
           Session: "grid-outline",

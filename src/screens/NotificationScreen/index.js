@@ -1,4 +1,3 @@
-// screens/NotificationScreen.js
 import React from 'react';
 import { View, Text } from 'react-native';
 import Icon from "react-native-vector-icons/Ionicons";
@@ -12,6 +11,7 @@ const notifications = [
     time: "2 hours ago",
     icon: "time",
   },
+  
   {
     id: 2,
     title: "Workout Alert",

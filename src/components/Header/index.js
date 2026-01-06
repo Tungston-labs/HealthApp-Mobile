@@ -1,4 +1,3 @@
-// components/Header.js
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -23,7 +22,6 @@ const Header = ({
           <Text style={styles.bmiValue}>{bmiValue}</Text>
         </View>
 
-        {/* ✅ SUBTITLE BELOW BMI */}
         <Text style={styles.subheading}>{subtitle}</Text>
       </View>
 

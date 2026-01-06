@@ -15,12 +15,12 @@ export default StyleSheet.create({
     marginBottom: 20,
   },
 
-  trainerImg: {
-    width: 110,
-    height: 130,
-    borderRadius: 12,
-    objectFit:"cover",
-  },
+trainerImg: {
+  width: 120,
+  height: 120,
+  borderRadius: 12,
+},
+
 
   viewProfileBtn: {
     position: "absolute",
@@ -75,6 +75,12 @@ export default StyleSheet.create({
     justifyContent: "space-between"
 
   },
+    inputUnderline: {
+  borderBottomWidth: 1,
+  borderBottomColor: '#1C1B1F', 
+  marginTop:10,
+  marginBottom:10,
+},
   priceRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -115,6 +121,14 @@ export default StyleSheet.create({
     
     width: 140,
   },
+fullUnderline: {
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  right: 0,
+  height: 1,
+  backgroundColor: "#1C1B1F",
+},
 
   bookText: {
     color: "#fff",

@@ -17,16 +17,10 @@ import { getCurrentLocation } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { Image } from 'react-native';
-import { uploadImageApi } from '../../services/trainerServices';
 export default function SignupDetailsScreenUser() {
   const navigation = useNavigation();
-  const [uploading, setUploading] = useState(false);
 
   const dispatch = useDispatch();
-  const profileImage = useSelector(
-    state => state.registration.profile_pic
-  );
-
   const registration = useSelector(state => state.registration);
 
   const [showLocationFields, setShowLocationFields] = useState(true);
@@ -67,21 +61,6 @@ export default function SignupDetailsScreenUser() {
       }
     );
   };
-  const resolveProfileImage = () => {
-    if (!profileImage) return null;
-
-    // local image object
-    if (typeof profileImage === "object" && profileImage.uri) {
-      return { uri: profileImage.uri };
-    }
-
-    // backend image string
-    if (typeof profileImage === "string") {
-      return { uri: profileImage };
-    }
-
-    return null;
-  };
 
 
   const handleUseLocation = async () => {
@@ -119,18 +98,19 @@ export default function SignupDetailsScreenUser() {
         <Text style={styles.subtitle}>Enter basic details</Text>
 
         <View style={styles.profileRow}>
-          <TouchableOpacity onPress={handlePickProfileImage}>
-            {resolveProfileImage() ? (
-              <Image
-                source={resolveProfileImage()}
-                style={styles.profileImage}
-              />
-            ) : (
-              <View style={styles.profilePlaceholder}>
-                <Ionicons name="camera-outline" size={26} color="#777" />
-              </View>
-            )}
-          </TouchableOpacity>
+      <TouchableOpacity onPress={handlePickProfileImage}>
+  {registration.profile_pic?.uri ? (
+    <Image
+      source={{ uri: registration.profile_pic.uri }}
+      style={styles.profileImage}
+    />
+  ) : (
+    <View style={styles.profilePlaceholder}>
+      <Ionicons name="camera-outline" size={26} color="#777" />
+    </View>
+  )}
+</TouchableOpacity>
+
 
 
           <View style={styles.nameInputWrapper}>

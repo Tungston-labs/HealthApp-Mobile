@@ -17,7 +17,6 @@ export default StyleSheet.create({
   closeBtn: {
     position: "absolute",
     top: 2,
-    backgroundColor: "#E6E5E8",
     right: 2,
     padding: 4,
     borderRadius: 25 / 2,
@@ -52,6 +51,8 @@ export default StyleSheet.create({
 
   activeSlot: {
     backgroundColor: "#7774F4",
+      borderColor: "#6966f7ff", 
+
   },
 
   activeSlotText: {
@@ -87,6 +88,8 @@ export default StyleSheet.create({
 
   activeTimeBtn: {
     backgroundColor: "#7774F4",
+      borderColor: "#6966f7ff", 
+
   },
 
   timeTextActive: {
@@ -131,13 +134,25 @@ export default StyleSheet.create({
 applyBtn: {
   backgroundColor: "#7774F4",
   paddingVertical: 14,
-  borderRadius: 18,
-  width: 140,
+  borderRadius: 25,
+  width: 200,
   alignItems: "center",
+
+  borderWidth: 1.5,
+  borderColor: "#6966f7ff", 
 },
+
+
   applyText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
   },
+  inputUnderline: {
+  borderBottomWidth: 1,
+  borderBottomColor: '#1C1B1F', 
+  marginTop:10,
+  marginBottom:10,
+},
+
 });

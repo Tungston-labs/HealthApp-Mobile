@@ -1,8 +1,8 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import TrainerBottomNav from "../components/TrainerBottomNav";
-
-import SessionBooking from "../screens/SessionBooking";
+import TrainerAssignedClients from "../screens/TrainerAssignedClients";
+import TrainerSessionHistory from "../screens/TrainerSessionHistory"
 import ProfileScreenTrainer from "../screens/TrainerProfile";
 import TrainerHomeContainer from "../screens/TrainerHome";
 
@@ -15,7 +15,8 @@ const TrainerNavigator = () => {
       screenOptions={{ headerShown: false }}
     >
       <Tab.Screen name="TrainerHome" component={TrainerHomeContainer} />
-      <Tab.Screen name="SessionBooking" component={SessionBooking} />
+      <Tab.Screen name="TrainerAssignedClients" component={TrainerAssignedClients} />
+      <Tab.Screen name="Session" component={TrainerSessionHistory} />
       <Tab.Screen name="ProfileScreenTrainer" component={ProfileScreenTrainer} />
     </Tab.Navigator>
   );

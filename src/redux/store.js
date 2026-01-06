@@ -28,7 +28,7 @@ export const store = configureStore({
 
     planList: PlanReducer,
     trainerReg: trainerRegistrationReducer,
-    trainerplan: trainerPlanReducer,
+    trainer: trainerPlanReducer,
     trainerDetail: trainerDetailReducer,
 
     trainerUpcomingSessions: trainerUpcomingSessionsReducer,

@@ -55,11 +55,7 @@ export default function   Navigation() {
           component={AppNavigator}
 
         />
-        <Stack.Screen
-          name="workout"
-          component={WorkoutPlan}
-
-        />
+       
         <Stack.Screen
           name="TrainerList"
           component={TrainerListScreen}

@@ -19,15 +19,20 @@ export const setRefreshToken = async (token) => {
     console.log("SET REFRESH TOKEN ERROR", e);
   }
 };
-
 export const setToken = async (access, refresh) => {
   try {
-    if (access) await setAccessToken(access);
-    if (refresh) await setRefreshToken(refresh);
+    if (access) {
+      await AsyncStorage.setItem("access_token", access);
+    }
+
+    if (refresh) {
+      await AsyncStorage.setItem("refresh_token", refresh);
+    }
   } catch (e) {
     console.log("SET TOKEN ERROR", e);
   }
 };
+
 
 export const getAccessToken = async () => {
   try {
