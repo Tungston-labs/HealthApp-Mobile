@@ -8,28 +8,24 @@ const fallbackImage = require('../../../assets/trainer1.jpg');
 
 const TrainerCard = ({ trainer = {}, onBookNow }) => {
   const navigation = useNavigation();
-
-  const imageSource =
-    typeof trainer.profile_pic === 'string' &&
-    trainer.profile_pic.trim().length > 0
-      ? { uri: trainer.profile_pic }
-      : fallbackImage;
+  
+  const imageSource = trainer.profile_pic
+    ? { uri: trainer.profile_pic }
+    : require('../../../assets/trainer1.jpg'); // fallback
 
   return (
     <View style={styles.card}>
       <View>
         <Image
           source={imageSource}
-          style={styles.trainerImg}
+          style={styles.trainerImg} // make sure width/height are defined
           resizeMode="cover"
         />
 
         <TouchableOpacity
           style={styles.viewProfileBtn}
           onPress={() =>
-            navigation.navigate('TrainerDetail', {
-              trainerId: trainer.id,
-            })
+            navigation.navigate('TrainerDetail', { trainerId: trainer.id })
           }
         >
           <Text style={styles.viewProfileText}>View Profile</Text>
@@ -37,22 +33,14 @@ const TrainerCard = ({ trainer = {}, onBookNow }) => {
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.trainerName}>
-          {trainer.name || 'Trainer'}
-        </Text>
-
-        <Text style={styles.exp}>
-          {(trainer.experience ?? 0)} Years experience
-        </Text>
+        <Text style={styles.trainerName}>{trainer.name || 'Trainer'}</Text>
+        <Text style={styles.exp}>{trainer.experience ?? 0} Years experience</Text>
 
         <View style={styles.ratingplan}>
           <View style={styles.priceRow}>
-            <Text style={styles.price}>
-              ₹ {trainer.single_price ?? 0}
-            </Text>
+            <Text style={styles.price}>₹ {trainer.single_price ?? 0}</Text>
             <Text style={styles.plan}>/plan</Text>
           </View>
-
           <View style={styles.starrating}>
             <Icon name="star" color="#FFB800" size={18} />
             <Text style={styles.rating}>{trainer.star_rating ?? 0}</Text>
@@ -63,6 +51,8 @@ const TrainerCard = ({ trainer = {}, onBookNow }) => {
           <Text style={styles.bookText}>Book Now</Text>
         </TouchableOpacity>
       </View>
+
+      <View style={styles.fullUnderline} />
     </View>
   );
 };

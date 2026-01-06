@@ -11,6 +11,7 @@ import ProfileSection from "../screens/ProfileSection";
 import SessionHistory from "../screens/SessionHistory"
 import SingleSession from "../screens/SingleSession";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import WorkoutPlan from "../screens/WorkoutPlan";
 
 const Tab = createBottomTabNavigator();
 const SessionStack = createNativeStackNavigator();
@@ -28,8 +29,10 @@ const AppNavigator = () => {
       tabBar={(props) => <BottomNav {...props} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tab.Screen name="Upcoming" component={UpcomingSession} />
-
+      <Tab.Screen
+        name="workout"
+        component={WorkoutPlan}
+      />
       <Tab.Screen name="profilesection" component={ProfileSection} />
 
       <Tab.Screen name="Session" component={SessionStackScreen} />

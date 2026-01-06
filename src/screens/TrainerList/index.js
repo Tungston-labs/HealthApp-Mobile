@@ -13,23 +13,19 @@ const TrainerListScreen = () => {
   const dispatch = useDispatch();
   const route = useRoute();
   
-  // 1. Redux State
   const { trainers, plan, loading, error } = useSelector((state) => state.trainer);
   
-  // 2. Local State
   const [selectedTrainer, setSelectedTrainer] = useState(null);
 
-  // 3. Derived Data (Ensure trainers is always an array)
   const trainersList = Array.isArray(trainers) ? trainers : [];
   
-  // 4. Params from Navigation
   const isFiltered = route.params?.isFiltered;
   const planId = route.params?.planId || 3;
 
   useEffect(() => {
-    // Only fetch default list if we DID NOT just come from the filter modal
-    // This prevents the filter results from being overwritten
+  
     if (!isFiltered) {
+      console.log("first data")
       dispatch(fetchAvailableTrainersThunk({ plan_id: planId }));
     }
   }, [dispatch, isFiltered, planId]);
@@ -38,7 +34,6 @@ const TrainerListScreen = () => {
     dispatch(fetchAvailableTrainersThunk({ plan_id: planId }));
   };
 
-  // --- UI Logic ---
 
   if (loading && trainersList.length === 0) {
     return (

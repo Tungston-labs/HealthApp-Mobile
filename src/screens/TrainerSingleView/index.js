@@ -24,6 +24,7 @@ const TrainerDetailScreen = () => {
   const dispatch = useDispatch();
 
   const { trainerId } = route.params;
+  const [selectedCert, setSelectedCert] = useState(null);
 
   const { loading, data, error } = useSelector(
     (state) => state.trainerDetail
@@ -92,26 +93,59 @@ const TrainerDetailScreen = () => {
         </View>
 
         {/* Certificates */}
-        <TouchableOpacity
-          style={styles.dropdownBtn}
-          onPress={() => setShowCertificates(!showCertificates)}
-        >
-          <Text style={styles.dropdownText}>Certificates</Text>
-          <Icon
-            name={showCertificates ? "chevron-up" : "chevron-down"}
-            size={24}
-            color="#000"
-          />
-        </TouchableOpacity>
-
-        {showCertificates &&
-          data.certificates?.map((cert, index) => (
-            <Image
-              key={index}
-              source={{ uri: cert }}
-              style={styles.certificateImage}
+        <View style={styles.certContainer}>
+          <TouchableOpacity
+            style={styles.certHeader}
+            onPress={() => setShowCertificates(!showCertificates)}
+          >
+            <Text style={styles.certTitle}>Certificates</Text>
+            <Icon
+              name={showCertificates ? "chevron-up" : "chevron-down"}
+              size={22}
+              color="#000"
             />
-          ))}
+          </TouchableOpacity>
+
+          {showCertificates && (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.certList}
+            >
+              {data.certificates?.map((cert, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.certCard}
+                  onPress={() => setSelectedCert(cert)}
+                  activeOpacity={0.8}
+                >
+                  <Image
+                    source={{ uri: cert }}
+                    style={styles.certImage}
+                  />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
+          {selectedCert && (
+            <View style={styles.certModal}>
+              <TouchableOpacity
+                style={styles.certClose}
+                onPress={() => setSelectedCert(null)}
+              >
+                <Icon name="close" size={28} color="#fff" />
+              </TouchableOpacity>
+
+              <Image
+                source={{ uri: selectedCert }}
+                style={styles.certFullImage}
+                resizeMode="contain"
+              />
+            </View>
+          )}
+
+        </View>
+
 
         {/* Rating Section */}
         <Text style={styles.sectionTitle}>Rating and feedback</Text>

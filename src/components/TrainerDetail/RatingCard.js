@@ -2,10 +2,15 @@
 import React from "react";
 import { View, Text } from "react-native";
 
-const RatingBar = ({ label, rating }) => {
+const RatingBar = ({ label, rating = 0 }) => {
   return (
     <View style={{ marginBottom: 10 }}>
-      {label && <Text style={{ fontSize: 13, fontFamily: "SegoeUI" }}>{label}</Text>}
+      {label && (
+        <Text style={{ fontSize: 13, fontFamily: "SegoeUI" }}>
+          {label}
+        </Text>
+      )}
+
       <View
         style={{
           height: 6,
@@ -23,7 +28,8 @@ const RatingBar = ({ label, rating }) => {
           }}
         />
       </View>
-      {rating && (
+
+      {rating !== undefined && rating !== null && (
         <Text
           style={{
             position: "absolute",
@@ -39,5 +45,6 @@ const RatingBar = ({ label, rating }) => {
     </View>
   );
 };
+
 
 export default RatingBar;

@@ -33,8 +33,6 @@ export const uploadImageApi = async (file) => {
 };
 
 
-
-
 export const registerTrainerApi = async (formData) => {
   return axios.post(
     "http://178.248.112.16:9001/api/trainer/",
