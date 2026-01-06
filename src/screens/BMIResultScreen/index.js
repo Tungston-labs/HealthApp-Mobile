@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Platform } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./style";
@@ -64,53 +64,52 @@ export default function BMIResultScreen({ navigation }) {
     bmiText = "Obesity";
     bmiColor = "#F5554A";
   }
+
 const buildRegisterPayload = (data) => {
   const formData = new FormData();
 
+  // Basic fields
   formData.append("name", data.name);
   formData.append("email", data.email);
   formData.append("phno", data.phno);
   formData.append("password", data.password);
-  formData.append("role", "user");
-
+  formData.append("role", data.role || "user");
   formData.append("dob", data.dob);
   formData.append("gender", data.gender);
   formData.append("blood_group", data.blood_group);
-
-  // IMPORTANT: Decimal fields as STRING
   formData.append("height", String(data.height));
   formData.append("weight", String(data.weight));
-
   formData.append(
     "address",
     `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`
   );
 
-  // JSONField → STRING
+  // Arrays
   formData.append(
     "health_issues",
-    JSON.stringify(data.health_issues || [])
+    JSON.stringify(Array.isArray(data.health_issues) ? data.health_issues : [])
   );
-
   formData.append(
     "wellness_goal",
-    JSON.stringify(data.wellness_goal || [])
+    JSON.stringify(Array.isArray(data.wellness_goal) ? data.wellness_goal : [])
   );
 
-  // ImageField → FILE
+  // Profile picture
   if (data.profile_pic) {
+    let uri = data.profile_pic.uri;
+    if (Platform.OS === "android" && !uri.startsWith("file://")) {
+      uri = "file://" + uri;
+    }
+
     formData.append("profile_pic", {
-      uri: data.profile_pic.uri,
+      uri,
       type: data.profile_pic.type || "image/jpeg",
-      name: data.profile_pic.name || "profile.jpg",
+      name: data.profile_pic.fileName || "profile.jpg",
     });
   }
 
   return formData;
 };
-
-
-
 
 
 
@@ -120,11 +119,17 @@ const handleFinalSubmit = () => {
     return;
   }
 
-  const formData = buildRegisterPayload(registration);
+  if (!registration.height || !registration.weight) {
+    Alert.alert("Missing data", "Height & Weight required");
+    return;
+  }
 
+  const formData = buildRegisterPayload(registration);
   console.log("REGISTER PAYLOAD 👉", formData);
+
   dispatch(registerClientThunk(formData));
 };
+
 
 
 useEffect(() => {
@@ -252,17 +257,17 @@ useEffect(() => {
               <View style={styles.legendItem}>
                 <View style={[styles.legendColor, { backgroundColor: "#84CDEE" }]} />
                 <Text style={styles.legendLabel}>Under Weight :</Text>
-                <Text style={styles.legendValue}> 18.5</Text>
+                <Text style={styles.legendValue}>&lt; 18.5</Text>
               </View>
 
               <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: "#FFDF32" }]} />
+                <View style={[styles.legendColor, { backgroundColor: "#78B060" }]} />
                 <Text style={styles.legendLabel}>Normal Weight :</Text>
                 <Text style={styles.legendValue}>18.5 - 24.9</Text>
               </View>
 
               <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: "#78B060" }]} />
+                <View style={[styles.legendColor, { backgroundColor: "#FFDF32" }]} />
                 <Text style={styles.legendLabel}>Over Weight :</Text>
                 <Text style={styles.legendValue}>25 - 29.9</Text>
               </View>

@@ -10,15 +10,13 @@ const initialState = {
 
   wellness_goal: [],
   health_issues: [],
-
+  profile_pic: null,
   address: "",
   name: "",
   email: "",
   phno: "",
   password: "",
-  profile_pic: null,
 };
-
 
 const registrationSlice = createSlice({
   name: "registration",
@@ -35,6 +33,7 @@ const registrationSlice = createSlice({
       ...initialState,
       wellness_goal: [],
       health_issues: [],
+      profile_pic: null,
     }),
   },
 });
