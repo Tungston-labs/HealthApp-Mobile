@@ -32,6 +32,7 @@ export default StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     gap: 10,
+    marginBottom: 25, 
   },
 
   locationText: {
@@ -57,7 +58,7 @@ export default StyleSheet.create({
     alignSelf: "center",
     backgroundColor: "#6C63FF",
     paddingHorizontal: 18,
-    paddingVertical: 10,
+    paddingVertical: 0,
     borderRadius: 14,
     alignItems: "center",
     gap: 6,
