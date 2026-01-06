@@ -6,7 +6,7 @@ import TrainingProgressCard from '../../components/ProgressBar';
 import { format, isToday, parse, parseISO } from 'date-fns';
 import Skeleton from '../../components/Skelton';
 import { useNavigation } from '@react-navigation/native';
-const TrainerHomeVeiw = ({
+const TrainerHomeView = ({
   activeSession,
   onEndSession,
   isSchedulesLoading,
@@ -76,7 +76,7 @@ const TrainerHomeVeiw = ({
         <Text style={styles.sectionTitle}>Upcoming Sessions</Text>
         {isSchedulesLoading && page === 1 ? (
           Array.from({ length: 5 }).map((_, index) => (
-            <Skeleton key={index} height={100} borderRadius={15} margin={10} />
+            <Skeleton key={index} height={100} borderRadius={15} />
           ))
         ) : (
           <FlatList
@@ -113,4 +113,4 @@ const TrainerHomeVeiw = ({
   );
 };
 
-export default TrainerHomeVeiw;
+export default TrainerHomeView;
