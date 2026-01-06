@@ -1,6 +1,6 @@
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEndTrainerSessionMutation } from '../redux/api/trainer/scheduleApi';
+import { useEndTrainerSessionMutation } from '../../redux/api/trainer/scheduleApi';
 
 export const useEndSession = () => {
   const [endSession, { isLoading }] = useEndTrainerSessionMutation();

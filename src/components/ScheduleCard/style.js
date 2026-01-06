@@ -44,6 +44,7 @@ export default StyleSheet.create({
 
   info: {
     flex: 1,
+    gap:3
   },
 
   name: {
