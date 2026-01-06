@@ -9,12 +9,13 @@ const TrainerAssignedClients = () => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <Header
-        username="John"
-        subtitle="Gym"
-        bmiValue="22.5"
-      />
-
+      
+      <View style={styles.headerCard}>
+              <View>
+                <Text style={styles.greeting}>Hi, John</Text>
+                <Text style={styles.subTitle}>Gym</Text>
+              </View>
+            </View>
       {/* Section Title */}
       <Text style={styles.sectionTitle}>All Assigned Clients</Text>
 

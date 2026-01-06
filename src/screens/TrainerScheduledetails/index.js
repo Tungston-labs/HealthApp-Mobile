@@ -25,57 +25,70 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const TrainerScheduleDetail = () => {
   const route = useRoute();
   const { id } = route.params;
+
+  const navigation = useNavigation();
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [noteText, setNoteText] = useState('');
-  const navigation = useNavigation();
+  const [isEditing, setIsEditing] = useState(false);
 
-  const { data, isLoading, isFetching, error, refetch } =
-    useGetTrainerSlotBookingByIdQuery(id);
+  const { data, error } = useGetTrainerSlotBookingByIdQuery(id);
+  const { data: notesData } = useGetTrainerNotesQuery(id);
   const [addNote, { isLoading: isSaving }] = useAddTrainerNoteMutation();
+  const [startSession] = useStartTrainerSessionMutation();
 
-  const {
-    data: notesData,
-    refetch: refetchNotes,
-    isLoading: notesloading,
-    isFetching: notesFetching,
-    error: notesError,
-  } = useGetTrainerNotesQuery(id);
+  // ✅ Allow only ONE note
+  const savedNote = notesData?.notes?.[0] || null;
 
   useEffect(() => {
     if (error) {
       Toast.show({
         type: 'error',
         text1: 'Failed to load data',
-        text2: error?.data?.message || 'Unable to fetch schedule',
       });
     }
   }, [error]);
 
+  // ✅ Add note
+  const openAddNote = () => {
+    setNoteText('');
+    setIsEditing(false);
+    setShowNoteModal(true);
+  };
+
+  // ✅ Edit note
+  const openEditNote = () => {
+    setNoteText(savedNote?.note || '');
+    setIsEditing(true);
+    setShowNoteModal(true);
+  };
+
+  // ✅ Save / Update
   const handleSubmitNote = async () => {
     if (!noteText.trim()) return;
 
     try {
       await addNote({ id, note: noteText }).unwrap();
 
-      setNoteText('');
       setShowNoteModal(false);
+      setNoteText('');
+      setIsEditing(false);
+
+      Toast.show({
+        type: 'success',
+        text1: isEditing ? 'Note updated' : 'Note added',
+      });
     } catch (err) {
-      console.log(err);
       Toast.show({
         type: 'error',
         text1: 'Failed to save note',
-        text2: err?.data?.message || 'Something went wrong. Please try again.',
       });
     }
   };
 
-  const [startSession, { isLoading: isSessionStarting }] = useStartTrainerSessionMutation();
-
   const handleStartSession = async () => {
     try {
-      const res = await startSession(id).unwrap();
-
+      await startSession(id).unwrap();
       await AsyncStorage.setItem(
         'active_session',
         JSON.stringify({
@@ -85,21 +98,16 @@ const TrainerScheduleDetail = () => {
         }),
       );
 
-      Toast.show({
-        type: 'success',
-        text1: 'Session Started',
-      });
-    } catch (error) {
-      console.log(error)
-      Toast.show({
-        type: 'error',
-        text1: 'Failed to start session',
-      });
+      Toast.show({ type: 'success', text1: 'Session Started' });
+    } catch {
+      Toast.show({ type: 'error', text1: 'Failed to start session' });
     }
   };
+
   const onBackPress = () => {
     navigation.navigate('TrainerNavigator', { screen: 'TrainerHome' });
   };
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
@@ -108,6 +116,7 @@ const TrainerScheduleDetail = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Schedule Detail</Text>
       </View>
+
       <PersonalDetailsCard
         data={data?.client}
         time={data?.time}
@@ -129,6 +138,7 @@ const TrainerScheduleDetail = () => {
           onPress={handleStartSession}
         />
       </View>
+
       <Text style={styles.mapHint}>Tap to open the map location.</Text>
 
       <View style={styles.locationBox}>
@@ -136,31 +146,32 @@ const TrainerScheduleDetail = () => {
         <Text style={styles.locationText}>{data?.client?.address}</Text>
       </View>
 
-    
-    
-      <TouchableOpacity
-        style={styles.addNoteBtn}
-        onPress={() => setShowNoteModal(true)}
-      >
-        <Icon name="add" size={18} color="#fff" />
-        <Text style={styles.addNoteText}>Add note</Text>
-      </TouchableOpacity>
+      {/* ✅ Add Note Button */}
+      {!savedNote && (
+        <TouchableOpacity style={styles.addNoteBtn} onPress={openAddNote}>
+          <Icon name="add" size={18} color="#fff" />
+          <Text style={styles.addNoteText}>Add note</Text>
+        </TouchableOpacity>
+      )}
 
-      {notesData?.notes?.length > 0 &&
-        notesData?.notes?.map((item, idx) => (
-          <View style={styles.noteBox}>
-            <Text key={idx} style={styles.savedNoteText}>
-              {item?.note}
+      {/* ✅ Saved Note with Edit */}
+      {savedNote && (
+        <View style={styles.noteBox}>
+          <Text style={styles.savedNoteText}>{savedNote.note}</Text>
+
+          <TouchableOpacity
+            onPress={openEditNote}
+            style={{ alignSelf: 'flex-end', marginTop: 8 }}
+          >
+            <Text style={{ color: '#6C63FF', fontWeight: '600' }}>
+              Edit
             </Text>
-          </View>
-        ))}
+          </TouchableOpacity>
+        </View>
+      )}
 
-      <Modal
-        visible={showNoteModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowNoteModal(false)}
-      >
+      {/* ✅ SAME MODAL for Add & Edit */}
+      <Modal visible={showNoteModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <TouchableOpacity
@@ -170,7 +181,9 @@ const TrainerScheduleDetail = () => {
               <Icon name="close" size={22} />
             </TouchableOpacity>
 
-            <Text style={styles.modalTitle}>Add a note</Text>
+            <Text style={styles.modalTitle}>
+              {isEditing ? 'Edit note' : 'Add a note'}
+            </Text>
 
             <TextInput
               placeholder="Type your note here..."
@@ -186,7 +199,7 @@ const TrainerScheduleDetail = () => {
               disabled={isSaving}
             >
               <Text style={styles.submitText}>
-                {isSaving ? 'Saving...' : 'Submit'}
+                {isEditing ? 'Save' : 'Submit'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -197,5 +210,3 @@ const TrainerScheduleDetail = () => {
 };
 
 export default TrainerScheduleDetail;
-
-
