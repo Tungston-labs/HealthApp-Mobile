@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,13 +8,19 @@ import {
   Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-
 import styles from './style';
 import PersonalDetailsCard from '../../components/PersonalDetailsCard';
 import TrainingProgressSelector from '../../components/TrainingProgressSelector';
 import ClickButton from '../../components/Swipe';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useGetTrainerSlotBookingByIdQuery } from '../../redux/api/trainer/scheduleApi';
+import {
+  useAddTrainerNoteMutation,
+  useGetTrainerNotesQuery,
+  useGetTrainerSlotBookingByIdQuery,
+  useStartTrainerSessionMutation,
+} from '../../redux/api/trainer/scheduleApi';
+import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TrainerScheduleDetail = () => {
   const route = useRoute();
@@ -22,17 +28,74 @@ const TrainerScheduleDetail = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [noteText, setNoteText] = useState('');
-  const [savedNote, setSavedNote] = useState('');
   const navigation = useNavigation();
 
   const { data, isLoading, isFetching, error, refetch } =
     useGetTrainerSlotBookingByIdQuery(id);
-  console.log(data, isLoading, isFetching, error, refetch);
-  const handleSubmitNote = () => {
-    if (noteText.trim()) {
-      setSavedNote(noteText);
+  const [addNote, { isLoading: isSaving }] = useAddTrainerNoteMutation();
+
+  const {
+    data: notesData,
+    refetch: refetchNotes,
+    isLoading: notesloading,
+    isFetching: notesFetching,
+    error: notesError,
+  } = useGetTrainerNotesQuery(id);
+
+
+  useEffect(() => {
+    if (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to load data',
+        text2: error?.data?.message || 'Unable to fetch schedule',
+      });
+    }
+  }, [error]);
+
+  const handleSubmitNote = async () => {
+    if (!noteText.trim()) return;
+
+    try {
+      await addNote({ id, note: noteText }).unwrap();
+
       setNoteText('');
       setShowNoteModal(false);
+    } catch (err) {
+      console.log(err);
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to save note',
+        text2: err?.data?.message || 'Something went wrong. Please try again.',
+      });
+    }
+  };
+
+  const [startSession, { isLoading:isSessionStarting }] = useStartTrainerSessionMutation();
+
+  const handleStartSession = async () => {
+    try {
+      const res = await startSession(id).unwrap();
+
+      await AsyncStorage.setItem(
+        'active_session',
+        JSON.stringify({
+          session_id: id,
+          started_at: Date.now(),
+          duration: data?.training_time?.duration_minutes || 0,
+        }),
+      );
+
+      Toast.show({
+        type: 'success',
+        text1: 'Session Started',
+      });
+    } catch (error) {
+      console.log(error)
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to start session',
+      });
     }
   };
   const onBackPress = () => {
@@ -53,17 +116,18 @@ const TrainerScheduleDetail = () => {
           count: data?.total_sessions || 0,
           total: data?.session_number || 0,
         }}
+        startDate={data?.date}
+        endDate={data?.last_date}
         isOpen={detailsOpen}
         onToggle={() => setDetailsOpen(prev => !prev)}
       />
 
-       <View style={styles.swipeWrapper}>
-        
+      <View style={styles.swipeWrapper}>
         <ClickButton
           title="Click to Start Session"
           successTitle=" Click to End Session "
           width={340}
-          onSwipeSuccess={() => console.log('Session Ended')}
+          onPress={handleStartSession}
         />
       </View>
       <Text style={styles.mapHint}>Tap to open the map location.</Text>
@@ -81,7 +145,7 @@ const TrainerScheduleDetail = () => {
 
       {/* Training Progress */}
       <TrainingProgressSelector
-        progressDay={1}
+        progressDay={data?.day_label || 'Day 1'}
         progressTime="00:00"
         time={data?.time}
       />
@@ -94,11 +158,26 @@ const TrainerScheduleDetail = () => {
         <Icon name="add" size={18} color="#fff" />
         <Text style={styles.addNoteText}>Add note</Text>
       </TouchableOpacity>
-      {savedNote ? (
-        <View style={styles.noteBox}>
-          <Text style={styles.savedNoteText}>{savedNote}</Text>
-        </View>
-      ) : null}
+
+      {notesData?.notes?.length > 0 &&
+        notesData?.notes?.map((item, idx) => (
+          <View style={styles.noteBox}>
+            <Text key={idx} style={styles.savedNoteText}>
+              {item?.note}
+            </Text>
+          </View>
+        ))}
+
+      {/* 
+      <View style={styles.swipeWrapper}>
+        <SwipeButton
+          title="Slide to start session"
+          successTitle="Session Ended"
+          width={340}
+          onSwipeSuccess={() => console.log('Session Ended')}
+        />
+      </View> */}
+
       <Modal
         visible={showNoteModal}
         transparent
@@ -125,10 +204,13 @@ const TrainerScheduleDetail = () => {
             />
 
             <TouchableOpacity
-              style={styles.submitBtn}
+              style={[styles.submitBtn, isSaving && { opacity: 0.6 }]}
               onPress={handleSubmitNote}
+              disabled={isSaving}
             >
-              <Text style={styles.submitText}>Submit</Text>
+              <Text style={styles.submitText}>
+                {isSaving ? 'Saving...' : 'Submit'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

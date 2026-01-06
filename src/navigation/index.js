@@ -28,7 +28,7 @@ import TrainerEditProfile from '../screens/TrainerEditprofile';
 const Stack = createNativeStackNavigator();
 import { navigationRef } from "./navigationService";
 
-export default function Navigation() {
+export default function   Navigation() {
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Welcome">
