@@ -63,3 +63,18 @@ export const fetchTrainerHistory = async (page = 1) => {
   const response = await api.get(`section/trainer/history/?page=${page}`);
   return response.data;
 };
+
+
+
+export const fetchTrainerProfileApi = async (trainerId) => {
+  const response = await api.get(`trainer/${trainerId}/`);
+  return response.data;
+};
+
+export const updateTrainerProfileApi = async (trainerId, payload) => {
+  const response = await api.patch(
+    `trainer/${trainerId}/`,
+    payload
+  );
+  return response.data;
+};
