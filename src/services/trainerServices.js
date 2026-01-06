@@ -61,3 +61,30 @@ export const fetchTrainerDetailAPI = async (trainerId) => {
   const response = await api.get(`trainer/detail/${trainerId}/`);
   return response.data;
 };
+
+
+
+const getTrainerBookings = async ({ page = 1, date = null }) => {
+  let url = `section/trainer/bookings/?page=${page}`;
+
+  if (date) {
+    url += `&date=${date}`; // YYYY-MM-DD
+  }
+
+  const response = await api.get(url);
+  return response.data;
+};
+
+const trainerService = {
+  getTrainerBookings,
+};
+
+export default trainerService;
+
+
+// trainer session history
+
+export const fetchTrainerHistory = async (page = 1) => {
+  const response = await api.get(`section/trainer/history/?page=${page}`);
+  return response.data;
+};
