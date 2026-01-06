@@ -8,6 +8,7 @@ import {
   Image,
   SafeAreaView,
   Platform,
+  Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import styles from './style';
@@ -39,6 +40,10 @@ export default function CreateAccountScreen({ navigation }) {
   const [genderOpen, setGenderOpen] = useState(false);
   const [genderValue, setGenderValue] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [pincode, setPincode] = useState("");
+  const [landmark, setLandmark] = useState("");
 
   const [expertiseOpen, setExpertiseOpen] = useState(false);
   const [expertiseValue, setExpertiseValue] = useState('');
@@ -99,17 +104,36 @@ export default function CreateAccountScreen({ navigation }) {
   const handleUseLocation = async () => {
     try {
       const coords = await getCurrentLocation();
-      const address = await reverseGeocode(coords.latitude, coords.longitude);
+      const fullAddress = await reverseGeocode(
+        coords.latitude,
+        coords.longitude
+      );
 
-      setLocation(address);
+      const pinMatch = fullAddress.match(/\b\d{6}\b/);
+      const pin = pinMatch ? pinMatch[0] : "";
 
-      alert(' Location fetched successfully');
-      console.log(' Location:', address);
+      const parts = fullAddress.split(",");
+
+      const landmarkValue = parts[0]?.trim() || "";
+      const cityValue = parts[1]?.trim() || "";
+
+      setAddress(fullAddress);
+      setCity(cityValue);
+      setLandmark(landmarkValue);
+      setPincode(pin);
+
+      alert("Location fetched successfully");
+      console.log("Location:", {
+        fullAddress,
+        cityValue,
+        pin,
+      });
     } catch (err) {
-      console.log(' Location error:', err);
-      alert('Unable to fetch location. Please try again.');
+      console.log("Location error:", err);
+      alert("Unable to fetch location. Please try again.");
     }
   };
+
   const handlePickImage = () => {
     launchImageLibrary(
       {
@@ -137,85 +161,102 @@ export default function CreateAccountScreen({ navigation }) {
   const handleRemoveImage = index => {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
+const handleSubmit = async () => {
+  try {
+    setIsUploading(true);
 
-  const handleSubmit = async () => {
-    try {
-      setIsUploading(true);
+    const adarImageUrl = aadhaarImage?.uri
+      ? await uploadImageApi(aadhaarImage)
+      : "";
 
-      const adarImageUrl = aadhaarImage?.uri ? await uploadImageApi(aadhaarImage) : "";
-      let certUrls = [];
- 
-      const formData = new FormData();
+    let certUrls = [];
+    const formData = new FormData();
 
-      // Text fields
-      formData.append("name", name);
-      formData.append("email", email.toLowerCase().trim());
-      formData.append("phno", phno);
-      formData.append("dob", dob);
-      formData.append("gender", genderValue.toLowerCase());
-      formData.append("location", location);
-      formData.append("adar_number", aadhaar);
-      formData.append("password", password);
-      formData.append("section_timing", sectionTiming);
-      for (const img of images) {
-        const url = await uploadImageApi(img);
-        if (url) certUrls.push(url);
-        await new Promise(r => setTimeout(r, 300)); // 300ms delay
-      }
+    const finalLocation =
+      location?.trim() ||
+      [landmark, address, city, pincode].filter(Boolean).join(", ");
 
-      // Numeric fields
-      const planId = expertiseMap[expertiseValue];
-      if (planId) formData.append("training_field", Number(planId));
-      formData.append("experience", Number(experience) || 0);
-      formData.append("no_of_section", Number(sessions) || 0);
-      formData.append("expecting_salary", Number(fee) || 0);
-
-      // File fields
-      if (profileImage?.uri) {
-        const fixedUri =
-          Platform.OS === "android"
-            ? profileImage.uri.startsWith("file://") ? profileImage.uri : `file://${profileImage.uri}`
-            : profileImage.uri;
-
-        formData.append("profile_pic", {
-          uri: fixedUri,
-          name: profileImage.fileName || `profile_${Date.now()}.jpg`,
-          type: profileImage.type || "image/jpeg",
-        });
-      }
-
-      if (adarImageUrl) formData.append("adar_image", adarImageUrl);
-
-certUrls.forEach((url) => {
-  formData.append("certificates[]", url);
-});
-
-      console.log("FormData ready to dispatch:", formData);
-      const result = await dispatch(registerTrainerThunk(formData)).unwrap();
-      alert("Trainer Registered Successfully!");
-
-    } catch (err) {
-  console.log("❌ FINAL SUBMIT ERROR");
-
-  if (err?.response) {
-    console.log("STATUS:", err.response.status);
-    console.log("DATA:", err.response.data);
-    alert(
-      err.response.data?.message ||
-      JSON.stringify(err.response.data)
-    );
-  } else if (err?.request) {
-    console.log("NO RESPONSE (NETWORK):", err.request);
-    alert("Network error. Server not reachable.");
-  } else {
-    console.log("ERROR MESSAGE:", err.message);
-    alert(err.message || "Something went wrong");
-  }
-}
- finally {
+    if (!finalLocation) {
+      Alert.alert("Error", "Please provide your location");
       setIsUploading(false);
+      return;
     }
+
+    // 🔹 Text fields
+    formData.append("name", name);
+    formData.append("email", email.toLowerCase().trim());
+    formData.append("phno", phno);
+    formData.append("dob", dob);
+    formData.append("gender", genderValue.toLowerCase());
+    formData.append("location", finalLocation); // ✅ REQUIRED
+    formData.append("adar_number", aadhaar);
+    formData.append("password", password);
+    formData.append("section_timing", sectionTiming);
+
+    // 🔹 Optional split address fields (backend supports these)
+    formData.append("address", address || "");
+    formData.append("landmark", landmark || "");
+    formData.append("city", city || "");
+    formData.append("pincode", pincode || "");
+
+    // 🔹 Upload certificates
+    for (const img of images) {
+      const url = await uploadImageApi(img);
+      if (url) certUrls.push(url);
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    const planId = expertiseMap[expertiseValue];
+    if (planId) formData.append("training_field", Number(planId));
+
+    formData.append("experience", Number(experience) || 0);
+    formData.append("no_of_section", Number(sessions) || 0);
+    formData.append("expecting_salary", Number(fee) || 0);
+
+    // 🔹 Profile image
+    if (profileImage?.uri) {
+      const fixedUri =
+        Platform.OS === "android"
+          ? profileImage.uri.startsWith("file://")
+            ? profileImage.uri
+            : `file://${profileImage.uri}`
+          : profileImage.uri;
+
+      formData.append("profile_pic", {
+        uri: fixedUri,
+        name: profileImage.fileName || `profile_${Date.now()}.jpg`,
+        type: profileImage.type || "image/jpeg",
+      });
+    }
+
+    if (adarImageUrl) {
+      formData.append("adar_image", adarImageUrl);
+    }
+
+    certUrls.forEach(url => {
+      formData.append("certificates[]", url);
+    });
+
+    console.log("✅ FINAL LOCATION:", finalLocation);
+    console.log("📦 FormData ready:", formData);
+
+    await dispatch(registerTrainerThunk(formData)).unwrap();
+    Alert.alert("Success", "Trainer Registered Successfully!");
+
+  } catch (err) {
+    console.log("❌ FINAL SUBMIT ERROR", err);
+
+    if (err?.response) {
+      alert(JSON.stringify(err.response.data));
+    } else {
+      alert(err.message || "Something went wrong");
+    }
+  } finally {
+    setIsUploading(false);
   }
+};
+
+
 
 
   useEffect(() => {
@@ -398,21 +439,37 @@ certUrls.forEach((url) => {
             placeholder="Enter pincode"
             placeholderTextColor="#888"
             style={styles.inputUnderline}
+            value={pincode}
+            onChangeText={setPincode}
+            keyboardType="numeric"
           />
+
           <TextInput
             placeholder="City/Town"
             placeholderTextColor="#888"
             style={styles.inputUnderline}
+            value={city}
+            onChangeText={setCity}
           />
         </View>
 
-        <TextInput placeholder="Landmark" style={styles.inputUnderline} />
+  
+        <TextInput
+          placeholder="Landmark"
+          placeholderTextColor="#888"
+          style={styles.inputUnderline}
+          value={landmark}
+          onChangeText={setLandmark}
+        />
         <TextInput
           placeholder="Address"
-          value={location}
-          onChangeText={setLocation}
+          placeholderTextColor="#888"
           style={styles.inputUnderline}
+          value={address}
+          onChangeText={setAddress}
+          multiline
         />
+
 
         <View style={styles.twoColRow}>
           <TextInput

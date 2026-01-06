@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, ActivityIndicator } from 'react-native';
+import {
+  View,
+  ActivityIndicator,
+  Text,
+  FlatList,
+} from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+
 import Header from '../../components/Header';
-import styles from './style';
 import FilterModal from '../../components/FIlterModal';
 import PlanCard from './PlanCard';
 import { fetchPlansThunk } from '../../redux/slices/planSlice';
-import { Text } from 'react-native-svg';
+import styles from './style';
 
 const WorkoutPlan = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -15,49 +20,55 @@ const WorkoutPlan = ({ navigation }) => {
 
   const { plans, loading, error } = useSelector(state => state.planList);
   const user = useSelector(state => state.auth?.user);
+
   useEffect(() => {
     dispatch(fetchPlansThunk());
-  }, []);
-
-  console.log("PLANS 👉", plans);
+  }, [dispatch]);
 
   return (
-    <>
-      <ScrollView style={styles.container}>
-        <Header
-          username={user?.name || 'User'}
-          subtitle="Your workout plans"
-          onNotificationPress={() => navigation.navigate('Notifications')}
-        />
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <FlatList
+        data={plans}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={2}
+        columnWrapperStyle={styles.gridContainer}
+        contentContainerStyle={{ paddingBottom: 80 }}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <Header
+            username={user?.name || 'User'}
+            subtitle="Your workout plans"
+            onNotificationPress={() => navigation.navigate('Notifications')}
+          />
+        }
+        ListEmptyComponent={
+          !loading && (
+            <Text style={{ textAlign: 'center', marginTop: 20 }}>
+              No plans available
+            </Text>
+          )
+        }
+        renderItem={({ item }) => (
+          <PlanCard
+            item={item}
+            onPress={() => {
+              setSelectedPlanId(item.id);
+              setShowModal(true);
+            }}
+          />
+        )}
+      />
 
-        {loading && <ActivityIndicator size="large" />}
-        {error && <Text>{JSON.stringify(error)}</Text>}
+      {loading && <ActivityIndicator size="large" />}
 
-        <View style={styles.gridContainer}>
-          {plans.length === 0 && !loading && (
-            <Text>No plans available</Text>
-          )}
-
-          {plans.map(item => (
-            <PlanCard
-              key={item.id}
-              item={item}
-              onPress={() => {
-                setSelectedPlanId(item.id);
-                setShowModal(true);
-              }}
-            />
-          ))}
-
-        </View>
-      </ScrollView>
+      {error && <Text>{JSON.stringify(error)}</Text>}
 
       <FilterModal
         visible={showModal}
         planId={selectedPlanId}
         onClose={() => setShowModal(false)}
       />
-    </>
+    </View>
   );
 };
 

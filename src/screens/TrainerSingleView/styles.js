@@ -22,6 +22,7 @@ export default StyleSheet.create({
     alignItems: "center",
   },
 
+
   profileImage: {
     width: 90,
     height: 90,
@@ -89,6 +90,72 @@ sectionTitle: {
   fontFamily: "SegoeUI",
   textAlign: "center",       
   width: "100%",              
+},
+certContainer: {
+  backgroundColor: "#E0E0E0",
+  borderRadius: 14,
+  padding: 10,
+  marginTop: 20,
+},
+
+certHeader: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  paddingHorizontal: 6,
+  paddingVertical: 4,
+},
+
+certTitle: {
+  fontSize: 15,
+  fontFamily: "SegoeUI-Semibold",
+  color: "#000",
+},
+
+certList: {
+  paddingTop: 10,
+},
+
+certCard: {
+  backgroundColor: "#D9D9D9",
+  borderRadius: 10,
+  marginRight: 10,
+  padding: 6,
+  elevation: 3,
+  shadowColor: "#000",
+  shadowOpacity: 0.2,
+  shadowRadius: 4,
+  shadowOffset: { width: 0, height: 2 },
+},
+
+certImage: {
+  width: 160,
+  height: 110,
+  borderRadius: 6,
+  resizeMode: "cover",
+},
+certModal: {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0,0,0,0.9)",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 999,
+},
+
+certFullImage: {
+  width: "90%",
+  height: "80%",
+},
+
+certClose: {
+  position: "absolute",
+  top: 40,
+  right: 20,
+  zIndex: 10,
 },
 
 
