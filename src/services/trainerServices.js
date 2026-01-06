@@ -66,15 +66,20 @@ export const fetchTrainerHistory = async (page = 1) => {
 
 
 
-export const fetchTrainerProfileApi = async (trainerId) => {
-  const response = await api.get(`trainer/${trainerId}/`);
+export const fetchTrainerProfileApi = async () => {
+  const response = await api.get("trainer/profile/");
   return response.data;
 };
 
-export const updateTrainerProfileApi = async (trainerId, payload) => {
+export const updateTrainerProfileApi = async (formData) => {
   const response = await api.patch(
-    `trainer/${trainerId}/`,
-    payload
+    "trainer/profile/edit/",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
   );
   return response.data;
 };

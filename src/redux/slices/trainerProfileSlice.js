@@ -4,31 +4,30 @@ import {
   updateTrainerProfileApi,
 } from "../../services/trainerServices";
 
-/* ================= FETCH ================= */
+/* FETCH */
 export const fetchTrainerProfileThunk = createAsyncThunk(
   "trainerProfile/fetch",
-  async (trainerId, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      return await fetchTrainerProfileApi(trainerId);
-    } catch (err) {
-      return rejectWithValue("Failed to load trainer profile");
+      return await fetchTrainerProfileApi();
+    } catch {
+      return rejectWithValue("Failed to load profile");
     }
   }
 );
 
-/* ================= UPDATE ================= */
+/* UPDATE */
 export const updateTrainerProfileThunk = createAsyncThunk(
   "trainerProfile/update",
-  async ({ trainerId, data }, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     try {
-      return await updateTrainerProfileApi(trainerId, data);
+      return await updateTrainerProfileApi(data);
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data || "Profile update failed"
-      );
+      return rejectWithValue(err.response?.data || "Update failed");
     }
   }
 );
+
 
 const trainerProfileSlice = createSlice({
   name: "trainerProfile",
@@ -38,16 +37,9 @@ const trainerProfileSlice = createSlice({
     error: null,
     updated: false,
   },
-  reducers: {
-    resetTrainerProfileState: state => {
-      state.loading = false;
-      state.error = null;
-      state.updated = false;
-    },
-  },
+  reducers: {},
   extraReducers: builder => {
     builder
-      // FETCH
       .addCase(fetchTrainerProfileThunk.pending, state => {
         state.loading = true;
       })
@@ -60,24 +52,11 @@ const trainerProfileSlice = createSlice({
         state.error = action.payload;
       })
 
-      // UPDATE
-      .addCase(updateTrainerProfileThunk.pending, state => {
-        state.loading = true;
-        state.updated = false;
-      })
       .addCase(updateTrainerProfileThunk.fulfilled, (state, action) => {
-        state.loading = false;
         state.profile = action.payload;
         state.updated = true;
-      })
-      .addCase(updateTrainerProfileThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
       });
   },
 });
-
-export const { resetTrainerProfileState } =
-  trainerProfileSlice.actions;
 
 export default trainerProfileSlice.reducer;
