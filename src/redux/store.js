@@ -4,6 +4,10 @@ import clientReducer from './slices/clientSlice';
 import registrationReducer from './slices/registrationSlice';
 import ForgotPasswordReducer from './slices/forgotPasswordSlice';
 import VerifyOtpReducer from './slices/verifyOtpSlice';
+import trainerUpcomingSessionsReducer from "./slices/trainerUpcomingSessions";
+import trainerHistoryReducer from "./slices/trainerHistorySlice";
+
+
 import ResetPasswordReducer from './slices/resetPasswordSlice';
 import PlanReducer from './slices/planSlice';
 import trainerRegistrationReducer from './slices/trainerRegistrationSlice';
@@ -23,6 +27,9 @@ export const store = configureStore({
     trainerReg: trainerRegistrationReducer,
     trainer: trainerPlanReducer,
     trainerDetail: trainerDetailReducer,
+    trainerUpcomingSessions: trainerUpcomingSessionsReducer,
+    trainerHistory: trainerHistoryReducer,
+
     [scheduleApi.reducerPath]: scheduleApi.reducer,
   },
   middleware: getDefaultMiddleware =>
