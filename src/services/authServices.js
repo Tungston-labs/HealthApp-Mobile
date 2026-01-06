@@ -2,10 +2,12 @@ import api from "./api";
 
 
 
-export const loginApi = (payload) =>
-  api.post("auth/login/", payload, {
-    skipAuth: true, 
-  })
+export const loginApi = (payload) => {
+  return api.post("auth/login/", payload, {
+    skipAuth: true,
+  });
+};
+
 
 export const logoutApi = (refresh) =>
   api.post("auth/logout/", { refresh });

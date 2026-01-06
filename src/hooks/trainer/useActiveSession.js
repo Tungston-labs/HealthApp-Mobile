@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useGetOngoingSessionQuery } from '../redux/api/trainer/scheduleApi';
+import { useGetOngoingSessionQuery } from '../../redux/api/trainer/scheduleApi';
 
 const STORAGE_KEY = 'active_session';
 

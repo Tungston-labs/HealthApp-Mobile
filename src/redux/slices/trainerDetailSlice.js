@@ -3,14 +3,14 @@ import { fetchTrainerDetailAPI } from "../../services/trainerServices";
 
 export const fetchTrainerDetailThunk = createAsyncThunk(
   "trainerDetail/fetch",
-  async (trainerId, { rejectWithValue }) => {
+  async (trainerId) => {
     try {
       const data = await fetchTrainerDetailAPI(trainerId);
       console.log("TRAINER DETAIL API DATA 👉", data);
       return data;
     } catch (err) {
       console.log("DETAIL ERROR 👉", err.response?.data || err.message);
-      return rejectWithValue(
+      return (
         err.response?.data?.message || "Failed to load trainer details"
       );
     }

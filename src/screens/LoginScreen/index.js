@@ -27,13 +27,10 @@ const { loading, isLoggedIn,user, error } = useSelector(
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-   const isFocused = useIsFocused();
+  const isFocused = useIsFocused();
 
-  const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Email and password are required");
-      return;
-    }
+const handleLogin = () => {
+  if (loading) return;
 
    dispatch(
   loginClientThunk({

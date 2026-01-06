@@ -59,6 +59,7 @@ export const scheduleApi = createApi({
         method: 'GET',
       }),
       providesTags: (result, err, id) => [{ type: 'Notes', id }],
+      keepUnusedDataFor: 60,
     }),
 
     addTrainerNote: builder.mutation({
@@ -106,6 +107,7 @@ export const scheduleApi = createApi({
       providesTags: ['ActiveSession'],
       refetchOnFocus: true,
       refetchOnReconnect: true,
+      keepUnusedDataFor: 10,
     }),
   }),
 });
