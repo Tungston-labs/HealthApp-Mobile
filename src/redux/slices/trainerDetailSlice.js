@@ -6,10 +6,10 @@ export const fetchTrainerDetailThunk = createAsyncThunk(
   async (trainerId) => {
     try {
       const data = await fetchTrainerDetailAPI(trainerId);
-      console.log("TRAINER DETAIL API DATA 👉", data);
+      console.log("TRAINER DETAIL API DATA ", data);
       return data;
     } catch (err) {
-      console.log("DETAIL ERROR 👉", err.response?.data || err.message);
+      console.log("DETAIL ERROR ", err.response?.data || err.message);
       return (
         err.response?.data?.message || "Failed to load trainer details"
       );

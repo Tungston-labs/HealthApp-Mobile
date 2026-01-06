@@ -54,7 +54,6 @@ const ReviewCard = ({ image, name, date, rating, text }) => {
           lineHeight: 20,
         }}
       >
-        {text}
       </Text>
     </View>
   );
