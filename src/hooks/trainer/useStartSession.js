@@ -13,8 +13,7 @@ export const useStartSession = () => {
         : null;
 
       const startedAt = Math.min(serverTimeMs ?? Date.now(), Date.now());
-      //////////////-----------need to add get the duration from response-----------//////////////
-      const duration = response?.session_duration?.value ?? 0;
+      const duration = response?.total_session_time?.value ?? 0;
 
       const session = {
         session_id: response?.booking_id ?? response?.session_id ?? id,
