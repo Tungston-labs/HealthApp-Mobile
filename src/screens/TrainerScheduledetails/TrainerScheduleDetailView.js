@@ -1,0 +1,140 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Modal,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import styles from './style';
+import PersonalDetailsCard from '../../components/PersonalDetailsCard';
+import ClickButton from '../../components/Swipe';
+
+const TrainerScheduleDetailView = ({
+  data,
+  detailsOpen,
+  setDetailsOpen,
+  isSessionStarting,
+  handleStart,
+  activeSession,
+  canStartToday,
+  openMap,
+  openAddNote,
+  savedNote,
+  openEditNote,
+  showNoteModal,
+  setShowNoteModal,
+  isEditing,
+  noteText,
+  setNoteText,
+  handleSubmitNote,
+  isSaving,
+  onBackPress,
+}) => {
+  return (
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={onBackPress}>
+          <Icon name="chevron-back" size={22} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Schedule Detail</Text>
+      </View>
+
+      <PersonalDetailsCard
+        data={data?.client}
+        time={data?.time}
+        progress={{
+          count: data?.total_sessions || 0,
+          total: data?.session_number || 0,
+        }}
+        startDate={data?.date}
+        endDate={data?.last_date}
+        isOpen={detailsOpen}
+        onToggle={() => setDetailsOpen(prev => !prev)}
+      />
+      <View style={styles.swipeWrapper}>
+        <ClickButton
+          title={
+            isSessionStarting ? 'Starting session...' : 'Click to Start Session'
+          }
+          // successTitle=" Click to End Session "
+          width={340}
+          onPress={handleStart}
+          disabled={activeSession || isSessionStarting || !canStartToday}
+        />
+      </View>
+
+      <Text style={styles.mapHint}>Tap to open the map location.</Text>
+
+      <TouchableOpacity
+        style={styles.locationBox}
+        onPress={() => openMap(data?.client?.address)}
+      >
+        <Icon name="location" size={18} color="#FF3B30" />
+        <Text style={styles.locationText}>{data?.client?.address}</Text>
+      </TouchableOpacity>
+
+      {/* ✅ Add Note Button */}
+      {!savedNote && (
+        <TouchableOpacity style={styles.addNoteBtn} onPress={openAddNote}>
+          <Icon name="add" size={18} color="#fff" />
+          <Text style={styles.addNoteText}>Add note</Text>
+        </TouchableOpacity>
+      )}
+
+      {/* ✅ Saved Note with Edit */}
+      {savedNote && (
+        <View style={styles.noteBox}>
+          <Text style={styles.savedNoteText}>{savedNote.note}</Text>
+
+          <TouchableOpacity
+            onPress={openEditNote}
+            style={{ alignSelf: 'flex-end', marginTop: 8 }}
+          >
+            <Text style={{ color: '#6C63FF', fontWeight: '600' }}>Edit</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* ✅ SAME MODAL for Add & Edit */}
+      <Modal visible={showNoteModal} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.closeIcon}
+              onPress={() => setShowNoteModal(false)}
+            >
+              <Icon name="close" size={22} />
+            </TouchableOpacity>
+
+            <Text style={styles.modalTitle}>
+              {isEditing ? 'Edit note' : 'Add a note'}
+            </Text>
+
+            <TextInput
+              placeholder="Type your note here..."
+              multiline
+              value={noteText}
+              onChangeText={setNoteText}
+              style={styles.modalInput}
+            />
+
+            <TouchableOpacity
+              style={[styles.submitBtn, isSaving && { opacity: 0.6 }]}
+              onPress={handleSubmitNote}
+              disabled={isSaving}
+            >
+              <Text style={styles.submitText}>
+                {isEditing ? 'Save' : 'Submit'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </ScrollView>
+  );
+};
+
+export default TrainerScheduleDetailView;
