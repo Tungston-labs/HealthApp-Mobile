@@ -63,7 +63,6 @@ const TrainerScheduleDetail = () => {
     setShowNoteModal(true);
   };
 
-  // ✅ Save / Update
   const handleSubmitNote = async () => {
     if (!noteText.trim()) return;
 
@@ -132,9 +131,9 @@ const TrainerScheduleDetail = () => {
 
       <View style={styles.swipeWrapper}>
         <ClickButton
-          title="Click to Start Session"
+          title="Start Session"
           successTitle=" Click to End Session "
-          width={340}
+          width={250}
           onPress={handleStartSession}
         />
       </View>
