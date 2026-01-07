@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { Linking, Platform } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
 import TrainerScheduleDetailView from './TrainerScheduleDetailView';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import {
@@ -11,6 +10,7 @@ import Toast from 'react-native-toast-message';
 import { useStartSession } from '../../hooks/trainer/useStartSession';
 import { useActiveSession } from '../../hooks/trainer/useActiveSession';
 import { isToday, parseISO } from 'date-fns';
+import { openMapByAddress } from '../../utils/trainer/openMap';
 
 const TrainerScheduleDetailContainer = () => {
   const route = useRoute();
@@ -107,23 +107,10 @@ const TrainerScheduleDetailContainer = () => {
     navigation.navigate('TrainerNavigator', { screen: 'TrainerHome' });
   };
 
-  const openMap = address => {
-    if (!address) return;
+  const openMap = useCallback(address => {
+    openMapByAddress(address);
+  }, []);
 
-    const encoded = encodeURIComponent(address);
-
-    const url =
-      Platform.OS === 'ios'
-        ? `http://maps.apple.com/?q=${encoded}`
-        : `geo:0,0?q=${encoded}`;
-
-    Linking.openURL(url).catch(() => {
-      // fallback for Android
-      Linking.openURL(
-        `https://www.google.com/maps/search/?api=1&query=${encoded}`,
-      );
-    });
-  };
   return (
     <TrainerScheduleDetailView
       data={data}
