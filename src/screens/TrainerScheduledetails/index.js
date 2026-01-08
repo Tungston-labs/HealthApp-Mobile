@@ -23,7 +23,7 @@ const TrainerScheduleDetailContainer = () => {
   const [noteText, setNoteText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
-  const { data, error } = useGetTrainerSlotBookingByIdQuery(id);
+  const { data, error,isLoading:isDataLoading } = useGetTrainerSlotBookingByIdQuery(id);
   const { data: notesData } = useGetTrainerNotesQuery(id);
   const [addNote, { isLoading: isAdding }] = useAddTrainerNoteMutation();
   const [editNote, { isLoading: isEditingNote }] = useEditTrainerNoteMutation();
@@ -120,6 +120,7 @@ const TrainerScheduleDetailContainer = () => {
   return (
     <TrainerScheduleDetailView
       data={data}
+      isDataLoading={isDataLoading}
       detailsOpen={detailsOpen}
       setDetailsOpen={setDetailsOpen}
       isSessionStarting={isSessionStarting}

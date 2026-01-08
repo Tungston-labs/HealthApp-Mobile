@@ -15,6 +15,7 @@ import ClickButton from '../../components/Swipe';
 
 const TrainerScheduleDetailView = ({
   data,
+  isDataLoading,
   detailsOpen,
   setDetailsOpen,
   isSessionStarting,
