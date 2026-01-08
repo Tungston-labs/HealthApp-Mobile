@@ -120,7 +120,6 @@ const TrainerScheduleDetailContainer = () => {
   return (
     <TrainerScheduleDetailView
       data={data}
-      isDataLoading={isDataLoading}
       detailsOpen={detailsOpen}
       setDetailsOpen={setDetailsOpen}
       isSessionStarting={isSessionStarting}
