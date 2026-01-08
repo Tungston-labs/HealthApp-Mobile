@@ -33,6 +33,7 @@ const TrainerScheduleDetailView = ({
   handleSubmitNote,
   isSaving,
   onBackPress,
+  isDataLoading,
 }) => {
   const isSubmitDisabled =
     isSaving || !noteText.trim() || (isEditing && noteText === savedNote);
@@ -59,14 +60,12 @@ const TrainerScheduleDetailView = ({
       />
       <View style={styles.swipeWrapper}>
         <>
-          title={
-            isSessionStarting ? 'Starting session...' : 'Click to Start Session'
-          }
-          // successTitle=" Click to End Session "
-          width={340}
+          title=
+          {isSessionStarting ? 'Starting session...' : 'Click to Start Session'}
+          // successTitle=" Click to End Session " width={340}
           onPress={handleStart}
           disabled={activeSession || isSessionStarting || !canStartToday}
-       </>
+        </>
       </View>
 
       <Text style={styles.mapHint}>Tap to open the map location.</Text>
