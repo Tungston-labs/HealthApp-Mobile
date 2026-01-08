@@ -77,6 +77,15 @@ export const scheduleApi = createApi({
       invalidatesTags: (result, err, { id }) => [{ type: 'Notes', id }],
     }),
 
+    editTrainerNote: builder.mutation({
+      query: ({ id, note }) => ({
+        url: `trainer/bookings/${id}/note/edit/`,
+        method: 'PUT',
+        data: { note },
+      }),
+      invalidatesTags: (result, err, { id }) => [{ type: 'Notes', id }],
+    }),
+
     startTrainerSession: builder.mutation({
       query: id => ({
         url: 'section/start-training/',
@@ -162,6 +171,7 @@ export const {
   useGetTrainerSlotBookingByIdQuery,
   useGetTrainerNotesQuery,
   useAddTrainerNoteMutation,
+  useEditTrainerNoteMutation,
   useStartTrainerSessionMutation,
   useGetOngoingSessionQuery,
   useEndTrainerSessionMutation,

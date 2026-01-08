@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Linking, Platform } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
 import TrainerScheduleDetailView from './TrainerScheduleDetailView';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import {
   useAddTrainerNoteMutation,
+  useEditTrainerNoteMutation,
   useGetTrainerNotesQuery,
   useGetTrainerSlotBookingByIdQuery,
 } from '../../redux/api/trainer/scheduleApi';
@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 import { useStartSession } from '../../hooks/trainer/useStartSession';
 import { useActiveSession } from '../../hooks/trainer/useActiveSession';
 import { isToday, parseISO } from 'date-fns';
+import { openMapByAddress } from '../../utils/trainer/openMap';
 
 const TrainerScheduleDetailContainer = () => {
   const route = useRoute();
@@ -24,12 +25,13 @@ const TrainerScheduleDetailContainer = () => {
 
   const { data, error } = useGetTrainerSlotBookingByIdQuery(id);
   const { data: notesData } = useGetTrainerNotesQuery(id);
-  const [addNote, { isLoading: isSaving }] = useAddTrainerNoteMutation();
+  const [addNote, { isLoading: isAdding }] = useAddTrainerNoteMutation();
+  const [editNote, { isLoading: isEditingNote }] = useEditTrainerNoteMutation();
   const { handleStartSession, isLoading: isSessionStarting } =
     useStartSession();
   const { activeSession, setActiveSession } = useActiveSession();
 
-  const savedNote = notesData?.notes?.[0] || null;
+  const isSaving = isAdding || isEditingNote;
 
   useEffect(() => {
     if (error) {
@@ -47,7 +49,7 @@ const TrainerScheduleDetailContainer = () => {
   };
 
   const openEditNote = () => {
-    setNoteText(savedNote?.note || '');
+    setNoteText(notesData?.note || '');
     setIsEditing(true);
     setShowNoteModal(true);
   };
@@ -56,7 +58,11 @@ const TrainerScheduleDetailContainer = () => {
     if (!noteText.trim()) return;
 
     try {
-      await addNote({ id, note: noteText }).unwrap();
+      if (isEditing) {
+        await editNote({ id, note: noteText }).unwrap();
+      } else {
+        await addNote({ id, note: noteText }).unwrap();
+      }
 
       setShowNoteModal(false);
       setNoteText('');
@@ -107,23 +113,10 @@ const TrainerScheduleDetailContainer = () => {
     navigation.navigate('TrainerNavigator', { screen: 'TrainerHome' });
   };
 
-  const openMap = address => {
-    if (!address) return;
+  const openMap = useCallback(address => {
+    openMapByAddress(address);
+  }, []);
 
-    const encoded = encodeURIComponent(address);
-
-    const url =
-      Platform.OS === 'ios'
-        ? `http://maps.apple.com/?q=${encoded}`
-        : `geo:0,0?q=${encoded}`;
-
-    Linking.openURL(url).catch(() => {
-      // fallback for Android
-      Linking.openURL(
-        `https://www.google.com/maps/search/?api=1&query=${encoded}`,
-      );
-    });
-  };
   return (
     <TrainerScheduleDetailView
       data={data}
@@ -135,7 +128,7 @@ const TrainerScheduleDetailContainer = () => {
       canStartToday={canStartToday}
       openMap={openMap}
       openAddNote={openAddNote}
-      savedNote={savedNote}
+      savedNote={notesData?.note}
       openEditNote={openEditNote}
       showNoteModal={showNoteModal}
       setShowNoteModal={setShowNoteModal}

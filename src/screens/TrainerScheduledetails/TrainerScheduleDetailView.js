@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './style';
@@ -33,6 +34,8 @@ const TrainerScheduleDetailView = ({
   isSaving,
   onBackPress,
 }) => {
+  const isSubmitDisabled =
+    isSaving || !noteText.trim() || (isEditing && noteText === savedNote);
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
@@ -76,7 +79,6 @@ const TrainerScheduleDetailView = ({
         <Text style={styles.locationText}>{data?.client?.address}</Text>
       </TouchableOpacity>
 
-      {/* ✅ Add Note Button */}
       {!savedNote && (
         <TouchableOpacity style={styles.addNoteBtn} onPress={openAddNote}>
           <Icon name="add" size={18} color="#fff" />
@@ -84,10 +86,9 @@ const TrainerScheduleDetailView = ({
         </TouchableOpacity>
       )}
 
-      {/* ✅ Saved Note with Edit */}
       {savedNote && (
         <View style={styles.noteBox}>
-          <Text style={styles.savedNoteText}>{savedNote.note}</Text>
+          <Text style={styles.savedNoteText}>{savedNote}</Text>
 
           <TouchableOpacity
             onPress={openEditNote}
@@ -98,7 +99,6 @@ const TrainerScheduleDetailView = ({
         </View>
       )}
 
-      {/* ✅ SAME MODAL for Add & Edit */}
       <Modal visible={showNoteModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -116,19 +116,25 @@ const TrainerScheduleDetailView = ({
             <TextInput
               placeholder="Type your note here..."
               multiline
+              scrollEnabled
               value={noteText}
+              maxLength={1000}
               onChangeText={setNoteText}
               style={styles.modalInput}
             />
 
             <TouchableOpacity
-              style={[styles.submitBtn, isSaving && { opacity: 0.6 }]}
+              style={[styles.submitBtn, isSubmitDisabled && { opacity: 0.6 }]}
               onPress={handleSubmitNote}
-              disabled={isSaving}
+              disabled={isSubmitDisabled}
             >
-              <Text style={styles.submitText}>
-                {isEditing ? 'Save' : 'Submit'}
-              </Text>
+              {isSaving ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.submitText}>
+                  {isEditing ? 'Save' : 'Submit'}
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
