@@ -7,7 +7,7 @@ const AssignedClientCard = ({ data }) => {
   return (
     <View style={styles.card}>
       {/* Avatar */}
-      <Image source={data?.client_profile_pic} style={styles.avatar} />
+      <Image source={{uri:data?.client_profile_pic}} style={styles.avatar} />
 
       {/* Info */}
       <View style={styles.info}>
