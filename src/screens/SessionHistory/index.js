@@ -8,6 +8,7 @@ import {
   getTrainerHistory,
   resetTrainerHistory,
 } from "../../redux/slices/trainerHistorySlice";
+import style from "./styles";
 
 const SessionHistory = () => {
   const dispatch = useDispatch();
@@ -18,6 +19,9 @@ const SessionHistory = () => {
     currentPage,
     totalPages,
   } = useSelector(state => state.trainerHistory);
+  useEffect(() => {
+  console.log("📦 REDUX SESSIONS:", sessions);
+}, [sessions]);
 
   /* 🔹 FIRST LOAD */
   useEffect(() => {
@@ -27,13 +31,20 @@ const SessionHistory = () => {
 
   /* 🔹 LOAD MORE (pagination) */
   const loadMore = () => {
+    console.log("djshfjsnfjksfk");
+    
     if (!loading && currentPage < totalPages) {
+      console.log("gfjhsgfhjsfhjs");
+      
       dispatch(getTrainerHistory(currentPage + 1));
     }
   };
 
   /* 🔹 RENDER EACH SESSION */
-  const renderItem = ({ item }) => (
+ const renderItem = ({ item }) => {
+  console.log("🟢 RENDERING SESSION ID:", item.id);
+
+  return (
     <SessionCard
       clientName={item.client?.name}
       address={item.client?.address}
@@ -45,6 +56,8 @@ const SessionHistory = () => {
       profilePic={item.client?.profile_pic_url}
     />
   );
+};
+
 
   return (
     <View style={styles.container}>
@@ -58,7 +71,7 @@ const SessionHistory = () => {
       ) : (
         <FlatList
           data={sessions}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           contentContainerStyle={styles.cardWrapper}
           showsVerticalScrollIndicator={false}
@@ -68,11 +81,14 @@ const SessionHistory = () => {
             loading ? <ActivityIndicator style={{ margin: 20 }} /> : null
           }
           ListEmptyComponent={
-            <Text style={{ textAlign: "center", marginTop: 40 }}>
-              No session history found
-            </Text>
+            !loading && (
+              <Text style={{ textAlign: "center", marginTop: 40 }}>
+                No session history found
+              </Text>
+            )
           }
         />
+
       )}
     </View>
   );

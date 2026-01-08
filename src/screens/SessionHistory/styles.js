@@ -8,9 +8,6 @@ export default StyleSheet.create({
   cardWrapper: {
     paddingTop: 20,
     paddingBottom: 20,
-    alignItems: "center",
     gap: 15,
   },
-
-
-})
+});

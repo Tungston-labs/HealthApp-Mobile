@@ -84,6 +84,11 @@ export default trainerService;
 
 export const fetchTrainerHistory = async (page = 1) => {
   const response = await api.get(`section/trainer/history/?page=${page}`);
+  console.log(
+    "✅ API RESPONSE (trainer history):",
+    JSON.stringify(response.data, null, 2)
+  );
+
   return response.data;
 };
 
