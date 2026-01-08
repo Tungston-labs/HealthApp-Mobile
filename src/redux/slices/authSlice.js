@@ -1,8 +1,12 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { loginApi } from '../../services/authServices';
-import { setToken } from '../../storage/asyncStorage';
-import api from '../../services/api';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { loginApi, logoutApi } from "../../services/authServices";
+import { setToken } from "../../storage/asyncStorage";
+import api from "../../services/api";
 
+/* =========================
+   LOGIN THUNK
+========================= */
 export const loginClientThunk = createAsyncThunk(
   "auth/login",
   async (payload, { rejectWithValue }) => {
@@ -10,8 +14,6 @@ export const loginClientThunk = createAsyncThunk(
       const res = await loginApi(payload);
       return res.data;
     } catch (err) {
-      console.log("LOGIN ERROR FULL:", err);
-
       if (err.response) {
         return rejectWithValue(
           err.response.data?.detail ||
@@ -19,19 +21,47 @@ export const loginClientThunk = createAsyncThunk(
           "Invalid credentials"
         );
       }
-
       if (err.request) {
-        return rejectWithValue("Server not reachable. Check network.");
+        return rejectWithValue("Server not reachable");
       }
-
       return rejectWithValue("Something went wrong");
     }
   }
 );
 
+/* =========================
+   LOGOUT THUNK
+========================= */
+export const logoutThunk = createAsyncThunk(
+  "auth/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      const refresh = await AsyncStorage.getItem("refresh_token");
 
+      if (refresh) {
+        await logoutApi(refresh);
+      }
+
+      await AsyncStorage.multiRemove([
+        "access_token",
+        "refresh_token",
+        "user",
+      ]);
+
+      delete api.defaults.headers.Authorization;
+
+      return true;
+    } catch (err) {
+      return rejectWithValue("Logout failed");
+    }
+  }
+);
+
+/* =========================
+   SLICE
+========================= */
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState: {
     loading: false,
     isLoggedIn: false,
@@ -50,6 +80,7 @@ const authSlice = createSlice({
   },
   extraReducers: builder => {
     builder
+      /* LOGIN */
       .addCase(loginClientThunk.pending, state => {
         state.loading = true;
         state.error = null;
@@ -67,15 +98,26 @@ const authSlice = createSlice({
         if (access) {
           setToken(access, refresh);
           api.defaults.headers.Authorization = `Bearer ${access}`;
-          console.log("🟢 Token set successfully");
-        } else {
-          console.error("🔴 Login succeeded but token missing");
         }
       })
-
       .addCase(loginClientThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      /* LOGOUT */
+      .addCase(logoutThunk.pending, state => {
+        state.loading = true;
+      })
+      .addCase(logoutThunk.fulfilled, state => {
+        state.loading = false;
+        state.isLoggedIn = false;
+        state.user = null;
+      })
+      .addCase(logoutThunk.rejected, state => {
+        state.loading = false;
+        state.isLoggedIn = false;
+        state.user = null;
       });
   },
 });
