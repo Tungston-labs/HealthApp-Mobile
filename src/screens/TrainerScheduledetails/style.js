@@ -32,6 +32,7 @@ export default StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     gap: 10,
+    marginBottom: 25, 
   },
 
   locationText: {

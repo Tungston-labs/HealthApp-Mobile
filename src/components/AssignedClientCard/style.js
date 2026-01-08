@@ -10,10 +10,10 @@ export default StyleSheet.create({
   },
 
   avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    marginRight: 12,
+    width: 54,
+    height: 54,
+    borderRadius: 15,
+    marginRight: 22,
   },
 
   info: {
@@ -44,4 +44,5 @@ export default StyleSheet.create({
     fontSize: 12,
     color: "#777",
   },
+  
 });
