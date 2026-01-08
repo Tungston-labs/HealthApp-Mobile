@@ -128,4 +128,24 @@ export default StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
   },
+  startSessionBtn: {
+  backgroundColor: "#6C63FF",
+  paddingVertical: 14,
+  borderRadius: 12,
+  alignItems: "center",
+  justifyContent: "center",
+  marginVertical: 16,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.15,
+  shadowRadius: 4,
+  elevation: 4,
+},
+
+startSessionText: {
+  color: "#fff",
+  fontSize: 16,
+  fontWeight: "600",
+},
+
 });
