@@ -17,14 +17,16 @@ import RatingBar from "../../components/TrainerDetail/RatingCard";
 import ReviewCard from "../../components/TrainerDetail/ReviewCard";
 import TrainerInfoCard from "../../components/TrainerInfoCard";
 import { fetchTrainerDetailThunk } from "../../redux/slices/trainerDetailSlice";
+import TrainerBookingModal from "../../components/TrainerBookingModal";
 
 const TrainerDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useDispatch();
-
+  const [showBookingModal, setShowBookingModal] = useState(false);
   const { trainerId } = route.params;
   const [selectedCert, setSelectedCert] = useState(null);
+
 
   const { loading, data, error } = useSelector(
     (state) => state.trainerDetail
@@ -37,7 +39,8 @@ const TrainerDetailScreen = () => {
       dispatch(fetchTrainerDetailThunk(trainerId));
     }
   }, [trainerId]);
-
+  console.log("TrainerDetailScreen route.params", route.params);
+  console.log("Trainer ID received:", trainerId);
   if (loading) {
     return (
       <View style={styles.loader}>
@@ -85,8 +88,9 @@ const TrainerDetailScreen = () => {
 
           <TrainerInfoCard
             name={data.name}
-            experience={`${data.experience} years`}
-            sessionTiming={`${data.section_timing} min`}
+            experience={data.experience}
+            sessionTiming={data.section_timing}
+
             numSessions={data.no_of_section}
             workoutType={data.plan_name}
           />
@@ -199,10 +203,17 @@ const TrainerDetailScreen = () => {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.bookBtn}
-          onPress={() => navigation.navigate("Payment", { trainerId })}
+          onPress={() => setShowBookingModal(true)}
         >
           <Text style={styles.bookText}>Book Now</Text>
         </TouchableOpacity>
+
+        <TrainerBookingModal
+          visible={showBookingModal}
+          onClose={() => setShowBookingModal(false)}
+          trainerId={trainerId}
+        // Pass any data needed like plan/pricing
+        />
       </View>
     </View>
   );

@@ -35,25 +35,7 @@ const UpcomingSession = () => {
 
       <GradientCard />
 
-      <View style={styles.progressCard}>
-        <View style={styles.progressHeader}>
-          <Text style={styles.progressTitle}>Training progress</Text>
-          <View style={styles.dayPill}>
-            <Text style={styles.dayText}>Day 1</Text>
-          </View>
-        </View>
-
-<View style={styles.progressContainer}>
-  <View style={styles.progressTrack}>
-    <View style={styles.progressFill} />
-  </View>
-</View>
-
-        <View style={styles.progressBottom}>
-          <Text style={styles.startedText}>Started</Text>
-          <Text style={styles.timerText}>⏱ 00.00.00</Text>
-        </View>
-      </View>
+    
 
       <Text style={styles.sectionTitle}>Upcoming sessions</Text>
 

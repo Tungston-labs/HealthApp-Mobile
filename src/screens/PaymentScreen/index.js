@@ -1,81 +1,106 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "./styles";
 import HeaderWithBack from "../../components/HeaderWithBack";
-import PaymentSuccessModal from "../../components/PaymentSuccessModal"
+import PaymentSuccessModal from "../../components/PaymentSuccessModal";
 import TrainerInfoCard from "../../components/TrainerInfoCard";
+import { fetchTrainerDetailThunk } from "../../redux/slices/trainerDetailSlice";
+
 const PaymentScreen = ({ navigation, route }) => {
+  const dispatch = useDispatch();
+  const { trainerId, workoutType } = route.params;
 
-  const trainer = route?.params?.trainer || {
-    name: "Cristofer Bator",
-    experience: "5 year",
-    sessions: 12,
-    timing: "60 min",
-    image: require("../../../assets/trainer2.jpg"),
-    amount: 2500,
-  };
+  const { loading, data, error } = useSelector(
+    (state) => state.trainerDetail
+  );
 
-  const [selectedMethod, setSelectedMethod] = useState("gpay");
+  const [selectedMethod, setSelectedMethod] = useState("razorpay");
   const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchTrainerDetailThunk(trainerId));
+  }, [dispatch, trainerId]);
+
+  if (loading) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <View style={styles.center}>
+        <Text>Unable to load trainer details</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <HeaderWithBack title="Payment"></HeaderWithBack>
+      <HeaderWithBack title="Payment" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Trainer Info */}
         <Text style={styles.sectionTitle}>Trainer info</Text>
-              <View style={styles.separator}></View>
-              <View style={styles.workoutPlan}>
-          <Text style={styles.label}>Workout Plan- Gym</Text>
-          <Text style={styles.label}>Workout type- single</Text>
-            </View>
-        <View style={styles.trainerBox}>
-          <Image source={trainer.image} style={styles.trainerImg} />
+        <View style={styles.separator} />
 
-          <View style={styles.trainerInfo}>
-            <TrainerInfoCard
-                name="Cristofer Bator"
-                        experience="5 years"
-                        sessionTiming="60 min"
-                        numSessions="12"
-                        workoutType="Yoga"
-            />
-          </View>
+        <View style={styles.workoutPlan}>
+          <Text style={styles.label}>
+            Workout Plan - {data.plan_name}
+          </Text>
+          <Text style={styles.label}>
+            Workout Type - {workoutType}
+          </Text>
         </View>
 
+        <View style={styles.trainerBox}>
+          <Image
+            source={{ uri: data.profile_pic }}
+            style={styles.trainerImg}
+          />
+
+          <TrainerInfoCard
+            name={data.name}
+            experience={data.experience}
+            sessionTiming={data.section_timing}
+            numSessions={data.no_of_section}
+            workoutType={data.plan_name}
+          />
+
+        </View>
+
+        {/* Payment Method */}
         <Text style={styles.sectionTitle}>Preferred payment method</Text>
-      <View style={styles.separator}></View>
+        <View style={styles.separator} />
+
         <TouchableOpacity
           style={[
             styles.paymentCard,
-            selectedMethod === "gpay" && styles.paymentCardActive,
+            selectedMethod === "razorpay" && styles.paymentCardActive,
           ]}
-          onPress={() => setSelectedMethod("gpay")}
+          onPress={() => setSelectedMethod("razorpay")}
         >
-          <Image
-            style={styles.gpayLogo}
-            source={require("../../../assets/gpay.png")}
-          />
-
-          <View style={{ flex: 1 }}>
-          </View>
-
-          {selectedMethod === "gpay" && (
-            <Icon name="checkmark-circle" size={34} color="#2ecc71" />
+          <Text style={styles.paymentText}>Gpay</Text>
+          {selectedMethod === "razorpay" && (
+            <Icon name="checkmark-circle" size={28} color="#2ecc71" />
           )}
         </TouchableOpacity>
-        
+
         <Text style={[styles.sectionTitle, { marginTop: 20 }]}>
-          Other payment Method
+          Other payment methods
         </Text>
-      <View style={styles.separator}></View>
+        <View style={styles.separator} />
 
         <TouchableOpacity
           style={styles.otherMethod}
@@ -83,14 +108,6 @@ const PaymentScreen = ({ navigation, route }) => {
         >
           <Icon name="business-outline" size={22} />
           <Text style={styles.otherMethodText}>Net Banking</Text>
-          <Icon
-            name={
-              selectedMethod === "netbanking"
-                ? "radio-button-on"
-                : "radio-button-off"
-            }
-            size={22}
-          />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -98,40 +115,44 @@ const PaymentScreen = ({ navigation, route }) => {
           onPress={() => setSelectedMethod("card")}
         >
           <Icon name="card-outline" size={22} />
-          <Text style={styles.otherMethodText}>Debit/Credit Card</Text>
-          <Icon
-            name={
-              selectedMethod === "card"
-                ? "radio-button-on"
-                : "radio-button-off"
-            }
-            size={22}
-          />
+          <Text style={styles.otherMethodText}>Debit / Credit Card</Text>
         </TouchableOpacity>
       </ScrollView>
 
-     <View style={styles.footer}>
-  <View>
-    <Text style={styles.totalLabel}>Total</Text>
-    <Text style={styles.totalValue}>₹ {trainer.amount}</Text>
-  </View>
+      {/* Footer */}
+      <View style={styles.footer}>
+        <View style={styles.totalWrapper}>
+          <Text style={styles.totalLabel}>Total</Text>
+          <Text style={styles.totalValue}>₹ {data.expecting_salary}</Text>
+        </View>
 
-  <TouchableOpacity
-    style={styles.payBtn}
-    onPress={() => setShowSuccess(true)}
-  >
-    <Text style={styles.payText}>Pay</Text>
-  </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.payBtn}
+          onPress={() => setShowSuccess(true)}
+        >
+          <Text style={styles.payText}>Proceed to Pay</Text>
+        </TouchableOpacity>
 
-<PaymentSuccessModal
+      <PaymentSuccessModal
   visible={showSuccess}
   onClose={() => {
     setShowSuccess(false);
-    navigation.navigate("MainApp"); 
+
+ navigation.reset({
+  index: 0,
+  routes: [
+    {
+      name: "MainApp",
+      params: { defaultTab: "Session" }, 
+    },
+  ],
+});
+
   }}
 />
 
-</View>
+
+      </View>
 
     </View>
   );

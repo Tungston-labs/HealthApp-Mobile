@@ -10,7 +10,8 @@ import trainerRegistrationReducer from './slices/trainerRegistrationSlice';
 import trainerPlanReducer from './slices/trainerPlanSlice';
 import trainerDetailReducer from './slices/trainerDetailSlice';
 import { scheduleApi } from './api/trainer/scheduleApi';
-
+import completedSessionreducer from "./slices/SessionHistorySlice"
+import completedSessionDetailReducer from "./slices/completedSessionDetailSlice"
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -23,6 +24,8 @@ export const store = configureStore({
     trainerReg: trainerRegistrationReducer,
     trainer: trainerPlanReducer,
     trainerDetail: trainerDetailReducer,
+    completedSessions:completedSessionreducer,
+    completedSessionDetail:completedSessionDetailReducer,
     [scheduleApi.reducerPath]: scheduleApi.reducer,
   },
   middleware: getDefaultMiddleware =>

@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   card: {
     width: 360,
-    height: 110,
+    height: 130,
     backgroundColor: "#EEEEFF",
     borderRadius: 14,
     flexDirection: "row",
@@ -11,7 +11,7 @@ export default StyleSheet.create({
   },
 
   profileImage: {
-    width: "30%",           // 30% of card width
+    width: "30%",          
     height: "100%",
     borderRadius: 12,
   },
@@ -42,7 +42,12 @@ export default StyleSheet.create({
     color: "#000",
     marginTop: 2,
   },
-
+  namevalue: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#000",
+    marginTop: 6,
+  },
   valueRow: {
     flexDirection: "row",
     alignItems: "center",
