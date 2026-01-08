@@ -17,7 +17,7 @@ const PersonalDetailsCard = ({
   return (
     <View style={styles.card}>
       <View style={styles.topRow}>
-        <Image source={data?.profile_pic_url} style={styles.avatar} />
+        <Image source={{uri:data?.profile_pic_url}} style={styles.avatar} />
 
         <View style={styles.info}>
           <Text style={styles.name}>{data?.name}</Text>
