@@ -3,6 +3,7 @@ import TrainerScheduleDetailView from './TrainerScheduleDetailView';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import {
   useAddTrainerNoteMutation,
+  useEditTrainerNoteMutation,
   useGetTrainerNotesQuery,
   useGetTrainerSlotBookingByIdQuery,
 } from '../../redux/api/trainer/scheduleApi';
@@ -24,12 +25,13 @@ const TrainerScheduleDetailContainer = () => {
 
   const { data, error } = useGetTrainerSlotBookingByIdQuery(id);
   const { data: notesData } = useGetTrainerNotesQuery(id);
-  const [addNote, { isLoading: isSaving }] = useAddTrainerNoteMutation();
+  const [addNote, { isLoading: isAdding }] = useAddTrainerNoteMutation();
+  const [editNote, { isLoading: isEditingNote }] = useEditTrainerNoteMutation();
   const { handleStartSession, isLoading: isSessionStarting } =
     useStartSession();
   const { activeSession, setActiveSession } = useActiveSession();
 
-  const savedNote = notesData?.notes?.[0] || null;
+  const isSaving = isAdding || isEditingNote;
 
   useEffect(() => {
     if (error) {
@@ -47,7 +49,7 @@ const TrainerScheduleDetailContainer = () => {
   };
 
   const openEditNote = () => {
-    setNoteText(savedNote?.note || '');
+    setNoteText(notesData?.note || '');
     setIsEditing(true);
     setShowNoteModal(true);
   };
@@ -56,7 +58,11 @@ const TrainerScheduleDetailContainer = () => {
     if (!noteText.trim()) return;
 
     try {
-      await addNote({ id, note: noteText }).unwrap();
+      if (isEditing) {
+        await editNote({ id, note: noteText }).unwrap();
+      } else {
+        await addNote({ id, note: noteText }).unwrap();
+      }
 
       setShowNoteModal(false);
       setNoteText('');
@@ -122,7 +128,7 @@ const TrainerScheduleDetailContainer = () => {
       canStartToday={canStartToday}
       openMap={openMap}
       openAddNote={openAddNote}
-      savedNote={savedNote}
+      savedNote={notesData?.note}
       openEditNote={openEditNote}
       showNoteModal={showNoteModal}
       setShowNoteModal={setShowNoteModal}
