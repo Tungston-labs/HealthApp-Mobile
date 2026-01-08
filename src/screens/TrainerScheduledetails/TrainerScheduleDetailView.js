@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './style';
@@ -33,7 +34,8 @@ const TrainerScheduleDetailView = ({
   isSaving,
   onBackPress,
 }) => {
-  const loading=true
+  const isSubmitDisabled =
+    isSaving || !noteText.trim() || (isEditing && noteText === savedNote);
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
@@ -86,7 +88,7 @@ const TrainerScheduleDetailView = ({
 
       {savedNote && (
         <View style={styles.noteBox}>
-          <Text style={styles.savedNoteText}>{savedNote.note}</Text>
+          <Text style={styles.savedNoteText}>{savedNote}</Text>
 
           <TouchableOpacity
             onPress={openEditNote}
@@ -114,19 +116,25 @@ const TrainerScheduleDetailView = ({
             <TextInput
               placeholder="Type your note here..."
               multiline
+              scrollEnabled
               value={noteText}
+              maxLength={1000}
               onChangeText={setNoteText}
               style={styles.modalInput}
             />
 
             <TouchableOpacity
-              style={[styles.submitBtn, isSaving && { opacity: 0.6 }]}
+              style={[styles.submitBtn, isSubmitDisabled && { opacity: 0.6 }]}
               onPress={handleSubmitNote}
-              disabled={isSaving}
+              disabled={isSubmitDisabled}
             >
-              <Text style={styles.submitText}>
-                {isEditing ? 'Save' : 'Submit'}
-              </Text>
+              {isSaving ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.submitText}>
+                  {isEditing ? 'Save' : 'Submit'}
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>

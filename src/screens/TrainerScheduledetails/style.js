@@ -111,6 +111,7 @@ export default StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     minHeight: 120,
+     maxHeight: 200,
     textAlignVertical: "top",
   },
 
