@@ -82,11 +82,6 @@ export default StyleSheet.create({
     color: "#333",
   },
 
-  swipeWrapper: {
-    marginTop:20,
-    marginBottom: 20,
-  },
-
   modalOverlay: {
     flex: 1,
     justifyContent: "flex-end",

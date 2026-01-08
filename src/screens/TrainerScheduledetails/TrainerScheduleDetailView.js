@@ -33,6 +33,7 @@ const TrainerScheduleDetailView = ({
   isSaving,
   onBackPress,
 }) => {
+  const loading=true
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
@@ -55,7 +56,7 @@ const TrainerScheduleDetailView = ({
         onToggle={() => setDetailsOpen(prev => !prev)}
       />
       <View style={styles.swipeWrapper}>
-        <ClickButton
+        <>
           title={
             isSessionStarting ? 'Starting session...' : 'Click to Start Session'
           }
@@ -63,7 +64,7 @@ const TrainerScheduleDetailView = ({
           width={340}
           onPress={handleStart}
           disabled={activeSession || isSessionStarting || !canStartToday}
-        />
+       </>
       </View>
 
       <Text style={styles.mapHint}>Tap to open the map location.</Text>
@@ -76,7 +77,6 @@ const TrainerScheduleDetailView = ({
         <Text style={styles.locationText}>{data?.client?.address}</Text>
       </TouchableOpacity>
 
-      {/* ✅ Add Note Button */}
       {!savedNote && (
         <TouchableOpacity style={styles.addNoteBtn} onPress={openAddNote}>
           <Icon name="add" size={18} color="#fff" />
@@ -84,7 +84,6 @@ const TrainerScheduleDetailView = ({
         </TouchableOpacity>
       )}
 
-      {/* ✅ Saved Note with Edit */}
       {savedNote && (
         <View style={styles.noteBox}>
           <Text style={styles.savedNoteText}>{savedNote.note}</Text>
@@ -98,7 +97,6 @@ const TrainerScheduleDetailView = ({
         </View>
       )}
 
-      {/* ✅ SAME MODAL for Add & Edit */}
       <Modal visible={showNoteModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
