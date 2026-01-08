@@ -15,7 +15,6 @@ import ClickButton from '../../components/Swipe';
 
 const TrainerScheduleDetailView = ({
   data,
-  isDataLoading,
   detailsOpen,
   setDetailsOpen,
   isSessionStarting,
@@ -59,7 +58,7 @@ const TrainerScheduleDetailView = ({
         onToggle={() => setDetailsOpen(prev => !prev)}
       />
       <View style={styles.swipeWrapper}>
-        <ClickButton
+        <>
           title={
             isSessionStarting ? 'Starting session...' : 'Click to Start Session'
           }
@@ -67,7 +66,7 @@ const TrainerScheduleDetailView = ({
           width={340}
           onPress={handleStart}
           disabled={activeSession || isSessionStarting || !canStartToday}
-        />
+       </>
       </View>
 
       <Text style={styles.mapHint}>Tap to open the map location.</Text>
