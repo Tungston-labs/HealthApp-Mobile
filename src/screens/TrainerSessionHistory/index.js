@@ -21,20 +21,19 @@ const SessionHistory = () => {
     totalPages,
   } = useSelector(state => state.trainerHistory);
 
-  /* 🔹 LOAD DATA ON SCREEN OPEN */
   useEffect(() => {
     dispatch(resetTrainerHistory());
     dispatch(getTrainerHistory(1));
   }, [dispatch]);
 
-  /* 🔹 PAGINATION */
+  
   const loadMore = () => {
     if (!loading && currentPage < totalPages) {
       dispatch(getTrainerHistory(currentPage + 1));
     }
   };
 
-  /* 🔹 RENDER EACH SESSION */
+  
   const renderItem = ({ item }) => {
     console.log("🟢 Rendering session:", item.id);
 
@@ -43,6 +42,9 @@ const SessionHistory = () => {
         clientName={item.client?.name}
         address={item.client?.address}
         sessionDate={item.date}
+        time={item.time}
+        endTime={item.session_end_time}
+
         timeLabel={item.time_label}
         status={item.status}
         sessionCount={`${item.session_number}/${item.total_sessions}`}

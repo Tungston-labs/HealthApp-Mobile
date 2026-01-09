@@ -2,68 +2,82 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   card: {
+    backgroundColor: "#ECECFF",
+    borderRadius: 18,
+    padding: 14,
+    marginBottom: 14,
+  },
+
+  mainRow: {
     flexDirection: "row",
-    backgroundColor: "#EDEDFF",
-    borderRadius: 14,
-    padding: 10,
-    marginBottom: 12,
-    alignItems: "center",
+    alignItems: "flex-start",
   },
 
+  /* LEFT IMAGE */
   avatar: {
-    width: 88,
-    height: 88,
-    borderRadius: 12,
-    marginRight: 12,
+    width: 86,
+    height: 89,
+    borderRadius: 14,
+    marginRight: 14,
   },
 
-  info: {
+  /* RIGHT CONTENT */
+  rightContent: {
     flex: 1,
   },
 
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+
   name: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "600",
+    color: "#000",
     marginBottom: 4,
   },
 
   timeRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 6,
   },
 
   timeText: {
     fontSize: 12,
-    marginLeft: 4,
-    color: "#A2A2A2",
-  },
-
-  dateRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-
-  label: {
-    fontSize: 10,
-    color: "#A2A2A2",
-  },
-
-  date: {
-    fontSize: 12,
-    fontWeight: "500",
+    marginLeft: 6,
+    color: "#9A9A9A",
   },
 
   badge: {
-    backgroundColor: "#E0DFFF",
-    paddingHorizontal: 8,
+    backgroundColor: "#DEDDFE",
+    paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: 6,
+    borderRadius: 8,
   },
 
   badgeText: {
-    fontSize: 11,
-    color: "#7774F4",
+    fontSize: 13,
     fontWeight: "600",
+    color: "#6C63FF",
+  },
+
+  bottomRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 12,
+  },
+
+  label: {
+    fontSize: 11,
+    color: "#9A9A9A",
+    marginBottom: 2,
+  },
+
+  date: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: "#000",
   },
 });
