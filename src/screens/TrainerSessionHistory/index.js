@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { View, FlatList, ActivityIndicator, Text } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-
 import styles from "./style";
 import SessionCard from "../../components/SessionCard";
 import HeaderWithBack from "../../components/HeaderWithBack";
@@ -9,7 +8,7 @@ import HeaderWithBack from "../../components/HeaderWithBack";
 import {
   getTrainerHistory,
   resetTrainerHistory,
-} from "../../redux/slices/trainerHistorySlice";                
+} from "../../redux/slices/trainerHistorySlice";
 
 const SessionHistory = () => {
   const dispatch = useDispatch();
@@ -26,14 +25,13 @@ const SessionHistory = () => {
     dispatch(getTrainerHistory(1));
   }, [dispatch]);
 
-  
+
   const loadMore = () => {
     if (!loading && currentPage < totalPages) {
       dispatch(getTrainerHistory(currentPage + 1));
     }
   };
 
-  
   const renderItem = ({ item }) => {
     console.log("🟢 Rendering session:", item.id);
 

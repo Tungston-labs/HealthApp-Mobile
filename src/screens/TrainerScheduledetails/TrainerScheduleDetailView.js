@@ -74,7 +74,7 @@ const TrainerScheduleDetailView = ({
           <Text style={styles.startSessionText}>Click to Start Session</Text>
         )}
       </TouchableOpacity>
-      
+
       <Text style={styles.mapHint}>Tap to open the map location.</Text>
 
       <TouchableOpacity
@@ -100,7 +100,7 @@ const TrainerScheduleDetailView = ({
             onPress={openEditNote}
             style={{ alignSelf: 'flex-end', marginTop: 8 }}
           >
-            <Text style={{ color: '#6C63FF', fontWeight: '600' }}>Edit</Text>
+            <Icon name="create-outline" size={20} color="#6C63FF" />
           </TouchableOpacity>
         </View>
       )}
@@ -150,3 +150,4 @@ const TrainerScheduleDetailView = ({
 };
 
 export default TrainerScheduleDetailView;
+
