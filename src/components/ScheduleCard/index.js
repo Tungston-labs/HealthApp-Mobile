@@ -23,7 +23,7 @@ const ScheduleCard = ({
       <View style={styles.card}>
         <Text style={styles.time}>{time}</Text>
 
-        <Image source={image} style={styles.avatar} />
+        <Image source={{uri:image}} style={styles.avatar} />
 
         <View style={styles.info}>
           <Text style={styles.name}>{name}</Text>

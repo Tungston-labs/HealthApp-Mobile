@@ -11,7 +11,6 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './style';
 import PersonalDetailsCard from '../../components/PersonalDetailsCard';
-import ClickButton from '../../components/Swipe';
 
 const TrainerScheduleDetailView = ({
   data,
@@ -33,6 +32,7 @@ const TrainerScheduleDetailView = ({
   handleSubmitNote,
   isSaving,
   onBackPress,
+  isDataLoading,
 }) => {
   const isSubmitDisabled =
     isSaving || !noteText.trim() || (isEditing && noteText === savedNote);
@@ -74,7 +74,7 @@ const TrainerScheduleDetailView = ({
           <Text style={styles.startSessionText}>Click to Start Session</Text>
         )}
       </TouchableOpacity>
-
+      
       <Text style={styles.mapHint}>Tap to open the map location.</Text>
 
       <TouchableOpacity
