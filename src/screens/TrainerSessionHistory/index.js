@@ -21,20 +21,19 @@ const SessionHistory = () => {
     totalPages,
   } = useSelector(state => state.trainerHistory);
 
-  /* 🔹 LOAD DATA ON SCREEN OPEN */
   useEffect(() => {
     dispatch(resetTrainerHistory());
     dispatch(getTrainerHistory(1));
   }, [dispatch]);
 
-  /* 🔹 PAGINATION */
+  
   const loadMore = () => {
     if (!loading && currentPage < totalPages) {
       dispatch(getTrainerHistory(currentPage + 1));
     }
   };
 
-  /* 🔹 RENDER EACH SESSION */
+  
   const renderItem = ({ item }) => {
     console.log("🟢 Rendering session:", item.id);
 

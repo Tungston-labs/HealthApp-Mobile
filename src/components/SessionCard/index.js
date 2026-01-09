@@ -1,20 +1,20 @@
 import React from "react";
 import { View, Text, Image } from "react-native";
 import styles from "./style";
+import Icon from "react-native-vector-icons/Ionicons";
 
 const SessionCard = ({
   clientName,
-  address,
   sessionDate,
   timeLabel,
   status,
   sessionCount,
-  duration,
   profilePic,
 }) => {
   return (
     <View style={styles.card}>
-      <View style={styles.row}>
+      <View style={styles.mainRow}>
+        {/* LEFT FIXED IMAGE */}
         <Image
           source={
             profilePic
@@ -24,21 +24,37 @@ const SessionCard = ({
           style={styles.avatar}
         />
 
-        <View style={{ flex: 1 }}>
-          <Text style={styles.name}>{clientName}</Text>
-          <Text style={styles.address}>{address}</Text>
+        {/* RIGHT CONTENT */}
+        <View style={styles.rightContent}>
+          {/* TOP RIGHT */}
+          <View style={styles.topRow}>
+            <View>
+              <Text style={styles.name}>{clientName}</Text>
+
+              <View style={styles.timeRow}>
+                <Icon name="time-outline" size={14} color="#9A9A9A" />
+                <Text style={styles.timeText}>{timeLabel}</Text>
+              </View>
+            </View>
+
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{sessionCount}</Text>
+            </View>
+          </View>
+
+          {/* BOTTOM RIGHT */}
+          <View style={styles.bottomRow}>
+            <View>
+              <Text style={styles.label}>start date</Text>
+              <Text style={styles.date}>{sessionDate}</Text>
+            </View>
+
+            <View>
+              <Text style={styles.label}>End date</Text>
+              <Text style={styles.date}>{status}</Text>
+            </View>
+          </View>
         </View>
-
-        <Text style={styles.status}>{status}</Text>
-      </View>
-
-      <View style={styles.divider} />
-
-      <View style={styles.footer}>
-        <Text>{sessionDate}</Text>
-        <Text>{timeLabel}</Text>
-        <Text>{duration}</Text>
-        <Text>{sessionCount}</Text>
       </View>
     </View>
   );

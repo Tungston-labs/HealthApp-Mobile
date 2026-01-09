@@ -58,15 +58,23 @@ const TrainerScheduleDetailView = ({
         isOpen={detailsOpen}
         onToggle={() => setDetailsOpen(prev => !prev)}
       />
-      <View style={styles.swipeWrapper}>
-        <>
-          title=
-          {isSessionStarting ? 'Starting session...' : 'Click to Start Session'}
-          // successTitle=" Click to End Session " width={340}
-          onPress={handleStart}
-          disabled={activeSession || isSessionStarting || !canStartToday}
-        </>
-      </View>
+
+      <TouchableOpacity
+        style={[
+          styles.startSessionBtn,
+          (activeSession || isSessionStarting || !canStartToday) && {
+            opacity: 0.6,
+          },
+        ]}
+        onPress={handleStart}
+        disabled={activeSession || isSessionStarting || !canStartToday}
+      >
+        {isSessionStarting ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.startSessionText}>Click to Start Session</Text>
+        )}
+      </TouchableOpacity>
 
       <Text style={styles.mapHint}>Tap to open the map location.</Text>
 
