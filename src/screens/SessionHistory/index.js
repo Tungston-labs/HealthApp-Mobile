@@ -5,36 +5,66 @@ import HeaderWithBack from "../../components/HeaderWithBack";
 import HistoryCard from "../../components/Historycard";
 import styles from "./styles";
 import { fetchCompletedSessionsThunk } from "../../redux/slices/SessionHistorySlice";
+import EmptyState from "../../components/EmptyState";
 
 const SessionHistory = () => {
   const dispatch = useDispatch();
 
-  const { sessions, loading, error } = useSelector(
-    (state) => state.completedSessions
+  const { loading, isLoggedIn, user, error } = useSelector(
+    (state) => state.auth || {
+      loading: false,
+      isLoggedIn: false,
+      error: null,
+      user: null,
+    }
   );
 
+  // Get completed sessions from your redux slice
+  const { sessions } = useSelector((state) => state.completedSessions);
+
+  // Use the session boolean from backend
+  const hasPlan = user?.session;
+
   useEffect(() => {
-    dispatch(fetchCompletedSessionsThunk());
-  }, []);
+    if (hasPlan) {
+      dispatch(fetchCompletedSessionsThunk());
+    }
+  }, [hasPlan, dispatch]);
+
+  // If user has no plan/session, show outer empty state
+  if (!hasPlan) {
+    return (
+      <EmptyState
+        image={require("../../../assets/emptystate.png")}
+        title="No Session History"
+        subtitle="Your completed sessions will appear here once you book a plan."
+      />
+    );
+  }
 
   return (
     <View style={styles.container}>
       <HeaderWithBack title="Session History" subtitle="Session Details" />
 
       {loading && <ActivityIndicator size="large" />}
+
       {error && <Text>{error}</Text>}
 
-      {!loading && (
+      {!loading && !error && (
         <ScrollView
           contentContainerStyle={styles.cardWrapper}
           showsVerticalScrollIndicator={false}
         >
           {sessions?.length > 0 ? (
             sessions.map((item) => (
-              <HistoryCard key={item.id} item={item} />
+              <HistoryCard key={item.session_id} item={item} />
             ))
           ) : (
-            <Text>No completed sessions found</Text>
+            <EmptyState
+              image={require("../../../assets/emptystate.png")}
+              title="No Completed Sessions"
+              subtitle="You haven't completed any sessions yet."
+            />
           )}
         </ScrollView>
       )}

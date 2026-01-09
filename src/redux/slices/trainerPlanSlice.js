@@ -20,7 +20,7 @@ const initialState = {
   trainers: [],
   plan: null,
   total: 0,
-  filters: null,   // 👈 stores last applied filter
+  filters: null,   //  stores last applied filter
   loading: false,
   error: null,
 };

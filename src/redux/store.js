@@ -12,6 +12,8 @@ import trainerDetailReducer from './slices/trainerDetailSlice';
 import { scheduleApi } from './api/trainer/scheduleApi';
 import completedSessionreducer from "./slices/SessionHistorySlice"
 import completedSessionDetailReducer from "./slices/completedSessionDetailSlice"
+import weeklySessionsReducer from "./slices/UpcomingSessionSlice"
+import trainerReducer from "./slices/trainerSlice"
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -25,6 +27,8 @@ export const store = configureStore({
     trainer: trainerPlanReducer,
     trainerDetail: trainerDetailReducer,
     completedSessions:completedSessionreducer,
+    weeklySessions:weeklySessionsReducer,
+    trainerSessions:trainerReducer,
     completedSessionDetail:completedSessionDetailReducer,
     [scheduleApi.reducerPath]: scheduleApi.reducer,
   },

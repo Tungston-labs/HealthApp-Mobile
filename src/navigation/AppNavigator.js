@@ -1,60 +1,69 @@
 // navigation/AppNavigator.js
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
-
-import ProfileScreen from "../screens/ProfileScreen";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useSelector } from "react-redux";
 
 import BottomNav from "../components/BottomNavbar";
+
 import UpcomingSession from "../screens/UpcomingSession";
-import ProfileSection from "../screens/ProfileSection";
-import SessionHistory from "../screens/SessionHistory"
-import SingleSession from "../screens/SingleSession";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import WorkoutPlan from "../screens/WorkoutPlan";
-import SingleSessionHistory from "../screens/SingleSessionHistory"
+import ProfileSection from "../screens/ProfileSection";
+import SessionHistory from "../screens/SessionHistory";
+import SingleSessionHistory from "../screens/SingleSessionHistory";
+import ProfileScreen from "../screens/ProfileScreen";
+
+// 🔥 NEW SCREEN
+import ClientListScreen from "../screens/ClientListScreen";
+
 const Tab = createBottomTabNavigator();
 const SessionStack = createNativeStackNavigator();
 
+/* -------- Session History Stack -------- */
 const SessionStackScreen = () => (
   <SessionStack.Navigator screenOptions={{ headerShown: false }}>
     <SessionStack.Screen name="History" component={SessionHistory} />
-    <SessionStack.Screen name="SingleSessionHistory" component={SingleSessionHistory} />
+    <SessionStack.Screen
+      name="SingleSessionHistory"
+      component={SingleSessionHistory}
+    />
   </SessionStack.Navigator>
 );
-const AppNavigator = ({ route }) => {
-  const defaultTab = route?.params?.defaultTab || "workout";
 
-  const tabOrder =
-    defaultTab === "Session"
-      ? [
-          { name: "workout", component: UpcomingSession },
-          { name: "profilesection", component: SessionStackScreen },
-          { name: "Session", component: ProfileSection },
-          { name: "profile", component: ProfileScreen },
-        ]
-      : [
-          { name: "workout", component: WorkoutPlan },
-          { name: "profilesection", component: ProfileSection },
-          { name: "Session", component: SessionStackScreen },
-          { name: "profile", component: ProfileScreen },
-        ];
+const AppNavigator = () => {
+  const { user } = useSelector((state) => state.auth || {});
+  const hasSession = !!user?.session;
 
   return (
     <Tab.Navigator
       tabBar={(props) => <BottomNav {...props} />}
       screenOptions={{ headerShown: false }}
+      initialRouteName="workout"
     >
-      {tabOrder.map((tab) => (
-        <Tab.Screen
-          key={tab.name}
-          name={tab.name}
-          component={tab.component}
-        />
-      ))}
+      {/* Workout / Upcoming Session */}
+      <Tab.Screen
+        name="workout"
+        component={hasSession ? UpcomingSession : WorkoutPlan}
+      />
+
+      <Tab.Screen
+        name="Session"
+        component={ClientListScreen}
+      />
+
+      {/* Session History */}
+      <Tab.Screen
+        name="profilesection"
+        component={SessionStackScreen}
+      />
+
+      {/* Profile */}
+      <Tab.Screen
+        name="profile"
+        component={ProfileScreen}
+      />
     </Tab.Navigator>
   );
 };
 
 export default AppNavigator;
-

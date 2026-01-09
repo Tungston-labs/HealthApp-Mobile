@@ -55,6 +55,16 @@ export const fetchAvailableTrainersAPI = async (payload) => {
   return response;
 };
 
+export const getTrainerDetailService = (trainerId) => {
+  return api.get(`detail/${trainerId}/`);
+};
+
+export const cancelTrainingService = (trainerId) => {
+  return api.post(`cancel-training/${trainerId}/`);
+};
+export const reportTrainerService = (payload) => {
+  return api.post("trainer-report/", payload);
+};
 export const fetchTrainerDetailAPI = async (trainerId) => {
   const response = await api.get(`trainer/detail/${trainerId}/`);
   return response.data;
