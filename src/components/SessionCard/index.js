@@ -1,5 +1,7 @@
+
+
 import React from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import styles from "./style";
 
 const SessionCard = ({
@@ -11,9 +13,10 @@ const SessionCard = ({
   sessionCount,
   duration,
   profilePic,
+  onPress,
 }) => {
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={onPress}>
       <View style={styles.row}>
         <Image
           source={
@@ -40,7 +43,7 @@ const SessionCard = ({
         <Text>{duration}</Text>
         <Text>{sessionCount}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
