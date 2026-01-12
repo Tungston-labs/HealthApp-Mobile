@@ -33,7 +33,9 @@ const TrainerScheduleDetailView = ({
   isSaving,
   onBackPress,
   isDataLoading,
+  hideButton=false
 }) => {
+  console.log({hideButton})
   const isSubmitDisabled =
     isSaving || !noteText.trim() || (isEditing && noteText === savedNote);
   return (
@@ -128,7 +130,6 @@ const TrainerScheduleDetailView = ({
               onChangeText={setNoteText}
               style={styles.modalInput}
             />
-
             <TouchableOpacity
               style={[styles.submitBtn, isSubmitDisabled && { opacity: 0.6 }]}
               onPress={handleSubmitNote}
