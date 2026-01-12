@@ -12,7 +12,7 @@ import HeaderWithBack from "../../components/HeaderWithBack";
 import TrainerCard from "../../screens/TrainerList/Trainercard";
 import EmptyState from "../../components/EmptyState";
 
-import { fetchTrainerPlansThunk } from "../../redux/slices/trainerPlanSlice";
+import { fetchAvailableTrainersThunk  } from "../../redux/slices/trainerPlanSlice";
 
 const ClientListScreen = () => {
   const dispatch = useDispatch();
@@ -22,7 +22,7 @@ const ClientListScreen = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchTrainerPlansThunk());
+    dispatch(fetchAvailableTrainersThunk());
   }, [dispatch]);
 
   if (loading) {
@@ -51,7 +51,6 @@ const ClientListScreen = () => {
         subtitle="Trainer Information"
       />
 
-      {/* LIST */}
       <FlatList
         data={trainers}
         keyExtractor={(item) => item.id.toString()}
