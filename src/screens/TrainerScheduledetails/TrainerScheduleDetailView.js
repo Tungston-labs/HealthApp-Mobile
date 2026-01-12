@@ -11,7 +11,6 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './style';
 import PersonalDetailsCard from '../../components/PersonalDetailsCard';
-import ClickButton from '../../components/Swipe';
 
 const TrainerScheduleDetailView = ({
   data,
@@ -34,7 +33,9 @@ const TrainerScheduleDetailView = ({
   isSaving,
   onBackPress,
   isDataLoading,
+  hideButton=false
 }) => {
+  console.log({hideButton})
   const isSubmitDisabled =
     isSaving || !noteText.trim() || (isEditing && noteText === savedNote);
   return (
@@ -101,7 +102,7 @@ const TrainerScheduleDetailView = ({
             onPress={openEditNote}
             style={{ alignSelf: 'flex-end', marginTop: 8 }}
           >
-            <Text style={{ color: '#6C63FF', fontWeight: '600' }}>Edit</Text>
+            <Icon name="create-outline" size={20} color="#6C63FF" />
           </TouchableOpacity>
         </View>
       )}
@@ -129,7 +130,6 @@ const TrainerScheduleDetailView = ({
               onChangeText={setNoteText}
               style={styles.modalInput}
             />
-
             <TouchableOpacity
               style={[styles.submitBtn, isSubmitDisabled && { opacity: 0.6 }]}
               onPress={handleSubmitNote}
@@ -151,3 +151,4 @@ const TrainerScheduleDetailView = ({
 };
 
 export default TrainerScheduleDetailView;
+
