@@ -1,39 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { View, FlatList, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import Ionicons from "react-native-vector-icons/Ionicons"; 
+import Ionicons from "react-native-vector-icons/Ionicons";
 import HeaderWithBack from "../../components/HeaderWithBack";
 import TrainerCard from "./Trainercard";
 import styles from "./styles";
 import TrainerBookingModal from "../../components/TrainerBookingModal";
 import { fetchAvailableTrainersThunk } from "../../redux/slices/trainerPlanSlice";
-import { useRoute } from "@react-navigation/native";
+import { fetchTrainerDetailThunk, resetTrainerDetail } from "../../redux/slices/trainerDetailSlice";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const TrainerListScreen = () => {
   const dispatch = useDispatch();
   const route = useRoute();
-  
+
   const { trainers, plan, loading, error } = useSelector((state) => state.trainer);
-  
-  const [selectedTrainer, setSelectedTrainer] = useState(null);
+
+  const [selectedTrainerId, setSelectedTrainerId] = useState(null);
 
   const trainersList = Array.isArray(trainers) ? trainers : [];
-  
   const isFiltered = route.params?.isFiltered;
   const planId = route.params?.planId || 3;
 
   useEffect(() => {
-  
     if (!isFiltered) {
-      console.log("first data")
       dispatch(fetchAvailableTrainersThunk({ plan_id: planId }));
     }
   }, [dispatch, isFiltered, planId]);
 
-  const handleRetry = () => {
-    dispatch(fetchAvailableTrainersThunk({ plan_id: planId }));
-  };
 
+const handleBookNow = (trainerId) => {
+  setSelectedTrainerId(trainerId);
+  dispatch(fetchTrainerDetailThunk(trainerId)); 
+};
+
+
+  const handleCloseModal = () => {
+    setSelectedTrainerId(null);
+    dispatch(resetTrainerDetail());
+  };
 
   if (loading && trainersList.length === 0) {
     return (
@@ -45,41 +50,31 @@ const TrainerListScreen = () => {
 
   return (
     <View style={styles.container}>
-      <HeaderWithBack title={plan?.name || 'Trainers'} />
+      <HeaderWithBack title={plan?.name || "Trainers"} />
       <Text style={styles.subtitle}>Available trainers</Text>
 
       {error ? (
         <View style={styles.center}>
           <Ionicons name="alert-circle-outline" size={50} color="red" />
-          <Text style={styles.errorText}>
-            {typeof error === "string" ? error : "Something went wrong"}
-          </Text>
-          <TouchableOpacity onPress={handleRetry} style={styles.retryBtn}>
-            <Text style={styles.retryText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      ) : trainersList.length === 0 ? (
-        <View style={styles.center}>
-          <Text style={styles.emptyText}>No trainers available for this selection.</Text>
+          <Text style={styles.errorText}>{error}</Text>
         </View>
       ) : (
         <FlatList
           data={trainersList}
           keyExtractor={(item) => item.id.toString()}
-          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <TrainerCard 
-              trainer={item} 
-              onBookNow={() => setSelectedTrainer(item)} 
+            <TrainerCard
+              trainer={item}
+              onBookNow={() => handleBookNow(item.id)}
             />
+
           )}
         />
       )}
 
       <TrainerBookingModal
-        visible={!!selectedTrainer}
-        trainer={selectedTrainer}
-        onClose={() => setSelectedTrainer(null)}
+        visible={!!selectedTrainerId}
+        onClose={handleCloseModal}
       />
     </View>
   );
