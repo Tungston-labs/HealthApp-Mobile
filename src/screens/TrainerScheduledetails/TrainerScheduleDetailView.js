@@ -68,7 +68,7 @@ const TrainerScheduleDetailView = ({
           },
         ]}
         onPress={handleStart}
-        disabled={activeSession || isSessionStarting || !canStartToday}
+        disabled={Boolean(activeSession || isSessionStarting || !canStartToday)}
       >
         {isSessionStarting ? (
           <ActivityIndicator color="#fff" />
