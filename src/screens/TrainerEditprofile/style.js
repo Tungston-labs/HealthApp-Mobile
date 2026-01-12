@@ -62,6 +62,7 @@ export default StyleSheet.create({
     paddingHorizontal: 28,
     paddingVertical: 12,
     borderRadius: 30,
+    width:100 ,
   },
 
   saveText: {

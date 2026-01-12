@@ -84,5 +84,30 @@ export default trainerService;
 
 export const fetchTrainerHistory = async (page = 1) => {
   const response = await api.get(`section/trainer/history/?page=${page}`);
+  console.log(
+    "✅ API RESPONSE (trainer history):",
+    JSON.stringify(response.data, null, 2)
+  );
+
+  return response.data;
+};
+
+
+
+export const fetchTrainerProfileApi = async () => {
+  const response = await api.get("trainer/profile/");
+  return response.data;
+};
+
+export const updateTrainerProfileApi = async (formData) => {
+  const response = await api.patch(
+    "trainer/profile/edit/",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
   return response.data;
 };

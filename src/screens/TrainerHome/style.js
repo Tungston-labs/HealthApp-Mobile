@@ -75,7 +75,7 @@ export default StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 41,
 
-borderBottomLeftRadius: 30,
+    borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
@@ -88,5 +88,12 @@ borderBottomLeftRadius: 30,
   bodyContainer: {
     flex: 1,
     paddingHorizontal: 20,
+  },
+  dateLabel: {
+    // marginTop: 8,
+    marginBottom: 8,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666',
   },
 });

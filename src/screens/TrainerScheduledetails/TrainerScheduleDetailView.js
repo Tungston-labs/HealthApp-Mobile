@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './style';
@@ -32,7 +33,10 @@ const TrainerScheduleDetailView = ({
   handleSubmitNote,
   isSaving,
   onBackPress,
+  isDataLoading,
 }) => {
+  const isSubmitDisabled =
+    isSaving || !noteText.trim() || (isEditing && noteText === savedNote);
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
@@ -54,17 +58,23 @@ const TrainerScheduleDetailView = ({
         isOpen={detailsOpen}
         onToggle={() => setDetailsOpen(prev => !prev)}
       />
-      <View style={styles.swipeWrapper}>
-        <ClickButton
-          title={
-            isSessionStarting ? 'Starting session...' : 'Click to Start Session'
-          }
-          // successTitle=" Click to End Session "
-          width={340}
-          onPress={handleStart}
-          disabled={activeSession || isSessionStarting || !canStartToday}
-        />
-      </View>
+
+      <TouchableOpacity
+        style={[
+          styles.startSessionBtn,
+          (activeSession || isSessionStarting || !canStartToday) && {
+            opacity: 0.6,
+          },
+        ]}
+        onPress={handleStart}
+        disabled={Boolean(activeSession || isSessionStarting || !canStartToday)}
+      >
+        {isSessionStarting ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.startSessionText}>Click to Start Session</Text>
+        )}
+      </TouchableOpacity>
 
       <Text style={styles.mapHint}>Tap to open the map location.</Text>
 
@@ -76,7 +86,6 @@ const TrainerScheduleDetailView = ({
         <Text style={styles.locationText}>{data?.client?.address}</Text>
       </TouchableOpacity>
 
-      {/* ✅ Add Note Button */}
       {!savedNote && (
         <TouchableOpacity style={styles.addNoteBtn} onPress={openAddNote}>
           <Icon name="add" size={18} color="#fff" />
@@ -84,10 +93,9 @@ const TrainerScheduleDetailView = ({
         </TouchableOpacity>
       )}
 
-      {/* ✅ Saved Note with Edit */}
       {savedNote && (
         <View style={styles.noteBox}>
-          <Text style={styles.savedNoteText}>{savedNote.note}</Text>
+          <Text style={styles.savedNoteText}>{savedNote}</Text>
 
           <TouchableOpacity
             onPress={openEditNote}
@@ -98,7 +106,6 @@ const TrainerScheduleDetailView = ({
         </View>
       )}
 
-      {/* ✅ SAME MODAL for Add & Edit */}
       <Modal visible={showNoteModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -116,19 +123,25 @@ const TrainerScheduleDetailView = ({
             <TextInput
               placeholder="Type your note here..."
               multiline
+              scrollEnabled
               value={noteText}
+              maxLength={1000}
               onChangeText={setNoteText}
               style={styles.modalInput}
             />
 
             <TouchableOpacity
-              style={[styles.submitBtn, isSaving && { opacity: 0.6 }]}
+              style={[styles.submitBtn, isSubmitDisabled && { opacity: 0.6 }]}
               onPress={handleSubmitNote}
-              disabled={isSaving}
+              disabled={isSubmitDisabled}
             >
-              <Text style={styles.submitText}>
-                {isEditing ? 'Save' : 'Submit'}
-              </Text>
+              {isSaving ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.submitText}>
+                  {isEditing ? 'Save' : 'Submit'}
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>

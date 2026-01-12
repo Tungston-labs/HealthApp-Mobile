@@ -3,7 +3,15 @@ import { View, Text, Image, FlatList } from 'react-native';
 import ScheduleCard from '../../components/ScheduleCard';
 import styles from './style';
 import TrainingProgressCard from '../../components/ProgressBar';
-import { format, isToday, parse, parseISO } from 'date-fns';
+import {
+  format,
+  isSameDay,
+  isThisWeek,
+  isToday,
+  isTomorrow,
+  parse,
+  parseISO,
+} from 'date-fns';
 import Skeleton from '../../components/Skelton';
 import { useNavigation } from '@react-navigation/native';
 const TrainerHomeView = ({
@@ -18,7 +26,9 @@ const TrainerHomeView = ({
   isSessionStarting,
   isActiveSessionLoading,
   isManualRefreshLoading,
-  onRefresh,startingSessionId,isEndingSession
+  onRefresh,
+  startingSessionId,
+  isEndingSession,
 }) => {
   const navigation = useNavigation();
 
@@ -32,29 +42,64 @@ const TrainerHomeView = ({
     return isToday(parseISO(date));
   }, []);
 
+  const getDateLabel = date => {
+    const parsed = parseISO(date);
+
+    if (isToday(parsed)) return 'Today';
+    if (isTomorrow(parsed)) return 'Tomorrow';
+
+    if (isThisWeek(parsed, { weekStartsOn: 1 })) {
+      return format(parsed, 'EEEE');
+    }
+
+    return format(parsed, 'dd MMM');
+  };
+
+  const shouldShowDateLabel = (currentItem, previousItem) => {
+    if (!previousItem) return true;
+
+    return !isSameDay(parseISO(currentItem.date), parseISO(previousItem.date));
+  };
+
   const renderItem = useCallback(
-    ({ item }) => {
+    ({ item, index }) => {
       const canStartToday = isScheduleToday(item?.date);
+      const prevItem = schedules?.results?.[index - 1];
+      const showLabel = shouldShowDateLabel(item, prevItem);
 
       return (
-        <ScheduleCard
-          time={
-            item?.time
-              ? format(parse(item.time, 'HH:mm:ss', new Date()), 'HH:mm')
-              : '00:00'
-          }
-          name={item?.client?.name}
-          image={item?.client?.profile_pic_url}
-          height={item?.client?.height}
-          weight={item?.client?.weight}
-          onPress={() => goToScheduleDetail(item.id)}
-          onStart={() => onSessionStart(item.id)}
-          disabled={isActiveSessionLoading || !!activeSession || !canStartToday}
-          loading={isSessionStarting && startingSessionId === item.id}
-        />
+        <>
+          {showLabel && (
+            <Text style={styles.dateLabel}>{getDateLabel(item.date)}</Text>
+          )}
+          <ScheduleCard
+            time={
+              item?.time
+                ? format(parse(item.time, 'HH:mm:ss', new Date()), 'HH:mm')
+                : '00:00'
+            }
+            name={item?.client?.name}
+            image={item?.client?.profile_pic_url}
+            height={item?.client?.height}
+            weight={item?.client?.weight}
+            onPress={() => goToScheduleDetail(item.id)}
+            onStart={() => onSessionStart(item.id)}
+            disabled={
+              isActiveSessionLoading || !!activeSession || !canStartToday
+            }
+            loading={isSessionStarting && startingSessionId === item.id}
+          />
+        </>
       );
     },
-    [activeSession, isSessionStarting, isActiveSessionLoading, onSessionStart,startingSessionId],
+    [
+      activeSession,
+      isSessionStarting,
+      isActiveSessionLoading,
+      onSessionStart,
+      startingSessionId,
+      schedules,
+    ],
   );
 
   return (
