@@ -1,10 +1,6 @@
-// navigation/AppNavigator.js
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
-
 import ProfileScreen from "../screens/ProfileScreen";
-
 import BottomNav from "../components/BottomNavbar";
 import UpcomingSession from "../screens/UpcomingSession";
 import ProfileSection from "../screens/ProfileSection";

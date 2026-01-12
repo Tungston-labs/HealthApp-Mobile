@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
-  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,6 +14,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import ProfileHeader from "../../components/ProfileHeader";
 import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
 import CommonActionModal from "../../components/ModalComponents";
+import Skeleton from "../../components/Skelton";
 
 import { logoutThunk } from "../../redux/slices/authSlice";
 import { fetchTrainerProfileThunk } from "../../redux/slices/trainerProfileSlice";
@@ -24,11 +24,8 @@ import styles from "./style";
 const ProfileScreenTrainer = ({ navigation }) => {
   const dispatch = useDispatch();
 
-  /* 🔹 AUTH USER */
-  const { user } = useSelector(state => state.auth); 
-  // user.id should be trainer id
+  const { user } = useSelector(state => state.auth);
 
-  /* 🔹 TRAINER PROFILE */
   const { profile, loading } = useSelector(
     state => state.trainerProfile
   );
@@ -38,7 +35,6 @@ const ProfileScreenTrainer = ({ navigation }) => {
   );
   const [logoutVisible, setLogoutVisible] = useState(false);
 
-  /* 🔹 FETCH PROFILE (ON SCREEN FOCUS) */
   useFocusEffect(
     useCallback(() => {
       if (user?.id) {
@@ -47,14 +43,12 @@ const ProfileScreenTrainer = ({ navigation }) => {
     }, [user?.id])
   );
 
-  /* 🔹 SET PROFILE IMAGE */
   useEffect(() => {
     if (profile?.profile_pic_url) {
       setProfileImage({ uri: profile.profile_pic_url });
     }
   }, [profile]);
 
-  /* 🔹 PICK IMAGE (UI ONLY) */
   const handlePickImage = () => {
     launchImageLibrary(
       { mediaType: "photo", quality: 0.7 },
@@ -66,7 +60,6 @@ const ProfileScreenTrainer = ({ navigation }) => {
     );
   };
 
-  /* 🔹 LOGOUT */
   const handleLogout = async () => {
     setLogoutVisible(false);
     await dispatch(logoutThunk());
@@ -78,7 +71,36 @@ const ProfileScreenTrainer = ({ navigation }) => {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
+    return (
+      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+        <StatusBar barStyle="dark-content" />
+
+        <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
+
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+          
+          <Skeleton
+            height={120}
+            width={120}
+            borderRadius={60}
+            style={{ alignSelf: "center", marginTop: 40 }}
+          />
+
+          <Skeleton
+            height={20}
+            width={160}
+            borderRadius={6}
+            style={{ alignSelf: "center", marginTop: 16 }}
+          />
+
+          <View style={styles.optionsWrapper}>
+            <Skeleton height={48} borderRadius={12} />
+            <Skeleton height={48} borderRadius={12} />
+            <Skeleton height={48} borderRadius={12} />
+          </View>
+        </ScrollView>
+      </View>
+    );
   }
 
   return (
@@ -97,7 +119,6 @@ const ProfileScreenTrainer = ({ navigation }) => {
         />
 
         <View style={styles.optionsWrapper}>
-          {/* EDIT PROFILE */}
           <TouchableOpacity
             style={styles.optionRow}
             onPress={() =>
@@ -110,7 +131,6 @@ const ProfileScreenTrainer = ({ navigation }) => {
             <Text style={styles.optionText}>Edit profile</Text>
           </TouchableOpacity>
 
-          {/* TERMS */}
           <TouchableOpacity
             style={styles.optionRow}
             onPress={() => navigation.navigate("TermsAndConditions")}
@@ -119,7 +139,6 @@ const ProfileScreenTrainer = ({ navigation }) => {
             <Text style={styles.optionText}>Terms and Conditions</Text>
           </TouchableOpacity>
 
-          {/* LOGOUT */}
           <TouchableOpacity
             style={styles.logoutRow}
             onPress={() => setLogoutVisible(true)}
