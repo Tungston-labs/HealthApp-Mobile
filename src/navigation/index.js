@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -25,13 +25,38 @@ import TermsAndConditions from '../screens/TermsAndConditionsScreen';
 import TrainerNavigator from './TrainerNavigator';
 import TrainerScheduleDetailContainer from '../screens/TrainerScheduledetails';
 import TrainerEditProfile from '../screens/TrainerEditprofile';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadPersistedAuthState } from '../redux/slices/authSlice';
 const Stack = createNativeStackNavigator();
 import { navigationRef } from "./navigationService";
 
 export default function   Navigation() {
+  const dispatch = useDispatch();
+  const { isLoggedIn, user } = useSelector(state => state.auth);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadAuth = async () => {
+      await dispatch(loadPersistedAuthState());
+      setIsLoading(false);
+    };
+    loadAuth();
+  }, [dispatch]);
+
+  if (isLoading) {
+    return null; // Or a loading screen
+  }
+
+  const getInitialRoute = () => {
+    if (isLoggedIn && user) {
+      return user.role === 'trainer' ? 'TrainerNavigator' : 'MainApp';
+    }
+    return 'Welcome';
+  };
+/////////////------------need to seprate the screens with role base — trainer and user---------///////////////////////////
   return (
     <NavigationContainer ref={navigationRef}>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Welcome">
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={getInitialRoute()}>
 
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
