@@ -39,7 +39,7 @@ const completedSessionDetailSlice = createSlice({
       })
       .addCase(fetchCompletedSessionDetailThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.session = action.payload;
+        state.session = action.payload; 
       })
       .addCase(fetchCompletedSessionDetailThunk.rejected, (state, action) => {
         state.loading = false;

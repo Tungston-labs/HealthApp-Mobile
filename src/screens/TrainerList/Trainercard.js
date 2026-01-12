@@ -6,19 +6,26 @@ import { useNavigation } from '@react-navigation/native';
 
 const fallbackImage = require('../../../assets/trainer1.jpg');
 
-const TrainerCard = ({ trainer = {}, onBookNow }) => {
+const TrainerCard = ({
+  trainer = {},
+  onBookNow,
+  showBookButton = true,
+  showPrice = true,
+  showRating = true,
+}) => {
   const navigation = useNavigation();
-  
+
   const imageSource = trainer.profile_pic
     ? { uri: trainer.profile_pic }
-    : require('../../../assets/trainer1.jpg'); // fallback
+    : fallbackImage;
 
   return (
     <View style={styles.card}>
+      {/* IMAGE + PROFILE */}
       <View>
         <Image
           source={imageSource}
-          style={styles.trainerImg} // make sure width/height are defined
+          style={styles.trainerImg}
           resizeMode="cover"
         />
 
@@ -32,24 +39,43 @@ const TrainerCard = ({ trainer = {}, onBookNow }) => {
         </TouchableOpacity>
       </View>
 
+      {/* INFO */}
       <View style={styles.info}>
-        <Text style={styles.trainerName}>{trainer.name || 'Trainer'}</Text>
-        <Text style={styles.exp}>{trainer.experience ?? 0} Years experience</Text>
+        <Text style={styles.trainerName}>
+          {trainer.name || 'Trainer'}
+        </Text>
 
-        <View style={styles.ratingplan}>
-          <View style={styles.priceRow}>
-            <Text style={styles.price}>₹ {trainer.single_price ?? 0}</Text>
-            <Text style={styles.plan}>/plan</Text>
-          </View>
-          <View style={styles.starrating}>
-            <Icon name="star" color="#FFB800" size={18} />
-            <Text style={styles.rating}>{trainer.star_rating ?? 0}</Text>
-          </View>
-        </View>
+        <Text style={styles.exp}>
+          {trainer.experience ?? 0} Years experience
+        </Text>
 
-        <TouchableOpacity onPress={onBookNow} style={styles.bookBtn}>
-          <Text style={styles.bookText}>Book Now</Text>
-        </TouchableOpacity>
+        {(showPrice || showRating) && (
+          <View style={styles.ratingplan}>
+            {showPrice && (
+              <View style={styles.priceRow}>
+                <Text style={styles.price}>
+                  ₹ {trainer.single_price ?? 0}
+                </Text>
+                <Text style={styles.plan}>/plan</Text>
+              </View>
+            )}
+
+            {showRating && (
+              <View style={styles.starrating}>
+                <Icon name="star" color="#FFB800" size={18} />
+                <Text style={styles.rating}>
+                  {trainer.star_rating ?? 0}
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
+
+        {showBookButton && (
+          <TouchableOpacity onPress={onBookNow} style={styles.bookBtn}>
+            <Text style={styles.bookText}>Book Now</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={styles.fullUnderline} />

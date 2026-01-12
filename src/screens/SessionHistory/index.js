@@ -1,33 +1,49 @@
 import React, { useEffect } from "react";
-import { View, FlatList, ActivityIndicator, Text } from "react-native";
+import { View, FlatList, ActivityIndicator, Text, ScrollView } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
 import SessionCard from "../../components/SessionCard";
 import HeaderWithBack from "../../components/HeaderWithBack";
-import {
-  getTrainerHistory,
-  resetTrainerHistory,
-} from "../../redux/slices/trainerHistorySlice";
-import style from "./styles";
+import HistoryCard from "../../components/Historycard";
+import styles from "./styles";
+import { fetchCompletedSessionsThunk } from "../../redux/slices/SessionHistorySlice";
+import EmptyState from "../../components/EmptyState";
+import { getTrainerHistory } from "../../redux/slices/trainerHistorySlice";
 
 const SessionHistory = () => {
   const dispatch = useDispatch();
 
-  const {
-    sessions,
-    loading,
-    currentPage,
-    totalPages,
-  } = useSelector(state => state.trainerHistory);
-  useEffect(() => {
-  console.log("📦 REDUX SESSIONS:", sessions);
-}, [sessions]);
+  const { loading, isLoggedIn, user, error } = useSelector(
+    (state) => state.auth || {
+      loading: false,
+      isLoggedIn: false,
+      error: null,
+      user: null,
+    }
+  );
 
-  /* 🔹 FIRST LOAD */
+  // Get completed sessions from your redux slice
+  const { sessions } = useSelector((state) => state.completedSessions);
+
+  // Use the session boolean from backend
+  const hasPlan = user?.session;
+
   useEffect(() => {
-    dispatch(resetTrainerHistory());
-    dispatch(getTrainerHistory(1));
-  }, []);
+    if (hasPlan) {
+      dispatch(fetchCompletedSessionsThunk());
+    }
+  }, [hasPlan, dispatch]);
+
+  // If user has no plan/session, show outer empty state
+  if (!hasPlan) {
+    return (
+      <EmptyState
+        image={require("../../../assets/emptystate.png")}
+        title="No Session History"
+        subtitle="Your completed sessions will appear here once you book a plan."
+      />
+    );
+  }
 
   /* 🔹 LOAD MORE (pagination) */
   const loadMore = () => {
@@ -66,29 +82,27 @@ const SessionHistory = () => {
         subtitle="Session Details"
       />
 
-      {loading && sessions.length === 0 ? (
-        <ActivityIndicator size="large" style={{ marginTop: 30 }} />
-      ) : (
-        <FlatList
-          data={sessions}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderItem}
+      {loading && <ActivityIndicator size="large" />}
+
+      {error && <Text>{error}</Text>}
+
+      {!loading && !error && (
+        <ScrollView
           contentContainerStyle={styles.cardWrapper}
           showsVerticalScrollIndicator={false}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.4}
-          ListFooterComponent={
-            loading ? <ActivityIndicator style={{ margin: 20 }} /> : null
-          }
-          ListEmptyComponent={
-            !loading && (
-              <Text style={{ textAlign: "center", marginTop: 40 }}>
-                No session history found
-              </Text>
-            )
-          }
-        />
-
+        >
+          {sessions?.length > 0 ? (
+            sessions.map((item) => (
+              <HistoryCard key={item.session_id} item={item} />
+            ))
+          ) : (
+            <EmptyState
+              image={require("../../../assets/emptystate.png")}
+              title="No Completed Sessions"
+              subtitle="You haven't completed any sessions yet."
+            />
+          )}
+        </ScrollView>
       )}
     </View>
   );

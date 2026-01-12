@@ -14,9 +14,9 @@ const BottomNav = ({ state, descriptors, navigation }) => {
         // Icons for each tab
         const icons = {
           workout: "home-outline",
-          profilesection: "barbell-outline",
+          Session: "barbell-outline",
           
-          Session: "grid-outline",
+          profilesection: "grid-outline",
           profile: "person-outline",
         };
         const onPress = () => { 

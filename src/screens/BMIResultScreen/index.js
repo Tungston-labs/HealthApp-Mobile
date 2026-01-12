@@ -65,97 +65,95 @@ export default function BMIResultScreen({ navigation }) {
     bmiColor = "#F5554A";
   }
 
-const buildRegisterPayload = (data) => {
-  const formData = new FormData();
+  const buildRegisterPayload = (data) => {
+    const formData = new FormData();
 
-  // Basic fields
-  formData.append("name", data.name);
-  formData.append("email", data.email);
-  formData.append("phno", data.phno);
-  formData.append("password", data.password);
-  formData.append("role", data.role || "user");
-  formData.append("dob", data.dob);
-  formData.append("gender", data.gender);
-  formData.append("blood_group", data.blood_group);
-  formData.append("height", String(data.height));
-  formData.append("weight", String(data.weight));
-  formData.append(
-    "address",
-    `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`
-  );
+    // Basic fields
+    formData.append("name", data.name);
+    formData.append("email", data.email);
+    formData.append("phno", data.phno);
+    formData.append("password", data.password);
+    formData.append("role", data.role || "user");
+    formData.append("dob", data.dob);
+    formData.append("gender", data.gender);
+    formData.append("blood_group", data.blood_group);
+    formData.append("height", String(data.height));
+    formData.append("weight", String(data.weight));
+    formData.append(
+      "address",
+      `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`
+    );
 
-  // Arrays
-  formData.append(
-    "health_issues",
-    JSON.stringify(Array.isArray(data.health_issues) ? data.health_issues : [])
-  );
-  formData.append(
-    "wellness_goal",
-    JSON.stringify(Array.isArray(data.wellness_goal) ? data.wellness_goal : [])
-  );
+    // Arrays
+    formData.append(
+      "health_issues",
+      JSON.stringify(Array.isArray(data.health_issues) ? data.health_issues : [])
+    );
+    formData.append(
+      "wellness_goal",
+      JSON.stringify(Array.isArray(data.wellness_goal) ? data.wellness_goal : [])
+    );
 
-  // Profile picture
-  if (data.profile_pic) {
-    let uri = data.profile_pic.uri;
-    if (Platform.OS === "android" && !uri.startsWith("file://")) {
-      uri = "file://" + uri;
+    // Profile picture
+    if (data.profile_pic) {
+      let uri = data.profile_pic.uri;
+      if (Platform.OS === "android" && !uri.startsWith("file://")) {
+        uri = "file://" + uri;
+      }
+
+      formData.append("profile_pic", {
+        uri,
+        type: data.profile_pic.type || "image/jpeg",
+        name: data.profile_pic.fileName || "profile.jpg",
+      });
     }
 
-    formData.append("profile_pic", {
-      uri,
-      type: data.profile_pic.type || "image/jpeg",
-      name: data.profile_pic.fileName || "profile.jpg",
-    });
-  }
-
-  return formData;
-};
+    return formData;
+  };
 
 
 
-const handleFinalSubmit = () => {
-  if (!registration.name || !registration.email || !registration.phno) {
-    Alert.alert("Incomplete profile", "Please complete signup details");
-    return;
-  }
+  const handleFinalSubmit = () => {
+    if (!registration.name || !registration.email || !registration.phno) {
+      Alert.alert("Incomplete profile", "Please complete signup details");
+      return;
+    }
 
-  if (!registration.height || !registration.weight) {
-    Alert.alert("Missing data", "Height & Weight required");
-    return;
-  }
+    if (!registration.height || !registration.weight) {
+      Alert.alert("Missing data", "Height & Weight required");
+      return;
+    }
 
-  const formData = buildRegisterPayload(registration);
-  console.log("REGISTER PAYLOAD 👉", formData);
+    const formData = buildRegisterPayload(registration);
+    console.log("REGISTER PAYLOAD 👉", formData);
 
-  dispatch(registerClientThunk(formData));
-};
-
-
-
-useEffect(() => {
-  if (registered) {
-    dispatch(resetRegistration());
-    dispatch(resetClientState());
-
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "workout" }],
-    });
-  }
-}, [registered, dispatch, navigation]);
+    dispatch(registerClientThunk(formData));
+  };
 
 
 
-useEffect(() => {
-  if (error && !registered) {
-    const message =
-      typeof error === "string"
-        ? error
-        : error.message || "Registration failed";
+  useEffect(() => {
+    if (registered) {
+      dispatch(resetRegistration());
+      dispatch(resetClientState());
 
-    Alert.alert("Registration failed", message);
-  }
-}, [error, registered]);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "MainApp" }],
+      });
+    }
+  }, [registered, dispatch, navigation]);
+
+  useEffect(() => {
+    if (error && !registered) {
+      Alert.alert(
+        "Registration failed",
+        typeof error === "string"
+          ? error
+          : error.message || "Registration failed"
+      );
+    }
+  }, [error, registered]);
 
 
 
@@ -298,4 +296,3 @@ useEffect(() => {
     </View>
   );
 }
-  
