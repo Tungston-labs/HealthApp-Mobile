@@ -20,7 +20,7 @@ const TrainerListScreen = () => {
 
   const trainersList = Array.isArray(trainers) ? trainers : [];
   const isFiltered = route.params?.isFiltered;
-  const planId = route.params?.planId || 3;
+const planId = route.params?.planId;
 
   useEffect(() => {
     if (!isFiltered) {

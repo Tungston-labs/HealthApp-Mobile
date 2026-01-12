@@ -8,12 +8,13 @@ export const fetchAvailableTrainersThunk = createAsyncThunk(
       const response = await fetchAvailableTrainersAPI(payload);
       return response.data; 
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.error || 'Failed to fetch trainers'
-      );
+      // log full backend response for debugging
+      console.log('🔥 BACKEND ERROR RESPONSE:', err?.response?.data);
+      return rejectWithValue(err?.response?.data || 'Failed to fetch trainers');
     }
   }
 );
+
 
 const initialState = {
   trainers: [],

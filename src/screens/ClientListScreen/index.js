@@ -11,18 +11,18 @@ import styles from "./styles";
 import HeaderWithBack from "../../components/HeaderWithBack";
 import TrainerCard from "../../screens/TrainerList/Trainercard";
 import EmptyState from "../../components/EmptyState";
+import { fetchClientTrainersThunk } from "../../redux/slices/clientTrainerSlice";
 
-import { fetchAvailableTrainersThunk  } from "../../redux/slices/trainerPlanSlice";
 
 const ClientListScreen = () => {
   const dispatch = useDispatch();
 
-  const { trainers, loading } = useSelector(
-    (state) => state.trainerSessions
-  );
+const { trainers, loading } = useSelector(
+  (state) => state.clientList
+);
 
   useEffect(() => {
-    dispatch(fetchAvailableTrainersThunk());
+    dispatch(fetchClientTrainersThunk());
   }, [dispatch]);
 
   if (loading) {
