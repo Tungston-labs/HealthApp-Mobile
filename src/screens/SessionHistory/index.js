@@ -58,9 +58,8 @@ const SessionHistory = () => {
   );
 };
 
-
   return (
-    <View style={styles.container}>
+    <View style={style.container}>
       <HeaderWithBack
         title="Session History"
         subtitle="Session Details"
@@ -73,7 +72,7 @@ const SessionHistory = () => {
           data={sessions}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
-          contentContainerStyle={styles.cardWrapper}
+          contentContainerStyle={style.cardWrapper}
           showsVerticalScrollIndicator={false}
           onEndReached={loadMore}
           onEndReachedThreshold={0.4}

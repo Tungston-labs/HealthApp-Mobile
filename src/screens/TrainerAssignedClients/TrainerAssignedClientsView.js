@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import styles from './style';
-import Header from '../../components/Header';
+import CommonHeader from '../../components/CommonHeader';
 import AssignedClientCard from '../../components/AssignedClientCard';
 import Skeleton from '../../components/Skelton';
 
@@ -19,7 +19,11 @@ const TrainerAssignedClientsView = ({
   );
   return (
     <View style={styles.container}>
-      <Header username="John" subtitle="Gym" bmiValue="22.5" />
+      <CommonHeader
+        greeting="Hi"
+        name="John"
+        subTitle="Gym"
+      />
 
       <Text style={styles.sectionTitle}>All Assigned Clients</Text>
 
