@@ -61,7 +61,7 @@ const SessionHistory = () => {
     <View style={styles.container}>
       <HeaderWithBack title="Session History" subtitle="Session Details" />
 
-      {/* INITIAL LOADING — SAME AS TRAINER HOME */}
+     
       {loading && currentPage === 1 ? (
         Array.from({ length: 5 }).map((_, index) => (
           <Skeleton key={index} height={100} borderRadius={15} />
