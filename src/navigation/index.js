@@ -17,7 +17,6 @@ import TrainerDetailScreen from "../screens/TrainerSingleView";
 import PaymentScreen from "../screens/PaymentScreen";
 import Welcome from '../screens/WelcomeScreens';
 import BMIResultScreen from '../screens/BMIResultScreen';
-import WorkoutPlan from '../screens/WorkoutPlan';
 import CreateAccount from '../screens/CreateAccountScreen';
 import ThankYouScreen from '../screens/ThankYouScreen';
 import ScheduleEmpty from '../screens/ScheduleEmpty';
@@ -27,8 +26,9 @@ import TrainerScheduleDetail from '../screens/TrainerScheduledetails';
 import TrainerEditProfile from '../screens/TrainerEditprofile';
 const Stack = createNativeStackNavigator();
 import { navigationRef } from "./navigationService";
+import ProfileSection from "../screens/ProfileSection";
 
-export default function   Navigation() {
+export default function Navigation() {
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Welcome">
@@ -39,7 +39,10 @@ export default function   Navigation() {
         <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
         <Stack.Screen name="SelectRoleScreen" component={SelectRoleScreen} />
         <Stack.Screen name="SignupDetailsScreenUser" component={SignupDetailsScreenUser} />
-
+        <Stack.Screen
+          name="ProfileSection"
+          component={ProfileSection}
+        />
         <Stack.Screen
           name="MainWizardScreen"
           component={MainWizardScreen}
@@ -55,7 +58,7 @@ export default function   Navigation() {
           component={AppNavigator}
 
         />
-       
+
         <Stack.Screen
           name="TrainerList"
           component={TrainerListScreen}

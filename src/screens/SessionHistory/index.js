@@ -19,10 +19,8 @@ const SessionHistory = () => {
     }
   );
 
-  // Get completed sessions from your redux slice
   const { sessions } = useSelector((state) => state.completedSessions);
 
-  // Use the session boolean from backend
   const hasPlan = user?.session;
 
   useEffect(() => {
@@ -31,7 +29,6 @@ const SessionHistory = () => {
     }
   }, [hasPlan, dispatch]);
 
-  // If user has no plan/session, show outer empty state
   if (!hasPlan) {
     return (
       <EmptyState

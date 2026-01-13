@@ -1,19 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
 import CommonActionModal from "../../components/ModalComponents";
 import TrainerInfoCard from "../../components/TrainerInfoCard";
 import EmptyState from "../../components/EmptyState";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { fetchTrainerDetailThunk } from "../../redux/slices/trainerDetailSlice";
 
 const ProfileSection = () => {
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [showEmergencyModal, setShowEmergencyModal] = useState(false);
     const [showConsultModal, setShowConsultModal] = useState(false);
+    const dispatch = useDispatch();
+    const route = useRoute();
+    const navigation = useNavigation();
 
-    const { user } = useSelector((state) => state.auth || { user: null });
+    const { user } = useSelector((state) => state.auth || {});
+    const session = user?.session ?? null;
 
+    const trainerId = route.params?.trainerId;
+
+    const { loading, data, error } = useSelector(
+        (state) => state.trainerDetail
+    );
+
+    const trainer = trainerId ? data ?? null : session;
+
+
+    useEffect(() => {
+        if (trainerId) {
+            dispatch(fetchTrainerDetailThunk(trainerId));
+        }
+    }, [trainerId]);
+    console.log("Opened profile for trainer:", trainerId);
     const handleCancelTraining = () => {
         console.log("Training cancelled");
         setShowCancelModal(false);
@@ -28,20 +49,36 @@ const ProfileSection = () => {
         setShowEmergencyModal(false);
     };
 
-    // Use session from logged-in user
-    const session = user?.session ? user : null;
+console.log("Change Trainer Params:", { planId: trainer?.plan_id, planName: trainer?.plan_name });
 
-    // Empty state condition
-    if (!session) {
+    if (!session && !trainerId) {
         return (
             <EmptyState
                 image={require("../../../assets/emptytrainer.png")}
                 title="No Trainer Assigned"
-                subtitle="Once you book a trainer, their details will appear here."
+                subtitle="Once you book a plan, trainer details will appear here."
             />
         );
     }
+    if (trainerId && !loading && !trainer) {
+        return (
+            <EmptyState
+                title="Trainer not found"
+                subtitle="Unable to load trainer details."
+            />
+        );
+    }
+    const fallbackImage = require('../../../assets/trainer1.jpg');
 
+    const imageSource = trainer?.profile_pic
+        ? { uri: trainer.profile_pic }
+        : fallbackImage;
+    console.log("Trainer Timing:", trainer?.section_timing);
+
+    const trainerTiming = trainer?.section_timing ? `${trainer.section_timing} min` : "N/A";
+    const trainerName = trainer?.name || "N/A";
+    const numSessions = trainer?.no_of_section ?? 0;
+    const workoutType = trainer?.plan_name || "N/A";
     return (
         <View style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -61,18 +98,25 @@ const ProfileSection = () => {
                 {/* Trainer Card */}
                 <View style={styles.trainerCard}>
                     <Image
-                        source={require("../../../assets/trainer2.jpg")}
+                        source={imageSource}
                         style={styles.trainerImage}
                     />
                     <View style={styles.infoRowWrapper}>
                         <View style={styles.trainerInfoCardWrapper}>
-                            <TrainerInfoCard
-                                name={session.name}
-                                experience={session.experience}
-                                sessionTiming={session.sessionTiming}
-                                numSessions={session.numSessions}
-                                workoutType={session.workoutType}
-                            />
+                            {trainer ? (
+                                <TrainerInfoCard
+                                    name={trainerName}
+                                    experience={trainer?.experience ?? 0}
+                                    trainerTiming={trainerTiming}
+                                    numSessions={numSessions}
+                                    workoutType={workoutType}
+                                />
+                            ) : (
+                                <Text>Loading trainer details...</Text>
+                            )}
+
+
+
                         </View>
 
                         <View style={styles.ratingBox}>
@@ -114,10 +158,25 @@ const ProfileSection = () => {
                     </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity style={styles.changeTrainerButton}>
-                    <Icon name="person-outline" size={18} color="#fff" />
-                    <Text style={styles.changeTrainerText}> Change trainer</Text>
-                </TouchableOpacity>
+          <TouchableOpacity
+  style={styles.changeTrainerButton}
+  onPress={() => {
+    // Use plan_name for now if plan_id is not available
+    if (trainer?.plan_name) {
+      navigation.navigate("TrainerList", {
+        planName: trainer.plan_name, // pass plan_name instead
+      });
+    } else {
+      console.warn("Plan Name not available for this trainer!");
+    }
+  }}
+>
+  <Icon name="person-outline" size={18} color="#fff" />
+  <Text style={styles.changeTrainerText}> Change trainer</Text>
+</TouchableOpacity>
+
+
+
             </ScrollView>
 
             {/* Modals */}
@@ -162,6 +221,7 @@ const ProfileSection = () => {
                 showDropdown={true}
                 showNote={true}
             />
+
         </View>
     );
 };

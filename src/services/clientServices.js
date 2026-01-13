@@ -10,6 +10,21 @@ export const registerClientApi = (data) =>
 export const getClientProfile = () =>
   api.get("client/profile/");
 
+export const fetchClientTrainersAPI = async (payload = {}) => {
+  try {
+    const response = await api.get("client/booked-trainers/", {
+      params: payload, // GET params
+    });
+    console.log("API CALL SUCCESS", response.data);
+    return response.data; // Return the actual data
+  } catch (err) {
+    console.log("API CALL ERROR", err.response || err);
+    throw err;
+  }
+};
+
+
+
 export const updateClientProfile = (id, data) =>
   api.patch(`client/${id}/`, data);
 

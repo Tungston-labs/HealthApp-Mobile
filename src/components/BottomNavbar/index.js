@@ -16,7 +16,7 @@ const BottomNav = ({ state, descriptors, navigation }) => {
           workout: "home-outline",
           Session: "barbell-outline",
           
-          profilesection: "grid-outline",
+          sessionhistory: "grid-outline",
           profile: "person-outline",
         };
         const onPress = () => { 

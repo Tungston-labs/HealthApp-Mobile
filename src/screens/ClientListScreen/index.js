@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import {
   View,
-  Text,
   FlatList,
   ActivityIndicator,
 } from "react-native";
@@ -12,19 +11,19 @@ import HeaderWithBack from "../../components/HeaderWithBack";
 import TrainerCard from "../../screens/TrainerList/Trainercard";
 import EmptyState from "../../components/EmptyState";
 import { fetchClientTrainersThunk } from "../../redux/slices/clientTrainerSlice";
-
+import { useNavigation } from "@react-navigation/native";
 
 const ClientListScreen = () => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
-const { trainers, loading } = useSelector(
-  (state) => state.clientList
-);
+  const { trainers, loading } = useSelector(state => state.clientTrainer);
 
   useEffect(() => {
     dispatch(fetchClientTrainersThunk());
   }, [dispatch]);
 
+  // Show loader while fetching
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
@@ -33,19 +32,26 @@ const { trainers, loading } = useSelector(
     );
   }
 
+  // Show empty state if no trainers
   if (!trainers || trainers.length === 0) {
     return (
-      <EmptyState
-        image={require("../../../assets/emptytrainer.png")}
-        title="No Trainers Available"
-        subtitle="Trainer plans will appear here."
-      />
+      <View style={styles.container}>
+        <HeaderWithBack
+          title="Trainers"
+          subtitle="Trainer Information"
+        />
+        <EmptyState
+          image={require("../../../assets/emptytrainer.png")}
+          title="No Trainers Available"
+          subtitle="Once you book a plan, trainer plans will appear here."
+        />
+      </View>
     );
   }
 
+  // Render FlatList only if trainers exist
   return (
     <View style={styles.container}>
-      {/* HEADER */}
       <HeaderWithBack
         title="Trainers"
         subtitle="Trainer Information"
@@ -53,20 +59,26 @@ const { trainers, loading } = useSelector(
 
       <FlatList
         data={trainers}
-        keyExtractor={(item) => item.id.toString()}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContainer}
+        keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => (
           <TrainerCard
             trainer={item}
             showBookButton={false}
             showPrice={false}
             showRating={false}
+            showViewProfileButton={false}
+            onPressCard={() =>
+              navigation.navigate("ProfileSection", {
+                trainerId: item.id,
+              })
+            }
           />
+
         )}
       />
     </View>
   );
 };
+
 
 export default ClientListScreen;

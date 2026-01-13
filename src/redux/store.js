@@ -31,7 +31,7 @@ export const store = configureStore({
     weeklySessions:weeklySessionsReducer,
     trainerSessions:trainerReducer,
     completedSessionDetail:completedSessionDetailReducer,
-    clientList:ClientTrainerReducer,
+    clientTrainer:ClientTrainerReducer,
     [scheduleApi.reducerPath]: scheduleApi.reducer,
   },
   middleware: getDefaultMiddleware =>

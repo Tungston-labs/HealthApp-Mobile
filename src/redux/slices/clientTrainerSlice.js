@@ -1,20 +1,22 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchClientTrainersAPI } from "../../services/trainerServices";
+import { fetchClientTrainersAPI } from "../../services/clientServices";
 
 /* -------------------- THUNK -------------------- */
 export const fetchClientTrainersThunk = createAsyncThunk(
   "clientTrainer/fetch",
   async (payload = {}, { rejectWithValue }) => {
     try {
-      const response = await fetchClientTrainersAPI(payload);
-      return response.data;
+      const data = await fetchClientTrainersAPI(payload);
+      console.log("THUNK DATA 👉", data);
+      return data; 
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.error || "Failed to fetch client trainers"
-      );
+      return rejectWithValue(err.message || "Failed to fetch client trainers");
     }
   }
 );
+
+
+
 
 /* -------------------- INITIAL STATE -------------------- */
 const initialState = {
@@ -44,18 +46,26 @@ const clientTrainerSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchClientTrainersThunk.fulfilled, (state, action) => {
-        state.loading = false;
+.addCase(fetchClientTrainersThunk.fulfilled, (state, action) => {
+  state.loading = false;
 
-        state.trainers =
-          action.payload?.available_trainers ?? [];
+  // map API fields to what TrainerCard expects
+  state.trainers = (action.payload?.data ?? []).map(t => ({
+    id: t.id,
+    name: t.trainer_name,
+    profile_pic: t.trainer_profile_pic,
+    experience: null, // optional
+    single_price: null,
+    star_rating: null,
+    date: t.date,
+    time: t.time,
+    status: t.status,
+  }));
 
-        state.plan =
-          action.payload?.plan ?? null;
+  state.total = action.payload?.count ?? 0;
+})
 
-        state.total =
-          action.payload?.total_available ?? 0;
-      })
+
       .addCase(fetchClientTrainersThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;

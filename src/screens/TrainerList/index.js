@@ -81,3 +81,4 @@ const handleBookNow = (trainerId) => {
 };
 
 export default TrainerListScreen;
+

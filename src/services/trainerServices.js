@@ -54,10 +54,6 @@ export const fetchAvailableTrainersAPI = async (payload) => {
   const response = await api.post("trainer/available-trainers/", payload);
   return response;
 };
-export const fetchClientTrainersAPI = async (payload) => {
-  const response = await api.post("trainer/available-trainers/", payload);
-  return response;
-};
 
 export const getTrainerDetailService = (trainerId) => {
   return api.get(`detail/${trainerId}/`);
