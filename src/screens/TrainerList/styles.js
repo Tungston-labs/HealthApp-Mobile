@@ -23,18 +23,20 @@ trainerImg: {
 
 
   viewProfileBtn: {
-    position: "absolute",
-    bottom: 8,
-    alignSelf: "center",
-    backgroundColor: "#fff",
-    paddingHorizontal: 14,
-    paddingVertical: 4,
-    borderRadius: 10,
-    elevation: 2,
-  },
+  position: "absolute",
+  bottom: 14,
+  alignSelf: "center",
+  backgroundColor: "#fff",
+  paddingHorizontal: 6,
+  paddingVertical: 2,
+  borderRadius: 10,
+  elevation: 2,
+  borderWidth: 1,
+  borderColor: "#8D8D8D", // you can change this color if needed
+},
 
   viewProfileText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "600",
   },
 

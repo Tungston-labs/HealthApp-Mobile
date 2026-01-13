@@ -7,7 +7,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import Header from '../../components/Header';
 import FilterModal from '../../components/FIlterModal';
-import PlanCard from './PlanCard';
+import PlanCard from '../../components/PlanCard';
 import Skeleton from '../../components/Skelton';
 import { fetchPlansThunk } from '../../redux/slices/planSlice';
 import styles from './style';

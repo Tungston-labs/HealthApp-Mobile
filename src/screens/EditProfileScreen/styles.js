@@ -33,7 +33,7 @@ export default StyleSheet.create({
     borderColor: "#DADADA",
     alignItems: "center",
     marginTop: 26,
-    borderWidth: 1,
+    borderWidth:1,
   },
 
   locationText: {
@@ -51,7 +51,7 @@ export default StyleSheet.create({
   col: {
     width: "48%",
   },
-
+  
   chipInput: {
     flexDirection: "row",
     alignItems: "center",
@@ -60,21 +60,20 @@ export default StyleSheet.create({
     paddingVertical: 10,
     justifyContent: "space-between",
   },
-
+  
   chipText: {
     fontSize: 15,
     color: "#000",
   },
-
+   
   saveBtn: {
     backgroundColor: "#6B4EFF",
-    paddingHorizontal: 8,
-    paddingVertical: 12,
+    paddingVertical: 15,
     borderRadius: 30,
     alignItems: "center",
     marginVertical: 40,
   },
-
+  
   saveText: {
     color: "#FFF",
     fontSize: 18,
