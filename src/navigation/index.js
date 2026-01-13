@@ -21,7 +21,8 @@ import WorkoutPlan from '../screens/WorkoutPlan';
 import CreateAccount from '../screens/CreateAccountScreen';
 import ThankYouScreen from '../screens/ThankYouScreen';
 import ScheduleEmpty from '../screens/ScheduleEmpty';
-import TermsAndConditions from '../screens/TermsAndConditionsScreen';
+import UserTermsAndConditions from '../screens/UserTermsAndConditions';
+import TrainerTermsAndConditions from '../screens/TrainerTermsAndConditions';
 import TrainerNavigator from './TrainerNavigator';
 import TrainerScheduleDetailContainer from '../screens/TrainerScheduledetails';
 import TrainerEditProfile from '../screens/TrainerEditprofile';
@@ -44,11 +45,10 @@ export default function Navigation() {
   }, [dispatch]);
 
   if (isLoading) {
-    ///////////////////----------- need to add splash screen---------------////////////////////
+
     return null;
   }
 
-  /////////////------------need to seprate the screens with role base — trainer and user---------///////////////////////////
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -95,6 +95,10 @@ export default function Navigation() {
               name="TrainerEditProfile"
               component={TrainerEditProfile}
             />
+             <Stack.Screen
+              name="TrainerTermsAndConditions"
+              component={TrainerTermsAndConditions}
+            />
           </>
         ) : (
           <>
@@ -113,9 +117,10 @@ export default function Navigation() {
             <Stack.Screen name="ThankYouScreen" component={ThankYouScreen} />
             <Stack.Screen name="ScheduleEmpty" component={ScheduleEmpty} />
             <Stack.Screen
-              name="TermsAndConditions"
-              component={TermsAndConditions}
+              name="UserTermsAndConditions"
+              component={UserTermsAndConditions}
             />
+           
           </>
         )}
       </Stack.Navigator>

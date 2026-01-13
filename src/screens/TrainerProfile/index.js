@@ -133,7 +133,7 @@ const ProfileScreenTrainer = ({ navigation }) => {
 
           <TouchableOpacity
             style={styles.optionRow}
-            onPress={() => navigation.navigate("TermsAndConditions")}
+            onPress={() => navigation.navigate("TrainerTermsAndConditions")}
           >
             <Icon name="document-text-outline" size={20} color="#111" />
             <Text style={styles.optionText}>Terms and Conditions</Text>
