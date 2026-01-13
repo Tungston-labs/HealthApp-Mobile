@@ -33,8 +33,7 @@ const TrainerHomeView = ({
   isEndingSession,
 }) => {
   const navigation = useNavigation();
-const user=useSelector(state=>state.auth.user);
-console.log({user})
+  const user = useSelector(state => state.auth.user);
   const goToScheduleDetail = useCallback(
     id => navigation.navigate('TrainerScheduleDetail', { id }),
     [navigation],

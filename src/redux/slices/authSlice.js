@@ -1,12 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loginApi, logoutApi } from '../../services/authServices';
-import { setToken } from '../../storage/asyncStorage';
-import api from '../../services/api';
+import { publicApi } from '../../services/api';
+import { clearStorage } from '../../storage/asyncStorage';
 
-/* =========================
-   LOGIN THUNK
-========================= */
 export const loginClientThunk = createAsyncThunk(
   'auth/login',
   async (payload, { rejectWithValue }) => {
@@ -16,13 +13,10 @@ export const loginClientThunk = createAsyncThunk(
       const access = res.data?.data?.access;
       const refresh = res.data?.data?.refresh;
 
-      if (access) {
-        await setToken(access, refresh);
-        await AsyncStorage.setItem('user', JSON.stringify(user));
-        api.defaults.headers.Authorization = `Bearer ${access}`;
-      }
+      if (refresh) await AsyncStorage.setItem('refresh_token', refresh);
+      if (user) await AsyncStorage.setItem('user', JSON.stringify(user));
 
-      return user;
+      return { user, access };
     } catch (err) {
       if (err.response) {
         return rejectWithValue(
@@ -39,9 +33,6 @@ export const loginClientThunk = createAsyncThunk(
   },
 );
 
-/* =========================
-   LOGOUT THUNK
-========================= */
 export const logoutThunk = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
@@ -52,15 +43,7 @@ export const logoutThunk = createAsyncThunk(
         await logoutApi(refresh);
       }
 
-      await AsyncStorage.multiRemove([
-        'access_token',
-        'refresh_token',
-        'user',
-        'active_session',
-      ]);
-
-      delete api.defaults.headers.Authorization;
-
+      clearStorage();
       return true;
     } catch (err) {
       return rejectWithValue('Logout failed');
@@ -72,31 +55,37 @@ export const loadPersistedAuthState = createAsyncThunk(
   'auth/loadPersisted',
   async (_, { rejectWithValue }) => {
     try {
-      const access = await AsyncStorage.getItem('access_token');
+      const refresh = await AsyncStorage.getItem('refresh_token');
       const userString = await AsyncStorage.getItem('user');
-
-      if (access && userString) {
-        const user = JSON.parse(userString);
-        api.defaults.headers.Authorization = `Bearer ${access}`;
-        return { user, isLoggedIn: true };
+      if (!refresh || !userString) {
+        return null;
       }
 
-      return { user: null, isLoggedIn: false };
+      const response = await publicApi.post('auth/token/refresh/', {
+        refresh,
+      });
+
+      if (!response?.data?.data?.access) {
+        throw new Error('Refresh failed');
+      }
+      return {
+        user: JSON.parse(userString),
+        access: response.data.data.access,
+      };
     } catch (err) {
-      return rejectWithValue('Failed to load persisted auth state');
+      await AsyncStorage.multiRemove(['refresh_token', 'user']);
+      return rejectWithValue('Session expired');
     }
   },
 );
 
-/* =========================
-   SLICE
-========================= */
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
     loading: false,
     isLoggedIn: false,
     user: null,
+    accessToken: null,
     error: null,
   },
   reducers: {
@@ -107,6 +96,10 @@ const authSlice = createSlice({
     logout: state => {
       state.isLoggedIn = false;
       state.user = null;
+      state.accessToken = null;
+    },
+    setAccessToken: (state, action) => {
+      state.accessToken = action.payload;
     },
   },
   extraReducers: builder => {
@@ -119,7 +112,8 @@ const authSlice = createSlice({
       .addCase(loginClientThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.isLoggedIn = true;
-        state.user = action.payload;
+        state.user = action.payload.user;
+        state.accessToken = action.payload.access;
       })
       .addCase(loginClientThunk.rejected, (state, action) => {
         state.loading = false;
@@ -134,6 +128,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.isLoggedIn = false;
         state.user = null;
+        state.accessToken = null;
       })
       .addCase(logoutThunk.rejected, state => {
         state.loading = false;
@@ -142,15 +137,18 @@ const authSlice = createSlice({
       })
 
       .addCase(loadPersistedAuthState.fulfilled, (state, action) => {
-        state.isLoggedIn = action.payload.isLoggedIn;
+        if (!action.payload) return;
         state.user = action.payload.user;
+        state.accessToken = action.payload.access;
+        state.isLoggedIn = true;
       })
       .addCase(loadPersistedAuthState.rejected, state => {
         state.isLoggedIn = false;
         state.user = null;
+        state.accessToken = null;
       });
   },
 });
 
-export const { resetAuthState, logout } = authSlice.actions;
+export const { resetAuthState, logout, setAccessToken } = authSlice.actions;
 export default authSlice.reducer;

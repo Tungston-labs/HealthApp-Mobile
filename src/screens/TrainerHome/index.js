@@ -35,8 +35,8 @@ const TrainerHomeContainer = () => {
   useEffect(() => {
     if (schedulesError) {
       const message =
-        error?.data?.message ||
-        error?.error ||
+        schedulesError?.data?.message ||
+        schedulesError?.error ||
         'Something went wrong. Please try again.';
       Toast.show({
         type: 'error',
