@@ -22,3 +22,27 @@ export const dashboardCounts = () =>
 export const planList = () => {
   return api.get("plan/clientlist/");
 };
+
+// GET CLIENT PROFILE (MOBILE) 
+export const fetchMobProfileApi = async () => {
+  const response = await api.get("client/mob/profile/");
+  return response.data;
+};
+
+
+// edit client profie in mobile app
+
+
+export const updateProfileApi = (payload) => {
+  console.log("SENDING PATCH PAYLOAD:", payload);
+
+  return api.patch(
+    "client/profile/edit/",
+    payload,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+};

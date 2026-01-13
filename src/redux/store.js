@@ -14,6 +14,10 @@ import trainerDetailReducer from './slices/trainerDetailSlice';
 import trainerUpcomingSessionsReducer from "./slices/trainerUpcomingSessions";
 import trainerHistoryReducer from "./slices/trainerHistorySlice";
 import trainerProfileReducer from "./slices/trainerProfileSlice";
+import mobProfileReducer from "./slices/mobProfileSlice";
+import clientProfileEditReducer from "./slices/clientProfileEditSlice";
+
+
 
 import { scheduleApi } from './api/trainer/scheduleApi';
 
@@ -35,8 +39,14 @@ export const store = configureStore({
     trainerHistory: trainerHistoryReducer,
     trainerProfile: trainerProfileReducer,
 
+    mobProfile: mobProfileReducer,
+    
+    profileEdit: clientProfileEditReducer,
+
+
     [scheduleApi.reducerPath]: scheduleApi.reducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(scheduleApi.middleware),
 });
+
