@@ -139,33 +139,6 @@ const EditProfile = ({ navigation }) => {
               <Text style={styles.locationText}>Use my location</Text>
             </TouchableOpacity>
 
-            <View style={styles.row}>
-              <View style={styles.col}>
-                <Text style={styles.label}>Pin code</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.pincode}
-                  onChangeText={(v) => handleChange("pincode", v)}
-                />
-              </View>
-
-              <View style={styles.col}>
-                <Text style={styles.label}>City/Town</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.city}
-                  onChangeText={(v) => handleChange("city", v)}
-                />
-              </View>
-            </View>
-
-            <Text style={styles.label}>Landmark</Text>
-            <TextInput
-              style={styles.input}
-              value={form.landmark}
-              onChangeText={(v) => handleChange("landmark", v)}
-            />
-
             <Text style={styles.label}>Address</Text>
             <TextInput
               style={styles.input}
