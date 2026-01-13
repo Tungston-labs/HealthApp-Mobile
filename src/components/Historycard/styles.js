@@ -2,8 +2,8 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   card: {
-    width: 360,
-    height: 130,
+    width: 420,
+    height: 150,
     backgroundColor: "#EEEEFF",
     borderRadius: 14,
     flexDirection: "row",
