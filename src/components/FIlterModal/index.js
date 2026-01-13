@@ -29,22 +29,24 @@ const FilterModal = ({ visible, onClose, planId }) => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   };
 
-  const handleApply = () => {
-    const payload = {
-      plan_id: planId,
-      slot_days: selectedSlot.split(',').map(d => d.toLowerCase()),
-      time: convertTo24Hour(selectedTime),
-      start_date: selectedDate,
-    };
-
-    dispatch(fetchAvailableTrainersThunk(payload))
-      .unwrap()
-      .then(() => {
-        onClose();
-        navigation.navigate('TrainerList', { isFiltered: true, planId: planId });
-      })
-      .catch(err => console.log('Fetch trainers error:', err));
+const handleApply = () => {
+  const payload = {
+    plan_id: planId,
+    slot_days: selectedSlot.split(',').map(d => d.toLowerCase()),
+    time: convertTo24Hour(selectedTime),
+    start_date: selectedDate,
   };
+
+  dispatch(fetchAvailableTrainersThunk(payload))
+    .unwrap()
+    .then(() => {
+      onClose();
+      // ✅ Navigate to ClientListScreen via its tab name
+      navigation.navigate('TrainerList', { isFiltered: true, planId });
+    })
+    .catch(err => console.log('Fetch trainers error:', err));
+};
+
 
   const timeSlots = ['09:45 AM', '10:45 AM', '12:45 PM', '02:45 PM', '11:45 AM', '03:45 PM', '04:45 PM'];
 

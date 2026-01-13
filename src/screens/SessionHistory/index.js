@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 import SessionCard from "../../components/SessionCard";
 import HeaderWithBack from "../../components/HeaderWithBack";
-import HistoryCard from "../../components/Historycard";
 import EmptyState from "../../components/EmptyState";
 import styles from "./styles";
 
@@ -28,7 +27,6 @@ const SessionHistory = () => {
     totalPages = 1,
   } = useSelector((state) => state.completedSessions || {});
 
-  // backend session flag
   const hasPlan = user?.session;
 
   useEffect(() => {
@@ -37,7 +35,6 @@ const SessionHistory = () => {
     }
   }, [hasPlan, dispatch]);
 
-  // 🔹 NO PLAN
   if (!hasPlan) {
     return (
       <EmptyState
@@ -57,7 +54,7 @@ const SessionHistory = () => {
 
   /* 🔹 RENDER EACH SESSION */
   const renderItem = ({ item }) => {
-    console.log("🟢 RENDERING SESSION ID:", item.id);
+    console.log("🟢 RENDERING SESSION ID:", item.session_id);
 
     return (
       <SessionCard
@@ -85,7 +82,13 @@ const SessionHistory = () => {
       ) : (
         <FlatList
           data={sessions}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) =>
+            item?.session_id
+              ? String(item.session_id)
+              : item?.id
+              ? String(item.id)
+              : String(index)
+          }
           renderItem={renderItem}
           contentContainerStyle={styles.cardWrapper}
           showsVerticalScrollIndicator={false}

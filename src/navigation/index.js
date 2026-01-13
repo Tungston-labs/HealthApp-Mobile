@@ -17,7 +17,6 @@ import TrainerDetailScreen from '../screens/TrainerSingleView';
 import PaymentScreen from '../screens/PaymentScreen';
 import Welcome from '../screens/WelcomeScreens';
 import BMIResultScreen from '../screens/BMIResultScreen';
-import WorkoutPlan from '../screens/WorkoutPlan';
 import CreateAccount from '../screens/CreateAccountScreen';
 import ThankYouScreen from '../screens/ThankYouScreen';
 import ScheduleEmpty from '../screens/ScheduleEmpty';

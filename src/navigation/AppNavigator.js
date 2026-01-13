@@ -1,4 +1,3 @@
-// navigation/AppNavigator.js
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -8,26 +7,23 @@ import BottomNav from "../components/BottomNavbar";
 
 import UpcomingSession from "../screens/UpcomingSession";
 import WorkoutPlan from "../screens/WorkoutPlan";
-import ProfileSection from "../screens/ProfileSection";
+import ClientListScreen from "../screens/ClientListScreen";
 import SessionHistory from "../screens/SessionHistory";
 import SingleSessionHistory from "../screens/SingleSessionHistory";
 import ProfileScreen from "../screens/ProfileScreen";
 
-// 🔥 NEW SCREEN
-import ClientListScreen from "../screens/ClientListScreen";
-
 const Tab = createBottomTabNavigator();
-const SessionStack = createNativeStackNavigator();
+const HistoryStack = createNativeStackNavigator();
 
-/* -------- Session History Stack -------- */
-const SessionStackScreen = () => (
-  <SessionStack.Navigator screenOptions={{ headerShown: false }}>
-    <SessionStack.Screen name="History" component={SessionHistory} />
-    <SessionStack.Screen
+/* -------- Session History Stack (3rd tab) -------- */
+const HistoryStackScreen = () => (
+  <HistoryStack.Navigator screenOptions={{ headerShown: false }}>
+    <HistoryStack.Screen name="SessionHistory" component={SessionHistory} />
+    <HistoryStack.Screen
       name="SingleSessionHistory"
       component={SingleSessionHistory}
     />
-  </SessionStack.Navigator>
+  </HistoryStack.Navigator>
 );
 
 const AppNavigator = () => {
@@ -38,26 +34,26 @@ const AppNavigator = () => {
     <Tab.Navigator
       tabBar={(props) => <BottomNav {...props} />}
       screenOptions={{ headerShown: false }}
-      initialRouteName="workout"
     >
-      {/* Workout / Upcoming Session */}
+      {/* 1️⃣ Workout */}
       <Tab.Screen
         name="workout"
         component={hasSession ? UpcomingSession : WorkoutPlan}
       />
 
+      {/* 2️⃣ Session */}
       <Tab.Screen
         name="Session"
         component={ClientListScreen}
       />
 
-      {/* Session History */}
+      {/* 3️⃣ History */}
       <Tab.Screen
-        name="profilesection"
-        component={SessionStackScreen}
+        name="sessionhistory"
+        component={HistoryStackScreen}
       />
 
-      {/* Profile */}
+      {/* 4️⃣ Profile */}
       <Tab.Screen
         name="profile"
         component={ProfileScreen}
