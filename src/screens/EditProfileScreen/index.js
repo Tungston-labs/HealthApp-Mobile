@@ -1,4 +1,4 @@
-// screens/EditProfile.js
+
 import React, { useState } from "react";
 import {
   View,
@@ -92,7 +92,7 @@ const EditProfile = ({ navigation }) => {
               </View>
             </View>
 
-            {/* DOB + Blood */}
+        
             <View style={styles.row}>
               <View style={styles.col}>
                 <Text style={styles.label}>Date of Birth</Text>
@@ -113,7 +113,7 @@ const EditProfile = ({ navigation }) => {
               </View>
             </View>
 
-            {/* Weight + Height */}
+
             <View style={styles.row}>
               <View style={styles.col}>
                 <Text style={styles.label}>Weight in KG</Text>
@@ -134,12 +134,11 @@ const EditProfile = ({ navigation }) => {
               </View>
             </View>
 
-            {/* Location Button */}
+          
             <TouchableOpacity style={styles.locationBtn}>
               <Text style={styles.locationText}>Use my location</Text>
             </TouchableOpacity>
 
-            {/* Pincode + City */}
             <View style={styles.row}>
               <View style={styles.col}>
                 <Text style={styles.label}>Pin code</Text>
@@ -160,7 +159,6 @@ const EditProfile = ({ navigation }) => {
               </View>
             </View>
 
-            {/* Landmark */}
             <Text style={styles.label}>Landmark</Text>
             <TextInput
               style={styles.input}
@@ -168,7 +166,6 @@ const EditProfile = ({ navigation }) => {
               onChangeText={(v) => handleChange("landmark", v)}
             />
 
-            {/* Address */}
             <Text style={styles.label}>Address</Text>
             <TextInput
               style={styles.input}
@@ -176,21 +173,18 @@ const EditProfile = ({ navigation }) => {
               onChangeText={(v) => handleChange("address", v)}
             />
 
-            {/* Health Condition */}
             <Text style={styles.label}>Have any (Health condition / injury)</Text>
             <View style={styles.chipInput}>
               <Text style={styles.chipText}>{form.condition}</Text>
               <Icon name="close" size={18} color="#999" />
             </View>
 
-            {/* Wellness Goal */}
             <Text style={styles.label}>Wellness Goal</Text>
             <View style={styles.chipInput}>
               <Text style={styles.chipText}>{form.goal}</Text>
               <Icon name="close" size={18} color="#999" />
             </View>
 
-            {/* Save */}
             <TouchableOpacity style={styles.saveBtn}>
               <Text style={styles.saveText}>Save</Text>
             </TouchableOpacity>

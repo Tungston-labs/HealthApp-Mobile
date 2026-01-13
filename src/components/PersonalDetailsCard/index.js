@@ -79,7 +79,7 @@ const PersonalDetailsCard = ({
               {Array.isArray(data?.wellness_goal) &&
               data.wellness_goal.length > 0
                 ? data.wellness_goal.join(', ')
-                : 'No wellness goals'}
+                : 'No workout goals'}
             </Text>
           </View>
           <View style={styles.divider} />

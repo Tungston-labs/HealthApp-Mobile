@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import styles from './style';
-import Header from '../../components/Header';
+import CommonHeader from '../../components/CommonHeader';
 import AssignedClientCard from '../../components/AssignedClientCard';
 import Skeleton from '../../components/Skelton';
+import { useSelector } from 'react-redux';
 
 const TrainerAssignedClientsView = ({
   isLoading,
@@ -13,13 +14,18 @@ const TrainerAssignedClientsView = ({
   onRefresh,
   isFetching,
 }) => {
+  const user = useSelector(state => state.auth.user);
   const renderItem = useCallback(
     ({ item }) => <AssignedClientCard data={item} />,
     [],
   );
   return (
     <View style={styles.container}>
-      <Header username="John" subtitle="Gym" bmiValue="22.5" />
+      <CommonHeader
+        greeting="Hi"
+        name={user?.name || 'Trainer'}
+        subTitle={user?.trainer?.training_plan?.name || 'Basic Plan'}
+      />
 
       <Text style={styles.sectionTitle}>All Assigned Clients</Text>
 

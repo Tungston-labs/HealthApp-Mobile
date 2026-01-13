@@ -11,7 +11,7 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './style';
 import PersonalDetailsCard from '../../components/PersonalDetailsCard';
-import ClickButton from '../../components/Swipe';
+import Skeleton from '../../components/Skelton';
 
 const TrainerScheduleDetailView = ({
   data,
@@ -34,9 +34,33 @@ const TrainerScheduleDetailView = ({
   isSaving,
   onBackPress,
   isDataLoading,
+  hideButton = false,
 }) => {
   const isSubmitDisabled =
     isSaving || !noteText.trim() || (isEditing && noteText === savedNote);
+
+  if (isDataLoading) {
+    return (
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+       
+        <View style={styles.header}>
+          <Skeleton width={24} height={24} borderRadius={12} />
+          <Skeleton width={140} height={20} borderRadius={6} />
+        </View>
+
+        <Skeleton height={160} borderRadius={20} />
+
+        <Skeleton height={48} borderRadius={12} />
+
+        <Skeleton height={14} width="60%" borderRadius={6} />
+
+        <Skeleton height={50} borderRadius={12} />
+
+        <Skeleton height={44} borderRadius={12} />
+      </ScrollView>
+    );
+  }
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
@@ -96,12 +120,11 @@ const TrainerScheduleDetailView = ({
       {savedNote && (
         <View style={styles.noteBox}>
           <Text style={styles.savedNoteText}>{savedNote}</Text>
-
           <TouchableOpacity
             onPress={openEditNote}
             style={{ alignSelf: 'flex-end', marginTop: 8 }}
           >
-            <Text style={{ color: '#6C63FF', fontWeight: '600' }}>Edit</Text>
+            <Icon name="create-outline" size={20} color="#6C63FF" />
           </TouchableOpacity>
         </View>
       )}

@@ -15,7 +15,7 @@ import { openMapByAddress } from '../../utils/trainer/openMap';
 
 const TrainerScheduleDetailContainer = () => {
   const route = useRoute();
-  const { id } = route.params;
+  const { id,hideButton } = route.params;
 
   const navigation = useNavigation();
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -143,6 +143,7 @@ const TrainerScheduleDetailContainer = () => {
       handleSubmitNote={handleSubmitNote}
       isSaving={isSaving}
       onBackPress={onBackPress}
+      hideButton={hideButton}
     />
   );
 };

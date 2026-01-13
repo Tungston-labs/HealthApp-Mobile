@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -22,15 +23,12 @@ const GOOGLE_API_KEY = "YOUR_GOOGLE_MAPS_KEY";
 
 const TrainerEditProfile = ({ navigation }) => {
   const dispatch = useDispatch();
-  const { profile, loading } = useSelector(
-    state => state.trainerProfile
-  );
+  const { profile, loading } = useSelector(state => state.trainerProfile);
 
   const [form, setForm] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  /* 🔹 LOAD API DATA */
   useEffect(() => {
     if (profile) {
       setForm({
@@ -50,19 +48,14 @@ const TrainerEditProfile = ({ navigation }) => {
   const handleChange = (key, value) =>
     setForm(prev => ({ ...prev, [key]: value }));
 
-  /* 🔹 PICK PROFILE IMAGE */
   const pickProfileImage = () => {
-    launchImageLibrary(
-      { mediaType: "photo", quality: 0.7 },
-      res => {
-        if (res?.assets?.length) {
-          setProfileImage(res.assets[0]);
-        }
+    launchImageLibrary({ mediaType: "photo", quality: 0.7 }, res => {
+      if (res?.assets?.length) {
+        setProfileImage(res.assets[0]);
       }
-    );
+    });
   };
 
-  /* 🔹 USE MY LOCATION */
   const useMyLocation = () => {
     Geolocation.getCurrentPosition(
       async position => {
@@ -91,7 +84,6 @@ const TrainerEditProfile = ({ navigation }) => {
     );
   };
 
-  /* 🔹 SAVE PROFILE */
   const handleSave = async () => {
     setSaving(true);
 
@@ -133,7 +125,11 @@ const TrainerEditProfile = ({ navigation }) => {
 
       <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         <ProfileHeader
           name="Edit Profile"
           showBack
@@ -143,6 +139,7 @@ const TrainerEditProfile = ({ navigation }) => {
         />
 
         <View style={styles.formWrapper}>
+
           <Text style={styles.label}>Name</Text>
           <TextInput
             style={styles.input}
@@ -153,11 +150,7 @@ const TrainerEditProfile = ({ navigation }) => {
           <View style={styles.row}>
             <View style={styles.col}>
               <Text style={styles.label}>Email</Text>
-              <TextInput
-                style={styles.input}
-                value={form.email}
-                editable={false}
-              />
+              <TextInput style={styles.input} value={form.email} editable={false} />
             </View>
             <View style={styles.col}>
               <Text style={styles.label}>Phone</Text>
@@ -183,10 +176,7 @@ const TrainerEditProfile = ({ navigation }) => {
             onChangeText={v => handleChange("aadhaar", v)}
           />
 
-          <TouchableOpacity
-            style={styles.locationBtn}
-            onPress={useMyLocation}
-          >
+          <TouchableOpacity style={styles.locationBtn} onPress={useMyLocation}>
             <Text style={styles.locationText}>Use my location</Text>
           </TouchableOpacity>
 
@@ -223,15 +213,17 @@ const TrainerEditProfile = ({ navigation }) => {
             onChangeText={v => handleChange("address", v)}
           />
 
-          <TouchableOpacity
-            style={styles.saveBtn}
-            onPress={handleSave}
-            disabled={saving}
-          >
-            <Text style={styles.saveText}>
-              {saving ? "Saving..." : "Save"}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.saveWrapper}>
+            <TouchableOpacity
+              style={styles.saveBtn}
+              onPress={handleSave}
+              disabled={saving}
+            >
+              <Text style={styles.saveText}>
+                {saving ? "Saving..." : "Save"}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </View>

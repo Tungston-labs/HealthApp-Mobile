@@ -13,7 +13,9 @@ import {
   parseISO,
 } from 'date-fns';
 import Skeleton from '../../components/Skelton';
+import CommonHeader from '../../components/CommonHeader';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 const TrainerHomeView = ({
   activeSession,
   onEndSession,
@@ -31,7 +33,7 @@ const TrainerHomeView = ({
   isEndingSession,
 }) => {
   const navigation = useNavigation();
-
+  const user = useSelector(state => state.auth.user);
   const goToScheduleDetail = useCallback(
     id => navigation.navigate('TrainerScheduleDetail', { id }),
     [navigation],
@@ -104,12 +106,11 @@ const TrainerHomeView = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerCard}>
-        <View>
-          <Text style={styles.greeting}>Hi, John</Text>
-          <Text style={styles.subTitle}>Gym</Text>
-        </View>
-      </View>
+      <CommonHeader
+        greeting="Hi"
+        name={user?.name || 'Trainer'}
+        subTitle={user?.trainer?.training_plan?.name || 'Basic Plan'}
+      />
       <View style={styles.bodyContainer}>
         {activeSession && (
           <TrainingProgressCard
