@@ -1,28 +1,35 @@
 // api.js
-import axios from "axios";
+import axios from 'axios';
 import {
-  getAccessToken,
   getRefreshToken,
-  setAccessToken,
   setRefreshToken,
-  clearTokens,
-} from "../storage/asyncStorage";
-import { forceLogout } from "../utils/forceLogout";
+  clearStorage,
+} from '../storage/asyncStorage';
+import { forceLogout } from '../utils/forceLogout';
+import { store } from '../redux/store';
+import { setAccessToken } from '../redux/slices/authSlice';
+
+const BASE_URL = 'http://178.248.112.16:9001/api/';
 
 const api = axios.create({
-  baseURL: "http://178.248.112.16:9001/api/",
+  baseURL: BASE_URL,
   timeout: 15000,
   headers: {
-    Accept: "application/json",
+    Accept: 'application/json',
   },
 });
 
+export const publicApi = axios.create({
+  baseURL: BASE_URL,
+  timeout: 15000,
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+});
 
-api.interceptors.request.use(async (config) => {
-  console.log("API INTERCEPTOR HIT 👉", config.url);
-  console.log("DATA INSTANCEOF FORMDATA 👉", config.data instanceof FormData);
-
-  const token = await getAccessToken();
+api.interceptors.request.use(async config => {
+  const token = store.getState().auth.accessToken;
 
   if (token && !config.skipAuth) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -31,29 +38,25 @@ api.interceptors.request.use(async (config) => {
   if (config.data instanceof FormData) {
     config.headers['Content-Type'] = 'multipart/form-data';
   } else {
-    config.headers["Content-Type"] = "application/json";
+    config.headers['Content-Type'] = 'application/json';
   }
 
   return config;
 });
 
-
-
-
 let isRefreshing = false;
 let failedQueue = [];
 
 const processQueue = (error, token = null) => {
-  failedQueue.forEach((prom) =>
-    error ? prom.reject(error) : prom.resolve(token)
+  failedQueue.forEach(prom =>
+    error ? prom.reject(error) : prom.resolve(token),
   );
   failedQueue = [];
 };
 
-
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
+  response => response,
+  async error => {
     const originalRequest = error.config;
 
     if (
@@ -67,37 +70,38 @@ api.interceptors.response.use(
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
-          .then((token) => {
+          .then(token => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
             return api(originalRequest);
           })
-          .catch((err) => Promise.reject(err));
+          .catch(err => Promise.reject(err));
       }
 
       isRefreshing = true;
 
       try {
         const refresh = await getRefreshToken();
-        if (!refresh) throw new Error("No refresh token");
+        if (!refresh) throw new Error('No refresh token');
 
-        const { data } = await axios.post(
-          `${api.defaults.baseURL}auth/token/refresh/`,
-          { refresh }
-        );
+        const response = await publicApi.post('auth/token/refresh/', {
+          refresh,
+        });
+        if (!response?.data?.data?.access) {
+          throw new Error('Invalid refresh response');
+        }
+        store.dispatch(setAccessToken(response?.data?.data?.access));
 
-        await setAccessToken(data.access);
-
-        if (data.refresh) {
-          await setRefreshToken(data.refresh);
+        if (response?.data?.data?.refresh) {
+          await setRefreshToken(response.data.data.refresh);
         }
 
-        processQueue(null, data.access);
+        processQueue(null, response.data.data.access);
 
-        originalRequest.headers.Authorization = `Bearer ${data.access}`;
+        originalRequest.headers.Authorization = `Bearer ${response.data.data.access}`;
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        await clearTokens();
+        await clearStorage();
         forceLogout();
         return Promise.reject(err);
       } finally {
@@ -106,7 +110,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

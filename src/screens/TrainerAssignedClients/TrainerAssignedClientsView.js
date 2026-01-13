@@ -4,6 +4,7 @@ import styles from './style';
 import CommonHeader from '../../components/CommonHeader';
 import AssignedClientCard from '../../components/AssignedClientCard';
 import Skeleton from '../../components/Skelton';
+import { useSelector } from 'react-redux';
 
 const TrainerAssignedClientsView = ({
   isLoading,
@@ -13,6 +14,7 @@ const TrainerAssignedClientsView = ({
   onRefresh,
   isFetching,
 }) => {
+  const user = useSelector(state => state.auth.user);
   const renderItem = useCallback(
     ({ item }) => <AssignedClientCard data={item} />,
     [],
@@ -21,8 +23,8 @@ const TrainerAssignedClientsView = ({
     <View style={styles.container}>
       <CommonHeader
         greeting="Hi"
-        name="John"
-        subTitle="Gym"
+        name={user?.name || 'Trainer'}
+        subTitle={user?.trainer?.training_plan?.name || 'Basic Plan'}
       />
 
       <Text style={styles.sectionTitle}>All Assigned Clients</Text>
