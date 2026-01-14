@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   View,
@@ -63,7 +62,6 @@ const EditProfile = ({ navigation }) => {
         <View style={styles.optionsWrapper}>
           <View style={styles.formWrapper}>
 
-            {/* Name */}
             <Text style={styles.label}>Name</Text>
             <TextInput
               style={styles.input}
@@ -71,7 +69,6 @@ const EditProfile = ({ navigation }) => {
               onChangeText={(v) => handleChange("name", v)}
             />
 
-            {/* Email + Phone */}
             <View style={styles.row}>
               <View style={styles.col}>
                 <Text style={styles.label}>E-mail ID</Text>
@@ -92,7 +89,6 @@ const EditProfile = ({ navigation }) => {
               </View>
             </View>
 
-        
             <View style={styles.row}>
               <View style={styles.col}>
                 <Text style={styles.label}>Date of Birth</Text>
@@ -112,7 +108,6 @@ const EditProfile = ({ navigation }) => {
                 />
               </View>
             </View>
-
 
             <View style={styles.row}>
               <View style={styles.col}>
@@ -134,37 +129,9 @@ const EditProfile = ({ navigation }) => {
               </View>
             </View>
 
-          
             <TouchableOpacity style={styles.locationBtn}>
               <Text style={styles.locationText}>Use my location</Text>
             </TouchableOpacity>
-
-            <View style={styles.row}>
-              <View style={styles.col}>
-                <Text style={styles.label}>Pin code</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.pincode}
-                  onChangeText={(v) => handleChange("pincode", v)}
-                />
-              </View>
-
-              <View style={styles.col}>
-                <Text style={styles.label}>City/Town</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.city}
-                  onChangeText={(v) => handleChange("city", v)}
-                />
-              </View>
-            </View>
-
-            <Text style={styles.label}>Landmark</Text>
-            <TextInput
-              style={styles.input}
-              value={form.landmark}
-              onChangeText={(v) => handleChange("landmark", v)}
-            />
 
             <Text style={styles.label}>Address</Text>
             <TextInput

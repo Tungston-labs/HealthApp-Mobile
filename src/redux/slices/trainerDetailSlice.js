@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchTrainerDetailAPI } from "../../services/trainerServices";
 
+
 export const fetchTrainerDetailThunk = createAsyncThunk(
   "trainerDetail/fetch",
   async (trainerId) => {
@@ -8,6 +9,7 @@ export const fetchTrainerDetailThunk = createAsyncThunk(
       const data = await fetchTrainerDetailAPI(trainerId);
       console.log("TRAINER DETAIL API DATA ", data);
       return data;
+
     } catch (err) {
       console.log("DETAIL ERROR ", err.response?.data || err.message);
       return (
@@ -16,6 +18,8 @@ export const fetchTrainerDetailThunk = createAsyncThunk(
     }
   }
 );
+
+
 
 
 const trainerDetailSlice = createSlice({
