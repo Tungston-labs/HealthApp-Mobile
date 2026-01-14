@@ -1,49 +1,52 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native";
 import styles from "./styles";
+import { useNavigation } from "@react-navigation/native";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const HistoryCard = ({ item }) => {
   const navigation = useNavigation();
 
-  const {
-    client,
-    time,
-    time_label,
-    session_number,
-    total_sessions,
-    date,
-    status,
-  } = item;
+  const formatTime = (time) => time?.slice(0, 5) || "N/A";
 
   return (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() =>
-        navigation.navigate("Session", {
-          screen: "SingleSession",
-          params: { session: item },
-        })
-      }
-    >
-      {/* Profile Image */}
+  <TouchableOpacity
+  style={styles.card}
+  onPress={() =>
+    navigation.navigate("SingleSessionHistory", {
+      session: item,
+    })
+  }
+>
+
+      {/* Trainer Image */}
       <Image
-        source={
-          client?.profile_pic_url
-            ? { uri: client.profile_pic_url }
-            : require("../../../assets/trainer2.jpg")
-        }
+        source={{
+          uri:
+            item.trainer?.profile_pic ||
+            "https://via.placeholder.com/150",
+        }}
         style={styles.profileImage}
       />
-              
 
       <View style={styles.contentContainer}>
-        {/* Row 1 */}
+        {/* Row 1 – Trainer Name */}
         <View style={styles.row}>
           <View style={styles.column}>
-            <Text style={styles.label}>Client Name</Text>
-            <Text style={styles.value}>{client?.name || "N/A"}</Text>
+            <Text style={styles.namevalue}>
+              {item.trainer?.name || "N/A"}
+            </Text>
+          </View>
+        </View>
+
+        {/* Row 2 – Workout Plan & Time */}
+        <View style={styles.row}>
+          <View style={styles.column}>
+            <Text style={styles.label}>Workout Plan</Text>
+            <Text style={styles.value}>
+              {item.plan?.name || "Custom Plan"}
+            </Text>
           </View>
 
           <View style={styles.column}>
@@ -51,44 +54,31 @@ const HistoryCard = ({ item }) => {
             <View style={styles.valueRow}>
               <Icon name="time-outline" size={16} color="#000" />
               <Text style={styles.valueWithIcon}>
-                {time} ({time_label})
+                {formatTime(item.time)}
               </Text>
             </View>
           </View>
         </View>
 
-        {/* Row 2 */}
-        <View style={styles.row}>
-          <View style={styles.column}>
-            <Text style={styles.label}>Sessions</Text>
-            <View style={styles.valueRow}>
-              <Icon name="barbell-outline" size={16} color="#000" />
-              <Text style={styles.valueWithIcon}>
-                {session_number}/{total_sessions}
-              </Text>
-            </View>
-          </View>
+        {/* Row 3 – Date */}
+      
+<View style={styles.row}>
+  <View style={styles.column}>
+    <Text style={styles.label}>Date</Text>
 
-          <View style={styles.column}>
-            <Text style={styles.label}>Status</Text>
-            <Text
-              style={[
-                styles.value,
-                { color: status === "completed" ? "green" : "#ff9800" },
-              ]}
-            >
-              {status}
-            </Text>
-          </View>
-        </View>
-
-        {/* Date */}
-        <View style={styles.row}>
-          <View style={styles.column}>
-            <Text style={styles.label}>Session Date</Text>
-            <Text style={styles.value}>{date}</Text>
-          </View>
-        </View>
+    <View style={styles.valueRow}>
+      <Ionicons
+        name="calendar-outline"
+        size={16}
+        color="#000"
+        style={{ marginRight: 8 }}
+      />
+      <Text style={styles.value}>
+        {item.date || "N/A"}
+      </Text>
+    </View>
+  </View>
+</View>
       </View>
     </TouchableOpacity>
   );

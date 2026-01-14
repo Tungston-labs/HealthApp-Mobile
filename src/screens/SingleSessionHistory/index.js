@@ -16,17 +16,18 @@ import {
 
 const SingleSessionHistory = ({ route }) => {
   const dispatch = useDispatch();
-  const sectionId = route?.params?.session?.section_id;
+const sessionId = route?.params?.sessionId;
+console.log("ROUTE PARAMS 👉", route.params);
 
   const { session, loading, error } = useSelector(
     (state) => state.completedSessionDetail
   );
 
   useEffect(() => {
-    if (sectionId) {
-      dispatch(fetchCompletedSessionDetailThunk(sectionId));
+    if (sessionId) {
+      dispatch(fetchCompletedSessionDetailThunk(sessionId));
     }
-  }, [sectionId]);
+  }, [sessionId]);
 
   if (loading) {
     return (
@@ -101,7 +102,7 @@ const SingleSessionHistory = ({ route }) => {
       {/* Notes */}
       <Text style={styles.notesTitle}>Notes</Text>
 
-      {session.notes?.length > 0 ? (
+      {Array.isArray(session.notes) && session.notes.length > 0 ? (
         session.notes.map((note, index) => (
           <View key={index} style={styles.notesBox}>
             <Text style={styles.notesText}>{note.note}</Text>
@@ -110,6 +111,7 @@ const SingleSessionHistory = ({ route }) => {
       ) : (
         <Text style={styles.notesText}>No notes available</Text>
       )}
+
 
       <View style={{ height: 80 }} />
     </ScrollView>

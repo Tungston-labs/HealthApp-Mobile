@@ -6,21 +6,21 @@ export const fetchAvailableTrainersThunk = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await fetchAvailableTrainersAPI(payload);
-      return response.data; // must match backend response
+      return response.data; 
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.error || 'Failed to fetch trainers'
-      );
+      // log full backend response for debugging
+      console.log('🔥 BACKEND ERROR RESPONSE:', err?.response?.data);
+      return rejectWithValue(err?.response?.data || 'Failed to fetch trainers');
     }
   }
 );
 
-/* ✅ initialState MUST be outside */
+
 const initialState = {
   trainers: [],
   plan: null,
   total: 0,
-  filters: null,   // 👈 stores last applied filter
+  filters: null,   
   loading: false,
   error: null,
 };
@@ -55,7 +55,6 @@ const trainerSlice = createSlice({
         state.total =
           action.payload?.total_available ?? 0;
 
-        /* ✅ STORE FILTER PAYLOAD */
         state.filters = action.meta.arg;
       })
       .addCase(fetchAvailableTrainersThunk.rejected, (state, action) => {

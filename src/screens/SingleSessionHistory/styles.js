@@ -15,7 +15,8 @@ export default StyleSheet.create({
 
   bannerImage: {
     width: "100%",
-    height: 180,
+    objectFit: 'cover',
+    height:250,
     borderRadius: 14,
     marginTop: 12,
   },

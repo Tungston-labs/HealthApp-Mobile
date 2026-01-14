@@ -1,65 +1,77 @@
 import React, { useEffect } from "react";
-import { View, FlatList, ActivityIndicator, Text } from "react-native";
+import {
+  View,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
 import SessionCard from "../../components/SessionCard";
 import HeaderWithBack from "../../components/HeaderWithBack";
-import {
-  getTrainerHistory,
-  resetTrainerHistory,
-} from "../../redux/slices/trainerHistorySlice";
-import style from "./styles";
+import EmptyState from "../../components/EmptyState";
+import styles from "./styles";
+
+import { fetchCompletedSessionsThunk } from "../../redux/slices/SessionHistorySlice";
+import { getTrainerHistory } from "../../redux/slices/trainerHistorySlice";
 
 const SessionHistory = () => {
   const dispatch = useDispatch();
 
-  const {
-    sessions,
-    loading,
-    currentPage,
-    totalPages,
-  } = useSelector(state => state.trainerHistory);
-  useEffect(() => {
-  console.log("📦 REDUX SESSIONS:", sessions);
-}, [sessions]);
+  const { loading, user } = useSelector(
+    (state) => state.auth || {}
+  );
 
-  /* 🔹 FIRST LOAD */
+  const {
+    sessions = [],
+    currentPage = 1,
+    totalPages = 1,
+  } = useSelector((state) => state.completedSessions || {});
+
+  const hasPlan = user?.session;
+
   useEffect(() => {
-    dispatch(resetTrainerHistory());
-    dispatch(getTrainerHistory(1));
-  }, []);
+    if (hasPlan) {
+      dispatch(fetchCompletedSessionsThunk());
+    }
+  }, [hasPlan, dispatch]);
+
+  if (!hasPlan) {
+    return (
+      <EmptyState
+        image={require("../../../assets/emptystate.png")}
+        title="No Session History"
+        subtitle="Your completed sessions will appear here once you book a plan."
+      />
+    );
+  }
 
   /* 🔹 LOAD MORE (pagination) */
   const loadMore = () => {
-    console.log("djshfjsnfjksfk");
-    
     if (!loading && currentPage < totalPages) {
-      console.log("gfjhsgfhjsfhjs");
-      
       dispatch(getTrainerHistory(currentPage + 1));
     }
   };
 
   /* 🔹 RENDER EACH SESSION */
- const renderItem = ({ item }) => {
-  console.log("🟢 RENDERING SESSION ID:", item.id);
+  const renderItem = ({ item }) => {
+    console.log("🟢 RENDERING SESSION ID:", item.session_id);
+
+    return (
+      <SessionCard
+        clientName={item.client?.name}
+        address={item.client?.address}
+        sessionDate={item.date}
+        timeLabel={item.time_label}
+        status={item.status}
+        sessionCount={`${item.session_number}/${item.total_sessions}`}
+        duration={item.section_timing?.label}
+        profilePic={item.client?.profile_pic_url}
+      />
+    );
+  };
 
   return (
-    <SessionCard
-      clientName={item.client?.name}
-      address={item.client?.address}
-      sessionDate={item.date}
-      timeLabel={item.time_label}
-      status={item.status}
-      sessionCount={`${item.session_number}/${item.total_sessions}`}
-      duration={item.section_timing?.label}
-      profilePic={item.client?.profile_pic_url}
-    />
-  );
-};
-
-  return (
-    <View style={style.container}>
+    <View style={styles.container}>
       <HeaderWithBack
         title="Session History"
         subtitle="Session Details"
@@ -70,24 +82,31 @@ const SessionHistory = () => {
       ) : (
         <FlatList
           data={sessions}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) =>
+            item?.session_id
+              ? String(item.session_id)
+              : item?.id
+              ? String(item.id)
+              : String(index)
+          }
           renderItem={renderItem}
-          contentContainerStyle={style.cardWrapper}
+          contentContainerStyle={styles.cardWrapper}
           showsVerticalScrollIndicator={false}
           onEndReached={loadMore}
           onEndReachedThreshold={0.4}
-          ListFooterComponent={
-            loading ? <ActivityIndicator style={{ margin: 20 }} /> : null
-          }
           ListEmptyComponent={
-            !loading && (
-              <Text style={{ textAlign: "center", marginTop: 40 }}>
-                No session history found
-              </Text>
-            )
+            <EmptyState
+              image={require("../../../assets/emptystate.png")}
+              title="No Completed Sessions"
+              subtitle="You haven't completed any sessions yet."
+            />
+          }
+          ListFooterComponent={
+            loading ? (
+              <ActivityIndicator style={{ marginVertical: 20 }} />
+            ) : null
           }
         />
-
       )}
     </View>
   );
