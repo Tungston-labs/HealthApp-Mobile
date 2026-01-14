@@ -1,21 +1,19 @@
-// screens/styles.js or components/styles.js depending on your structure
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-  /* ---- Screen container ---- */
+  
   container: {
     flex: 1,
-    backgroundColor: "transparent", // the screen base is white, content sits on top
+    backgroundColor: "transparent", 
   },
 
-  /* ---- Header / Profile ---- */
   headerWrapper: {
     width: "100%",
     alignItems: "center",
     paddingTop: 40,
     paddingBottom: 10,
     position: "relative",
-    zIndex: 2, // above the circle
+    zIndex: 2, 
   },
 
   topGradientSmall: {
@@ -42,7 +40,7 @@ export default StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 6,
-    borderColor: "#6B63F6", // ring color (blue/purple)
+    borderColor: "#6B63F6", 
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#fff",
@@ -84,7 +82,6 @@ export default StyleSheet.create({
     zIndex: 3,
   },
 
-  /* ---- White card / options ---- */
   optionsWrapper: {
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 28,
@@ -122,4 +119,6 @@ export default StyleSheet.create({
     color: "#E2574C",
     fontWeight: "600",
   },
+  
 });
+

@@ -28,9 +28,9 @@ const styles = StyleSheet.create({
 
   bmiContainer: {
     marginTop: 10,
-    display:"flex",
-    gap:10,
-    flexDirection:"row",
+    display: "flex",
+    gap: 10,
+    flexDirection: "row",
   },
 
   bmiLabel: {
@@ -53,6 +53,15 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginTop: 4,
   },
+  callIcon: {
+    backgroundColor: "#7774F4",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
 });
 
 export default styles;

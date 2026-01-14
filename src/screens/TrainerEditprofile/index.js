@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -13,7 +12,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { launchImageLibrary } from "react-native-image-picker";
 import Geolocation from "react-native-geolocation-service";
-
 import ProfileHeader from "../../components/ProfileHeader";
 import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
 import { updateTrainerProfileThunk } from "../../redux/slices/trainerProfileSlice";

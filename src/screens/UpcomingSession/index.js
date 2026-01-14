@@ -6,6 +6,37 @@ import Header from "../../components/Header";
 import GradientCard from "../../components/LinearGradient";
 import { fetchWeeklySessionsThunk } from "../../redux/slices/UpcomingSessionSlice";
 
+const PLAN_DATA = [
+  {
+    id: "1",
+    plan_name: "Weight Loss",
+    plan_type: "3_days",
+    single_price: 999,
+    upload_file: "https://via.placeholder.com/300",
+  },
+  {
+    id: "2",
+    plan_name: "Muscle Gain",
+    plan_type: "6_days",
+    single_price: 1499,
+    upload_file: "https://via.placeholder.com/300",
+  },
+  {
+    id: "3",
+    plan_name: "Yoga",
+    plan_type: "3_days",
+    single_price: 799,
+    upload_file: "https://via.placeholder.com/300",
+  },
+  {
+    id: "4",
+    plan_name: "Cardio",
+    plan_type: "6_days",
+    single_price: 1199,
+    upload_file: "https://via.placeholder.com/300",
+  },
+];
+
 const UpcomingSession = () => {
   const dispatch = useDispatch();
 console.log("🔥 UpcomingSession screen rendered");

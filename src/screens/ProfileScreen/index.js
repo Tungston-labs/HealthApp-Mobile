@@ -73,7 +73,7 @@ const ProfileScreen = ({ navigation }) => {
 
           <TouchableOpacity
             style={styles.optionRow}
-            onPress={() => navigation.navigate("TermsAndConditions")}
+            onPress={() => navigation.navigate("UserTermsAndConditions")}
           >
             <Icon name="document-text-outline" size={20} />
             <Text style={styles.optionText}>Terms and Conditions</Text>
