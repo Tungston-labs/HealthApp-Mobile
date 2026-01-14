@@ -13,11 +13,12 @@ const HistoryCard = ({ item }) => {
   return (
   <TouchableOpacity
   style={styles.card}
-  onPress={() =>
-    navigation.navigate("SingleSessionHistory", {
-      session: item,
-    })
-  }
+ onPress={() =>
+  navigation.navigate("SingleSessionHistory", {
+    sessionId: item.session_id,
+  })
+}
+
 >
 
       {/* Trainer Image */}

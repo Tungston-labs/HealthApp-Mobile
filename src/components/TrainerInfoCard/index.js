@@ -23,7 +23,7 @@ const TrainerInfoCard = ({
         <View>
           <Text style={styles.label}>Session timing</Text>
           <Text style={styles.value}>
-            {sessionTiming} min
+            {sessionTiming} 
           </Text>
         </View>
       </View>

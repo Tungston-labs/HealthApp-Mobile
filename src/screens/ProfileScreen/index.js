@@ -1,44 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useFocusEffect } from "@react-navigation/native";
 
 import ProfileHeader from "../../components/ProfileHeader";
 import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
 import CommonActionModal from "../../components/ModalComponents";
 
 import { logoutThunk } from "../../redux/slices/authSlice";
-import styles from "./styles";
+import { fetchMobProfileThunk } from "../../redux/slices/mobProfileSlice";
 
-import { launchImageLibrary } from "react-native-image-picker";
+import styles from "./styles";
 
 const ProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch();
 
-  const userImg = require("../../../assets/trainer2.jpg");
-  const [profileImage, setProfileImage] = useState(userImg);
+  /* 🔹 CLIENT PROFILE STATE */
+  const { profile, loading } = useSelector(
+    state => state.mobProfile
+  );
+
   const [logoutVisible, setLogoutVisible] = useState(false);
 
-  const handlePickImage = () => {
-    launchImageLibrary(
-      { mediaType: "photo", quality: 0.7 },
-      response => {
-        if (response?.assets?.length) {
-          setProfileImage({ uri: response.assets[0].uri });
-        }
-      }
-    );
-  };
+  /* 🔹 REFRESH PROFILE ON SCREEN FOCUS */
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchMobProfileThunk());
+    }, [dispatch])
+  );
 
+  /* 🔹 LOGOUT */
   const handleLogout = async () => {
     setLogoutVisible(false);
-
     await dispatch(logoutThunk());
 
     navigation.reset({
@@ -54,23 +55,39 @@ const ProfileScreen = ({ navigation }) => {
       <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
 
       <ScrollView style={styles.container}>
+
+        {/* 🔹 LOADER (DO NOT RETURN EARLY) */}
+        {loading && (
+          <ActivityIndicator
+            size="large"
+            style={{ marginVertical: 30 }}
+          />
+        )}
+
+        {/* 🔹 PROFILE HEADER */}
         <ProfileHeader
-          image={profileImage}
-          name="Peter Tarka"
+          image={profile?.profile_pic_url}
+          name={profile?.name || "Client"}
           showBack={false}
-          showEdit
-          onEdit={handlePickImage}
+          showEdit={false}
         />
 
         <View style={styles.optionsWrapper}>
+
+          {/* 🔹 EDIT PROFILE */}
           <TouchableOpacity
             style={styles.optionRow}
-            onPress={() => navigation.navigate("EditProfile")}
+            onPress={() =>
+              navigation.navigate("EditProfile", {
+                profileData: profile,   // ✅ always fresh
+              })
+            }
           >
             <Icon name="person-outline" size={20} />
             <Text style={styles.optionText}>Edit profile</Text>
           </TouchableOpacity>
 
+          {/* 🔹 TERMS */}
           <TouchableOpacity
             style={styles.optionRow}
             onPress={() => navigation.navigate("UserTermsAndConditions")}
@@ -79,6 +96,7 @@ const ProfileScreen = ({ navigation }) => {
             <Text style={styles.optionText}>Terms and Conditions</Text>
           </TouchableOpacity>
 
+          {/* 🔹 LOGOUT */}
           <TouchableOpacity
             style={styles.logoutRow}
             onPress={() => setLogoutVisible(true)}
@@ -86,9 +104,11 @@ const ProfileScreen = ({ navigation }) => {
             <Icon name="log-out" size={20} color="#E2574C" />
             <Text style={styles.logoutText}>Log out</Text>
           </TouchableOpacity>
+
         </View>
       </ScrollView>
 
+      {/* 🔹 LOGOUT MODAL */}
       <CommonActionModal
         visible={logoutVisible}
         onClose={() => setLogoutVisible(false)}
