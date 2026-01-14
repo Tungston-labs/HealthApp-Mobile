@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,157 +5,227 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
+import React, { useEffect, useState } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+import { launchImageLibrary } from "react-native-image-picker";
+
 import ProfileHeader from "../../components/ProfileHeader";
-import styles from "./styles";
 import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
+import styles from "./styles";
 
-const EditProfile = ({ navigation }) => {
-  const userImg = require("../../../assets/trainer2.jpg");
+import {
+  updateProfileThunk,
+  resetProfileEditState,
+} from "../../redux/slices/clientProfileEditSlice";
 
+const EditProfile = ({ navigation, route }) => {
+  const dispatch = useDispatch();
+  const { profileData } = route.params || {};
+
+  const { loading, error } = useSelector(state => state.profileEdit);
+
+  /* ---------------- FORM STATE ---------------- */
   const [form, setForm] = useState({
-    name: "Dummy@gmail.com",
-    email: "Dummy@gmail.com",
-    phone: "62389450215",
-    dob: "11-11-2025",
-    blood: "AB+",
-    weight: "56",
-    height: "56",
-    pincode: "682500",
-    city: "682500",
-    landmark: "Lake Annaliesemouth",
-    address: "29250 Elsie Trafficway, West Forestmouth 58892-3171",
-    condition: "asdasdnsand",
-    goal: "Reduce stress",
+    name: "",
+    dob: "",
+    blood: "",
+    weight: "",
+    height: "",
+    address: "",
+    condition: "",
+    goal: "",
   });
 
-  const handleChange = (key, value) =>
-    setForm({ ...form, [key]: value });
+  const [profilePic, setProfilePic] = useState(null);
 
+  /* ---------------- PREFILL ---------------- */
+  useEffect(() => {
+    if (profileData) {
+      setForm({
+        name: profileData.name || "",
+        dob: profileData.dob || "",
+        blood: profileData.blood_group || "",
+        weight: profileData.weight?.toString() || "",
+        height: profileData.height?.toString() || "",
+        address: profileData.address || "",
+        condition: Array.isArray(profileData.health_issues)
+          ? profileData.health_issues.join(", ")
+          : "",
+        goal: Array.isArray(profileData.wellness_goal)
+          ? profileData.wellness_goal.join(", ")
+          : "",
+      });
+    }
+  }, [profileData]);
+
+  /* ---------------- IMAGE PICKER ---------------- */
+  const pickImage = () => {
+    launchImageLibrary(
+      { mediaType: "photo", quality: 0.8 },
+      response => {
+        if (response.didCancel || response.errorCode) return;
+        setProfilePic(response.assets[0]);
+      }
+    );
+  };
+
+  /* ---------------- SAVE ---------------- */
+  const handleSave = async () => {
+    const formData = new FormData();
+
+    formData.append("name", form.name);
+    formData.append("dob", form.dob);
+    formData.append("blood_group", form.blood);
+    formData.append("weight", form.weight);
+    formData.append("height", form.height);
+    formData.append("address", form.address);
+
+    formData.append(
+      "health_issues",
+      JSON.stringify(
+        form.condition
+          ? form.condition.split(",").map(i => i.trim())
+          : []
+      )
+    );
+
+    formData.append(
+      "wellness_goal",
+      JSON.stringify(
+        form.goal
+          ? form.goal.split(",").map(i => i.trim())
+          : []
+      )
+    );
+
+    if (profilePic) {
+      formData.append("profile_pic", {
+        uri: profilePic.uri,
+        type: profilePic.type,
+        name: profilePic.fileName || "profile.jpg",
+      });
+    }
+
+    const res = await dispatch(updateProfileThunk(formData));
+
+    if (res.meta.requestStatus === "fulfilled") {
+      Alert.alert("Success", "Profile updated successfully");
+      dispatch(resetProfileEditState());
+      navigation.goBack();
+    }
+  };
+
+  /* ---------------- ERROR ---------------- */
+  useEffect(() => {
+    if (error) {
+      Alert.alert("Error", error);
+      dispatch(resetProfileEditState());
+    }
+  }, [error]);
+
+  /* ---------------- IMAGE SOURCE ---------------- */
+  const imageSource = profilePic
+    ? { uri: profilePic.uri }
+    : profileData?.profile_pic_url
+    ? { uri: profileData.profile_pic_url }
+    : require("../../../assets/trainer2.jpg");
+
+  /* ---------------- UI ---------------- */
   return (
-    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-
-      <View
-        style={{
-          position: "absolute",
-          top: 200,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "#FFFFFF",
-        }}
-      />
+    <View style={{ flex: 1, backgroundColor: "#FFF" }}>
+      <StatusBar barStyle="dark-content" />
 
       <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
 
       <ScrollView style={styles.container}>
+        {/* ✅ WORKING PROFILE HEADER */}
         <ProfileHeader
-          image={userImg}
-          name=""
+          image={imageSource}
+          name={form.name}
           showBack
           onBack={() => navigation.goBack()}
+          showEdit
+          onEdit={pickImage}   // 🔥 THIS IS THE FIX
         />
 
-        <View style={styles.optionsWrapper}>
-          <View style={styles.formWrapper}>
+        {/* FORM */}
+        <View style={styles.formWrapper}>
+          <Text style={styles.label}>Name</Text>
+          <TextInput
+            style={styles.input}
+            value={form.name}
+            onChangeText={v => setForm({ ...form, name: v })}
+          />
 
-            <Text style={styles.label}>Name</Text>
-            <TextInput
-              style={styles.input}
-              value={form.name}
-              onChangeText={(v) => handleChange("name", v)}
-            />
+          <Text style={styles.label}>Date of Birth</Text>
+          <TextInput
+            style={styles.input}
+            value={form.dob}
+            onChangeText={v => setForm({ ...form, dob: v })}
+          />
 
-            <View style={styles.row}>
-              <View style={styles.col}>
-                <Text style={styles.label}>E-mail ID</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.email}
-                  onChangeText={(v) => handleChange("email", v)}
-                />
-              </View>
+          <Text style={styles.label}>Blood Group</Text>
+          <TextInput
+            style={styles.input}
+            value={form.blood}
+            onChangeText={v => setForm({ ...form, blood: v })}
+          />
 
-              <View style={styles.col}>
-                <Text style={styles.label}>Ph Number</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.phone}
-                  onChangeText={(v) => handleChange("phone", v)}
-                />
-              </View>
-            </View>
+          <Text style={styles.label}>Weight</Text>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            value={form.weight}
+            onChangeText={v => setForm({ ...form, weight: v })}
+          />
 
-            <View style={styles.row}>
-              <View style={styles.col}>
-                <Text style={styles.label}>Date of Birth</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.dob}
-                  onChangeText={(v) => handleChange("dob", v)}
-                />
-              </View>
-
-              <View style={styles.col}>
-                <Text style={styles.label}>Blood Group</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.blood}
-                  onChangeText={(v) => handleChange("blood", v)}
-                />
-              </View>
-            </View>
-
-            <View style={styles.row}>
-              <View style={styles.col}>
-                <Text style={styles.label}>Weight in KG</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.weight}
-                  onChangeText={(v) => handleChange("weight", v)}
-                />
-              </View>
-
-              <View style={styles.col}>
-                <Text style={styles.label}>Height in CM</Text>
-                <TextInput
-                  style={styles.input}
-                  value={form.height}
-                  onChangeText={(v) => handleChange("height", v)}
-                />
-              </View>
-            </View>
-
-            <TouchableOpacity style={styles.locationBtn}>
+          <Text style={styles.label}>Height</Text>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            value={form.height}
+            onChangeText={v => setForm({ ...form, height: v })}
+          />
+          <TouchableOpacity style={styles.locationBtn}>
               <Text style={styles.locationText}>Use my location</Text>
             </TouchableOpacity>
 
-            <Text style={styles.label}>Address</Text>
-            <TextInput
-              style={styles.input}
-              value={form.address}
-              onChangeText={(v) => handleChange("address", v)}
-            />
+          <Text style={styles.label}>Address</Text>
+          <TextInput
+            style={styles.input}
+            value={form.address}
+            onChangeText={v => setForm({ ...form, address: v })}
+          />
 
-            <Text style={styles.label}>Have any (Health condition / injury)</Text>
-            <View style={styles.chipInput}>
-              <Text style={styles.chipText}>{form.condition}</Text>
-              <Icon name="close" size={18} color="#999" />
-            </View>
+          <Text style={styles.label}>Health Condition</Text>
+          <TextInput
+            style={styles.input}
+            value={form.condition}
+            onChangeText={v => setForm({ ...form, condition: v })}
+          />
 
-            <Text style={styles.label}>Wellness Goal</Text>
-            <View style={styles.chipInput}>
-              <Text style={styles.chipText}>{form.goal}</Text>
-              <Icon name="close" size={18} color="#999" />
-            </View>
+          <Text style={styles.label}>Wellness Goal</Text>
+          <TextInput
+            style={styles.input}
+            value={form.goal}
+            onChangeText={v => setForm({ ...form, goal: v })}
+          />
 
-            <TouchableOpacity style={styles.saveBtn}>
+          <TouchableOpacity
+            style={styles.saveBtn}
+            onPress={handleSave}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#FFF" />
+            ) : (
               <Text style={styles.saveText}>Save</Text>
-            </TouchableOpacity>
-
-          </View>
+            )}
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>

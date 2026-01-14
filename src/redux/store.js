@@ -14,7 +14,11 @@ import trainerDetailReducer from './slices/trainerDetailSlice';
 import trainerUpcomingSessionsReducer from "./slices/trainerUpcomingSessions";
 import trainerHistoryReducer from "./slices/trainerHistorySlice";
 import trainerProfileReducer from "./slices/trainerProfileSlice";
-import CancelTrainingReducer from "./slices/CancelTrainingSlice";
+import mobProfileReducer from "./slices/mobProfileSlice";
+import clientProfileEditReducer from "./slices/clientProfileEditSlice";
+
+
+
 import { scheduleApi } from './api/trainer/scheduleApi';
 import completedSessionreducer from "./slices/SessionHistorySlice"
 import completedSessionDetailReducer from "./slices/completedSessionDetailSlice"
@@ -38,6 +42,11 @@ export const store = configureStore({
     trainerUpcomingSessions: trainerUpcomingSessionsReducer,
     trainerHistory: trainerHistoryReducer,
     trainerProfile: trainerProfileReducer,
+
+    mobProfile: mobProfileReducer,
+    
+    profileEdit: clientProfileEditReducer,
+
 
     completedSessions:completedSessionreducer,
     weeklySessions:weeklySessionsReducer,
