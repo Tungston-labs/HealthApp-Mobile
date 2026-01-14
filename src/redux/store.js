@@ -33,7 +33,7 @@ export const store = configureStore({
     forgotpassword: ForgotPasswordReducer,
     verifyotp: VerifyOtpReducer,
     resetpassword: ResetPasswordReducer,
-
+    cancelTraining:CancelTrainingReducer,
     planList: PlanReducer,
     trainerReg: trainerRegistrationReducer,
     trainer: trainerPlanReducer,

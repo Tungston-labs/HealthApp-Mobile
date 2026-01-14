@@ -55,7 +55,7 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginTop: 20,
-    marginHorizontal: 16,
+    marginHorizontal: 26,
   },
 
   sessionCard: {
@@ -122,6 +122,13 @@ progressFill: {
   height: "100%",
   width: "45%",  
   backgroundColor: "#7774F4",
+},
+planGrid: {
+  flexDirection: "row",
+  flexWrap: "wrap",
+  justifyContent: "space-between",
+  paddingHorizontal: 20,
+  marginTop: 12,
 },
 
 });

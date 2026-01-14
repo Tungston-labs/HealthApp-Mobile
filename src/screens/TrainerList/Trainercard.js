@@ -1,3 +1,4 @@
+// screens/TrainerList/Trainercard.js
 import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -16,8 +17,8 @@ const TrainerCard = ({
   onPressCard,
 }) => {
   const navigation = useNavigation();
-  const imageSource = trainer.profile_pic
-    ? { uri: trainer.profile_pic }
+  const imageSource = trainer.trainer_profile_pic || trainer.profile_pic
+    ? { uri: trainer.trainer_profile_pic || trainer.profile_pic }
     : fallbackImage;
 
   return (
@@ -25,7 +26,7 @@ const TrainerCard = ({
       {/* IMAGE + PROFILE */}
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={onPressCard} // card press
+        onPress={() => onPressCard && onPressCard()} // <- call safely
       >
         <Image
           source={imageSource}
@@ -48,7 +49,9 @@ const TrainerCard = ({
 
       {/* INFO */}
       <View style={styles.info}>
-        <Text style={styles.trainerName}>{trainer.name || "Trainer"}</Text>
+        <Text style={styles.trainerName}>
+          {trainer.trainer_name || trainer.name || "Trainer"}
+        </Text>
         <Text style={styles.exp}>{trainer.experience ?? 0} Years experience</Text>
 
         {(showPrice || showRating) && (
@@ -56,7 +59,11 @@ const TrainerCard = ({
             {showPrice && (
               <View style={styles.priceRow}>
                 <Text style={styles.price}>₹ {trainer.single_price ?? 0}</Text>
-                <Text style={styles.plan}>/plan</Text>
+                {trainer.plan?.name && (
+                  <Text style={styles.planName}>
+                    {trainer.plan.name}
+                  </Text>
+                )}
               </View>
             )}
             {showRating && (
@@ -79,6 +86,5 @@ const TrainerCard = ({
     </View>
   );
 };
-
 
 export default TrainerCard;

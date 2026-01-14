@@ -11,6 +11,7 @@ import ClientListScreen from "../screens/ClientListScreen";
 import SessionHistory from "../screens/SessionHistory";
 import SingleSessionHistory from "../screens/SingleSessionHistory";
 import ProfileScreen from "../screens/ProfileScreen";
+import ProfileSection from "../screens/ProfileSection";
 
 const Tab = createBottomTabNavigator();
 const HistoryStack = createNativeStackNavigator();
@@ -25,7 +26,14 @@ const HistoryStackScreen = () => (
     />
   </HistoryStack.Navigator>
 );
+const ClientStack = createNativeStackNavigator();
 
+const ClientStackScreen = () => (
+  <ClientStack.Navigator screenOptions={{ headerShown: false }}>
+    <ClientStack.Screen name="ClientList" component={ClientListScreen} />
+    <ClientStack.Screen name="ProfileSection" component={ProfileSection} />
+  </ClientStack.Navigator>
+);
 const AppNavigator = () => {
   const { user } = useSelector((state) => state.auth || {});
   const hasSession = !!user?.session;
@@ -44,7 +52,7 @@ const AppNavigator = () => {
       {/* 2️⃣ Session */}
       <Tab.Screen
         name="Session"
-        component={ClientListScreen}
+        component={ClientStackScreen}
       />
 
       {/* 3️⃣ History */}

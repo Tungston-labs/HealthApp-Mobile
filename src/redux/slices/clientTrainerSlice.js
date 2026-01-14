@@ -59,6 +59,7 @@ const clientTrainerSlice = createSlice({
     star_rating: null,
     date: t.date,
     time: t.time,
+    trainer_id:t.trainer_id,
     status: t.status,
   }));
 

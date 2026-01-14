@@ -6,34 +6,69 @@ import CommonActionModal from "../../components/ModalComponents";
 import TrainerInfoCard from "../../components/TrainerInfoCard";
 import EmptyState from "../../components/EmptyState";
 import FilterModal from "../../components/FIlterModal";
-
+import { useFocusEffect } from "@react-navigation/native";
+import { resetCancelState } from "../../redux/slices/CancelTrainingSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { fetchTrainerDetailThunk } from "../../redux/slices/trainerDetailSlice";
+import { cancelTrainingThunk } from "../../redux/slices/CancelTrainingSlice";
 
 const ProfileSection = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
   const [showConsultModal, setShowConsultModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
-
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const route = useRoute();
-
+  const { loading, data } = useSelector((state) => state.trainerDetail);
   const { user } = useSelector((state) => state.auth || {});
   const session = user?.session ?? null;
 
   const trainerId = route.params?.trainerId;
-
-  const { loading, data } = useSelector((state) => state.trainerDetail);
-
-  const trainer = trainerId ? data ?? null : session;
+  const trainer = trainerId ? data : session;
 
   useEffect(() => {
+    console.log("ProfileSection received trainerId 👉", trainerId);
     if (trainerId) {
       dispatch(fetchTrainerDetailThunk(trainerId));
     }
+  }, [trainerId]);
+
+  const {
+    loading: cancelLoading,
+    success: cancelSuccess,
+    error: cancelError,
+  } = useSelector((state) => state.cancelTraining);
+
+  const handleCancelTraining = () => {
+    dispatch(cancelTrainingThunk());
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      dispatch(resetCancelState());
+
+      return () => { };
+    }, [dispatch])
+  );
+  useEffect(() => {
+    if (cancelSuccess) {
+      setShowCancelModal(false);
+      alert("Cancellation request submitted successfully");
+
+      dispatch(resetCancelState());
+    }
+
+    if (cancelError) {
+      alert(cancelError);
+      dispatch(resetCancelState());
+    }
+  }, [cancelSuccess, cancelError]);
+
+
+  useEffect(() => {
+    console.log("ProfileSection received trainerId 👉", trainerId);
   }, [trainerId]);
 
   if (!session && !trainerId) {
@@ -43,6 +78,13 @@ const ProfileSection = () => {
         title="No Trainer Assigned"
         subtitle="Once you book a plan, trainer details will appear here."
       />
+    );
+  }
+  if (trainerId && loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading trainer details...</Text>
+      </View>
     );
   }
 
@@ -57,17 +99,24 @@ const ProfileSection = () => {
 
   const fallbackImage = require("../../../assets/trainer1.jpg");
 
-  const imageSource = trainer?.profile_pic
-    ? { uri: trainer.profile_pic }
-    : fallbackImage;
+  const imageSource =
+    trainer?.profile_pic || trainer?.trainer_profile_pic
+      ? { uri: trainer.profile_pic || trainer.trainer_profile_pic }
+      : fallbackImage;
+  const trainerName =
+    trainer?.name || trainer?.trainer_name || "N/A";
 
-  const trainerTiming = trainer?.section_timing
-    ? `${trainer.section_timing} min`
-    : "N/A";
 
-  const trainerName = trainer?.name || "N/A";
+  const sessionTiming =
+    trainer?.section_timing
+      ? `${trainer.section_timing} min`
+      : "N/A";
+
+
   const numSessions = trainer?.no_of_section ?? 0;
-  const workoutType = trainer?.plan_name || "N/A";
+
+  const workoutType = trainer?.plan_name ?? "N/A";
+const isCancelRequested = session?.cancel_requested;
 
   return (
     <View style={styles.container}>
@@ -98,10 +147,11 @@ const ProfileSection = () => {
                 <TrainerInfoCard
                   name={trainerName}
                   experience={trainer?.experience ?? 0}
-                  trainerTiming={trainerTiming}
+                  sessionTiming={sessionTiming}
                   numSessions={numSessions}
                   workoutType={workoutType}
                 />
+
               )}
             </View>
 
@@ -173,17 +223,18 @@ const ProfileSection = () => {
       {/* MODALS */}
       <CommonActionModal
         visible={showCancelModal}
-        onClose={() => setShowCancelModal(false)}
-        onConfirm={() => setShowCancelModal(false)}
+        onClose={() => !cancelLoading && setShowCancelModal(false)}
+        onConfirm={!cancelLoading ? handleCancelTraining : undefined}
+        confirmText={cancelLoading ? "Cancelling..." : "Confirm"}
         iconName="close-circle-outline"
         iconColor="red"
         title="Cancel training"
         description="Refunds are available only before completing 7 sessions."
         cancelText="Cancel"
-        confirmText="Confirm"
         showDropdown={false}
         showNote={false}
       />
+
 
       <CommonActionModal
         visible={showEmergencyModal}

@@ -61,9 +61,10 @@ export const fetchClientTrainersAPI = async (payload = {}) => {
     throw err;
   }
 };
-
-
-
+export const ClientCancelTraining = async () => {
+  const response = await api.post("refund/training/cancel/");
+  return response.data;
+};
 export const updateClientProfile = (id, data) =>
   api.patch(`client/${id}/`, data);
 
