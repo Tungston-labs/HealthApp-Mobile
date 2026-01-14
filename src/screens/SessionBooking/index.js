@@ -1,19 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     View,
     Text,
     ScrollView,
     TouchableOpacity,
     TextInput,
+    ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { useDispatch, useSelector } from "react-redux";
+
 import styles from "./style";
 import SessionCard from "../../components/SessionCard";
 import CalendarModal from "../../components/CalendarModal";
+import { fetchTrainerBookings } from "../../redux/slices/trainerUpcomingSessions";
 
 const SessionBooking = () => {
+    const dispatch = useDispatch();
+
+    const {
+        bookings,
+        isLoading,
+        next,
+    } = useSelector((state) => state.trainerUpcomingSessions);
+
+
     const [activeTab, setActiveTab] = useState("booking");
     const [calendarVisible, setCalendarVisible] = useState(false);
+    const [page, setPage] = useState(1);
+
+    /* 🔄 Fetch bookings */
+    useEffect(() => {
+        if (activeTab === "booking") {
+            dispatch(fetchTrainerBookings({ page: 1 }));
+        }
+    }, [activeTab]);
 
     return (
         <View style={styles.container}>
@@ -57,17 +78,37 @@ const SessionBooking = () => {
 
             <ScrollView showsVerticalScrollIndicator={false}>
 
+                {/* BOOKINGS TAB */}
                 {activeTab === "booking" && (
                     <>
-                        <Text style={styles.sectionTitle}>Section booking</Text>
+                        <Text style={styles.sectionTitle}>Session bookings</Text>
 
-                        <SessionCard />
-                        <SessionCard />
-                        <SessionCard />
-                        <SessionCard />
+                        {isLoading && <ActivityIndicator size="large" />}
+
+                        {!isLoading && bookings.length === 0 && (
+                            <Text>No bookings found</Text>
+                        )}
+
+                        {bookings.map((item) => (
+  <SessionCard
+    key={item.id}
+    clientName={item.client.name}
+    date={item.date}
+    time={item.time_label}
+    endDate={item.session_end_date}
+    status={item.status}
+
+    /* ✅ USE API VALUES */
+    sessionCount={item.session_number}
+    totalSessions={item.total_sessions}
+  />
+))}
+
+
                     </>
                 )}
 
+                {/* HISTORY TAB */}
                 {activeTab === "history" && (
                     <>
                         <View style={styles.filterRow}>
@@ -88,18 +129,12 @@ const SessionBooking = () => {
                             </TouchableOpacity>
                         </View>
 
-                        <Text style={styles.historyDate}>12 nov 2025</Text>
-
-                        <SessionCard />
-                        <SessionCard />
-                        <SessionCard />
-                        <SessionCard />
+                        {/* Later connect history API here */}
                     </>
                 )}
 
             </ScrollView>
 
-            {/* CALENDAR MODAL */}
             <CalendarModal
                 visible={calendarVisible}
                 onClose={() => setCalendarVisible(false)}

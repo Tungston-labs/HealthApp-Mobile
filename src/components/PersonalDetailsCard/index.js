@@ -17,7 +17,7 @@ const PersonalDetailsCard = ({
   return (
     <View style={styles.card}>
       <View style={styles.topRow}>
-        <Image source={data?.profile_pic_url} style={styles.avatar} />
+        <Image source={{uri:data?.profile_pic_url}} style={styles.avatar} />
 
         <View style={styles.info}>
           <Text style={styles.name}>{data?.name}</Text>
@@ -75,16 +75,12 @@ const PersonalDetailsCard = ({
 
           <View style={styles.section}>
             <Text style={styles.label}>Workout Goals</Text>
-            {Array.isArray(data?.wellness_goal) &&
-            data.wellness_goal.length > 0 ? (
-              data.wellness_goal.map((i, index) => (
-                <Text style={styles.value} key={`${i}-${index}`}>
-                  {i}
-                </Text>
-              ))
-            ) : (
-              <Text style={styles.value}>No wellness goals</Text>
-            )}
+            <Text style={styles.value}>
+              {Array.isArray(data?.wellness_goal) &&
+              data.wellness_goal.length > 0
+                ? data.wellness_goal.join(', ')
+                : 'No workout goals'}
+            </Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.section}>

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,148 +7,221 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { launchImageLibrary } from "react-native-image-picker";
+import Geolocation from "react-native-geolocation-service";
+
 import ProfileHeader from "../../components/ProfileHeader";
-import styles from "./style";
 import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
+import { updateTrainerProfileThunk } from "../../redux/slices/trainerProfileSlice";
+import styles from "./style";
+
+const GOOGLE_API_KEY = "YOUR_GOOGLE_MAPS_KEY";
 
 const TrainerEditProfile = ({ navigation }) => {
-  const userImg = require("../../../assets/trainer2.jpg");
+  const dispatch = useDispatch();
+  const { profile, loading } = useSelector(state => state.trainerProfile);
 
-  const [form, setForm] = useState({
-    name: "Dummy Dummy",
-    email: "Dummy@gmail.com",
-    phone: "62389450215",
-    dob: "11-11-2025",
-    aadhaar: "0000000000000000",
-    pincode: "682500",
-    city: "682500",
-    landmark: "Lake Annaliesemouth",
-    address: "29250 Elsie Trafficway, West Forestmouth 58892-3171",
-  });
+  const [form, setForm] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        name: profile.name || "",
+        email: profile.email || "",
+        phone: profile.phno || "",
+        dob: profile.dob || "",
+        aadhaar: profile.adar_number || "",
+        pincode: profile.pincode || "",
+        city: profile.city || "",
+        landmark: profile.landmark || "",
+        address: profile.location || "",
+      });
+    }
+  }, [profile]);
 
   const handleChange = (key, value) =>
-    setForm({ ...form, [key]: value });
+    setForm(prev => ({ ...prev, [key]: value }));
+
+  const pickProfileImage = () => {
+    launchImageLibrary({ mediaType: "photo", quality: 0.7 }, res => {
+      if (res?.assets?.length) {
+        setProfileImage(res.assets[0]);
+      }
+    });
+  };
+
+  const useMyLocation = () => {
+    Geolocation.getCurrentPosition(
+      async position => {
+        const { latitude, longitude } = position.coords;
+
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_API_KEY}`;
+        const res = await fetch(url);
+        const json = await res.json();
+
+        if (!json.results.length) return;
+
+        const components = json.results[0].address_components;
+        const get = type =>
+          components.find(c => c.types.includes(type))?.long_name || "";
+
+        setForm(prev => ({
+          ...prev,
+          address: json.results[0].formatted_address,
+          city: get("locality"),
+          pincode: get("postal_code"),
+          landmark: get("sublocality") || get("route"),
+        }));
+      },
+      error => Alert.alert("Location error", error.message),
+      { enableHighAccuracy: true, timeout: 15000 }
+    );
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("phno", form.phone);
+    formData.append("dob", form.dob);
+    formData.append("adar_number", form.aadhaar);
+    formData.append("location", form.address);
+    formData.append("city", form.city);
+    formData.append("pincode", form.pincode);
+    formData.append("landmark", form.landmark);
+
+    if (profileImage) {
+      formData.append("profile_pic", {
+        uri: profileImage.uri,
+        name: "profile.jpg",
+        type: profileImage.type || "image/jpeg",
+      });
+    }
+
+    const res = await dispatch(updateTrainerProfileThunk(formData));
+    setSaving(false);
+
+    if (!res.error) {
+      navigation.goBack();
+    } else {
+      Alert.alert("Update failed");
+    }
+  };
+
+  if (!form || loading) {
+    return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
+  }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+    <View style={{ flex: 1, backgroundColor: "#FFF" }}>
+      <StatusBar barStyle="dark-content" />
 
-      {/* White panel */}
-      <View
-        style={{
-          position: "absolute",
-          top: 200,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "#FFFFFF",
-        }}
-      />
-
-      {/* Background curve */}
       <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         <ProfileHeader
-          image={userImg}
           name="Edit Profile"
           showBack
+          showEdit
+          onEdit={pickProfileImage}
           onBack={() => navigation.goBack()}
         />
 
         <View style={styles.formWrapper}>
-          {/* Name */}
+
           <Text style={styles.label}>Name</Text>
           <TextInput
             style={styles.input}
             value={form.name}
-            onChangeText={(v) => handleChange("name", v)}
+            onChangeText={v => handleChange("name", v)}
           />
 
-          {/* Email + Phone */}
           <View style={styles.row}>
             <View style={styles.col}>
-              <Text style={styles.label}>E-mail ID</Text>
-              <TextInput
-                style={styles.input}
-                value={form.email}
-                onChangeText={(v) => handleChange("email", v)}
-              />
+              <Text style={styles.label}>Email</Text>
+              <TextInput style={styles.input} value={form.email} editable={false} />
             </View>
-
             <View style={styles.col}>
-              <Text style={styles.label}>Ph Number</Text>
+              <Text style={styles.label}>Phone</Text>
               <TextInput
                 style={styles.input}
                 value={form.phone}
-                onChangeText={(v) => handleChange("phone", v)}
+                onChangeText={v => handleChange("phone", v)}
               />
             </View>
           </View>
 
-          {/* DOB */}
-          <Text style={styles.label}>Date of Birth</Text>
+          <Text style={styles.label}>DOB</Text>
           <TextInput
             style={styles.input}
             value={form.dob}
-            onChangeText={(v) => handleChange("dob", v)}
+            onChangeText={v => handleChange("dob", v)}
           />
 
-          {/* Aadhaar */}
-          <Text style={styles.label}>Aadhaar Number</Text>
+          <Text style={styles.label}>Aadhaar</Text>
           <TextInput
             style={styles.input}
             value={form.aadhaar}
-            onChangeText={(v) => handleChange("aadhaar", v)}
+            onChangeText={v => handleChange("aadhaar", v)}
           />
 
-          {/* Location Button */}
-          <TouchableOpacity style={styles.locationBtn}>
+          <TouchableOpacity style={styles.locationBtn} onPress={useMyLocation}>
             <Text style={styles.locationText}>Use my location</Text>
           </TouchableOpacity>
 
-          {/* Pincode + City */}
           <View style={styles.row}>
             <View style={styles.col}>
-              <Text style={styles.label}>Pin code</Text>
+              <Text style={styles.label}>Pincode</Text>
               <TextInput
                 style={styles.input}
                 value={form.pincode}
-                onChangeText={(v) => handleChange("pincode", v)}
+                onChangeText={v => handleChange("pincode", v)}
               />
             </View>
-
             <View style={styles.col}>
-              <Text style={styles.label}>City/Town</Text>
+              <Text style={styles.label}>City</Text>
               <TextInput
                 style={styles.input}
                 value={form.city}
-                onChangeText={(v) => handleChange("city", v)}
+                onChangeText={v => handleChange("city", v)}
               />
             </View>
           </View>
 
-          {/* Landmark */}
           <Text style={styles.label}>Landmark</Text>
           <TextInput
             style={styles.input}
             value={form.landmark}
-            onChangeText={(v) => handleChange("landmark", v)}
+            onChangeText={v => handleChange("landmark", v)}
           />
 
-          {/* Address */}
           <Text style={styles.label}>Address</Text>
           <TextInput
             style={styles.input}
             value={form.address}
-            onChangeText={(v) => handleChange("address", v)}
+            onChangeText={v => handleChange("address", v)}
           />
 
-          {/* Save */}
           <View style={styles.saveWrapper}>
-            <TouchableOpacity style={styles.saveBtn}>
-              <Text style={styles.saveText}>Save</Text>
+            <TouchableOpacity
+              style={styles.saveBtn}
+              onPress={handleSave}
+              disabled={saving}
+            >
+              <Text style={styles.saveText}>
+                {saving ? "Saving..." : "Save"}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

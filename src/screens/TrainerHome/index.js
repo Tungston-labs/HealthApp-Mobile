@@ -4,7 +4,7 @@ import { useGetUpcomingSchedulesQuery } from '../../redux/api/trainer/scheduleAp
 import { useStartSession } from '../../hooks/trainer/useStartSession';
 import { useActiveSession } from '../../hooks/trainer/useActiveSession';
 import { useEndSession } from '../../hooks/trainer/useEndSession';
-import TrainerHomeVeiw from './TrainerHomeVeiw';
+import TrainerHomeView from './TrainerHomeView';
 const TrainerHomeContainer = () => {
   const [isManualRefreshLoading, setIsManualRefreshLoading] = useState(false);
   const [startingSessionId, setStartingSessionId] = useState(null);
@@ -34,10 +34,14 @@ const TrainerHomeContainer = () => {
 
   useEffect(() => {
     if (schedulesError) {
+      const message =
+        schedulesError?.data?.message ||
+        schedulesError?.error ||
+        'Something went wrong. Please try again.';
       Toast.show({
         type: 'error',
         text1: 'Error loading schedules',
-        text2: schedulesError || 'Something went wrong. Please try again.',
+        text2: message,
       });
     }
   }, [schedulesError]);
@@ -65,10 +69,10 @@ const TrainerHomeContainer = () => {
   const onSessionStart = useCallback(
     async id => {
       if (activeSession || isSessionStarting || isActiveSessionLoading) return;
-    setStartingSessionId(id);
+      setStartingSessionId(id);
 
       const success = await handleStartSession({ id });
-          setStartingSessionId(null);
+      setStartingSessionId(null);
 
       if (success) {
         setActiveSession(success);
@@ -107,7 +111,7 @@ const TrainerHomeContainer = () => {
   ]);
 
   return (
-    <TrainerHomeVeiw
+    <TrainerHomeView
       activeSession={activeSession}
       onEndSession={onEndSession}
       isSchedulesLoading={isSchedulesLoading}

@@ -9,18 +9,16 @@ const HistoryCard = ({ item }) => {
   const navigation = useNavigation();
 
   const formatTime = (time) => time?.slice(0, 5) || "N/A";
-  console.log("ITEM 👉", item);
 
   return (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() =>
-        navigation.navigate("SingleSessionHistory", {
-          sessionId: item.session_id,
-        })
-      }
-    >
-
+  <TouchableOpacity
+  style={styles.card}
+  onPress={() =>
+    navigation.navigate("SingleSessionHistory", {
+      session: item,
+    })
+  }
+>
 
       {/* Trainer Image */}
       <Image
@@ -63,24 +61,24 @@ const HistoryCard = ({ item }) => {
         </View>
 
         {/* Row 3 – Date */}
+      
+<View style={styles.row}>
+  <View style={styles.column}>
+    <Text style={styles.label}>Date</Text>
 
-        <View style={styles.row}>
-          <View style={styles.column}>
-            <Text style={styles.label}>Date</Text>
-
-            <View style={styles.valueRow}>
-              <Ionicons
-                name="calendar-outline"
-                size={16}
-                color="#000"
-                style={{ marginRight: 8 }}
-              />
-              <Text style={styles.value}>
-                {item.date || "N/A"}
-              </Text>
-            </View>
-          </View>
-        </View>
+    <View style={styles.valueRow}>
+      <Ionicons
+        name="calendar-outline"
+        size={16}
+        color="#000"
+        style={{ marginRight: 8 }}
+      />
+      <Text style={styles.value}>
+        {item.date || "N/A"}
+      </Text>
+    </View>
+  </View>
+</View>
       </View>
     </TouchableOpacity>
   );

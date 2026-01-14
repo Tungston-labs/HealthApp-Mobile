@@ -1,25 +1,31 @@
 import React, { useEffect } from "react";
-import { View, ScrollView, ActivityIndicator, Text } from "react-native";
+import {
+  View,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+
+import SessionCard from "../../components/SessionCard";
 import HeaderWithBack from "../../components/HeaderWithBack";
-import HistoryCard from "../../components/Historycard";
-import styles from "./styles";
-import { fetchCompletedSessionsThunk } from "../../redux/slices/SessionHistorySlice";
 import EmptyState from "../../components/EmptyState";
+import styles from "./styles";
+
+import { fetchCompletedSessionsThunk } from "../../redux/slices/SessionHistorySlice";
+import { getTrainerHistory } from "../../redux/slices/trainerHistorySlice";
 
 const SessionHistory = () => {
   const dispatch = useDispatch();
 
-  const { loading, isLoggedIn, user, error } = useSelector(
-    (state) => state.auth || {
-      loading: false,
-      isLoggedIn: false,
-      error: null,
-      user: null,
-    }
+  const { loading, user } = useSelector(
+    (state) => state.auth || {}
   );
 
-  const { sessions } = useSelector((state) => state.completedSessions);
+  const {
+    sessions = [],
+    currentPage = 1,
+    totalPages = 1,
+  } = useSelector((state) => state.completedSessions || {});
 
   const hasPlan = user?.session;
 
@@ -39,31 +45,68 @@ const SessionHistory = () => {
     );
   }
 
+  /* 🔹 LOAD MORE (pagination) */
+  const loadMore = () => {
+    if (!loading && currentPage < totalPages) {
+      dispatch(getTrainerHistory(currentPage + 1));
+    }
+  };
+
+  /* 🔹 RENDER EACH SESSION */
+  const renderItem = ({ item }) => {
+    console.log("🟢 RENDERING SESSION ID:", item.session_id);
+
+    return (
+      <SessionCard
+        clientName={item.client?.name}
+        address={item.client?.address}
+        sessionDate={item.date}
+        timeLabel={item.time_label}
+        status={item.status}
+        sessionCount={`${item.session_number}/${item.total_sessions}`}
+        duration={item.section_timing?.label}
+        profilePic={item.client?.profile_pic_url}
+      />
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <HeaderWithBack title="Session History" subtitle="Session Details" />
+      <HeaderWithBack
+        title="Session History"
+        subtitle="Session Details"
+      />
 
-      {loading && <ActivityIndicator size="large" />}
-
-      {error && <Text>{error}</Text>}
-
-      {!loading && !error && (
-        <ScrollView
+      {loading && sessions.length === 0 ? (
+        <ActivityIndicator size="large" style={{ marginTop: 30 }} />
+      ) : (
+        <FlatList
+          data={sessions}
+          keyExtractor={(item, index) =>
+            item?.session_id
+              ? String(item.session_id)
+              : item?.id
+              ? String(item.id)
+              : String(index)
+          }
+          renderItem={renderItem}
           contentContainerStyle={styles.cardWrapper}
           showsVerticalScrollIndicator={false}
-        >
-          {sessions?.length > 0 ? (
-            sessions.map((item) => (
-              <HistoryCard key={item.session_id} item={item} />
-            ))
-          ) : (
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.4}
+          ListEmptyComponent={
             <EmptyState
               image={require("../../../assets/emptystate.png")}
               title="No Completed Sessions"
               subtitle="You haven't completed any sessions yet."
             />
-          )}
-        </ScrollView>
+          }
+          ListFooterComponent={
+            loading ? (
+              <ActivityIndicator style={{ marginVertical: 20 }} />
+            ) : null
+          }
+        />
       )}
     </View>
   );

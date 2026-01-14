@@ -8,7 +8,13 @@ export const scheduleApi = createApi({
     axiosInstance: api,
     baseUrl: '/', // axios already has baseURL
   }),
-  tagTypes: ['UpcomingSessions', 'SlotBooking', 'Notes', 'ActiveSession'],
+  tagTypes: [
+    'UpcomingSessions',
+    'SlotBooking',
+    'Notes',
+    'ActiveSession',
+    'AssignedClients',
+  ],
   endpoints: builder => ({
     getUpcomingSchedules: builder.query({
       query: ({ page = 1, limit = 10 }) => ({
@@ -71,6 +77,15 @@ export const scheduleApi = createApi({
       invalidatesTags: (result, err, { id }) => [{ type: 'Notes', id }],
     }),
 
+    editTrainerNote: builder.mutation({
+      query: ({ id, note }) => ({
+        url: `trainer/bookings/${id}/note/edit/`,
+        method: 'PUT',
+        data: { note },
+      }),
+      invalidatesTags: (result, err, { id }) => [{ type: 'Notes', id }],
+    }),
+
     startTrainerSession: builder.mutation({
       query: id => ({
         url: 'section/start-training/',
@@ -109,6 +124,45 @@ export const scheduleApi = createApi({
       refetchOnReconnect: true,
       keepUnusedDataFor: 10,
     }),
+
+    getAssignedClients: builder.query({
+      query: ({ page = 1, limit = 10 }) => ({
+        url: 'trainer/assigned-clients/',
+        method: 'GET',
+        params: { page, page_size: limit },
+      }),
+
+      serializeQueryArgs: ({ endpointName }) => endpointName,
+
+      merge: (currentCache, newData) => {
+        if (!currentCache?.results || newData.current_page === 1) {
+          currentCache.results = newData.results;
+        } else {
+          const existingIds = new Set(
+            currentCache.results.map(item => item.client_id),
+          );
+
+          const uniqueNew = newData.results.filter(
+            item => !existingIds.has(item.client_id),
+          );
+
+          currentCache.results.push(...uniqueNew);
+        }
+
+        currentCache.current_page = newData.current_page;
+        currentCache.total_pages = newData.total_pages;
+        currentCache.total_items = newData.total_items;
+        currentCache.next = newData.next;
+      },
+
+      forceRefetch({ currentArg, previousArg }) {
+        return currentArg?.page !== previousArg?.page;
+      },
+
+      providesTags: ['AssignedClients'],
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+    }),
   }),
 });
 
@@ -117,7 +171,9 @@ export const {
   useGetTrainerSlotBookingByIdQuery,
   useGetTrainerNotesQuery,
   useAddTrainerNoteMutation,
+  useEditTrainerNoteMutation,
   useStartTrainerSessionMutation,
   useGetOngoingSessionQuery,
   useEndTrainerSessionMutation,
+  useGetAssignedClientsQuery,
 } = scheduleApi;
