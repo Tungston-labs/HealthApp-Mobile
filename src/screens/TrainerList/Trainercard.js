@@ -1,3 +1,4 @@
+// screens/TrainerList/Trainercard.js
 import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -16,17 +17,16 @@ const TrainerCard = ({
   onPressCard,
 }) => {
   const navigation = useNavigation();
-const imageSource = trainer.trainer_profile_pic || trainer.profile_pic
-  ? { uri: trainer.trainer_profile_pic || trainer.profile_pic }
-  : fallbackImage;
-
+  const imageSource = trainer.trainer_profile_pic || trainer.profile_pic
+    ? { uri: trainer.trainer_profile_pic || trainer.profile_pic }
+    : fallbackImage;
 
   return (
     <View style={styles.card}>
       {/* IMAGE + PROFILE */}
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={onPressCard} // card press
+        onPress={() => onPressCard && onPressCard()} // <- call safely
       >
         <Image
           source={imageSource}
@@ -49,9 +49,9 @@ const imageSource = trainer.trainer_profile_pic || trainer.profile_pic
 
       {/* INFO */}
       <View style={styles.info}>
-<Text style={styles.trainerName}>
-  {trainer.trainer_name || trainer.name || "Trainer"}
-</Text>
+        <Text style={styles.trainerName}>
+          {trainer.trainer_name || trainer.name || "Trainer"}
+        </Text>
         <Text style={styles.exp}>{trainer.experience ?? 0} Years experience</Text>
 
         {(showPrice || showRating) && (
@@ -59,11 +59,11 @@ const imageSource = trainer.trainer_profile_pic || trainer.profile_pic
             {showPrice && (
               <View style={styles.priceRow}>
                 <Text style={styles.price}>₹ {trainer.single_price ?? 0}</Text>
-{trainer.plan?.name && (
-  <Text style={styles.planName}>
-    {trainer.plan.name}
-  </Text>
-)}
+                {trainer.plan?.name && (
+                  <Text style={styles.planName}>
+                    {trainer.plan.name}
+                  </Text>
+                )}
               </View>
             )}
             {showRating && (
@@ -86,6 +86,5 @@ const imageSource = trainer.trainer_profile_pic || trainer.profile_pic
     </View>
   );
 };
-
 
 export default TrainerCard;
