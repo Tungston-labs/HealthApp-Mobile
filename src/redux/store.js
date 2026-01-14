@@ -16,7 +16,7 @@ import trainerHistoryReducer from "./slices/trainerHistorySlice";
 import trainerProfileReducer from "./slices/trainerProfileSlice";
 import mobProfileReducer from "./slices/mobProfileSlice";
 import clientProfileEditReducer from "./slices/clientProfileEditSlice";
-
+import CancelTrainingReducer from "./slices/CancelTrainingSlice"
 
 
 import { scheduleApi } from './api/trainer/scheduleApi';
