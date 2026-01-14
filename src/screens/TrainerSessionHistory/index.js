@@ -48,6 +48,9 @@ const SessionHistory = () => {
         clientName={item.client?.name}
         address={item.client?.address}
         sessionDate={item.date}
+        time={item.time}
+        endTime={item.session_end_time}
+
         timeLabel={item.time_label}
         status={item.status}
         sessionCount={`${item.session_number}/${item.total_sessions}`}

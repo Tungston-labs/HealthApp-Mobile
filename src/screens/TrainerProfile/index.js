@@ -17,7 +17,10 @@ import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
 import CommonActionModal from "../../components/ModalComponents";
 
 import { logoutThunk } from "../../redux/slices/authSlice";
-import { fetchTrainerProfileThunk } from "../../redux/slices/trainerProfileSlice";
+import {
+  fetchTrainerProfileThunk,
+  updateTrainerProfileThunk,
+} from "../../redux/slices/trainerProfileSlice";
 
 import styles from "./style";
 
@@ -25,11 +28,10 @@ const ProfileScreenTrainer = ({ navigation }) => {
   const dispatch = useDispatch();
 
   /* 🔹 AUTH USER */
-  const { user } = useSelector(state => state.auth); 
-  // user.id should be trainer id
+  const { user } = useSelector(state => state.auth);
 
-  /* 🔹 TRAINER PROFILE */
-  const { profile, loading } = useSelector(
+  /* 🔹 TRAINER PROFILE STATE */
+  const { profile, loading, updated } = useSelector(
     state => state.trainerProfile
   );
 
@@ -38,29 +40,50 @@ const ProfileScreenTrainer = ({ navigation }) => {
   );
   const [logoutVisible, setLogoutVisible] = useState(false);
 
-  /* 🔹 FETCH PROFILE (ON SCREEN FOCUS) */
+  /* 🔹 FETCH PROFILE (ON FOCUS) */
   useFocusEffect(
     useCallback(() => {
-      if (user?.id) {
-        dispatch(fetchTrainerProfileThunk(user.id));
-      }
-    }, [user?.id])
+      dispatch(fetchTrainerProfileThunk());
+    }, [])
   );
 
-  /* 🔹 SET PROFILE IMAGE */
+  /* 🔹 UPDATE LOCAL IMAGE WHEN PROFILE CHANGES */
   useEffect(() => {
     if (profile?.profile_pic_url) {
       setProfileImage({ uri: profile.profile_pic_url });
     }
   }, [profile]);
 
-  /* 🔹 PICK IMAGE (UI ONLY) */
+  /* 🔹 REFETCH AFTER SUCCESSFUL UPDATE */
+  useEffect(() => {
+    if (updated) {
+      dispatch(fetchTrainerProfileThunk());
+    }
+  }, [updated]);
+
+  /* 🔹 PICK IMAGE + UPLOAD */
   const handlePickImage = () => {
     launchImageLibrary(
-      { mediaType: "photo", quality: 0.7 },
+      {
+        mediaType: "photo",
+        quality: 0.7,
+      },
       response => {
         if (response?.assets?.length) {
-          setProfileImage({ uri: response.assets[0].uri });
+          const asset = response.assets[0];
+
+          // 🔥 Optimistic UI update
+          setProfileImage({ uri: asset.uri });
+
+          // 🔥 FormData for PATCH
+          const formData = new FormData();
+          formData.append("profile_pic", {
+            uri: asset.uri,
+            name: asset.fileName || "profile.jpg",
+            type: asset.type || "image/jpeg",
+          });
+
+          dispatch(updateTrainerProfileThunk(formData));
         }
       }
     );
@@ -89,7 +112,7 @@ const ProfileScreenTrainer = ({ navigation }) => {
 
       <ScrollView style={styles.container}>
         <ProfileHeader
-          image={profile?.profile_pic_url}
+          image={profileImage}
           name={profile?.name || "Trainer"}
           showBack={false}
           showEdit
