@@ -16,25 +16,28 @@ const ProfileSection = () => {
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
   const [showConsultModal, setShowConsultModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
+const dispatch=useDispatch();
+const navigation=useNavigation();
+const route = useRoute();
+const { loading, data } = useSelector((state) => state.trainerDetail);
+const { user } = useSelector((state) => state.auth || {});
+const session = user?.session ?? null;
 
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
-  const route = useRoute();
+const trainerId = route.params?.trainerId; 
+const trainer = trainerId ? data : session;
 
-  const { user } = useSelector((state) => state.auth || {});
-  const session = user?.session ?? null;
+useEffect(() => {
+  console.log("ProfileSection received trainerId 👉", trainerId);
+  if (trainerId) {
+    dispatch(fetchTrainerDetailThunk(trainerId));
+  }
+}, [trainerId]);
 
-  const trainerId = route.params?.trainerId;
 
-  const { loading, data } = useSelector((state) => state.trainerDetail);
 
-  const trainer = trainerId ? data ?? null : session;
-
-  useEffect(() => {
-    if (trainerId) {
-      dispatch(fetchTrainerDetailThunk(trainerId));
-    }
-  }, [trainerId]);
+useEffect(() => {
+  console.log("ProfileSection received trainerId 👉", trainerId);
+}, [trainerId]);
 
   if (!session && !trainerId) {
     return (
@@ -43,6 +46,13 @@ const ProfileSection = () => {
         title="No Trainer Assigned"
         subtitle="Once you book a plan, trainer details will appear here."
       />
+    );
+  }
+  if (trainerId && loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading trainer details...</Text>
+      </View>
     );
   }
 
@@ -57,17 +67,21 @@ const ProfileSection = () => {
 
   const fallbackImage = require("../../../assets/trainer1.jpg");
 
-  const imageSource = trainer?.profile_pic
-    ? { uri: trainer.profile_pic }
-    : fallbackImage;
+const trainerName = trainer?.trainer_name ?? "N/A";
 
-  const trainerTiming = trainer?.section_timing
-    ? `${trainer.section_timing} min`
-    : "N/A";
+const imageSource = trainer?.trainer_profile_pic
+  ? { uri: trainer.trainer_profile_pic }
+  : fallbackImage;
 
-  const trainerName = trainer?.name || "N/A";
+
+  const trainerTiming =
+    trainer?.section_timing != null
+      ? `${trainer.section_timing} min`
+      : "N/A";
+
   const numSessions = trainer?.no_of_section ?? 0;
-  const workoutType = trainer?.plan_name || "N/A";
+
+  const workoutType = trainer?.plan_name ?? "N/A";
 
   return (
     <View style={styles.container}>
@@ -102,6 +116,7 @@ const ProfileSection = () => {
                   numSessions={numSessions}
                   workoutType={workoutType}
                 />
+
               )}
             </View>
 

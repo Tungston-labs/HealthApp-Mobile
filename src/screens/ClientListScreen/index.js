@@ -57,25 +57,25 @@ const ClientListScreen = () => {
         subtitle="Trainer Information"
       />
 
-      <FlatList
-        data={trainers}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => (
-          <TrainerCard
-            trainer={item}
-            showBookButton={false}
-            showPrice={false}
-            showRating={false}
-            showViewProfileButton={false}
-            onPressCard={() =>
-              navigation.navigate("ProfileSection", {
-                trainerId: item.id,
-              })
-            }
-          />
+  <FlatList
+  data={trainers}
+  keyExtractor={item => item.id.toString()}
+  renderItem={({ item }) => (
+    <TrainerCard
+      trainer={item}
+      showBookButton={false}
+      showPrice={false}
+      showRating={false}
+      showViewProfileButton={false}
+      onPressCard={() => 
+        navigation.push("ProfileSection", { trainerId: item.trainer_id })
+      }
+    />
+  )}
+/>
 
-        )}
-      />
+
+
     </View>
   );
 };

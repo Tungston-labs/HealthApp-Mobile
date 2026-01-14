@@ -3,38 +3,45 @@ import {
   View,
   FlatList,
   ActivityIndicator,
+  Text,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
-import SessionCard from "../../components/SessionCard";
 import HeaderWithBack from "../../components/HeaderWithBack";
+import HistoryCard from "../../components/Historycard";
 import EmptyState from "../../components/EmptyState";
 import styles from "./styles";
 
 import { fetchCompletedSessionsThunk } from "../../redux/slices/SessionHistorySlice";
-import { getTrainerHistory } from "../../redux/slices/trainerHistorySlice";
 
-const SessionHistory = () => {
+const SessionHistory = ({ navigation }) => {
   const dispatch = useDispatch();
 
-  const { loading, user } = useSelector(
+  /* 🔹 AUTH */
+  const { loading: authLoading, user, error: authError } = useSelector(
     (state) => state.auth || {}
   );
 
+  /* 🔹 SESSION STATE */
   const {
     sessions = [],
-    currentPage = 1,
-    totalPages = 1,
+    loading,
+    error,
   } = useSelector((state) => state.completedSessions || {});
 
   const hasPlan = user?.session;
 
+  /* 🔹 INITIAL FETCH */
   useEffect(() => {
     if (hasPlan) {
       dispatch(fetchCompletedSessionsThunk());
     }
   }, [hasPlan, dispatch]);
 
+  /* 🔹 SAFETY */
+  const safeSessions = Array.isArray(sessions) ? sessions : [];
+
+  /* 🔹 NO PLAN */
   if (!hasPlan) {
     return (
       <EmptyState
@@ -45,66 +52,36 @@ const SessionHistory = () => {
     );
   }
 
-  /* 🔹 LOAD MORE (pagination) */
-  const loadMore = () => {
-    if (!loading && currentPage < totalPages) {
-      dispatch(getTrainerHistory(currentPage + 1));
-    }
-  };
-
-  /* 🔹 RENDER EACH SESSION */
-  const renderItem = ({ item }) => {
-    console.log("🟢 RENDERING SESSION ID:", item.session_id);
-
-    return (
-      <SessionCard
-        clientName={item.client?.name}
-        address={item.client?.address}
-        sessionDate={item.date}
-        timeLabel={item.time_label}
-        status={item.status}
-        sessionCount={`${item.session_number}/${item.total_sessions}`}
-        duration={item.section_timing?.label}
-        profilePic={item.client?.profile_pic_url}
-      />
-    );
-  };
-
   return (
     <View style={styles.container}>
       <HeaderWithBack
         title="Session History"
         subtitle="Session Details"
+        onBackPress={() => navigation?.goBack()}
       />
 
-      {loading && sessions.length === 0 ? (
+      {/* 🔹 INITIAL LOADING */}
+      {loading && safeSessions.length === 0 ? (
         <ActivityIndicator size="large" style={{ marginTop: 30 }} />
+      ) : error ? (
+        <Text style={{ textAlign: "center", marginTop: 20 }}>
+          {typeof error === "string" ? error : error?.detail}
+        </Text>
       ) : (
         <FlatList
-          data={sessions}
+          data={safeSessions}
           keyExtractor={(item, index) =>
-            item?.session_id
-              ? String(item.session_id)
-              : item?.id
-              ? String(item.id)
-              : String(index)
+            item?.session_id ? String(item.session_id) : String(index)
           }
-          renderItem={renderItem}
+          renderItem={({ item }) => <HistoryCard item={item} />}
           contentContainerStyle={styles.cardWrapper}
           showsVerticalScrollIndicator={false}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.4}
           ListEmptyComponent={
             <EmptyState
               image={require("../../../assets/emptystate.png")}
               title="No Completed Sessions"
               subtitle="You haven't completed any sessions yet."
             />
-          }
-          ListFooterComponent={
-            loading ? (
-              <ActivityIndicator style={{ marginVertical: 20 }} />
-            ) : null
           }
         />
       )}

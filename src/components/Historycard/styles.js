@@ -2,7 +2,8 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   card: {
-    width: 420,
+
+    padding: 10,
     height: 150,
     backgroundColor: "#EEEEFF",
     borderRadius: 14,
@@ -11,7 +12,7 @@ export default StyleSheet.create({
   },
 
   profileImage: {
-    width: "30%",          
+    width: "30%",
     height: "100%",
     borderRadius: 12,
   },

@@ -16,9 +16,14 @@ export default StyleSheet.create({
   },
 
 trainerImg: {
-  width: 120,
-  height: 120,
+  width: 100,
+  height: 100,
   borderRadius: 12,
+},
+planName: {
+  fontSize: 12,
+  color: "#666",
+  marginTop: 2,
 },
 
 

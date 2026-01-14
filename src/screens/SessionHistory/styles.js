@@ -8,6 +8,7 @@ export default StyleSheet.create({
   cardWrapper: {
     paddingTop: 20,
     paddingBottom: 20,
+    paddingHorizontal:20,
     gap: 15,
   },
 });

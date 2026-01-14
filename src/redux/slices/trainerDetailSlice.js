@@ -3,19 +3,22 @@ import { fetchTrainerDetailAPI } from "../../services/trainerServices";
 
 export const fetchTrainerDetailThunk = createAsyncThunk(
   "trainerDetail/fetch",
-  async (trainerId) => {
+  async (trainerId, { rejectWithValue }) => {
     try {
-      const data = await fetchTrainerDetailAPI(trainerId);
-      console.log("TRAINER DETAIL API DATA ", data);
-      return data;
+      const response = await fetchTrainerDetailAPI(trainerId);
+      console.log("TRAINER DETAIL API DATA 👉", response);
+      // Return first trainer object
+      return response.data?.[0] ?? null;
     } catch (err) {
-      console.log("DETAIL ERROR ", err.response?.data || err.message);
-      return (
+      console.log("DETAIL ERROR 👉", err.response?.data || err.message);
+      return rejectWithValue(
         err.response?.data?.message || "Failed to load trainer details"
       );
     }
   }
 );
+
+
 
 
 const trainerDetailSlice = createSlice({
