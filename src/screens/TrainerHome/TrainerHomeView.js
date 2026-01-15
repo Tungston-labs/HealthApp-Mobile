@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { View, Text, Image, FlatList } from 'react-native';
 import ScheduleCard from '../../components/ScheduleCard';
 import styles from './style';
@@ -32,6 +32,7 @@ const TrainerHomeView = ({
   startingSessionId,
   isEndingSession,
 }) => {
+  const [overtimeShownSessionId, setOvertimeShownSessionId] = useState(null);
   const navigation = useNavigation();
   const user = useSelector(state => state.auth.user);
   const goToScheduleDetail = useCallback(
@@ -117,6 +118,8 @@ const TrainerHomeView = ({
             session={activeSession}
             onEndSession={onEndSession}
             isEndingSession={isEndingSession}
+            overtimeShownSessionId={overtimeShownSessionId}
+            setOvertimeShownSessionId={setOvertimeShownSessionId}
           />
         )}
         <Text style={styles.sectionTitle}>Upcoming Sessions</Text>
