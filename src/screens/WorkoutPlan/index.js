@@ -16,12 +16,13 @@ const WorkoutPlan = ({ navigation }) => {
 
   const [showModal, setShowModal] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState(null);
+  const [selectedPlanSlot, setSelectedPlanSlot] = useState(null);
   const [showUpcoming, setShowUpcoming] = useState(false);
 
   const { plans, loading, error } = useSelector(
     (state) => state.planList
   );
-  
+
   const user = useSelector((state) => state.auth?.user);
 
   useEffect(() => {
@@ -30,6 +31,7 @@ const WorkoutPlan = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      {/* ✅ FIXED HEADER */}
       <Header
         username={user?.name || "User"}
         subtitle="Your workout plans"
@@ -38,11 +40,7 @@ const WorkoutPlan = ({ navigation }) => {
         }
       />
 
-      {/* SHOW ONLY AFTER SUCCESS */}
-       <UpcomingSessionSection />
-      {/* {showUpcoming && <UpcomingSessionSection />} */}
-
-      {/* PLAN GRID */}
+      {/* ✅ EVERYTHING BELOW SCROLLS */}
       {loading ? (
         <FlatList
           data={Array.from({ length: 6 })}
@@ -61,17 +59,28 @@ const WorkoutPlan = ({ navigation }) => {
           columnWrapperStyle={styles.gridContainer}
           contentContainerStyle={{ paddingBottom: 80 }}
           showsVerticalScrollIndicator={false}
+
+          /* ✅ UPCOMING SECTION SCROLLS WITH LIST */
+          ListHeaderComponent={
+            <>
+              <UpcomingSessionSection />
+              <View style={{ height: 16 }} />
+            </>
+          }
+
           ListEmptyComponent={
             <Text style={{ textAlign: "center", marginTop: 20 }}>
               No plans available
             </Text>
           }
+
           renderItem={({ item }) => (
             <PlanCard
               item={item}
               onPress={() => {
                 setSelectedPlanId(item.id);
                 setShowModal(true);
+                setSelectedPlanSlot(item?.plan_type)
               }}
             />
           )}
@@ -79,10 +88,11 @@ const WorkoutPlan = ({ navigation }) => {
       )}
 
       {error && <Text>{JSON.stringify(error)}</Text>}
-      
+
       <FilterModal
         visible={showModal}
         planId={selectedPlanId}
+        selectedPlanSlot={selectedPlanSlot}
         onClose={(success = false) => {
           setShowModal(false);
           if (success) {

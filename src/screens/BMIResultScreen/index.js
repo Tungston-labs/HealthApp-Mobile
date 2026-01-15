@@ -112,7 +112,6 @@ export default function BMIResultScreen({ navigation }) {
   };
 
 
-
   const handleFinalSubmit = () => {
     if (!registration.name || !registration.email || !registration.phno) {
       Alert.alert("Incomplete profile", "Please complete signup details");
@@ -129,8 +128,6 @@ export default function BMIResultScreen({ navigation }) {
 
     dispatch(registerClientThunk(formData));
   };
-
-
 
   useEffect(() => {
     if (registered) {
@@ -154,9 +151,6 @@ export default function BMIResultScreen({ navigation }) {
       );
     }
   }, [error, registered]);
-
-
-
 
 
   return (
