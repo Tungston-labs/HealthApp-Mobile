@@ -16,6 +16,8 @@ import { launchImageLibrary } from "react-native-image-picker";
 import ProfileHeader from "../../components/ProfileHeader";
 import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
 import styles from "./styles";
+import { getCurrentLocation } from "../../utils/location";
+import { reverseGeocode } from "../../utils/reverseGeocode";
 
 import {
   updateProfileThunk,
@@ -76,20 +78,34 @@ const EditProfile = ({ navigation, route }) => {
     );
   };
   const handleUseLocation = async () => {
-    try {
-      const coords = await getCurrentLocation(); // { latitude, longitude }
-      const fullAddress = await reverseGeocode(coords.latitude, coords.longitude);
+    Alert.alert(
+      "Use current location?",
+      "This will replace your existing address.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "OK",
+          onPress: async () => {
+            try {
+              const coords = await getCurrentLocation();
+              const fullAddress = await reverseGeocode(
+                coords.latitude,
+                coords.longitude
+              );
 
-      setForm(prev => ({ ...prev, address: fullAddress }));
-      setLatitude(coords.latitude);
-      setLongitude(coords.longitude);
-
-      Alert.alert("Success", "Location fetched successfully!");
-    } catch (err) {
-      console.log("Location fetch error:", err);
-      Alert.alert("Error", "Unable to fetch location. Please try again.");
-    }
+              setForm(prev => ({ ...prev, address: fullAddress }));
+              setLatitude(coords.latitude);
+              setLongitude(coords.longitude);
+            } catch {
+              Alert.alert("Error", "Unable to fetch location");
+            }
+          },
+        },
+      ]
+    );
   };
+
+
 
 
   /* ---------------- SAVE ---------------- */
@@ -102,10 +118,11 @@ const EditProfile = ({ navigation, route }) => {
     formData.append("weight", form.weight);
     formData.append("height", form.height);
     formData.append("address", form.address);
-    if (latitude && longitude) {
-      formData.append("latitude", latitude);
-      formData.append("longitude", longitude);
+    if (latitude !== null && longitude !== null) {
+      formData.append("latitude", latitude.toFixed(6));
+      formData.append("longitude", longitude.toFixed(6));
     }
+
     formData.append(
       "health_issues",
       JSON.stringify(
