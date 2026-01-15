@@ -24,6 +24,9 @@ import {
 
 const EditProfile = ({ navigation, route }) => {
   const dispatch = useDispatch();
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+
   const { profileData } = route.params || {};
 
   const { loading, error } = useSelector(state => state.profileEdit);
@@ -72,6 +75,22 @@ const EditProfile = ({ navigation, route }) => {
       }
     );
   };
+  const handleUseLocation = async () => {
+    try {
+      const coords = await getCurrentLocation(); // { latitude, longitude }
+      const fullAddress = await reverseGeocode(coords.latitude, coords.longitude);
+
+      setForm(prev => ({ ...prev, address: fullAddress }));
+      setLatitude(coords.latitude);
+      setLongitude(coords.longitude);
+
+      Alert.alert("Success", "Location fetched successfully!");
+    } catch (err) {
+      console.log("Location fetch error:", err);
+      Alert.alert("Error", "Unable to fetch location. Please try again.");
+    }
+  };
+
 
   /* ---------------- SAVE ---------------- */
   const handleSave = async () => {
@@ -83,7 +102,10 @@ const EditProfile = ({ navigation, route }) => {
     formData.append("weight", form.weight);
     formData.append("height", form.height);
     formData.append("address", form.address);
-
+    if (latitude && longitude) {
+      formData.append("latitude", latitude);
+      formData.append("longitude", longitude);
+    }
     formData.append(
       "health_issues",
       JSON.stringify(
@@ -92,6 +114,9 @@ const EditProfile = ({ navigation, route }) => {
           : []
       )
     );
+
+
+
 
     formData.append(
       "wellness_goal",
@@ -131,8 +156,8 @@ const EditProfile = ({ navigation, route }) => {
   const imageSource = profilePic
     ? { uri: profilePic.uri }
     : profileData?.profile_pic_url
-    ? { uri: profileData.profile_pic_url }
-    : require("../../../assets/trainer2.jpg");
+      ? { uri: profileData.profile_pic_url }
+      : require("../../../assets/trainer2.jpg");
 
   /* ---------------- UI ---------------- */
   return (
@@ -190,9 +215,10 @@ const EditProfile = ({ navigation, route }) => {
             value={form.height}
             onChangeText={v => setForm({ ...form, height: v })}
           />
-          <TouchableOpacity style={styles.locationBtn}>
-              <Text style={styles.locationText}>Use my location</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.locationBtn} onPress={handleUseLocation}>
+            <Text style={styles.locationText}>Use my location</Text>
+          </TouchableOpacity>
+
 
           <Text style={styles.label}>Address</Text>
           <TextInput

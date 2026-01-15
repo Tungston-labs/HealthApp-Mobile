@@ -46,7 +46,7 @@ const AppNavigator = () => {
       {/* 1️⃣ Workout */}
       <Tab.Screen
         name="workout"
-        component={hasSession ? UpcomingSession : WorkoutPlan}
+        component={WorkoutPlan}
       />
 
       {/* 2️⃣ Session */}
