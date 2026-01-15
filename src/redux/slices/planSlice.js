@@ -17,8 +17,6 @@ export const fetchPlansThunk = createAsyncThunk(
   }
 );
 
-
-
 const planSlice = createSlice({
   name: "plans",
   initialState: {
@@ -43,5 +41,6 @@ const planSlice = createSlice({
   },
 });
 
-
 export default planSlice.reducer;
+
+

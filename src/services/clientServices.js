@@ -84,9 +84,7 @@ export const fetchMobProfileApi = async () => {
   return response.data;
 };
 
-
 // edit client profie in mobile app
-
 
 export const updateProfileApi = (payload) => {
   console.log("SENDING PATCH PAYLOAD:", payload);
@@ -100,4 +98,8 @@ export const updateProfileApi = (payload) => {
       },
     }
   );
+};
+
+export const getUnbookedPlans = () => {
+  return api.get("client/plans/unbooked/");
 };
