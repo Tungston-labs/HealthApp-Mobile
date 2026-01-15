@@ -8,6 +8,7 @@ import VerifyOtpReducer from './slices/verifyOtpSlice';
 import ResetPasswordReducer from './slices/resetPasswordSlice';
 
 import PlanReducer from './slices/planSlice';
+import unbookedplans from './slices/UnbookedPlanSlice';
 import trainerRegistrationReducer from './slices/trainerRegistrationSlice';
 import trainerPlanReducer from './slices/trainerPlanSlice';
 import trainerDetailReducer from './slices/trainerDetailSlice';
@@ -35,6 +36,7 @@ export const store = configureStore({
     resetpassword: ResetPasswordReducer,
     cancelTraining:CancelTrainingReducer,
     planList: PlanReducer,
+    unbookedplans: unbookedplans,
     trainerReg: trainerRegistrationReducer,
     trainer: trainerPlanReducer,
     trainerDetail: trainerDetailReducer,
