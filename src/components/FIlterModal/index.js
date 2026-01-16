@@ -22,6 +22,7 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
+  // ✅ AUTO SLOT SELECTION BASED ON PLAN
   useEffect(() => {
     if (!visible) return;
 
@@ -32,48 +33,61 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
     }
   }, [visible, selectedPlanSlot]);
 
-  // Convert 12-hour time to 24-hour (HH:MM)
-  const convertTo24Hour = (timeStr) => {
-    const [time, modifier] = timeStr.split(' ');
-    let [hours, minutes] = time.split(':').map(Number);
-    if (modifier === 'PM' && hours < 12) hours += 12;
-    if (modifier === 'AM' && hours === 12) hours = 0;
-    return `${hours.toString().padStart(2, '0')}:${minutes
-      .toString()
-      .padStart(2, '0')}`;
-  };
+ const convertTo24Hour = (timeStr) => {
+  const [time, modifier] = timeStr.split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+
+  if (modifier === 'PM' && hours < 12) hours += 12;
+  if (modifier === 'AM' && hours === 12) hours = 0;
+
+  return `${hours.toString().padStart(2, '0')}:${minutes
+    .toString()
+    .padStart(2, '0')}`;
+};
+
 const handleApply = async () => {
   try {
     const { latitude, longitude } = await getCurrentLocation();
+
+    if (
+      latitude === null ||
+      longitude === null ||
+      latitude === undefined ||
+      longitude === undefined
+    ) {
+      alert('Location not available');
+      return;
+    }
 
     const payload = {
       plan_id: planId,
       slot_days: selectedSlot.split(',').map(d => d.toLowerCase()),
       time: convertTo24Hour(selectedTime),
       start_date: selectedDate,
-      client_lat: latitude,   
-      client_lon: longitude, 
+      client_lat: Number(latitude),
+      client_lon: Number(longitude),
     };
 
-    dispatch(fetchAvailableTrainersThunk(payload))
-      .unwrap()
-      .then(() => {
-        onClose();
-        navigation.navigate('TrainerList', { isFiltered: true, planId });
-      })
-      .catch(err => console.log('Fetch trainers error:', err));
+    console.log(' SENDING PAYLOAD:', payload);
+
+    await dispatch(fetchAvailableTrainersThunk(payload)).unwrap();
+
+    onClose();
+    navigation.navigate('TrainerList', { isFiltered: true, planId });
 
   } catch (err) {
-    console.log('Location error:', err);
+    console.log(' Location / API error:', err);
     alert('Unable to get location. Please enable GPS.');
   }
 };
 
 
+
+
   const timeSlots = ['09:45 AM', '10:45 AM', '12:45 PM', '02:45 PM', '11:45 AM', '03:45 PM', '04:45 PM'];
 
   return (
-  <Modal visible={visible} transparent animationType="slide">
+   <Modal visible={visible} transparent animationType="slide">
   <View style={styles.overlay}>
     <View style={styles.container}>
       <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
@@ -142,7 +156,6 @@ const handleApply = async () => {
     </View>
   </View>
 </Modal>
-
   );
 };
 
