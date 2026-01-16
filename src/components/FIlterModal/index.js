@@ -42,17 +42,17 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
       .toString()
       .padStart(2, '0')}`;
   };
-
 const handleApply = async () => {
   try {
-    const location = await getCurrentLocation(); // get client location
+    const { latitude, longitude } = await getCurrentLocation();
+
     const payload = {
       plan_id: planId,
       slot_days: selectedSlot.split(',').map(d => d.toLowerCase()),
       time: convertTo24Hour(selectedTime),
       start_date: selectedDate,
-      client_lat: location.latitude,
-      client_lon: location.longitude,
+      client_lat: latitude,   
+      client_lon: longitude, 
     };
 
     dispatch(fetchAvailableTrainersThunk(payload))
@@ -68,7 +68,6 @@ const handleApply = async () => {
     alert('Unable to get location. Please enable GPS.');
   }
 };
-
 
 
   const timeSlots = ['09:45 AM', '10:45 AM', '12:45 PM', '02:45 PM', '11:45 AM', '03:45 PM', '04:45 PM'];
@@ -90,19 +89,34 @@ const handleApply = async () => {
       <View style={styles.inputUnderline} />
 
       <Text style={styles.sectionTitle}>Select Slot</Text>
-      <View style={styles.slotRow}>
-        {['Mon,Wed,Fri', 'Tue,Thu,Sat'].map(slot => (
-          <TouchableOpacity
-            key={slot}
-            style={[styles.slotBtn, selectedSlot === slot && styles.activeSlot]}
-            onPress={() => setSelectedSlot(slot)}
-          >
-            <Text style={selectedSlot === slot ? styles.activeSlotText : styles.inactiveSlotText}>
-              {slot}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+    <View style={styles.slotRow}>
+              {selectedSlot === 'Mon,Tue,Wed,Thu,Fri,Sat' ? (
+                <TouchableOpacity style={[styles.slotBtn, styles.activeSlot]}>
+                  <Text style={styles.activeSlotText}>Mon–Sat</Text>
+                </TouchableOpacity>
+              ) : (
+                ['Mon,Wed,Fri', 'Tue,Thu,Sat'].map(slot => (
+                  <TouchableOpacity
+                    key={slot}
+                    style={[
+                      styles.slotBtn,
+                      selectedSlot === slot && styles.activeSlot,
+                    ]}
+                    onPress={() => setSelectedSlot(slot)}
+                  >
+                    <Text
+                      style={
+                        selectedSlot === slot
+                          ? styles.activeSlotText
+                          : styles.inactiveSlotText
+                      }
+                    >
+                      {slot}
+                    </Text>
+                  </TouchableOpacity>
+                ))
+              )}
+            </View>
 
       <View style={styles.inputUnderline} />
       <Text style={styles.sectionTitle}>Select Time Slot</Text>
