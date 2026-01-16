@@ -35,13 +35,14 @@ export default function Navigation() {
   const { isLoggedIn, user } = useSelector(state => state.auth);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const loadAuth = async () => {
-      await dispatch(loadPersistedAuthState());
-      setIsLoading(false);
-    };
-    loadAuth();
-  }, [dispatch]);
+useEffect(() => {
+  dispatch(loadPersistedAuthState());
+  setIsLoading(false);
+}, [dispatch]);
+console.log("isLoading:", isLoading);
+console.log("isLoggedIn:", isLoggedIn);
+console.log("user:", user);
+
 
   if (isLoading) {
 
