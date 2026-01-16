@@ -197,6 +197,15 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
     '03:45 PM',
     '04:45 PM',
   ];
+  const isFutureOrToday = (dateStr) => {
+    const selected = new Date(dateStr);
+    selected.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return selected >= today;
+  };
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -210,8 +219,13 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
             <Text style={styles.sectionTitle}>Select Date Slot</Text>
             <CalendarPicker
               selectedDate={selectedDate}
-              onSelect={d => setSelectedDate(d)}
+              onSelect={d => {
+                if (isFutureOrToday(d)) {
+                  setSelectedDate(d);
+                }
+              }}
             />
+
 
             <View style={styles.inputUnderline} />
             <Text style={styles.sectionTitle}>Select Slot</Text>
