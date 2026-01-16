@@ -6,7 +6,6 @@ import registrationReducer from './slices/registrationSlice';
 import ForgotPasswordReducer from './slices/forgotPasswordSlice';
 import VerifyOtpReducer from './slices/verifyOtpSlice';
 import ResetPasswordReducer from './slices/resetPasswordSlice';
-
 import PlanReducer from './slices/planSlice';
 import trainerRegistrationReducer from './slices/trainerRegistrationSlice';
 import trainerPlanReducer from './slices/trainerPlanSlice';
@@ -16,15 +15,15 @@ import trainerHistoryReducer from "./slices/trainerHistorySlice";
 import trainerProfileReducer from "./slices/trainerProfileSlice";
 import mobProfileReducer from "./slices/mobProfileSlice";
 import clientProfileEditReducer from "./slices/clientProfileEditSlice";
-
-
-
+import CancelTrainingReducer from "./slices/CancelTrainingSlice";
+import nutritionRequestReducer from "./slices/NutritionRequestSlice";
 import { scheduleApi } from './api/trainer/scheduleApi';
 import completedSessionreducer from "./slices/SessionHistorySlice"
 import completedSessionDetailReducer from "./slices/completedSessionDetailSlice"
 import weeklySessionsReducer from "./slices/UpcomingSessionSlice"
-import trainerReducer from "./slices/trainerSlice"
+import trainerReducer from "./slices/trainerSlice";
 import ClientTrainerReducer from "./slices/clientTrainerSlice"
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -33,26 +32,23 @@ export const store = configureStore({
     forgotpassword: ForgotPasswordReducer,
     verifyotp: VerifyOtpReducer,
     resetpassword: ResetPasswordReducer,
-    cancelTraining:CancelTrainingReducer,
+    cancelTraining: CancelTrainingReducer,
     planList: PlanReducer,
     trainerReg: trainerRegistrationReducer,
     trainer: trainerPlanReducer,
     trainerDetail: trainerDetailReducer,
+    nutritionRequest: nutritionRequestReducer,
 
     trainerUpcomingSessions: trainerUpcomingSessionsReducer,
     trainerHistory: trainerHistoryReducer,
     trainerProfile: trainerProfileReducer,
-
     mobProfile: mobProfileReducer,
-    
     profileEdit: clientProfileEditReducer,
-
-
-    completedSessions:completedSessionreducer,
-    weeklySessions:weeklySessionsReducer,
-    trainerSessions:trainerReducer,
-    completedSessionDetail:completedSessionDetailReducer,
-    clientTrainer:ClientTrainerReducer,
+    completedSessions: completedSessionreducer,
+    weeklySessions: weeklySessionsReducer,
+    trainerSessions: trainerReducer,
+    completedSessionDetail: completedSessionDetailReducer,
+    clientTrainer: ClientTrainerReducer,
     [scheduleApi.reducerPath]: scheduleApi.reducer,
   },
   middleware: getDefaultMiddleware =>

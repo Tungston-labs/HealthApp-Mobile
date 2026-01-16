@@ -7,7 +7,8 @@ const initialState = {
   blood_group: null,
   height: null,
   weight: null,
-
+ latitude: null,
+  longitude: null,
   wellness_goal: [],
   health_issues: [],
   profile_pic: null,

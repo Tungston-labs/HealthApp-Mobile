@@ -5,7 +5,6 @@ import {
   setRefreshToken,
   clearStorage,
 } from '../storage/asyncStorage';
-import { forceLogout } from '../utils/forceLogout';
 import { store } from '../redux/store';
 import { setAccessToken } from '../redux/slices/authSlice';
 
@@ -102,7 +101,6 @@ api.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
         await clearStorage();
-        forceLogout();
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

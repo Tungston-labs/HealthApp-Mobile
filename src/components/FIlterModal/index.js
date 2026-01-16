@@ -11,6 +11,7 @@ import CalendarPicker from './CalendarPicker';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import { fetchAvailableTrainersThunk } from '../../redux/slices/trainerPlanSlice';
+import { getCurrentLocation } from '../../utils/location';
 
 const FilterModal = ({ visible, onClose, planId }) => {
   const [selectedSlot, setSelectedSlot] = useState('Mon,Wed,Fri');
@@ -29,80 +30,92 @@ const FilterModal = ({ visible, onClose, planId }) => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   };
 
-const handleApply = () => {
-  const payload = {
-    plan_id: planId,
-    slot_days: selectedSlot.split(',').map(d => d.toLowerCase()),
-    time: convertTo24Hour(selectedTime),
-    start_date: selectedDate,
-  };
+const handleApply = async () => {
+  try {
+    const location = await getCurrentLocation(); // get client location
+    const payload = {
+      plan_id: planId,
+      slot_days: selectedSlot.split(',').map(d => d.toLowerCase()),
+      time: convertTo24Hour(selectedTime),
+      start_date: selectedDate,
+      client_lat: location.latitude,
+      client_lon: location.longitude,
+    };
 
-  dispatch(fetchAvailableTrainersThunk(payload))
-    .unwrap()
-    .then(() => {
-      onClose();
-      // ✅ Navigate to ClientListScreen via its tab name
-      navigation.navigate('TrainerList', { isFiltered: true, planId });
-    })
-    .catch(err => console.log('Fetch trainers error:', err));
+    dispatch(fetchAvailableTrainersThunk(payload))
+      .unwrap()
+      .then(() => {
+        onClose();
+        navigation.navigate('TrainerList', { isFiltered: true, planId });
+      })
+      .catch(err => console.log('Fetch trainers error:', err));
+
+  } catch (err) {
+    console.log('Location error:', err);
+    alert('Unable to get location. Please enable GPS.');
+  }
 };
+
 
 
   const timeSlots = ['09:45 AM', '10:45 AM', '12:45 PM', '02:45 PM', '11:45 AM', '03:45 PM', '04:45 PM'];
 
   return (
-    <Modal visible={visible} transparent animationType="slide">
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-            <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-              <Text style={styles.closeText}>✕</Text>
-            </TouchableOpacity>
+  <Modal visible={visible} transparent animationType="slide">
+  <View style={styles.overlay}>
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+        <Text style={styles.closeText}>✕</Text>
+      </TouchableOpacity>
 
-            {/* DATE */}
-            <Text style={styles.sectionTitle}>Select Date Slot</Text>
-            <CalendarPicker selectedDate={selectedDate} onSelect={d => setSelectedDate(d)} />
-            <View style={styles.inputUnderline} />
-            <Text style={styles.sectionTitle}>Select Slot</Text>
-            <View style={styles.slotRow}>
-              {['Mon,Wed,Fri', 'Tue,Thu,Sat'].map(slot => (
-                <TouchableOpacity
-                  key={slot}
-                  style={[styles.slotBtn, selectedSlot === slot && styles.activeSlot]}
-                  onPress={() => setSelectedSlot(slot)}
-                >
-                  <Text style={selectedSlot === slot ? styles.activeSlotText : styles.inactiveSlotText}>
-                    {slot}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+      {/* DATE */}
+      <Text style={styles.sectionTitle}>Select Date Slot</Text>
+      <CalendarPicker
+        selectedDate={selectedDate}
+        onSelect={d => setSelectedDate(d)}
+      />
+      <View style={styles.inputUnderline} />
 
-            <View style={styles.inputUnderline} />
-            <Text style={styles.sectionTitle}>Select Time Slot</Text>
-            <View style={styles.timeSlotGrid}>
-              {timeSlots.map(t => (
-                <TouchableOpacity
-                  key={t}
-                  style={[styles.timeBtn, selectedTime === t && styles.activeTimeBtn]}
-                  onPress={() => setSelectedTime(t)}
-                >
-                  <Text style={selectedTime === t ? styles.activeTimeText : styles.inactiveTimeText}>
-                    {t}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <View style={styles.applyWrapper}>
-              <TouchableOpacity style={styles.applyBtn} onPress={handleApply}>
-                <Text style={styles.applyText}>Apply filter →</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-
-        </View>
+      <Text style={styles.sectionTitle}>Select Slot</Text>
+      <View style={styles.slotRow}>
+        {['Mon,Wed,Fri', 'Tue,Thu,Sat'].map(slot => (
+          <TouchableOpacity
+            key={slot}
+            style={[styles.slotBtn, selectedSlot === slot && styles.activeSlot]}
+            onPress={() => setSelectedSlot(slot)}
+          >
+            <Text style={selectedSlot === slot ? styles.activeSlotText : styles.inactiveSlotText}>
+              {slot}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
-    </Modal>
+
+      <View style={styles.inputUnderline} />
+      <Text style={styles.sectionTitle}>Select Time Slot</Text>
+      <View style={styles.timeSlotGrid}>
+        {timeSlots.map(t => (
+          <TouchableOpacity
+            key={t}
+            style={[styles.timeBtn, selectedTime === t && styles.activeTimeBtn]}
+            onPress={() => setSelectedTime(t)}
+          >
+            <Text style={selectedTime === t ? styles.activeTimeText : styles.inactiveTimeText}>
+              {t}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <View style={styles.applyWrapper}>
+        <TouchableOpacity style={styles.applyBtn} onPress={handleApply}>
+          <Text style={styles.applyText}>Apply filter →</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
   );
 };
 

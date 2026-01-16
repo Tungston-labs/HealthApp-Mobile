@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Alert } from "react-native";
 import { registerClientThunk, resetClientState } from "../../redux/slices/clientSlice";
 import { resetRegistration } from "../../redux/slices/registrationSlice";
+import { setAuth } from "../../redux/slices/authSlice";
 
 export default function BMIResultScreen({ navigation }) {
   const {
@@ -30,9 +31,7 @@ export default function BMIResultScreen({ navigation }) {
     weightUnit === "LBS" ? weight * 0.453592 : weight;
 
   const heightInMeters = height / 100;
-  if (!weight || !height) {
-    return null;
-  }
+
 
   const bmi = (
     weightInKg /
@@ -113,47 +112,57 @@ export default function BMIResultScreen({ navigation }) {
 
 
 
-  const handleFinalSubmit = () => {
-    if (!registration.name || !registration.email || !registration.phno) {
-      Alert.alert("Incomplete profile", "Please complete signup details");
-      return;
-    }
+const handleFinalSubmit = async () => {
+  const formData = buildRegisterPayload(registration);
+  
+  try {
+    const res = await dispatch(registerClientThunk(formData)).unwrap();
 
-    if (!registration.height || !registration.weight) {
-      Alert.alert("Missing data", "Height & Weight required");
-      return;
-    }
+    const userData = res.user || {
+      name: registration.name,
+      email: registration.email,
+      role: registration.role || "user",
+    };
 
-    const formData = buildRegisterPayload(registration);
-    console.log("REGISTER PAYLOAD 👉", formData);
+    // Correctly set auth in Redux
+    dispatch(setAuth({ user: userData, access: res.token?.access }));
 
-    dispatch(registerClientThunk(formData));
-  };
+    // Navigate to main app
+    navigation.replace("MainApp"); // or AppNavigator entry
+  } catch (err) {
+    Alert.alert("Registration failed", err?.message || err);
+  }
+};
 
 
+useEffect(() => {
+  if (registered) {
+    dispatch(resetRegistration());
+    dispatch(resetClientState());
+  }
+}, [registered]);
 
-  useEffect(() => {
-    if (registered) {
-      dispatch(resetRegistration());
-      dispatch(resetClientState());
 
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "MainApp" }],
-      });
-    }
-  }, [registered, dispatch, navigation]);
+useEffect(() => {
+  if (error && !registered) {
+    Alert.alert(
+      "Registration failed",
+      typeof error === "string"
+        ? error
+        : error.message || "Registration failed"
+    );
+  }
+}, [error, registered]);
 
-  useEffect(() => {
-    if (error && !registered) {
-      Alert.alert(
-        "Registration failed",
-        typeof error === "string"
-          ? error
-          : error.message || "Registration failed"
-      );
-    }
-  }, [error, registered]);
+if (!weight || !height) {
+  return (
+    <View style={styles.container}>
+      <ActivityIndicator size="large" />
+    </View>
+  );
+}
+
+
 
 
 

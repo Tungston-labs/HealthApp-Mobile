@@ -12,8 +12,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { fetchTrainerDetailThunk } from "../../redux/slices/trainerDetailSlice";
 import { cancelTrainingThunk } from "../../redux/slices/CancelTrainingSlice";
+import { requestNutritionThunk, resetNutritionState } from "../../redux/slices/NutritionRequestSlice";
 
 const ProfileSection = () => {
+  const [consultType, setConsultType] = useState("call");
+  const [consultNote, setConsultNote] = useState("");
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
   const [showConsultModal, setShowConsultModal] = useState(false);
@@ -40,6 +43,11 @@ const ProfileSection = () => {
     success: cancelSuccess,
     error: cancelError,
   } = useSelector((state) => state.cancelTraining);
+  const {
+    loading: nutritionLoading,
+    success: nutritionSuccess,
+    error: nutritionError,
+  } = useSelector((state) => state.nutritionRequest);
 
   const handleCancelTraining = () => {
     dispatch(cancelTrainingThunk());
@@ -65,6 +73,35 @@ const ProfileSection = () => {
       dispatch(resetCancelState());
     }
   }, [cancelSuccess, cancelError]);
+
+  const handleConsultSubmit = () => {
+    if (!consultNote.trim()) {
+      alert("Please enter a note");
+      return;
+    }
+
+    dispatch(
+      requestNutritionThunk({
+        consultation_type: consultType,
+        note: consultNote,
+      })
+    );
+  };
+
+  useEffect(() => {
+    if (nutritionSuccess) {
+      alert("Nutrition request submitted successfully");
+      setShowConsultModal(false);
+      setConsultNote("");
+      setConsultType("call");
+      dispatch(resetNutritionState());
+    }
+
+    if (nutritionError) {
+      alert(nutritionError);
+      dispatch(resetNutritionState());
+    }
+  }, [nutritionSuccess, nutritionError]);
 
 
   useEffect(() => {
@@ -116,7 +153,7 @@ const ProfileSection = () => {
   const numSessions = trainer?.no_of_section ?? 0;
 
   const workoutType = trainer?.plan_name ?? "N/A";
-const isCancelRequested = session?.cancel_requested;
+  const isCancelRequested = session?.cancel_requested;
 
   return (
     <View style={styles.container}>
@@ -253,16 +290,21 @@ const isCancelRequested = session?.cancel_requested;
       <CommonActionModal
         visible={showConsultModal}
         onClose={() => setShowConsultModal(false)}
-        onConfirm={() => setShowConsultModal(false)}
+        onConfirm={!nutritionLoading ? handleConsultSubmit : undefined}
         iconName="chatbubble-ellipses-outline"
         iconColor="#6C63FF"
         title="Request a Consultation"
         description="Choose your consultation type and leave a short note."
         cancelText="Cancel"
-        confirmText="Send"
+        confirmText={nutritionLoading ? "Sending..." : "Send"}
         showDropdown={true}
         showNote={true}
+        selectedValue={consultType}
+        onSelectValue={setConsultType}
+        noteValue={consultNote}
+        onChangeNote={setConsultNote}
       />
+
     </View>
   );
 };
