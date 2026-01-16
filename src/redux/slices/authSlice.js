@@ -21,8 +21,8 @@ export const loginClientThunk = createAsyncThunk(
       if (err.response) {
         return rejectWithValue(
           err.response.data?.detail ||
-            err.response.data?.email_or_phno?.[0] ||
-            'Invalid credentials',
+          err.response.data?.email_or_phno?.[0] ||
+          'Invalid credentials',
         );
       }
       if (err.request) {
@@ -101,7 +101,13 @@ const authSlice = createSlice({
     setAccessToken: (state, action) => {
       state.accessToken = action.payload;
     },
+    setAuth: (state, action) => {
+      state.user = action.payload.user;
+      state.accessToken = action.payload.access;
+      state.isLoggedIn = true;
+    },
   },
+
   extraReducers: builder => {
     builder
       /* LOGIN */
@@ -150,5 +156,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { resetAuthState, logout, setAccessToken } = authSlice.actions;
+export const { resetAuthState, logout, setAccessToken, setAuth } = authSlice.actions;
 export default authSlice.reducer;
