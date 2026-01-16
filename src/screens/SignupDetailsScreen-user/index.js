@@ -17,6 +17,8 @@ import { getCurrentLocation } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { Image } from 'react-native';
+import { validateSignup } from "../../utils/Validators";
+import {showError} from "../../utils/toast"
 export default function SignupDetailsScreenUser() {
   const navigation = useNavigation();
 
@@ -31,16 +33,18 @@ export default function SignupDetailsScreenUser() {
     dispatch(updateRegistration({ [field]: value }));
   };
 
-  const handleContinue = () => {
-    const { name, email, phno, password } = registration;
+const handleContinue = () => {
+  
+  const result = validateSignup(registration);
 
-    if (!name || !email || !phno || !password) {
-      Alert.alert('Missing details', 'Please fill all required fields');
-      return;
-    }
+  if (!result.ok) {
+    showError(result.msg);
+    return;
+  }
 
-    navigation.navigate('MainWizardScreen');
-  };
+  navigation.navigate('MainWizardScreen');
+};
+
   const handlePickProfileImage = async () => {
     launchImageLibrary(
       { mediaType: 'photo', quality: 0.7 },
@@ -63,26 +67,36 @@ export default function SignupDetailsScreenUser() {
   };
 
 
-  const handleUseLocation = async () => {
-    try {
-      const coords = await getCurrentLocation();
-      const address = await reverseGeocode(coords.latitude, coords.longitude);
+const handleUseLocation = async () => {
+  try {
+    const coords = await getCurrentLocation();
+    const { latitude, longitude } = coords;
 
-      setLocation(address);
+    const address = await reverseGeocode(latitude, longitude);
 
-      dispatch(
-        updateRegistration({
-          address: address,
-        }),
-      );
+    setLocation(address);
 
-      Alert.alert('Success', '📍 Location fetched successfully');
-      console.log(' Location:', address);
-    } catch (err) {
-      console.log(' Location error:', err);
-      Alert.alert('Error', 'Unable to fetch location. Please try again.');
-    }
-  };
+    dispatch(
+      updateRegistration({
+        address: address,
+        latitude: latitude,
+        longitude: longitude,
+      })
+    );
+
+    Alert.alert(
+      'Success',
+      `📍 Location fetched\nLat: ${latitude}\nLng: ${longitude}`
+    );
+
+    console.log('Latitude:', latitude);
+    console.log('Longitude:', longitude);
+  } catch (err) {
+    console.log('Location error:', err);
+    Alert.alert('Error', 'Unable to fetch location. Please try again.');
+  }
+};
+
 
   return (
     <SafeAreaView style={styles.container}>
