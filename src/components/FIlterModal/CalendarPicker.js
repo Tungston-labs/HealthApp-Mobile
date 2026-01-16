@@ -2,7 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 
 export default function CalendarPicker({ selectedDate, onSelect }) {
-  const initial = selectedDate ? new Date(selectedDate) : new Date();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const initialDate = selectedDate
+    ? new Date(selectedDate)
+    : new Date();
+
+  
+  const safeInitial =
+    initialDate < today ? today : initialDate;
 
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const months = [
@@ -15,42 +24,50 @@ export default function CalendarPicker({ selectedDate, onSelect }) {
   const VISIBLE_ITEMS = 5;
   const PADDING = ((VISIBLE_ITEMS - 1) / 2) * ITEM_HEIGHT;
 
-  // refs for FlatLists
   const dayRef = useRef(null);
   const monthRef = useRef(null);
   const yearRef = useRef(null);
 
-  const [selectedDay, setSelectedDay] = useState(initial.getDate() - 1);
-  const [selectedMonth, setSelectedMonth] = useState(initial.getMonth());
+  const [selectedDay, setSelectedDay] = useState(safeInitial.getDate() - 1);
+  const [selectedMonth, setSelectedMonth] = useState(safeInitial.getMonth());
   const [selectedYear, setSelectedYear] = useState(
-    years.indexOf(initial.getFullYear())
+    years.indexOf(safeInitial.getFullYear())
   );
 
-  // Send date to parent
+  // ✅ SEND DATE TO PARENT (PAST DATES BLOCKED)
   useEffect(() => {
     const day = String(days[selectedDay]).padStart(2, "0");
-    const monthIndex = selectedMonth + 1;
-    const month = String(monthIndex).padStart(2, "0");
+    const month = String(selectedMonth + 1).padStart(2, "0");
     const year = years[selectedYear];
+
+    const composedDate = new Date(`${year}-${month}-${day}`);
+    composedDate.setHours(0, 0, 0, 0);
+
+    if (composedDate < today) {
+      // 🔒 Auto-fix to today
+      setSelectedDay(today.getDate() - 1);
+      setSelectedMonth(today.getMonth());
+      setSelectedYear(years.indexOf(today.getFullYear()));
+      return;
+    }
 
     onSelect(`${year}-${month}-${day}`);
   }, [selectedDay, selectedMonth, selectedYear]);
 
-const scrollToInitial = () => {
-  dayRef.current?.scrollToOffset({
-    offset: selectedDay * ITEM_HEIGHT,
-    animated: false,
-  });
-  monthRef.current?.scrollToOffset({
-    offset: selectedMonth * ITEM_HEIGHT,
-    animated: false,
-  });
-  yearRef.current?.scrollToOffset({
-    offset: selectedYear * ITEM_HEIGHT,
-    animated: false,
-  });
-};
-
+  const scrollToInitial = () => {
+    dayRef.current?.scrollToOffset({
+      offset: selectedDay * ITEM_HEIGHT,
+      animated: false,
+    });
+    monthRef.current?.scrollToOffset({
+      offset: selectedMonth * ITEM_HEIGHT,
+      animated: false,
+    });
+    yearRef.current?.scrollToOffset({
+      offset: selectedYear * ITEM_HEIGHT,
+      animated: false,
+    });
+  };
 
   const onScrollEnd = (event, setItem, length) => {
     const index = Math.round(event.nativeEvent.contentOffset.y / ITEM_HEIGHT);
@@ -85,7 +102,9 @@ const scrollToInitial = () => {
         decelerationRate="fast"
         onLayout={scrollToInitial}
         contentContainerStyle={{ paddingVertical: PADDING }}
-        onMomentumScrollEnd={(e) => onScrollEnd(e, setSelectedDay, days.length)}
+        onMomentumScrollEnd={(e) =>
+          onScrollEnd(e, setSelectedDay, days.length)
+        }
         renderItem={({ item, index }) =>
           renderItem(item.toString().padStart(2, "0"), index, selectedDay)
         }
@@ -132,42 +151,38 @@ const scrollToInitial = () => {
   );
 }
 
-
 const styles = StyleSheet.create({
   wheelWrapper: {
-  flexDirection: "row",
-  width: "100%",
-  height: 200,
-  backgroundColor:"#E6E5E8",
-  justifyContent: "space-between",
-  position: "relative",
-  marginTop: 10,
-  borderRadius:20,
-  overflow: "hidden",  
-},
+    flexDirection: "row",
+    width: "100%",
+    height: 200,
+    backgroundColor: "#E6E5E8",
+    justifyContent: "space-between",
+    position: "relative",
+    marginTop: 10,
+    borderRadius: 20,
+    overflow: "hidden",
+  },
   wheel: {
     flex: 1,
   },
-
   wheelText: {
     fontSize: 18,
     textAlign: "center",
     color: "#999",
     fontFamily: "SegoeUI",
   },
-
   wheelTextActive: {
     color: "#000",
     fontWeight: "700",
   },
-selectionOverlay: {
-  position: "absolute",
-  top: 80,     
-  left: 0,
-  right: 0,
-  height: 40,
-  zIndex: 10,
-  borderRadius: 6,
-},
-
+  selectionOverlay: {
+    position: "absolute",
+    top: 80,
+    left: 0,
+    right: 0,
+    height: 40,
+    zIndex: 10,
+    borderRadius: 6,
+  },
 });

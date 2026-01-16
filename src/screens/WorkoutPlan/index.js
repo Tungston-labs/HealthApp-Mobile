@@ -23,6 +23,10 @@ const WorkoutPlan = ({ navigation }) => {
     (state) => state.planList
   );
 
+  const { sessions } = useSelector(
+    (state) => state.weeklySessions
+  );
+
   const user = useSelector((state) => state.auth?.user);
 
   useEffect(() => {
@@ -60,12 +64,14 @@ const WorkoutPlan = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 80 }}
           showsVerticalScrollIndicator={false}
 
-          /* ✅ UPCOMING SECTION SCROLLS WITH LIST */
+          /* ✅ SHOW ONLY IF UPCOMING SESSIONS EXIST */
           ListHeaderComponent={
-            <>
-              <UpcomingSessionSection />
-              <View style={{ height: 16 }} />
-            </>
+            sessions && sessions.length > 0 ? (
+              <>
+                <UpcomingSessionSection />
+                <View style={{ height: 16 }} />
+              </>
+            ) : null
           }
 
           ListEmptyComponent={
@@ -80,7 +86,7 @@ const WorkoutPlan = ({ navigation }) => {
               onPress={() => {
                 setSelectedPlanId(item.id);
                 setShowModal(true);
-                setSelectedPlanSlot(item?.plan_type)
+                setSelectedPlanSlot(item?.plan_type);
               }}
             />
           )}
