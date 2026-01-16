@@ -23,12 +23,19 @@ const CommonActionModal = ({
 
   showDropdown = false,
   showNote = false,
+  selectedValue,
+  onSelectValue,
+  noteValue,
+  onChangeNote,
 }) => {
   const [showDropdownList, setShowDropdownList] = useState(false);
-  const [selectedType, setSelectedType] = useState("");
-  const [note, setNote] = useState("");
 
-  const consultationTypes = ["Diet plan", "Weekly review", "Consultation call"];
+
+const consultationTypes = [
+  { label: "PDF / Brochure", value: "pdf" },
+  { label: "Call Session", value: "call" },
+  { label: "Email Consultation", value: "email" },
+];
 
   return (
     <Modal transparent visible={visible} animationType="fade">
@@ -66,7 +73,7 @@ const CommonActionModal = ({
                 onPress={() => setShowDropdownList(!showDropdownList)}
               >
                 <Text style={styles.dropdownText}>
-                  {selectedType || "Select type"}
+                  {selectedValue || "Select type"}
                 </Text>
                 <Icon name="chevron-down" size={20} color="#777" />
               </TouchableOpacity>
@@ -77,7 +84,7 @@ const CommonActionModal = ({
                     <TouchableOpacity
                       key={i}
                       onPress={() => {
-                        setSelectedType(type);
+                        onSelectValue(type);      // ✅ parent setter
                         setShowDropdownList(false);
                       }}
                       style={styles.dropdownItem}
@@ -99,8 +106,8 @@ const CommonActionModal = ({
                 placeholder="Enter note"
                 placeholderTextColor="#9C9C9C"
                 multiline
-                value={note}
-                onChangeText={setNote}
+                value={noteValue}
+                onChangeText={onChangeNote}
               />
             </>
           )}
@@ -112,7 +119,7 @@ const CommonActionModal = ({
 
             <TouchableOpacity
               style={styles.confirmBtn}
-              onPress={() => onConfirm(selectedType, note)}
+              onPress={onConfirm}
             >
               <Text style={styles.confirmText}>{confirmText}</Text>
             </TouchableOpacity>

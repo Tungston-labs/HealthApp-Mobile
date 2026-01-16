@@ -203,13 +203,37 @@ const EditProfile = ({ navigation, route }) => {
             onChangeText={v => setForm({ ...form, name: v })}
           />
 
-          <Text style={styles.label}>Date of Birth</Text>
+          {/* <Text style={styles.label}>Date of Birth</Text>
           <TextInput
             style={styles.input}
             value={form.dob}
             onChangeText={v => setForm({ ...form, dob: v })}
-          />
+          /> */}
 
+          <Text style={styles.label}>Date of Birth</Text>
+          <TextInput
+            style={styles.input}
+            value={form.dob}
+            placeholder="YYYY-MM-DD"
+            keyboardType="number-pad"
+            maxLength={10}
+            onChangeText={(text) => {
+              // Remove non-numeric characters
+              let cleaned = text.replace(/\D/g, "");
+
+              let formatted = cleaned;
+
+              if (cleaned.length > 4 && cleaned.length <= 6) {
+                formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4)}`;
+              }
+              else if (cleaned.length > 6) {
+                formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4, 6)}-${cleaned.slice(6, 8)}`;
+              }
+
+              setForm({ ...form, dob: formatted });
+            }}
+          />
+          
           <Text style={styles.label}>Blood Group</Text>
           <TextInput
             style={styles.input}
@@ -232,10 +256,9 @@ const EditProfile = ({ navigation, route }) => {
             value={form.height}
             onChangeText={v => setForm({ ...form, height: v })}
           />
-          <TouchableOpacity style={styles.locationBtn} onPress={handleUseLocation}>
+          <TouchableOpacity style={styles.locationBtn}>
             <Text style={styles.locationText}>Use my location</Text>
           </TouchableOpacity>
-
 
           <Text style={styles.label}>Address</Text>
           <TextInput

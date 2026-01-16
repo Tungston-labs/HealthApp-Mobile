@@ -17,7 +17,6 @@ export const updateProfileThunk = createAsyncThunk(
   }
 );
 
-
 const clientProfileEditSlice = createSlice({
   name: "profileEdit",
   initialState: {
