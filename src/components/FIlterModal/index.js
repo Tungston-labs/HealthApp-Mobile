@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,7 +14,7 @@ import { useDispatch } from 'react-redux';
 import { fetchAvailableTrainersThunk } from '../../redux/slices/trainerPlanSlice';
 import { getCurrentLocation } from '../../utils/location';
 
-const FilterModal = ({ visible, onClose, planId }) => {
+const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
   const [selectedSlot, setSelectedSlot] = useState('Mon,Wed,Fri');
   const [selectedDate, setSelectedDate] = useState('2025-12-11');
   const [selectedTime, setSelectedTime] = useState('09:45 AM');
@@ -21,13 +22,25 @@ const FilterModal = ({ visible, onClose, planId }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
+  useEffect(() => {
+    if (!visible) return;
+
+    if (selectedPlanSlot === "3_days") {
+      setSelectedSlot('Mon,Wed,Fri');
+    } else {
+      setSelectedSlot('Mon,Tue,Wed,Thu,Fri,Sat');
+    }
+  }, [visible, selectedPlanSlot]);
+
   // Convert 12-hour time to 24-hour (HH:MM)
   const convertTo24Hour = (timeStr) => {
     const [time, modifier] = timeStr.split(' ');
     let [hours, minutes] = time.split(':').map(Number);
     if (modifier === 'PM' && hours < 12) hours += 12;
     if (modifier === 'AM' && hours === 12) hours = 0;
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    return `${hours.toString().padStart(2, '0')}:${minutes
+      .toString()
+      .padStart(2, '0')}`;
   };
 
 const handleApply = async () => {

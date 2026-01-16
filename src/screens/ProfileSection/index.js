@@ -6,8 +6,7 @@ import CommonActionModal from "../../components/ModalComponents";
 import TrainerInfoCard from "../../components/TrainerInfoCard";
 import EmptyState from "../../components/EmptyState";
 import FilterModal from "../../components/FIlterModal";
-import { useFocusEffect } from "@react-navigation/native";
-import { resetCancelState } from "../../redux/slices/CancelTrainingSlice";
+
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { fetchTrainerDetailThunk } from "../../redux/slices/trainerDetailSlice";
@@ -21,18 +20,21 @@ const ProfileSection = () => {
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
   const [showConsultModal, setShowConsultModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
+
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const route = useRoute();
-  const { loading, data } = useSelector((state) => state.trainerDetail);
+
   const { user } = useSelector((state) => state.auth || {});
   const session = user?.session ?? null;
 
   const trainerId = route.params?.trainerId;
-  const trainer = trainerId ? data : session;
+
+  const { loading, data } = useSelector((state) => state.trainerDetail);
+
+  const trainer = trainerId ? data ?? null : session;
 
   useEffect(() => {
-    console.log("ProfileSection received trainerId 👉", trainerId);
     if (trainerId) {
       dispatch(fetchTrainerDetailThunk(trainerId));
     }
@@ -117,13 +119,6 @@ const ProfileSection = () => {
       />
     );
   }
-  if (trainerId && loading) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading trainer details...</Text>
-      </View>
-    );
-  }
 
   if (trainerId && !loading && !trainer) {
     return (
@@ -136,20 +131,15 @@ const ProfileSection = () => {
 
   const fallbackImage = require("../../../assets/trainer1.jpg");
 
-  const imageSource =
-    trainer?.profile_pic || trainer?.trainer_profile_pic
-      ? { uri: trainer.profile_pic || trainer.trainer_profile_pic }
-      : fallbackImage;
-  const trainerName =
-    trainer?.name || trainer?.trainer_name || "N/A";
+  const imageSource = trainer?.profile_pic
+    ? { uri: trainer.profile_pic }
+    : fallbackImage;
 
+  const trainerTiming = trainer?.section_timing
+    ? `${trainer.section_timing} min`
+    : "N/A";
 
-  const sessionTiming =
-    trainer?.section_timing
-      ? `${trainer.section_timing} min`
-      : "N/A";
-
-
+  const trainerName = trainer?.name || "N/A";
   const numSessions = trainer?.no_of_section ?? 0;
 
   const workoutType = trainer?.plan_name ?? "N/A";
@@ -184,11 +174,10 @@ const ProfileSection = () => {
                 <TrainerInfoCard
                   name={trainerName}
                   experience={trainer?.experience ?? 0}
-                  sessionTiming={sessionTiming}
+                  trainerTiming={trainerTiming}
                   numSessions={numSessions}
                   workoutType={workoutType}
                 />
-
               )}
             </View>
 
@@ -260,18 +249,17 @@ const ProfileSection = () => {
       {/* MODALS */}
       <CommonActionModal
         visible={showCancelModal}
-        onClose={() => !cancelLoading && setShowCancelModal(false)}
-        onConfirm={!cancelLoading ? handleCancelTraining : undefined}
-        confirmText={cancelLoading ? "Cancelling..." : "Confirm"}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={() => setShowCancelModal(false)}
         iconName="close-circle-outline"
         iconColor="red"
         title="Cancel training"
         description="Refunds are available only before completing 7 sessions."
         cancelText="Cancel"
+        confirmText="Confirm"
         showDropdown={false}
         showNote={false}
       />
-
 
       <CommonActionModal
         visible={showEmergencyModal}

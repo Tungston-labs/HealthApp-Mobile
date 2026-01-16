@@ -50,8 +50,6 @@ export const fetchMobProfileApi = async () => {
 };
 
 
-
-
 export const updateProfileApi = (payload) => {
   console.log("SENDING PATCH PAYLOAD:", payload);
 
@@ -64,4 +62,8 @@ export const updateProfileApi = (payload) => {
       },
     }
   );
+};
+
+export const getUnbookedPlans = () => {
+  return api.get("client/plans/unbooked/");
 };

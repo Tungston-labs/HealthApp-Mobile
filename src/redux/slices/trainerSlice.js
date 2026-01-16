@@ -5,7 +5,6 @@ import {
   reportTrainerService,
 } from "../../services/trainerServices";
 
-
 export const fetchTrainerDetailThunk = createAsyncThunk(
   "trainer/fetchDetail",
   async (trainerId, { rejectWithValue }) => {
