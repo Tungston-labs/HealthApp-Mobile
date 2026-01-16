@@ -10,6 +10,8 @@ export const fetchPlansThunk = createAsyncThunk(
 
       return res.data?.data || [];
     } catch (err) {
+        console.log("PLAN FETCH ERROR:", err.response || err.message || err);
+
       return rejectWithValue(
         err?.response?.data?.message || "Plan fetch failed"
       );

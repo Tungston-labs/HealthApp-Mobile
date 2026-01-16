@@ -67,3 +67,10 @@ export const updateProfileApi = (payload) => {
 export const getUnbookedPlans = () => {
   return api.get("client/plans/unbooked/");
 };
+
+
+
+export const fetchClientBMI = async () => {
+  const response = await api.get("client/client/bmi/");
+  return response.data;
+};

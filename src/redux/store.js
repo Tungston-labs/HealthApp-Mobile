@@ -24,6 +24,7 @@ import completedSessionDetailReducer from "./slices/completedSessionDetailSlice"
 import weeklySessionsReducer from "./slices/UpcomingSessionSlice"
 import trainerReducer from "./slices/trainerSlice";
 import ClientTrainerReducer from "./slices/clientTrainerSlice"
+import clientBmiReducer from "./slices/clientBmiSlice";
 
 export const store = configureStore({
   reducer: {
@@ -45,7 +46,12 @@ export const store = configureStore({
     trainerHistory: trainerHistoryReducer,
     trainerProfile: trainerProfileReducer,
     mobProfile: mobProfileReducer,
+
     profileEdit: clientProfileEditReducer,
+    clientBmi: clientBmiReducer,
+
+
+
     completedSessions: completedSessionreducer,
     weeklySessions: weeklySessionsReducer,
     trainerSessions: trainerReducer,
@@ -56,3 +62,6 @@ export const store = configureStore({
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(scheduleApi.middleware),
 });
+
+
+
