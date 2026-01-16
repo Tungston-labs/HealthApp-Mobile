@@ -1,31 +1,37 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./style";
 import { useNavigation } from "@react-navigation/native";
 import CommonActionModal from "../ModalComponents/index";
+import { useDispatch, useSelector } from "react-redux";
+import { getClientBMIThunk } from "../../redux/slices/clientBmiSlice";
 
-const Header = ({
-  username = "User",
-  subtitle = "",
-  bmiValue = "22.5",
-}) => {
+const Header = ({ subtitle = "" }) => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
 
-  const handleEmergencyCall = () => {
-    setShowEmergencyModal(false);
-  
-  };
+  const { name, bmi, loading } = useSelector(state => state.clientBmi);
+
+  useEffect(() => {
+    dispatch(getClientBMIThunk());
+  }, []);
 
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.greeting}>Hi, {username}</Text>
+        <Text style={styles.greeting}>
+          Hi, {loading ? "..." : name || "User"}
+        </Text>
 
         <View style={styles.bmiContainer}>
           <Text style={styles.bmiLabel}>BMI</Text>
-          <Text style={styles.bmiValue}>{bmiValue}</Text>
+          {loading ? (
+            <ActivityIndicator size="small" />
+          ) : (
+            <Text style={styles.bmiValue}>{bmi}</Text>
+          )}
         </View>
 
         <Text style={styles.subheading}>{subtitle}</Text>
@@ -41,7 +47,7 @@ const Header = ({
       <CommonActionModal
         visible={showEmergencyModal}
         onClose={() => setShowEmergencyModal(false)}
-        onConfirm={handleEmergencyCall}
+        onConfirm={() => setShowEmergencyModal(false)}
         iconName="call-outline"
         iconColor="green"
         title="Confirm Emergency Call"

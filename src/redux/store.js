@@ -26,6 +26,8 @@ import completedSessionDetailReducer from "./slices/completedSessionDetailSlice"
 import weeklySessionsReducer from "./slices/UpcomingSessionSlice"
 import trainerReducer from "./slices/trainerSlice"
 import ClientTrainerReducer from "./slices/clientTrainerSlice"
+import clientBmiReducer from "./slices/clientBmiSlice";
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -34,7 +36,7 @@ export const store = configureStore({
     forgotpassword: ForgotPasswordReducer,
     verifyotp: VerifyOtpReducer,
     resetpassword: ResetPasswordReducer,
-    cancelTraining:CancelTrainingReducer,
+    cancelTraining: CancelTrainingReducer,
     planList: PlanReducer,
     unbookedplans: unbookedplans,
     trainerReg: trainerRegistrationReducer,
@@ -46,17 +48,22 @@ export const store = configureStore({
     trainerProfile: trainerProfileReducer,
 
     mobProfile: mobProfileReducer,
-    
+
     profileEdit: clientProfileEditReducer,
+    clientBmi: clientBmiReducer,
 
 
-    completedSessions:completedSessionreducer,
-    weeklySessions:weeklySessionsReducer,
-    trainerSessions:trainerReducer,
-    completedSessionDetail:completedSessionDetailReducer,
-    clientTrainer:ClientTrainerReducer,
+
+    completedSessions: completedSessionreducer,
+    weeklySessions: weeklySessionsReducer,
+    trainerSessions: trainerReducer,
+    completedSessionDetail: completedSessionDetailReducer,
+    clientTrainer: ClientTrainerReducer,
     [scheduleApi.reducerPath]: scheduleApi.reducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(scheduleApi.middleware),
 });
+
+
+
