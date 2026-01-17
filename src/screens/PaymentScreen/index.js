@@ -49,59 +49,61 @@ const PaymentScreen = ({ navigation, route }) => {
     }
   }, [dispatch, trainerId]);
 
-  // 🔥 MAIN PAYMENT FLOW
   const openRazorpay = async () => {
+    // ✅ Ensure plan_id exists
+    if (!plan_id) {
+      Alert.alert("Error", "Plan ID is missing. Please select a plan.");
+      return;
+    }
+
     try {
       setPaying(true);
 
-      // 1️⃣ CREATE ORDER (BACKEND)
-      const orderRes = await createTrainerBookingOrder({
+      const payload = {
         trainer_id: trainerId,
-        plan_id: plan_id,
-        booking_type: booking_type,
-      });
-
-      const { order_id, amount, key } = orderRes.data;
-
-      // 2️⃣ OPEN RAZORPAY
-      const options = {
-        key: key,
-        amount: amount * 100, // paise
-        currency: "INR",
-        name: data.name,
-        description: "Trainer Booking",
-        image: data.profile_pic,
-        order_id: order_id,
-        prefill: {
-          name: "User",
-          email: "user@email.com",
-          contact: "9999999999",
-        },
-        theme: { color: "#3399cc" },
+        plan_id,
+        booking_type,
       };
 
-      RazorpayCheckout.open(options)
-        .then(async (response) => {
-          // 3️⃣ VERIFY PAYMENT (BACKEND)
-          await verifyTrainerPayment({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            start_date: start_date,
-            time: time,
-            slot_days: slot_days,
-          });
+      console.log("Booking payload:", payload);
 
-          setShowSuccess(true);
-        })
-        .catch(() => {
-          Alert.alert("Payment cancelled");
-        })
-        .finally(() => setPaying(false));
-    } catch (err) {
-      setPaying(false);
-      console.log("Payment error:", err);
+      // 1️⃣ Create order
+      const orderRes = await createTrainerBookingOrder(payload);
+      const { order_id, amount: orderAmount, key } = orderRes.data;
+
+      const options = {
+        key,
+        amount: Math.round(orderAmount * 100), // in paise
+        currency: "INR",
+        name: "HealthApp",
+        description: "Trainer booking",
+        order_id,
+        theme: { color: "#4CAF50" },
+      };
+
+      console.log("RAZORPAY OPTIONS:", options);
+
+      // 2️⃣ Open Razorpay
+      const response = await RazorpayCheckout.open(options);
+
+      console.log("PAYMENT SUCCESS:", response);
+
+      // 3️⃣ Verify payment
+      await verifyTrainerPayment({
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_signature: response.razorpay_signature,
+        start_date,
+        time,
+        slot_days,
+      });
+
+      setShowSuccess(true);
+    } catch (error) {
+      console.log("PAYMENT ERROR:", error?.response?.data || error.message || error);
       Alert.alert("Error", "Unable to initiate payment");
+    } finally {
+      setPaying(false);
     }
   };
 
@@ -131,12 +133,8 @@ const PaymentScreen = ({ navigation, route }) => {
         <View style={styles.separator} />
 
         <View style={styles.workoutPlan}>
-          <Text style={styles.label}>
-            Workout Plan - {data.plan_name}
-          </Text>
-          <Text style={styles.label}>
-            Workout Type - {booking_type}
-          </Text>
+          <Text style={styles.label}>Workout Plan - {data.plan_name}</Text>
+          <Text style={styles.label}>Workout Type - {booking_type}</Text>
         </View>
 
         <View style={styles.trainerBox}>
@@ -148,7 +146,6 @@ const PaymentScreen = ({ navigation, route }) => {
             }
             style={styles.trainerImg}
           />
-
           <TrainerInfoCard
             name={data.name}
             experience={data.experience}
@@ -202,12 +199,7 @@ const PaymentScreen = ({ navigation, route }) => {
             setShowSuccess(false);
             navigation.reset({
               index: 0,
-              routes: [
-                {
-                  name: "MainApp",
-                  params: { defaultTab: "Session" },
-                },
-              ],
+              routes: [{ name: "MainApp", params: { defaultTab: "Session" } }],
             });
           }}
         />
