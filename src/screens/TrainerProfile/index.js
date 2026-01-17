@@ -25,6 +25,9 @@ const ProfileScreenTrainer = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const { user } = useSelector(state => state.auth);
+  const imageSource = profile?.profile_pic_url
+  ? { uri: profile.profile_pic_url }
+  : require("../../../assets/trainer2.jpg");
 
   const { profile, loading } = useSelector(
     state => state.trainerProfile
@@ -110,13 +113,17 @@ const ProfileScreenTrainer = ({ navigation }) => {
       <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
 
       <ScrollView style={styles.container}>
-        <ProfileHeader
-          image={profile?.profile_pic_url}
-          name={profile?.name || "Trainer"}
-          showBack={false}
-          showEdit
-          onEdit={handlePickImage}
-        />
+
+
+<ProfileHeader
+  image={profileImage || imageSource}
+  name={profile?.name || "Trainer"}
+  showBack={false}
+  showEdit
+  onEdit={handlePickImage}
+/>
+
+
 
         <View style={styles.optionsWrapper}>
           <TouchableOpacity
