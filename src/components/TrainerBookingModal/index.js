@@ -139,7 +139,7 @@ const TrainerBookingModal = ({ visible, onClose, plan }) => {
                 onPress={() =>
                   navigation.navigate("Payment", {
                     trainerId: data.id,
-                    planId: plan.id,
+                    plan_id: plan.id,
                     booking_type: selected.toLowerCase(),
                     amount: amount,
                     address: address,
