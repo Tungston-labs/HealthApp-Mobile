@@ -19,6 +19,8 @@ import { registerTrainerThunk } from '../../redux/slices/trainerRegistrationSlic
 import { launchImageLibrary } from 'react-native-image-picker';
 import DOBPicker from './DOBPicker';
 import { uploadImageApi } from '../../services/trainerServices';
+import Toast from 'react-native-toast-message';
+import { validateSignup } from '../../utils/Validators';
 export default function CreateAccountScreen({ navigation }) {
   const [images, setImages] = useState([]);
   const dispatch = useDispatch();
@@ -39,12 +41,11 @@ export default function CreateAccountScreen({ navigation }) {
   const [aadhaarImage, setAadhaarImage] = useState(null);
   const [genderOpen, setGenderOpen] = useState(false);
   const [genderValue, setGenderValue] = useState('');
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [pincode, setPincode] = useState("");
   const [landmark, setLandmark] = useState("");
-
+  const [coords, setCoords] = useState(null);
   const [expertiseOpen, setExpertiseOpen] = useState(false);
   const [expertiseValue, setExpertiseValue] = useState('');
   const expertiseMap = {
@@ -103,34 +104,26 @@ export default function CreateAccountScreen({ navigation }) {
   }, []);
   const handleUseLocation = async () => {
     try {
-      const coords = await getCurrentLocation();
+      const locationData = await getCurrentLocation();
+
+      // Round to 6 decimal places immediately
+      const roundedCoords = {
+        latitude: parseFloat(locationData.latitude.toFixed(6)),
+        longitude: parseFloat(locationData.longitude.toFixed(6)),
+      };
+
+      setCoords(roundedCoords); // Save the cleaned coordinates
+
       const fullAddress = await reverseGeocode(
-        coords.latitude,
-        coords.longitude
+        roundedCoords.latitude,
+        roundedCoords.longitude
       );
 
-      const pinMatch = fullAddress.match(/\b\d{6}\b/);
-      const pin = pinMatch ? pinMatch[0] : "";
-
-      const parts = fullAddress.split(",");
-
-      const landmarkValue = parts[0]?.trim() || "";
-      const cityValue = parts[1]?.trim() || "";
-
+      // ... rest of your address logic
       setAddress(fullAddress);
-      setCity(cityValue);
-      setLandmark(landmarkValue);
-      setPincode(pin);
-
       alert("Location fetched successfully");
-      console.log("Location:", {
-        fullAddress,
-        cityValue,
-        pin,
-      });
     } catch (err) {
       console.log("Location error:", err);
-      alert("Unable to fetch location. Please try again.");
     }
   };
 
@@ -162,65 +155,75 @@ export default function CreateAccountScreen({ navigation }) {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 const handleSubmit = async () => {
+  // 1. Prepare Validation Data
+  const validationData = {
+    name, email, phno, dob, genderValue, expertiseValue,
+    aadhaar, password, location, landmark, address, city, pincode,
+    profileImage, aadhaarImage, images, sectionTiming
+  };
+
+  const check = validateSignup(validationData);
+  if (!check.ok) {
+    Toast.show({
+      type: 'error',
+      text1: 'Validation Error',
+      text2: check.msg,
+    });
+    return;
+  }
+
   try {
     setIsUploading(true);
 
-    const adarImageUrl = aadhaarImage?.uri
-      ? await uploadImageApi(aadhaarImage)
-      : "";
-
+    // 2. Upload Images to get URLs
+    const adarImageUrl = await uploadImageApi(aadhaarImage);
     let certUrls = [];
-    const formData = new FormData();
-
-    const finalLocation =
-      location?.trim() ||
-      [landmark, address, city, pincode].filter(Boolean).join(", ");
-
-    if (!finalLocation) {
-      Alert.alert("Error", "Please provide your location");
-      setIsUploading(false);
-      return;
+    for (const img of images) {
+      const url = await uploadImageApi(img);
+      if (url) certUrls.push(url);
     }
 
-    // 🔹 Text fields
+    // 3. Prepare Form Data
+    const formData = new FormData();
+    const finalLocationString = location?.trim() || [landmark, address, city, pincode].filter(Boolean).join(", ");
+
+    // Basic Info
     formData.append("name", name);
     formData.append("email", email.toLowerCase().trim());
     formData.append("phno", phno);
     formData.append("dob", dob);
     formData.append("gender", genderValue.toLowerCase());
-    formData.append("location", finalLocation); // ✅ REQUIRED
-    formData.append("adar_number", aadhaar);
     formData.append("password", password);
-    formData.append("section_timing", sectionTiming);
-
-    // 🔹 Optional split address fields (backend supports these)
+    
+    // Address Details (Fixed syntax here)
+    formData.append("location", finalLocationString); 
     formData.append("address", address || "");
-    formData.append("landmark", landmark || "");
     formData.append("city", city || "");
     formData.append("pincode", pincode || "");
+    formData.append("landmark", landmark || "");
 
-    // 🔹 Upload certificates
-    for (const img of images) {
-      const url = await uploadImageApi(img);
-      if (url) certUrls.push(url);
-      await new Promise(r => setTimeout(r, 300));
+    // Aadhaar & Section Info
+    formData.append("adar_number", aadhaar);
+    formData.append("section_timing", sectionTiming);
+
+    // Coordinates (Fixed precision for Django)
+    if (coords?.latitude && coords?.longitude) {
+      formData.append("latitude", Number(coords.latitude).toFixed(6));
+      formData.append("longitude", Number(coords.longitude).toFixed(6));
     }
 
+    // Professional Info
     const planId = expertiseMap[expertiseValue];
     if (planId) formData.append("training_field", Number(planId));
-
     formData.append("experience", Number(experience) || 0);
     formData.append("no_of_section", Number(sessions) || 0);
     formData.append("expecting_salary", Number(fee) || 0);
 
-    // 🔹 Profile image
+    // Profile Picture logic
     if (profileImage?.uri) {
-      const fixedUri =
-        Platform.OS === "android"
-          ? profileImage.uri.startsWith("file://")
-            ? profileImage.uri
-            : `file://${profileImage.uri}`
-          : profileImage.uri;
+      const fixedUri = Platform.OS === "android"
+        ? (profileImage.uri.startsWith("file://") ? profileImage.uri : `file://${profileImage.uri}`)
+        : profileImage.uri;
 
       formData.append("profile_pic", {
         uri: fixedUri,
@@ -229,41 +232,50 @@ const handleSubmit = async () => {
       });
     }
 
-    if (adarImageUrl) {
-      formData.append("adar_image", adarImageUrl);
-    }
-
+    // URLs from step 2
+    if (adarImageUrl) formData.append("adar_image", adarImageUrl);
     certUrls.forEach(url => {
       formData.append("certificates[]", url);
     });
 
-    console.log("✅ FINAL LOCATION:", finalLocation);
-    console.log("📦 FormData ready:", formData);
-
+    // 4. Submit to Redux
     await dispatch(registerTrainerThunk(formData)).unwrap();
-    Alert.alert("Success", "Trainer Registered Successfully!");
+
+    Toast.show({
+      type: 'success',
+      text1: 'Success',
+      text2: 'Trainer Registered Successfully!',
+    });
+
+    navigation.reset({ index: 0, routes: [{ name: "ThankYouScreen" }] });
 
   } catch (err) {
-    console.log("❌ FINAL SUBMIT ERROR", err);
+    console.log("REGISTRATION ERROR:", err);
+    let errorMessage = "Something went wrong";
 
-    if (err?.response) {
-      alert(JSON.stringify(err.response.data));
-    } else {
-      alert(err.message || "Something went wrong");
+    if (typeof err === 'string') {
+      errorMessage = err;
+    } else if (err?.message && typeof err.message === 'string') {
+      errorMessage = err.message;
+    } else if (typeof err === 'object') {
+      const values = Object.values(err);
+      if (values.length > 0) {
+        errorMessage = Array.isArray(values[0]) ? values[0][0] : JSON.stringify(values[0]);
+      }
     }
+
+    Toast.show({
+      type: 'error',
+      text1: 'Registration Failed',
+      text2: errorMessage,
+      visibilityTime: 5000,
+    });
+
   } finally {
     setIsUploading(false);
   }
 };
 
-
-
-
-  useEffect(() => {
-    if (success) {
-      navigation.navigate('ThankYouScreen');
-    }
-  }, [success, navigation]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -453,7 +465,7 @@ const handleSubmit = async () => {
           />
         </View>
 
-  
+
         <TextInput
           placeholder="Landmark"
           placeholderTextColor="#888"

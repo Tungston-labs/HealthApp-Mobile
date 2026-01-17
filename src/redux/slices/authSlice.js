@@ -1,37 +1,59 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loginApi, logoutApi } from '../../services/authServices';
-import { publicApi } from '../../services/api';
+import api, { publicApi } from '../../services/api';
 import { clearStorage } from '../../storage/asyncStorage';
 
 export const loginClientThunk = createAsyncThunk(
-  'auth/login',
+  "auth/login",
   async (payload, { rejectWithValue }) => {
     try {
       const res = await loginApi(payload);
+
       const user = res.data?.data?.user;
       const access = res.data?.data?.access;
       const refresh = res.data?.data?.refresh;
 
-      if (refresh) await AsyncStorage.setItem('refresh_token', refresh);
-      if (user) await AsyncStorage.setItem('user', JSON.stringify(user));
+      // 🚨 TRAINER STATUS CHECK
+      if (user?.role === "trainer" && user?.trainer?.status !== "approved") {
+        return rejectWithValue(
+          `Your account is ${user.trainer.status}. Please wait for approval.`
+        );
+      }
+
+      if (refresh) await AsyncStorage.setItem("refresh_token", refresh);
+      if (user) await AsyncStorage.setItem("user", JSON.stringify(user));
 
       return { user, access };
     } catch (err) {
-      if (err.response) {
-        return rejectWithValue(
-          err.response.data?.detail ||
-          err.response.data?.email_or_phno?.[0] ||
-          'Invalid credentials',
-        );
+      if (err.response?.data?.message) {
+        return rejectWithValue(err.response.data.message);
       }
-      if (err.request) {
-        return rejectWithValue('Server not reachable');
+
+      if (err.response?.data?.detail) {
+        return rejectWithValue(err.response.data.detail);
       }
-      return rejectWithValue('Something went wrong');
+
+      return rejectWithValue("Invalid credentials");
     }
-  },
+
+  }
 );
+
+// authSlice.js
+export const fetchTrainerStatusThunk = createAsyncThunk(
+  "auth/fetchTrainerStatus",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await api.get("/trainer/status/");
+      console.log("TRAINER STATUS API:", res.data);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data);
+    }
+  }
+);
+
 
 export const logoutThunk = createAsyncThunk(
   'auth/logout',
@@ -87,6 +109,9 @@ const authSlice = createSlice({
     user: null,
     accessToken: null,
     error: null,
+    role: null,
+    isVerified: true,
+    trainerStatus: null,
   },
   reducers: {
     resetAuthState: state => {
@@ -117,10 +142,32 @@ const authSlice = createSlice({
       })
       .addCase(loginClientThunk.fulfilled, (state, action) => {
         state.loading = false;
+
+        if (!action.payload || !action.payload.user) {
+          // 🚨 safety guard
+          state.isLoggedIn = false;
+          state.error = "Account not approved yet";
+          return;
+        }
+
+        const user = action.payload.user;
+
         state.isLoggedIn = true;
-        state.user = action.payload.user;
+        state.user = user;
         state.accessToken = action.payload.access;
+        state.role = user?.role;
+
+        if (user?.role === "trainer") {
+          state.trainerStatus = user?.trainer?.status;
+          state.isVerified = user?.trainer?.status === "approved";
+        } else {
+          state.trainerStatus = null;
+          state.isVerified = true;
+        }
       })
+
+
+
       .addCase(loginClientThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
@@ -135,24 +182,47 @@ const authSlice = createSlice({
         state.isLoggedIn = false;
         state.user = null;
         state.accessToken = null;
+        state.isVerified = true;
+        state.role = null;
       })
       .addCase(logoutThunk.rejected, state => {
         state.loading = false;
         state.isLoggedIn = false;
         state.user = null;
       })
-
       .addCase(loadPersistedAuthState.fulfilled, (state, action) => {
         if (!action.payload) return;
-        state.user = action.payload.user;
-        state.accessToken = action.payload.access;
+
+        const user = action.payload.user;
+
+        state.loading = false;
         state.isLoggedIn = true;
+        state.user = user;
+        state.accessToken = action.payload.access;
+        state.role = user?.role;
+
+        if (user?.role === "trainer") {
+          state.trainerStatus = user?.trainer?.status; // approved / pending
+          state.isVerified = user?.trainer?.status === "approved";
+        } else {
+          state.trainerStatus = null;
+          state.isVerified = true;
+        }
+
       })
-      .addCase(loadPersistedAuthState.rejected, state => {
-        state.isLoggedIn = false;
-        state.user = null;
-        state.accessToken = null;
+      .addCase(fetchTrainerStatusThunk.pending, state => {
+        state.loading = true;
+      })
+      .addCase(fetchTrainerStatusThunk.fulfilled, (state, action) => {
+        state.loading = false;
+
+        state.trainerStatus =
+          action.payload.trainerStatus || action.payload.status;
+      })
+      .addCase(fetchTrainerStatusThunk.rejected, state => {
+        state.loading = false;
       });
+
   },
 });
 

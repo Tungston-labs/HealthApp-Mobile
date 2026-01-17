@@ -33,22 +33,15 @@ import { navigationRef } from './navigationService';
 
 export default function Navigation() {
   const dispatch = useDispatch();
-  const { isLoggedIn, user } = useSelector(state => state.auth);
+  const { isLoggedIn, user, isVerified } = useSelector(state => state.auth);
   const [isLoading, setIsLoading] = useState(true);
 
-useEffect(() => {
-  dispatch(loadPersistedAuthState());
-  setIsLoading(false);
-}, [dispatch]);
-console.log("isLoading:", isLoading);
-console.log("isLoggedIn:", isLoggedIn);
-console.log("user:", user);
+  useEffect(() => {
+    dispatch(loadPersistedAuthState());
+    setIsLoading(false);
+  }, [dispatch]);
 
-
-  if (isLoading) {
-
-    return null;
-  }
+  if (isLoading) return null;
 
   return (
     <NavigationContainer ref={navigationRef}>
@@ -56,62 +49,43 @@ console.log("user:", user);
         {!isLoggedIn ? (
           <>
             <Stack.Screen name="Welcome" component={Welcome} />
-
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen
-              name="ForgotPassword"
-              component={ForgotPasswordScreen}
+              name="ThankYouScreen"
+              component={ThankYouScreen}
+              options={{ gestureEnabled: false }}
             />
+            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
             <Stack.Screen name="OtpScreen" component={OtpScreen} />
-            <Stack.Screen
-              name="ResetPasswordScreen"
-              component={ResetPasswordScreen}
-            />
-            <Stack.Screen
-              name="SelectRoleScreen"
-              component={SelectRoleScreen}
-            />
-            <Stack.Screen
-              name="SignupDetailsScreenUser"
-              component={SignupDetailsScreenUser}
-            />
+            <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
+            <Stack.Screen name="SelectRoleScreen" component={SelectRoleScreen} />
+            <Stack.Screen name="SignupDetailsScreenUser" component={SignupDetailsScreenUser} />
             <Stack.Screen name="CreateAccount" component={CreateAccount} />
-            <Stack.Screen
-              name="MainWizardScreen"
-              component={MainWizardScreen}
-            />
+            <Stack.Screen name="MainWizardScreen" component={MainWizardScreen} />
             <Stack.Screen name="BMIResultScreen" component={BMIResultScreen} />
           </>
-        ) : user?.role === 'trainer' ? (
-          <>
+        ) : user?.role === "trainer" ? (
+          isVerified ? (
+            <>
+              <Stack.Screen name="TrainerNavigator" component={TrainerNavigator} />
+              <Stack.Screen name="TrainerScheduleDetail" component={TrainerScheduleDetailContainer} />
+              <Stack.Screen name="TrainerEditProfile" component={TrainerEditProfile} />
+              <Stack.Screen name="TrainerTermsAndConditions" component={TrainerTermsAndConditions} />
+            </>
+          ) : (
             <Stack.Screen
-              name="TrainerNavigator"
-              component={TrainerNavigator}
+              name="ThankYouScreen"
+              component={ThankYouScreen}
+              options={{ gestureEnabled: false }}
             />
-            <Stack.Screen
-              name="TrainerScheduleDetail"
-              component={TrainerScheduleDetailContainer}
-            />
-            <Stack.Screen
-              name="TrainerEditProfile"
-              component={TrainerEditProfile}
-            />
-             <Stack.Screen
-              name="TrainerTermsAndConditions"
-              component={TrainerTermsAndConditions}
-            />
-          </>
+          )
         ) : (
           <>
+            {/* Client (user) */}
             <Stack.Screen name="MainApp" component={AppNavigator} />
-
             <Stack.Screen name="Notifications" component={NotificationScreen} />
-
             <Stack.Screen name="TrainerList" component={TrainerListScreen} />
-            <Stack.Screen
-              name="TrainerDetail"
-              component={TrainerDetailScreen}
-            />
+            <Stack.Screen name="TrainerDetail" component={TrainerDetailScreen} />
             <Stack.Screen name="Payment" component={PaymentScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
 
@@ -119,14 +93,11 @@ console.log("user:", user);
                         <Stack.Screen name="RazorPayScreen" component={RazorpayButton} />
 
             <Stack.Screen name="ScheduleEmpty" component={ScheduleEmpty} />
-            <Stack.Screen
-              name="UserTermsAndConditions"
-              component={UserTermsAndConditions}
-            />
-           
+            <Stack.Screen name="UserTermsAndConditions" component={UserTermsAndConditions} />
           </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
