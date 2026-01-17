@@ -8,9 +8,9 @@ import EmptyState from "../../components/EmptyState";
 import FilterModal from "../../components/FIlterModal";
 
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import { fetchTrainerDetailThunk } from "../../redux/slices/trainerDetailSlice";
-import { cancelTrainingThunk } from "../../redux/slices/CancelTrainingSlice";
+import { cancelTrainingThunk, resetCancelState } from "../../redux/slices/CancelTrainingSlice";
 import { requestNutritionThunk, resetNutritionState } from "../../redux/slices/NutritionRequestSlice";
 
 const ProfileSection = () => {
