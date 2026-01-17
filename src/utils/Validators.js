@@ -7,27 +7,38 @@ export const nameRegex = /^[A-Za-z ]{3,}$/;
 export const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 export const validateSignup = (data) => {
-  if (!nameRegex.test(data.name))
-    return { ok: false, msg: 'Enter valid full name' };
+  // Text Fields
+  if (!nameRegex.test(data.name)) return { ok: false, msg: 'Enter valid full name (min 3 chars)' };
+  if (!emailRegex.test(data.email)) return { ok: false, msg: 'Enter valid email address' };
+  if (!phoneRegex.test(data.phno)) return { ok: false, msg: 'Enter valid 10 digit phone number' };
+  if (!data.dob) return { ok: false, msg: 'Date of Birth is required' };
+  if (!data.genderValue) return { ok: false, msg: 'Please select your gender' };
+  if (!data.expertiseValue) return { ok: false, msg: 'Please select your expertise/training field' };
+  
+  // Aadhaar
+  if (!data.aadhaar || !aadhaarRegex.test(data.aadhaar)) 
+    return { ok: false, msg: 'Aadhaar must be exactly 12 digits' };
 
-  if (!emailRegex.test(data.email))
-    return { ok: false, msg: 'Enter valid email address' };
-
-  if (!phoneRegex.test(data.phno))
-    return { ok: false, msg: 'Enter valid 10 digit phone number' };
-
-
-if (data.aadhaar && !aadhaarRegex.test(data.aadhaar))
-  return { ok: false, msg: 'Aadhaar must be 12 digits' };
-
+  // Password
   if (!passwordRegex.test(data.password))
-    return {
-      ok: false,
-      msg: 'Password must have 1 capital & 1 number',
-    };
+    return { ok: false, msg: 'Password must be 8+ chars with 1 Capital & 1 Number' };
 
-  if (!data.address)
-    return { ok: false, msg: 'Location is required' };
+  // Location (checks both the manual string or the auto-fetched components)
+  const finalLocation = data.location?.trim() || [data.landmark, data.address, data.city, data.pincode].filter(Boolean).join(", ");
+  if (!finalLocation || finalLocation.length < 5) 
+    return { ok: false, msg: 'Full location details are required' };
 
+  // Image Checks
+  if (!data.profileImage?.uri) return { ok: false, msg: 'Please upload a Profile Picture' };
+  if (!data.aadhaarImage?.uri) return { ok: false, msg: 'Please upload your Aadhaar Image' };
+  if (!data.images || data.images.length === 0) return { ok: false, msg: 'Please upload at least one certificate image' };
+if (!data.genderValue) return { ok: false, msg: 'Please select your gender' };
+  
+  // NEW: Section Timing Validation
+  if (!data.sectionTiming) {
+    return { ok: false, msg: 'Please select a session duration (Section Timing)' };
+  }
+
+  if (!data.expertiseValue) return { ok: false, msg: 'Please select your expertise' };
   return { ok: true };
 };
