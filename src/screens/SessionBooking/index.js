@@ -90,19 +90,19 @@ const SessionBooking = () => {
                         )}
 
                         {bookings.map((item) => (
-  <SessionCard
-    key={item.id}
-    clientName={item.client.name}
-    date={item.date}
-    time={item.time_label}
-    endDate={item.session_end_date}
-    status={item.status}
+                            <SessionCard
+                                key={item.id}
+                                clientName={item.client.name}
+                                date={item.date}
+                                time={item.time_label}
+                                endDate={item.session_end_date}
+                                status={item.status}
 
-    /* ✅ USE API VALUES */
-    sessionCount={item.session_number}
-    totalSessions={item.total_sessions}
-  />
-))}
+                                /* ✅ USE API VALUES */
+                                sessionCount={item.session_number}
+                                totalSessions={item.total_sessions}
+                            />
+                        ))}
 
 
                     </>

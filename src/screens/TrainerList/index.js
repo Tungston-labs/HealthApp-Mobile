@@ -1,39 +1,44 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, Text, ActivityIndicator, TouchableOpacity } from "react-native";
+import { View, FlatList, Text, ActivityIndicator } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import HeaderWithBack from "../../components/HeaderWithBack";
 import TrainerCard from "./Trainercard";
 import styles from "./styles";
 import TrainerBookingModal from "../../components/TrainerBookingModal";
-import { fetchAvailableTrainersThunk } from "../../redux/slices/trainerPlanSlice";
-import { fetchTrainerDetailThunk, resetTrainerDetail } from "../../redux/slices/trainerDetailSlice";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  fetchAvailableTrainersThunk,
+} from "../../redux/slices/trainerPlanSlice";
+import {
+  fetchTrainerDetailThunk,
+  resetTrainerDetail,
+} from "../../redux/slices/trainerDetailSlice";
+import { useRoute } from "@react-navigation/native";
 
 const TrainerListScreen = () => {
   const dispatch = useDispatch();
   const route = useRoute();
 
-  const { trainers, plan, loading, error } = useSelector((state) => state.trainer);
+  const { trainers, plan, loading, error } = useSelector(
+    (state) => state.trainer
+  );
 
   const [selectedTrainerId, setSelectedTrainerId] = useState(null);
 
   const trainersList = Array.isArray(trainers) ? trainers : [];
+  const planId = route.params?.planId;
   const isFiltered = route.params?.isFiltered;
-const planId = route.params?.planId;
 
   useEffect(() => {
-    if (!isFiltered) {
+    if (!isFiltered && planId) {
       dispatch(fetchAvailableTrainersThunk({ plan_id: planId }));
     }
-  }, [dispatch, isFiltered, planId]);
+  }, [dispatch, planId, isFiltered]);
 
-
-const handleBookNow = (trainerId) => {
-  setSelectedTrainerId(trainerId);
-  dispatch(fetchTrainerDetailThunk(trainerId)); 
-};
-
+  const handleBookNow = (trainerId) => {
+    setSelectedTrainerId(trainerId);
+    dispatch(fetchTrainerDetailThunk(trainerId));
+  };
 
   const handleCloseModal = () => {
     setSelectedTrainerId(null);
@@ -43,7 +48,7 @@ const handleBookNow = (trainerId) => {
   if (loading && trainersList.length === 0) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#000" />
+        <ActivityIndicator size="large" />
       </View>
     );
   }
@@ -51,7 +56,7 @@ const handleBookNow = (trainerId) => {
   return (
     <View style={styles.container}>
       <HeaderWithBack title={plan?.name || "Trainers"} />
-      <Text style={styles.subtitle}>Available trainers</Text>
+      <Text style={styles.subtitle}>Available Trainers</Text>
 
       {error ? (
         <View style={styles.center}>
@@ -67,7 +72,6 @@ const handleBookNow = (trainerId) => {
               trainer={item}
               onBookNow={() => handleBookNow(item.id)}
             />
-
           )}
         />
       )}
@@ -75,6 +79,7 @@ const handleBookNow = (trainerId) => {
       <TrainerBookingModal
         visible={!!selectedTrainerId}
         onClose={handleCloseModal}
+        plan={plan}
       />
     </View>
   );
