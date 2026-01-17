@@ -17,7 +17,9 @@ import { fetchTrainerDetailThunk } from "../../redux/slices/trainerDetailSlice";
 
 const PaymentScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const { trainerId, workoutType } = route.params;
+
+  // ✅ Read from route params
+  const { trainerId, booking_type, amount } = route.params;
 
   const { loading, data, error } = useSelector(
     (state) => state.trainerDetail
@@ -27,7 +29,9 @@ const PaymentScreen = ({ navigation, route }) => {
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchTrainerDetailThunk(trainerId));
+    if (trainerId) {
+      dispatch(fetchTrainerDetailThunk(trainerId));
+    }
   }, [dispatch, trainerId]);
 
   if (loading) {
@@ -60,13 +64,17 @@ const PaymentScreen = ({ navigation, route }) => {
             Workout Plan - {data.plan_name}
           </Text>
           <Text style={styles.label}>
-            Workout Type - {workoutType}
+            Workout Type - {booking_type}
           </Text>
         </View>
 
         <View style={styles.trainerBox}>
           <Image
-            source={{ uri: data.profile_pic }}
+            source={
+              data.profile_pic
+                ? { uri: data.profile_pic }
+                : require("../../../assets/trainer2.jpg")
+            }
             style={styles.trainerImg}
           />
 
@@ -77,7 +85,6 @@ const PaymentScreen = ({ navigation, route }) => {
             numSessions={data.no_of_section}
             workoutType={data.plan_name}
           />
-
         </View>
 
         {/* Payment Method */}
@@ -91,7 +98,7 @@ const PaymentScreen = ({ navigation, route }) => {
           ]}
           onPress={() => setSelectedMethod("razorpay")}
         >
-          <Text style={styles.paymentText}>Gpay</Text>
+          <Text style={styles.paymentText}>GPay / Razorpay</Text>
           {selectedMethod === "razorpay" && (
             <Icon name="checkmark-circle" size={28} color="#2ecc71" />
           )}
@@ -115,7 +122,9 @@ const PaymentScreen = ({ navigation, route }) => {
           onPress={() => setSelectedMethod("card")}
         >
           <Icon name="card-outline" size={22} />
-          <Text style={styles.otherMethodText}>Debit / Credit Card</Text>
+          <Text style={styles.otherMethodText}>
+            Debit / Credit Card
+          </Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -123,37 +132,38 @@ const PaymentScreen = ({ navigation, route }) => {
       <View style={styles.footer}>
         <View style={styles.totalWrapper}>
           <Text style={styles.totalLabel}>Total</Text>
-          <Text style={styles.totalValue}>₹ {data.expecting_salary}</Text>
+          {/* ✅ Correct amount */}
+          <Text style={styles.totalValue}>₹ {amount}</Text>
         </View>
 
         <TouchableOpacity
-          style={styles.payBtn}
+          style={[
+            styles.payBtn,
+            !selectedMethod && { opacity: 0.6 },
+          ]}
+          disabled={!selectedMethod}
           onPress={() => setShowSuccess(true)}
         >
           <Text style={styles.payText}>Proceed to Pay</Text>
         </TouchableOpacity>
 
-      <PaymentSuccessModal
-  visible={showSuccess}
-  onClose={() => {
-    setShowSuccess(false);
+        <PaymentSuccessModal
+          visible={showSuccess}
+          onClose={() => {
+            setShowSuccess(false);
 
- navigation.reset({
-  index: 0,
-  routes: [
-    {
-      name: "MainApp",
-      params: { defaultTab: "Session" }, 
-    },
-  ],
-});
-
-  }}
-/>
-
-
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "MainApp",
+                  params: { defaultTab: "Session" },
+                },
+              ],
+            });
+          }}
+        />
       </View>
-
     </View>
   );
 };
