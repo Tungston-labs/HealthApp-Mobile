@@ -6,9 +6,9 @@ export const fetchAvailableTrainersThunk = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await fetchAvailableTrainersAPI(payload);
+      console.log(response)
       return response.data; 
     } catch (err) {
-      // log full backend response for debugging
       console.log('🔥 BACKEND ERROR RESPONSE:', err?.response?.data);
       return rejectWithValue(err?.response?.data || 'Failed to fetch trainers');
     }
