@@ -14,7 +14,7 @@ export default StyleSheet.create({
   justifyContent: "space-between",
   paddingHorizontal: 12,
 },
-
+ 
 
   card: {
     width: cardWidth,
@@ -23,7 +23,7 @@ export default StyleSheet.create({
     marginBottom: 16,
     overflow: "hidden",
     shadowColor: "#000",
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.12, 
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
     elevation: 5,

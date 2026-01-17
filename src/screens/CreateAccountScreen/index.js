@@ -256,9 +256,6 @@ const handleSubmit = async () => {
   }
 };
 
-
-
-
   useEffect(() => {
     if (success) {
       navigation.navigate('ThankYouScreen');
