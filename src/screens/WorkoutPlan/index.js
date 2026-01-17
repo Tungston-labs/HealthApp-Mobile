@@ -35,7 +35,7 @@ const WorkoutPlan = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/* ✅ FIXED HEADER */}
+      {/*  FIXED HEADER */}
       <Header
         username={user?.name || "User"}
         subtitle="Your workout plans"
@@ -44,7 +44,7 @@ const WorkoutPlan = ({ navigation }) => {
         }
       />
 
-      {/* ✅ EVERYTHING BELOW SCROLLS */}
+      {/*  EVERYTHING BELOW SCROLLS */}
       {loading ? (
         <FlatList
           data={Array.from({ length: 6 })}
@@ -64,7 +64,6 @@ const WorkoutPlan = ({ navigation }) => {
           contentContainerStyle={{ paddingBottom: 80 }}
           showsVerticalScrollIndicator={false}
 
-          /* ✅ SHOW ONLY IF UPCOMING SESSIONS EXIST */
           ListHeaderComponent={
             sessions && sessions.length > 0 ? (
               <>

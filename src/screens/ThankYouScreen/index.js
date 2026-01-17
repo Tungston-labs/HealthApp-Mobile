@@ -1,65 +1,66 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Image, SafeAreaView } from "react-native";
+import React from "react";
+import { View, Text, Image, SafeAreaView, TouchableOpacity } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
+import { logout } from "../../redux/slices/authSlice";
 import styles from "./style";
 
 export default function ThankYouScreen() {
-  const [showVerified, setShowVerified] = useState(false);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowVerified(true);
-    }, 2000);
+  const { trainerStatus } = useSelector(state => state.auth);
+  const isApproved = trainerStatus === "approved";
 
-    return () => clearTimeout(timer);
-  }, []);
-  useEffect(() => {
-    if (showVerified) {
-      const navTimer = setTimeout(() => {
-        navigation.replace("TrainerNavigator");
-      }, 1000);
-
-      return () => clearTimeout(navTimer);
-    }
-  }, [showVerified, navigation]);
+  const handleGoToLogin = () => {
+    dispatch(logout());
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Login" }],
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.innerWrapper}>
-        {!showVerified && (
-          <>
-            <Image
-              source={require("../../Images/thankyou.png")}
-              style={styles.clockImage}
-            />
+        <Image
+          source={require("../../Images/thankyou.png")}
+          style={styles.clockImage}
+        />
 
-            <Text style={styles.title}>Thank you!</Text>
+        <Text style={styles.title}>Thank you!</Text>
 
-            <Text style={styles.description}>
-              Your account is under review and will Be{"\n"}
-              verified within <Text style={styles.boldText}>24 hours.</Text>{" "}
-              Please check back later.
+        <Text style={styles.description}>
+          {isApproved ? (
+            <>
+              Your account has been{" "}
+              <Text style={styles.boldText}>approved.</Text>
+              {"\n"}Please login to continue.
+            </>
+          ) : (
+            <>
+              Your account is under review and will be{"\n"}
+              verified within{" "}
+              <Text style={styles.boldText}>24 hours.</Text>
+              {"\n\n"}
+              Once approved, please login again.
+            </>
+          )}
+        </Text>
+
+        <View style={styles.loginBtnWrapper}>
+          <TouchableOpacity
+            style={[
+              styles.loginBtn,
+              !isApproved && { opacity: 0.7 },
+            ]}
+            onPress={handleGoToLogin}
+          >
+            <Text style={styles.loginText}>
+              {isApproved ? "Go to Login" : "Login Again Later"}
             </Text>
-          </>
-        )}
-
-        {showVerified && (
-          <>
-            <Image
-              source={require("../../Images/verified.png")}
-              style={styles.clockImage}
-            />
-
-            <Text style={styles.title}>Account Verified</Text>
-
-            <Text style={styles.description}>
-              Your account has been successfully{"\n"}
-              verified.{"\n"}
-              You're all set to continue!
-            </Text>
-          </>
-        )}
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
