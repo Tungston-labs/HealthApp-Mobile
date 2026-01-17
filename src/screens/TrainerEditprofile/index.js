@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+
 import {
   View,
   Text,
@@ -26,6 +28,11 @@ const TrainerEditProfile = ({ navigation }) => {
   const [form, setForm] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+  const [fetchingLocation, setFetchingLocation] = useState(false);
+
+
 
   useEffect(() => {
     if (profile) {
@@ -54,33 +61,74 @@ const TrainerEditProfile = ({ navigation }) => {
     });
   };
 
+
+  const OPENCAGE_KEY = "YOUR_OPENCAGE_KEY";
+
   const useMyLocation = () => {
+    if (fetchingLocation) return;
+
+    setFetchingLocation(true);
+
     Geolocation.getCurrentPosition(
       async position => {
-        const { latitude, longitude } = position.coords;
+        try {
+          const { latitude, longitude } = position.coords;
 
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_API_KEY}`;
-        const res = await fetch(url);
-        const json = await res.json();
+          setLatitude(latitude);
+          setLongitude(longitude);
 
-        if (!json.results.length) return;
+          const res = await axios.get(
+            "https://api.opencagedata.com/geocode/v1/json",
+            {
+              params: {
+                q: `${latitude},${longitude}`,
+                key: OPENCAGE_KEY,
+                language: "en",
+              },
+            }
+          );
 
-        const components = json.results[0].address_components;
-        const get = type =>
-          components.find(c => c.types.includes(type))?.long_name || "";
+          if (!res.data.results || res.data.results.length === 0) {
+            throw new Error("Address not found");
+          }
 
-        setForm(prev => ({
-          ...prev,
-          address: json.results[0].formatted_address,
-          city: get("locality"),
-          pincode: get("postal_code"),
-          landmark: get("sublocality") || get("route"),
-        }));
+          const data = res.data.results[0];
+          const components = data.components;
+
+          setForm(prev => ({
+            ...prev,
+            address: data.formatted,
+            city: components.city || components.town || components.village || "",
+            pincode: components.postcode || "",
+            landmark:
+              components.suburb ||
+              components.neighbourhood ||
+              components.road ||
+              "",
+          }));
+
+          Alert.alert("Success", "Location fetched successfully");
+        } catch (err) {
+          console.log("GEOCODE ERROR:", err);
+          // Alert.alert("Error", "Unable to fetch address");
+        } finally {
+          setFetchingLocation(false);
+        }
       },
-      error => Alert.alert("Location error", error.message),
-      { enableHighAccuracy: true, timeout: 15000 }
+      error => {
+        setFetchingLocation(false);
+        Alert.alert("Location error", error.message);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 20000,
+        maximumAge: 10000,
+      }
     );
   };
+
+
+
 
   const handleSave = async () => {
     setSaving(true);
@@ -94,6 +142,13 @@ const TrainerEditProfile = ({ navigation }) => {
     formData.append("city", form.city);
     formData.append("pincode", form.pincode);
     formData.append("landmark", form.landmark);
+    formData.append("location", form.address);
+
+    if (latitude !== null && longitude !== null) {
+      formData.append("latitude", latitude.toFixed(6));
+      formData.append("longitude", longitude.toFixed(6));
+    }
+
 
     if (profileImage) {
       formData.append("profile_pic", {
@@ -128,13 +183,22 @@ const TrainerEditProfile = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
+
         <ProfileHeader
+          image={
+            profileImage
+              ? { uri: profileImage.uri }
+              : profile?.profile_pic_url
+                ? { uri: profile.profile_pic_url }
+                : require("../../../assets/trainer2.jpg")
+          }
           name="Edit Profile"
           showBack
           showEdit
           onEdit={pickProfileImage}
           onBack={() => navigation.goBack()}
         />
+
 
         <View style={styles.formWrapper}>
 
@@ -191,9 +255,19 @@ const TrainerEditProfile = ({ navigation }) => {
             onChangeText={v => handleChange("aadhaar", v)}
           />
 
-          <TouchableOpacity style={styles.locationBtn} onPress={useMyLocation}>
-            <Text style={styles.locationText}>Use my location</Text>
+          <TouchableOpacity
+            style={[
+              styles.locationBtn,
+              fetchingLocation && { opacity: 0.6 }
+            ]}
+            onPress={useMyLocation}
+            disabled={fetchingLocation}
+          >
+            <Text style={styles.locationText}>
+              {fetchingLocation ? "Fetching location..." : "Use my location"}
+            </Text>
           </TouchableOpacity>
+
 
           <View style={styles.row}>
             <View style={styles.col}>

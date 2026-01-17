@@ -43,20 +43,18 @@ const trainerSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchAvailableTrainersThunk.fulfilled, (state, action) => {
-        state.loading = false;
+    .addCase(fetchAvailableTrainersThunk.fulfilled, (state, action) => {
+  state.loading = false;
 
-        state.trainers =
-          action.payload?.available_trainers ?? [];
+  state.trainers = action.payload?.trainers ?? [];
 
-        state.plan =
-          action.payload?.plan ?? null;
+  state.plan = action.payload?.plan ?? null;
 
-        state.total =
-          action.payload?.total_available ?? 0;
+  state.total = action.payload?.total_available ?? 0;
 
-        state.filters = action.meta.arg;
-      })
+  state.filters = action.meta.arg;
+})
+
       .addCase(fetchAvailableTrainersThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;

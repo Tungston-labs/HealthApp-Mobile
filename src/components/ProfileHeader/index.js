@@ -5,7 +5,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import styles from "../../screens/ProfileScreen/styles";
 
 const ProfileHeader = ({
-  image,        
+  image,
   name,
   showBack = false,
   onBack,
@@ -25,10 +25,15 @@ const ProfileHeader = ({
       <View style={styles.imageContainer}>
         <View style={styles.imageBorder}>
           <Image
-            source={typeof image === "string" ? { uri: image } : image}
+            source={
+              typeof image === "string"
+                ? { uri: image }       // API string URL
+                : image                // { uri: ... } or require(...)
+            }
             style={styles.profileImg}
             resizeMode="cover"
           />
+
         </View>
 
         {showEdit && (
