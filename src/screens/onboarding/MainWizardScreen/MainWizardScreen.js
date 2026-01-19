@@ -9,6 +9,7 @@ import ConditionScreen from "../ConditionScreen";
 import WeightScreen from "../WeightScreen";
 import HeightScreen from "../HeightScreen";
 import { useSelector } from "react-redux";
+import Toast from "react-native-toast-message";
 
 export default function MainWizardScreen() {
   const navigation = useNavigation();
@@ -73,45 +74,64 @@ export default function MainWizardScreen() {
 const handleNext = () => {
   const reg = registration;
 
+
   switch (step) {
     case 1:
       if (!reg.gender) {
-        alert("Select gender");
+        Toast.show({
+          type: "error",
+          text1: "Select gender",
+        });
         return;
       }
       break;
 
     case 2:
-      if (!reg.age) {
-        alert("Select age");
+      if (!reg.dob || !reg.age) {
+        Toast.show({
+          type: "error",
+          text1: "Select your date of birth",
+        });
         return;
       }
       break;
 
     case 3:
       if (!reg.blood_group) {
-        alert("Select blood group");
+        Toast.show({
+          type: "error",
+          text1: "Select blood group",
+        });
         return;
       }
       break;
 
     case 4:
       if (!reg.wellness_goal) {
-        alert("Select a goal");
+        Toast.show({
+          type: "error",
+          text1: "Select a wellness goal",
+        });
         return;
       }
       break;
 
     case 5:
       if (!reg.health_issues || reg.health_issues.length === 0) {
-        alert("Select at least one condition");
+        Toast.show({
+          type: "error",
+          text1: "Select at least one health condition",
+        });
         return;
       }
       break;
 
     case 6:
       if (!reg.weight) {
-        alert("Select weight");
+        Toast.show({
+          type: "error",
+          text1: "Select your weight",
+        });
         return;
       }
       break;
