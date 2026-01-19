@@ -17,8 +17,10 @@ import { getCurrentLocation } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { Image } from 'react-native';
-import { validateSignup } from "../../utils/Validators";
-import {showError} from "../../utils/toast"
+import { validateSignup, validateUserStep2 } from "../../utils/Validators";
+import {showError} from "../../utils/toast";
+import { validateUserStep1 } from "../../utils/Validators";
+
 export default function SignupDetailsScreenUser() {
   const navigation = useNavigation();
 
@@ -35,7 +37,7 @@ export default function SignupDetailsScreenUser() {
 
 const handleContinue = () => {
   
-  const result = validateSignup(registration);
+  const result = validateUserStep1(registration);
 
   if (!result.ok) {
     showError(result.msg);
