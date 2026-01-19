@@ -276,14 +276,11 @@ const handleSubmit = async () => {
   }
 };
 
-<<<<<<< HEAD
   useEffect(() => {
     if (success) {
       navigation.navigate('ThankYouScreen');
     }
   }, [success, navigation]);
-=======
->>>>>>> 710f48b335393fbd61c1eea4a85f4664d1bb3983
 
   return (
     <SafeAreaView style={styles.container}>
