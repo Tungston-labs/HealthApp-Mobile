@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
   Alert,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./style";
 import { useDispatch, useSelector } from "react-redux";
-import { resetPasswordAction, resetState } from "../../redux/slices/resetPasswordSlice";
+import {
+  resetPasswordAction,
+  resetState,
+} from "../../redux/slices/resetPasswordSlice";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ResetPasswordScreen({ navigation, route }) {
   const [password, setPassword] = useState("");
@@ -24,7 +27,6 @@ export default function ResetPasswordScreen({ navigation, route }) {
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.resetpassword);
 
-  // Password validation function
   const validatePassword = (pass) => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     if (!pass) return "Password is required";
@@ -33,7 +35,6 @@ export default function ResetPasswordScreen({ navigation, route }) {
     return "";
   };
 
-  // Confirm password validation
   const validateConfirm = (confPass) => {
     if (!confPass) return "Confirm password is required";
     if (confPass !== password) return "Passwords do not match";
@@ -53,7 +54,7 @@ export default function ResetPasswordScreen({ navigation, route }) {
       await dispatch(
         resetPasswordAction({
           email: route.params.email,
-          password: password,
+          password,
           confirm_password: confirmPassword,
         })
       ).unwrap();
@@ -70,7 +71,7 @@ export default function ResetPasswordScreen({ navigation, route }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["left", "right"]}>
       <Text style={styles.title}>
         Create your new password and confirm{"\n"}it to regain access
       </Text>
@@ -118,7 +119,9 @@ export default function ResetPasswordScreen({ navigation, route }) {
               setConfirmError(validateConfirm(text));
             }}
           />
-          <TouchableOpacity onPress={() => setConfirmShowPassword(!confirmShowPassword)}>
+          <TouchableOpacity
+            onPress={() => setConfirmShowPassword(!confirmShowPassword)}
+          >
             <Ionicons
               name={confirmShowPassword ? "eye-off-outline" : "eye-outline"}
               size={20}
@@ -136,7 +139,9 @@ export default function ResetPasswordScreen({ navigation, route }) {
         onPress={handleReset}
         disabled={loading}
       >
-        <Text style={styles.resetText}>{loading ? "Resetting..." : "Reset Password"}</Text>
+        <Text style={styles.resetText}>
+          {loading ? "Resetting..." : "Reset Password"}
+        </Text>
         <Ionicons name="chevron-forward" size={22} color="#fff" />
       </TouchableOpacity>
 
@@ -149,11 +154,9 @@ export default function ResetPasswordScreen({ navigation, route }) {
       </TouchableOpacity>
 
       {error && (
-        <View style={{ marginTop: 10 }}>
-          <Text style={{ color: "red" }}>
-            {typeof error === "string" ? error : JSON.stringify(error)}
-          </Text>
-        </View>
+        <Text style={{ color: "red", marginTop: 10 }}>
+          {typeof error === "string" ? error : JSON.stringify(error)}
+        </Text>
       )}
     </SafeAreaView>
   );

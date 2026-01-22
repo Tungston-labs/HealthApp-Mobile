@@ -10,6 +10,7 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 999,
+    backgroundColor: 'rgba(0,0,0,0.25)', // subtle dim background (optional but recommended)
   },
 
   modalContent: {
@@ -18,7 +19,15 @@ export default StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 20,
     paddingHorizontal: 18,
-    elevation: 6,
+
+    // ✅ iOS shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+
+    // ✅ Android shadow
+    elevation: 10,
   },
 
   modalTitle: {

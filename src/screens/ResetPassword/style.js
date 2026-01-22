@@ -1,16 +1,14 @@
 import { StyleSheet, Dimensions } from "react-native";
 
 const { width } = Dimensions.get("window");
-const scale = width / 390; 
+const scale = width / 390;
 
 export default StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingHorizontal: 24 * scale,
-
-    justifyContent: "center",   
-    alignItems: "center",      
+    paddingHorizontal: 24 * scale, // ✅ equal on both sides
+    justifyContent: "center",
   },
 
   title: {
@@ -31,7 +29,6 @@ export default StyleSheet.create({
     color: "#222",
     fontWeight: "600",
     marginBottom: 8 * scale,
-    marginLeft: 2,
   },
 
   inputWrapper: {
@@ -55,19 +52,11 @@ export default StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "center",
-
     backgroundColor: "#7774F4",
     paddingVertical: 12 * scale,
     paddingHorizontal: 18 * scale,
     borderRadius: 25 * scale,
-
     width: 180 * scale,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-
     marginTop: 10 * scale,
   },
 

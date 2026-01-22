@@ -10,7 +10,7 @@ const BottomNav = ({ state, descriptors, navigation }) => {
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const isFocused = state.index === index;
-
+        
         // Icons for each tab
         const icons = {
           workout: "home-outline",
@@ -24,7 +24,7 @@ const BottomNav = ({ state, descriptors, navigation }) => {
             navigation.navigate(route.name);
           }
         };
-
+        
         return (
           <TouchableOpacity
             key={route.key}

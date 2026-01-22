@@ -1,28 +1,19 @@
 import { StyleSheet, Dimensions } from "react-native";
 
-const { width, height } = Dimensions.get("window");
-const scale = width / 375; 
+const { width } = Dimensions.get("window");
+const scale = width / 375;
 
 export default StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    paddingHorizontal: 25 * scale,
-    justifyContent: "center", 
+    justifyContent: "center",
+    paddingHorizontal: 0, // ✅ removed left & right padding
   },
 
   centerWrapper: {
-    alignItems: "center", 
     width: "100%",
-  },
-
-  logoContainer: {
-    marginBottom: 20 * scale,
-    alignItems: "center",
-  },
-  logo: {
-    width: 160 * scale,
-    height: 160 * scale,
+    paddingHorizontal: 24, // ✅ this keeps content inside but input stretches full width
   },
 
   description: {
@@ -37,7 +28,6 @@ export default StyleSheet.create({
     fontSize: 16 * scale,
     fontWeight: "700",
     color: "#000000",
-    alignSelf: "flex-start",
     marginBottom: 8 * scale,
   },
 
@@ -45,94 +35,40 @@ export default StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 10 * scale,
+    paddingHorizontal: 10, // ✅ minimal padding to align icon perfectly
     borderBottomWidth: 2,
     borderColor: "#898989",
-    width: "100%",
     marginBottom: 25 * scale,
-  },
-
-  inputIcon: {
-    marginRight: 10 * scale,
   },
 
   input: {
     flex: 1,
     fontSize: 15 * scale,
     color: "#000000",
+    marginLeft: 10,
   },
-  
-  continueWrapper: {
-  alignSelf: "flex-end",
-  position: "relative",
-  marginBottom: 20 * scale,
-},
 
   continueBtn: {
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
-  backgroundColor: "#7774F4",
-  paddingVertical: 10 * scale,
-  paddingHorizontal: 18 * scale,   
-  borderRadius: 20 * scale,
-
-  alignSelf: "flex-end",           
-  marginBottom: 20 * scale,
-
-  elevation: 6,
-  shadowColor: "#000",
-  shadowOpacity: 0.2,
-  shadowRadius: 6,
-  shadowOffset: { width: 0, height: 4 },
-},
-innerShadow: {
-  position: "absolute",
-  top: 2,
-  left: 2,
-  right: 2,
-  bottom: 2,
-  borderRadius: 20 * scale,
-  backgroundColor: "#7774F4",
-
-  shadowColor: "#000",
-  shadowOpacity: 0.25,
-  shadowRadius: 10,
-  shadowOffset: { width: -2, height: -2 },
-
-  zIndex: -1,
-},
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#7774F4",
+    paddingVertical: 10 * scale,
+    paddingHorizontal: 18 * scale,
+    borderRadius: 20 * scale,
+    alignSelf: "flex-end",
+    marginBottom: 20 * scale,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
+  },
 
   continueText: {
     color: "#fff",
     fontSize: 16 * scale,
     fontWeight: "700",
     marginRight: 6 * scale,
-  },
-
-  backToLoginWrapper: {
-    flexDirection: "row",
-    justifyContent: "center",
-  },
-
-  backNormal: {
-    fontSize: 14 * scale,
-    color: "#444",
-  },
-
-  backLogin: {
-    fontSize: 14 * scale,
-    fontWeight: "700",
-    color: "#6C63FF",
-  },
-
-    backToLogin: {
-    color: "#444",
-    marginTop: 25,
-    fontSize: 14,
-  },
-
-  loginText: {
-    color: "#7774F4",
-    fontWeight: "600",
   },
 });
