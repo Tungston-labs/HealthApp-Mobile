@@ -1,26 +1,37 @@
 import { StyleSheet, Dimensions } from "react-native";
+
 const { width } = Dimensions.get("window");
+const H_PADDING = 20;
 
 export default StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+
+  scrollContent: {
+    paddingHorizontal: H_PADDING,
+    paddingBottom: 160,
+  },
+
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingHorizontal: 25,
-  },
-
-  logo: {
-    width: 160,
-    height: 60,
-    marginTop: 20,
-    marginBottom: 30,
   },
 
   welcomeText: {
     fontSize: 24,
     fontWeight: "700",
     marginBottom: 4,
-    color: "#000000",
+    color: "#000",
   },
+
+  subtitle: {
+    fontSize: 17,
+    marginBottom: 25,
+    color: "#000",
+  },
+
   profileRow: {
     flexDirection: 'row',
     marginBottom: 10,
@@ -48,7 +59,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#898989',
     paddingBottom: 4,
   },
 
@@ -57,22 +68,6 @@ export default StyleSheet.create({
     marginLeft: 8,
     fontSize: 16,
     color: '#000',
-  },
-
-  subtitle: {
-    fontSize: 17,
-    fontWeight: "400",
-    marginBottom: 25,
-    color: "#000",
-  },
-
-  input: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#898989",
-    paddingVertical: 10,
-    marginTop: 12,
-    fontSize: 15,
-    color: "#000",
   },
 
   inputRow: {
@@ -87,6 +82,15 @@ export default StyleSheet.create({
   inputField: {
     marginLeft: 10,
     flex: 1,
+    fontSize: 15,
+    color: "#000",
+  },
+
+  input: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#898989",
+    paddingVertical: 10,
+    marginTop: 12,
     fontSize: 15,
     color: "#000",
   },
@@ -129,7 +133,7 @@ export default StyleSheet.create({
   },
 
   smallInput: {
-    width: width * 0.38,
+    width: (width - H_PADDING * 2 - 12) / 2,
   },
 
   backLogin: {
@@ -137,22 +141,24 @@ export default StyleSheet.create({
     fontSize: 15,
     color: "#7774F4",
     fontWeight: "600",
+    marginTop: 25,
   },
+
+  continueFixed: {
+    position: "absolute",
+    bottom: 20,
+    right: H_PADDING,
+    left: H_PADDING,
+    alignItems: "flex-end",
+  },
+
   continueBtn: {
     backgroundColor: "#7774F4",
     paddingVertical: 14,
     paddingHorizontal: 22,
     borderRadius: 30,
-    marginTop: 25,
-    marginBottom: 40,
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
-
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
     elevation: 5,
   },
 
@@ -160,18 +166,9 @@ export default StyleSheet.create({
     color: "#fff",
     fontSize: 17,
     fontWeight: "800",
-    fontFamily: "Segoe UI",
   },
 
   arrowIcon: {
-    marginRight: -9,
+    marginLeft: 4,
   },
-
-  continueFixed: {
-    position: "absolute",
-    bottom: 25,
-    right: 25,
-  },
-
-
 });
