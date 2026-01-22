@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import styles from './style';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import IonIcon from 'react-native-vector-icons/Ionicons';
+import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+
 const ScheduleCard = ({
   time,
   name,
@@ -23,21 +25,24 @@ const ScheduleCard = ({
       <View style={styles.card}>
         <Text style={styles.time}>{time}</Text>
 
-        <Image source={{uri:image}} style={styles.avatar} />
+        <Image source={{ uri: image }} style={styles.avatar} />
 
         <View style={styles.info}>
           <Text style={styles.name}>{name}</Text>
 
           <View style={styles.metaRow}>
             <View style={styles.metaItem}>
-              <Icon name="weight-lifter" size={16} color="#666" />
+              <IonIcon name="barbell-outline" size={16} color="#666" />
               <Text style={styles.metaText}>{weight} KG</Text>
             </View>
+
             <View style={styles.metaItem}>
-              <Icon name="human-male-height" size={16} color="#666" />
+              <IonIcon name="body-outline" size={16} color="#666" />
               <Text style={styles.metaText}>{height}</Text>
             </View>
           </View>
+
+
           <TouchableOpacity
             onPress={() => onStart?.()}
             disabled={disabled || loading}
@@ -51,7 +56,8 @@ const ScheduleCard = ({
             ) : (
               <>
                 <Text style={styles.startText}>Start</Text>
-                <Icon name="play" size={20} color="#fff" />
+                <IonIcon name="play" size={20} color="#fff" />
+
               </>
             )}
           </TouchableOpacity>
