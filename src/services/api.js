@@ -1,97 +1,106 @@
-import axios from "axios";
+// api.js
+import axios from 'axios';
 import {
-  getAccessToken,
   getRefreshToken,
-  setAccessToken,
-} from "../storage/asyncStorage";
-import refreshApi from "./refreshApi";
-import { forceLogout } from "../utils/forceLogout";
+  setRefreshToken,
+  clearStorage,
+} from '../storage/asyncStorage';
+import { store } from '../redux/store';
+import { setAccessToken } from '../redux/slices/authSlice';
+
+const BASE_URL = 'http://178.248.112.16:9001/api/';
 
 const api = axios.create({
-  baseURL: "http://178.248.112.16:9001/api/",
+  baseURL: BASE_URL,
   timeout: 15000,
   headers: {
-  Accept: "application/json",
+    Accept: 'application/json',
   },
 });
 
-api.interceptors.request.use(async (config) => {
-  const token = await getAccessToken();
+export const publicApi = axios.create({
+  baseURL: BASE_URL,
+  timeout: 15000,
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+});
+
+api.interceptors.request.use(async config => {
+  const token = store.getState().auth.accessToken;
 
   if (token && !config.skipAuth) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
   if (config.data instanceof FormData) {
-
     config.headers['Content-Type'] = 'multipart/form-data';
-    
-
   } else {
     config.headers['Content-Type'] = 'application/json';
   }
 
   return config;
-}, (error) => Promise.reject(error));
+});
 
 let isRefreshing = false;
 let failedQueue = [];
 
 const processQueue = (error, token = null) => {
-  failedQueue.forEach((prom) => {
-    error ? prom.reject(error) : prom.resolve(token);
-  });
+  failedQueue.forEach(prom =>
+    error ? prom.reject(error) : prom.resolve(token),
+  );
   failedQueue = [];
 };
 
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
+  response => response,
+  async error => {
     const originalRequest = error.config;
 
-    if (originalRequest?.skipAuth) {
-      return Promise.reject(error);
-    }
-
-    if (!error.response) {
-      return Promise.reject({
-        message: error.message || "Network error. Please try again.",
-      });
-    }
-
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.skipAuth
+    ) {
       originalRequest._retry = true;
 
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return api(originalRequest);
-        });
+        })
+          .then(token => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch(err => Promise.reject(err));
       }
 
       isRefreshing = true;
 
       try {
         const refresh = await getRefreshToken();
-        if (!refresh) throw new Error("No refresh token");
+        if (!refresh) throw new Error('No refresh token');
 
-        const res = await refreshApi.post("auth/token/refresh/", {
+        const response = await publicApi.post('auth/token/refresh/', {
           refresh,
         });
+        if (!response?.data?.data?.access) {
+          throw new Error('Invalid refresh response');
+        }
+        store.dispatch(setAccessToken(response?.data?.data?.access));
 
-        const newAccessToken = res.data.access;
-        await setAccessToken(newAccessToken);
+        if (response?.data?.data?.refresh) {
+          await setRefreshToken(response.data.data.refresh);
+        }
 
-        api.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
-        processQueue(null, newAccessToken);
+        processQueue(null, response.data.data.access);
 
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        originalRequest.headers.Authorization = `Bearer ${response.data.data.access}`;
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        forceLogout();
+        await clearStorage();
         return Promise.reject(err);
       } finally {
         isRefreshing = false;
@@ -99,7 +108,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

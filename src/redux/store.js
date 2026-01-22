@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
+
 import authReducer from './slices/authSlice';
 import clientReducer from './slices/clientSlice';
 import registrationReducer from './slices/registrationSlice';
@@ -6,10 +7,24 @@ import ForgotPasswordReducer from './slices/forgotPasswordSlice';
 import VerifyOtpReducer from './slices/verifyOtpSlice';
 import ResetPasswordReducer from './slices/resetPasswordSlice';
 import PlanReducer from './slices/planSlice';
+import unbookedplans from './slices/UnbookedPlanSlice';
 import trainerRegistrationReducer from './slices/trainerRegistrationSlice';
 import trainerPlanReducer from './slices/trainerPlanSlice';
 import trainerDetailReducer from './slices/trainerDetailSlice';
+import trainerUpcomingSessionsReducer from "./slices/trainerUpcomingSessions";
+import trainerHistoryReducer from "./slices/trainerHistorySlice";
+import trainerProfileReducer from "./slices/trainerProfileSlice";
+import mobProfileReducer from "./slices/mobProfileSlice";
+import clientProfileEditReducer from "./slices/clientProfileEditSlice";
+import CancelTrainingReducer from "./slices/CancelTrainingSlice";
+import nutritionRequestReducer from "./slices/NutritionRequestSlice";
 import { scheduleApi } from './api/trainer/scheduleApi';
+import completedSessionreducer from "./slices/SessionHistorySlice"
+import completedSessionDetailReducer from "./slices/completedSessionDetailSlice"
+import weeklySessionsReducer from "./slices/UpcomingSessionSlice"
+import trainerReducer from "./slices/trainerSlice";
+import ClientTrainerReducer from "./slices/clientTrainerSlice"
+import clientBmiReducer from "./slices/clientBmiSlice";
 
 export const store = configureStore({
   reducer: {
@@ -19,12 +34,34 @@ export const store = configureStore({
     forgotpassword: ForgotPasswordReducer,
     verifyotp: VerifyOtpReducer,
     resetpassword: ResetPasswordReducer,
+    cancelTraining: CancelTrainingReducer,
     planList: PlanReducer,
+    unbookedplans: unbookedplans,
     trainerReg: trainerRegistrationReducer,
-    trainerplan: trainerPlanReducer,
+    trainer: trainerPlanReducer,
     trainerDetail: trainerDetailReducer,
+    nutritionRequest: nutritionRequestReducer,
+
+    trainerUpcomingSessions: trainerUpcomingSessionsReducer,
+    trainerHistory: trainerHistoryReducer,
+    trainerProfile: trainerProfileReducer,
+    mobProfile: mobProfileReducer,
+
+    profileEdit: clientProfileEditReducer,
+    clientBmi: clientBmiReducer,
+
+
+
+    completedSessions: completedSessionreducer,
+    weeklySessions: weeklySessionsReducer,
+    trainerSessions: trainerReducer,
+    completedSessionDetail: completedSessionDetailReducer,
+    clientTrainer: ClientTrainerReducer,
     [scheduleApi.reducerPath]: scheduleApi.reducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(scheduleApi.middleware),
 });
+
+
+

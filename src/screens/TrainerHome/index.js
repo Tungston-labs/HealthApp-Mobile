@@ -1,118 +1,133 @@
-import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  RefreshControl,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
-import ScheduleCard from '../../components/ScheduleCard';
-import styles from './style';
-import TrainingProgressCard from '../../components/ProgressBar';
-import { format, parse } from 'date-fns';
-import Skeleton from '../../components/Skelton';
+import React, { useCallback, useEffect, useState } from 'react';
 import Toast from 'react-native-toast-message';
-import { useGetTodaysSchedulesQuery } from '../../redux/api/trainer/scheduleApi';
+import { useGetUpcomingSchedulesQuery } from '../../redux/api/trainer/scheduleApi';
+import { useStartSession } from '../../hooks/trainer/useStartSession';
+import { useActiveSession } from '../../hooks/trainer/useActiveSession';
+import { useEndSession } from '../../hooks/trainer/useEndSession';
+import TrainerHomeView from './TrainerHomeView';
+const TrainerHomeContainer = () => {
+  const [isManualRefreshLoading, setIsManualRefreshLoading] = useState(false);
+  const [startingSessionId, setStartingSessionId] = useState(null);
 
-const TrainerHome = () => {
-  const navigation = useNavigation();
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
   const {
-    data: schedules = [],
-    error,
-    isLoading,
-    isFetching,
-    refetch,
-  } = useGetTodaysSchedulesQuery();
+    activeSession,
+    setActiveSession,
+    loading: isActiveSessionLoading,
+    reload: fetchActiveSession,
+    clearSession: clearActiveSession,
+  } = useActiveSession();
 
-  const goToScheduleDetail = id => {
-    navigation.navigate('TrainerScheduleDetail', { id });
-  };
+  const { handleStartSession, isLoading: isSessionStarting } =
+    useStartSession();
+  const { handleEndSession, isLoading: isEnding } = useEndSession();
 
-  const goToNotifications = () => {
-    navigation.navigate('Notifications');
-  };
+  const {
+    data: schedules,
+    error: schedulesError,
+    isLoading: isSchedulesLoading,
+    isFetching: isSchedulesFetching,
+    refetch: refetchSchedules,
+  } = useGetUpcomingSchedulesQuery({ page, limit });
 
   useEffect(() => {
-    if (error) {
+    if (schedulesError) {
+      const message =
+        schedulesError?.data?.message ||
+        schedulesError?.error ||
+        'Something went wrong. Please try again.';
       Toast.show({
         type: 'error',
         text1: 'Error loading schedules',
-        text2: error || 'Something went wrong. Please try again.',
+        text2: message,
       });
     }
-  }, [error]);
+  }, [schedulesError]);
+
+  const handleManualRefresh = useCallback(async () => {
+    setIsManualRefreshLoading(true);
+    setPage(1);
+
+    try {
+      await refetchSchedules({ force: true });
+    } finally {
+      setIsManualRefreshLoading(false);
+    }
+  }, [refetchSchedules, setPage]);
+
+  const loadMore = useCallback(() => {
+    if (
+      schedules?.current_page < schedules?.total_pages &&
+      !isSchedulesFetching
+    ) {
+      setPage(prev => prev + 1);
+    }
+  }, [schedules, isSchedulesFetching]);
+
+  const onSessionStart = useCallback(
+    async id => {
+      if (activeSession || isSessionStarting || isActiveSessionLoading) return;
+      setStartingSessionId(id);
+
+      const success = await handleStartSession({ id });
+      setStartingSessionId(null);
+
+      if (success) {
+        setActiveSession(success);
+        fetchActiveSession();
+      }
+    },
+    [
+      activeSession,
+      isSessionStarting,
+      isActiveSessionLoading,
+      handleStartSession,
+      setActiveSession,
+      fetchActiveSession,
+    ],
+  );
+
+  const onEndSession = useCallback(async () => {
+    if (!activeSession || isEnding) return;
+
+    const success = await handleEndSession(activeSession.session_id);
+    if (success) {
+      await clearActiveSession();
+      fetchActiveSession();
+      Toast.show({
+        type: 'success',
+        text1: 'Session ended successfully',
+        text2: 'Your session has been ended.',
+      });
+    }
+  }, [
+    activeSession,
+    isEnding,
+    handleEndSession,
+    clearActiveSession,
+    fetchActiveSession,
+  ]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerCard}>
-        <View>
-          <Text style={styles.greeting}>Hi, John</Text>
-          <Text style={styles.subTitle}>Gym</Text>
-        </View>
-
-
-        <TouchableOpacity
-          style={styles.bell}
-          onPress={goToNotifications}
-          activeOpacity={0.7}
-        >
-          <Icon name="notifications-outline" size={20} />
-        </TouchableOpacity>
-      </View>
-
-<TrainingProgressCard />
-
-
-      <Text style={styles.sectionTitle}>Today's Schedule</Text>
-
-      {isLoading ? (
-        Array.from({ length: 5 }).map((_, index) => (
-          <Skeleton key={index} height={100} borderRadius={15} margin={10} />
-        ))
-      ) : schedules?.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Image
-            source={require('../../Images/empty.png')}
-            style={styles.emptyImage}
-            resizeMode="contain"
-          />
-
-          <Text style={styles.emptyTitle}>Your schedule is empty</Text>
-          <Text style={styles.emptySubText}>
-            Users will book your training slots{'\n'}stay tuned.
-          </Text>
-        </View>
-      ) : (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-          }
-        >
-          {schedules.map((item, index) => (
-            <ScheduleCard
-              key={item?.id || index}
-              time={
-                item?.time
-                  ? format(parse(item.time, 'HH:mm:ss', new Date()), 'HH:mm')
-                  : '00:00'
-              }
-              name={item?.client?.name}
-              image={item?.client?.profile_pic}
-              weight={item?.client?.weight}
-              rating={item?.client?.height}
-              progress={'need to change'}
-              onPress={() => goToScheduleDetail(item?.id)}
-            />
-          ))}
-        </ScrollView>
-      )}
-    </View>
+    <TrainerHomeView
+      activeSession={activeSession}
+      onEndSession={onEndSession}
+      isSchedulesLoading={isSchedulesLoading}
+      page={page}
+      schedules={schedules}
+      loadMore={loadMore}
+      isSchedulesFetching={isSchedulesFetching}
+      onSessionStart={onSessionStart}
+      isSessionStarting={isSessionStarting}
+      isActiveSessionLoading={isActiveSessionLoading}
+      isManualRefreshLoading={isManualRefreshLoading}
+      onRefresh={handleManualRefresh}
+      startingSessionId={startingSessionId}
+      isEndingSession={isEnding}
+    />
   );
 };
 
-export default TrainerHome;
+export default TrainerHomeContainer;

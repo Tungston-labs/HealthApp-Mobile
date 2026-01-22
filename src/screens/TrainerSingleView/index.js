@@ -17,13 +17,16 @@ import RatingBar from "../../components/TrainerDetail/RatingCard";
 import ReviewCard from "../../components/TrainerDetail/ReviewCard";
 import TrainerInfoCard from "../../components/TrainerInfoCard";
 import { fetchTrainerDetailThunk } from "../../redux/slices/trainerDetailSlice";
+import TrainerBookingModal from "../../components/TrainerBookingModal";
 
 const TrainerDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useDispatch();
-
+  const [showBookingModal, setShowBookingModal] = useState(false);
   const { trainerId } = route.params;
+  const [selectedCert, setSelectedCert] = useState(null);
+
 
   const { loading, data, error } = useSelector(
     (state) => state.trainerDetail
@@ -36,7 +39,8 @@ const TrainerDetailScreen = () => {
       dispatch(fetchTrainerDetailThunk(trainerId));
     }
   }, [trainerId]);
-
+  console.log("TrainerDetailScreen route.params", route.params);
+  console.log("Trainer ID received:", trainerId);
   if (loading) {
     return (
       <View style={styles.loader}>
@@ -84,34 +88,68 @@ const TrainerDetailScreen = () => {
 
           <TrainerInfoCard
             name={data.name}
-            experience={`${data.experience} years`}
-            sessionTiming={`${data.section_timing} min`}
+            experience={data.experience}
+            sessionTiming={data.section_timing}
+
             numSessions={data.no_of_section}
             workoutType={data.plan_name}
           />
         </View>
 
         {/* Certificates */}
-        <TouchableOpacity
-          style={styles.dropdownBtn}
-          onPress={() => setShowCertificates(!showCertificates)}
-        >
-          <Text style={styles.dropdownText}>Certificates</Text>
-          <Icon
-            name={showCertificates ? "chevron-up" : "chevron-down"}
-            size={24}
-            color="#000"
-          />
-        </TouchableOpacity>
-
-        {showCertificates &&
-          data.certificates?.map((cert, index) => (
-            <Image
-              key={index}
-              source={{ uri: cert }}
-              style={styles.certificateImage}
+        <View style={styles.certContainer}>
+          <TouchableOpacity
+            style={styles.certHeader}
+            onPress={() => setShowCertificates(!showCertificates)}
+          >
+            <Text style={styles.certTitle}>Certificates</Text>
+            <Icon
+              name={showCertificates ? "chevron-up" : "chevron-down"}
+              size={22}
+              color="#000"
             />
-          ))}
+          </TouchableOpacity>
+
+          {showCertificates && (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.certList}
+            >
+              {data.certificates?.map((cert, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.certCard}
+                  onPress={() => setSelectedCert(cert)}
+                  activeOpacity={0.8}
+                >
+                  <Image
+                    source={{ uri: cert }}
+                    style={styles.certImage}
+                  />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
+          {selectedCert && (
+            <View style={styles.certModal}>
+              <TouchableOpacity
+                style={styles.certClose}
+                onPress={() => setSelectedCert(null)}
+              >
+                <Icon name="close" size={28} color="#fff" />
+              </TouchableOpacity>
+
+              <Image
+                source={{ uri: selectedCert }}
+                style={styles.certFullImage}
+                resizeMode="contain"
+              />
+            </View>
+          )}
+
+        </View>
+
 
         {/* Rating Section */}
         <Text style={styles.sectionTitle}>Rating and feedback</Text>
@@ -165,10 +203,17 @@ const TrainerDetailScreen = () => {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.bookBtn}
-          onPress={() => navigation.navigate("Payment", { trainerId })}
+          onPress={() => setShowBookingModal(true)}
         >
           <Text style={styles.bookText}>Book Now</Text>
         </TouchableOpacity>
+
+        <TrainerBookingModal
+          visible={showBookingModal}
+          onClose={() => setShowBookingModal(false)}
+          trainerId={trainerId}
+        // Pass any data needed like plan/pricing
+        />
       </View>
     </View>
   );

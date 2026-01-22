@@ -1,134 +1,152 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-
-import styles from './style';
-import PersonalDetailsCard from '../../components/PersonalDetailsCard';
-import TrainingProgressSelector from '../../components/TrainingProgressSelector';
-import ClickButton from '../../components/Swipe';
+import React, { useCallback, useEffect, useState } from 'react';
+import TrainerScheduleDetailView from './TrainerScheduleDetailView';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useGetTrainerSlotBookingByIdQuery } from '../../redux/api/trainer/scheduleApi';
+import {
+  useAddTrainerNoteMutation,
+  useEditTrainerNoteMutation,
+  useGetTrainerNotesQuery,
+  useGetTrainerSlotBookingByIdQuery,
+} from '../../redux/api/trainer/scheduleApi';
+import Toast from 'react-native-toast-message';
+import { useStartSession } from '../../hooks/trainer/useStartSession';
+import { useActiveSession } from '../../hooks/trainer/useActiveSession';
+import { isToday, parseISO } from 'date-fns';
+import { openMapByAddress } from '../../utils/trainer/openMap';
 
-const TrainerScheduleDetail = () => {
+const TrainerScheduleDetailContainer = () => {
   const route = useRoute();
-  const { id } = route.params;
+  const { id,hideButton } = route.params;
+
+  const navigation = useNavigation();
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [noteText, setNoteText] = useState('');
-  const [savedNote, setSavedNote] = useState('');
-  const navigation = useNavigation();
+  const [isEditing, setIsEditing] = useState(false);
 
-  const { data, isLoading, isFetching, error, refetch } =
-    useGetTrainerSlotBookingByIdQuery(id);
-  console.log(data, isLoading, isFetching, error, refetch);
-  const handleSubmitNote = () => {
-    if (noteText.trim()) {
-      setSavedNote(noteText);
-      setNoteText('');
+  const {
+    data,
+    error,
+    isLoading: isDataLoading,
+  } = useGetTrainerSlotBookingByIdQuery(id);
+  const { data: notesData } = useGetTrainerNotesQuery(id);
+  const [addNote, { isLoading: isAdding }] = useAddTrainerNoteMutation();
+  const [editNote, { isLoading: isEditingNote }] = useEditTrainerNoteMutation();
+  const { handleStartSession, isLoading: isSessionStarting } =
+    useStartSession();
+  const { activeSession, setActiveSession } = useActiveSession();
+
+  const isSaving = isAdding || isEditingNote;
+
+  useEffect(() => {
+    if (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to load data',
+      });
+    }
+  }, [error]);
+
+  const openAddNote = () => {
+    setNoteText('');
+    setIsEditing(false);
+    setShowNoteModal(true);
+  };
+
+  const openEditNote = () => {
+    setNoteText(notesData?.note || '');
+    setIsEditing(true);
+    setShowNoteModal(true);
+  };
+
+  const handleSubmitNote = async () => {
+    if (!noteText.trim()) return;
+
+    try {
+      if (isEditing) {
+        await editNote({ id, note: noteText }).unwrap();
+      } else {
+        await addNote({ id, note: noteText }).unwrap();
+      }
+
       setShowNoteModal(false);
+      setNoteText('');
+      setIsEditing(false);
+
+      Toast.show({
+        type: 'success',
+        text1: isEditing ? 'Note updated' : 'Note added',
+      });
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to save note',
+      });
     }
   };
-  const onBackPress = () => {
-    navigation.navigate('TrainerNavigator', { screen: 'TrainerHome' });
+
+  const canStartToday = !!data?.date && isToday(parseISO(data.date));
+  const handleStart = async () => {
+    if (isSessionStarting || !canStartToday) return;
+
+    if (activeSession) {
+      Toast.show({
+        type: 'info',
+        text1: 'A session is already active',
+      });
+      return;
+    }
+
+    const session = await handleStartSession({ id });
+
+    if (!session) return;
+
+    setActiveSession(session);
+
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'TrainerNavigator',
+          params: { screen: 'TrainerHome' },
+        },
+      ],
+    });
   };
+
+  const onBackPress = () => {
+    // navigation.navigate('TrainerNavigator', { screen: 'TrainerHome' });
+    navigation.goBack();
+  };
+
+  const openMap = useCallback(address => {
+    openMapByAddress(address);
+  }, []);
+
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onBackPress}>
-          <Icon name="chevron-back" size={22} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Schedule Detail</Text>
-      </View>
-      <PersonalDetailsCard
-        data={data?.client}
-        time={data?.time}
-        progress={{
-          count: data?.total_sessions || 0,
-          total: data?.session_number || 0,
-        }}
-        isOpen={detailsOpen}
-        onToggle={() => setDetailsOpen(prev => !prev)}
-      />
-
-       <View style={styles.swipeWrapper}>
-
-        <ClickButton
-          title="Click to Start Session"
-          successTitle=" Click to End Session "
-          width={340}
-          onSwipeSuccess={() => console.log('Session Ended')}
-        />
-      </View>
-      <Text style={styles.mapHint}>Tap to open the map location.</Text>
-
-      <View style={styles.locationBox}>
-        <Icon name="location" size={18} color="#FF3B30" />
-        <Text style={styles.locationText}>{data?.client?.address}</Text>
-      </View>
-      <Text style={styles.sectionTitle}>
-        Workout plan - {data?.plan?.plan_name}
-      </Text>
-      <Text style={styles.subText}>Workout type - {data?.plan?.plan_type}</Text>
-      <TrainingProgressSelector
-        progressDay={1}
-        progressTime="00:00"
-        time={data?.time}
-      />
-      <TouchableOpacity
-        style={styles.addNoteBtn}
-        onPress={() => setShowNoteModal(true)}
-      >
-        <Icon name="add" size={18} color="#fff" />
-        <Text style={styles.addNoteText}>Add note</Text>
-      </TouchableOpacity>
-      {savedNote ? (
-        <View style={styles.noteBox}>
-          <Text style={styles.savedNoteText}>{savedNote}</Text>
-        </View>
-      ) : null}
-      <Modal
-        visible={showNoteModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowNoteModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.closeIcon}
-              onPress={() => setShowNoteModal(false)}
-            >
-              <Icon name="close" size={22} />
-            </TouchableOpacity>
-
-            <Text style={styles.modalTitle}>Add a note</Text>
-
-            <TextInput
-              placeholder="Type your note here..."
-              multiline
-              value={noteText}
-              onChangeText={setNoteText}
-              style={styles.modalInput}
-            />
-
-            <TouchableOpacity
-              style={styles.submitBtn}
-              onPress={handleSubmitNote}
-            >
-              <Text style={styles.submitText}>Submit</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </ScrollView>
+    <TrainerScheduleDetailView
+      data={data}
+      isDataLoading={isDataLoading}
+      detailsOpen={detailsOpen}
+      setDetailsOpen={setDetailsOpen}
+      isSessionStarting={isSessionStarting}
+      handleStart={handleStart}
+      activeSession={activeSession}
+      canStartToday={canStartToday}
+      openMap={openMap}
+      openAddNote={openAddNote}
+      savedNote={notesData?.note}
+      openEditNote={openEditNote}
+      showNoteModal={showNoteModal}
+      setShowNoteModal={setShowNoteModal}
+      isEditing={isEditing}
+      noteText={noteText}
+      setNoteText={setNoteText}
+      handleSubmitNote={handleSubmitNote}
+      isSaving={isSaving}
+      onBackPress={onBackPress}
+      hideButton={hideButton}
+    />
   );
 };
 
-export default TrainerScheduleDetail;
+export default TrainerScheduleDetailContainer;

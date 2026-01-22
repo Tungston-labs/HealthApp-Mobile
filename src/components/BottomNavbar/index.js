@@ -13,10 +13,10 @@ const BottomNav = ({ state, descriptors, navigation }) => {
 
         // Icons for each tab
         const icons = {
-          Upcoming: "home-outline",
-          profilesection: "barbell-outline",
+          workout: "home-outline",
+          Session: "barbell-outline",
           
-          Session: "grid-outline",
+          sessionhistory: "grid-outline",
           profile: "person-outline",
         };
         const onPress = () => { 

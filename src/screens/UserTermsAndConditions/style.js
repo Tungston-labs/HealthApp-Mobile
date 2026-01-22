@@ -24,29 +24,21 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontFamily: "Segoe UI",
     fontSize: 24,
     fontWeight: "700",
     color: "#000000",
   },
 
   subTitle: {
-    fontFamily: "Segoe UI",
     fontSize: 18,
     fontWeight: "700",
     color: "#000000",
-    marginTop: 20,
+    
+    marginTop: 24,
   },
 
-  underline: {
-    width: 50,
-    height: 2,
-    backgroundColor: "#000000",
-    marginVertical: 6,
-  },
 
   paragraph: {
-    fontFamily: "Segoe UI",
     fontSize: 15,
     fontWeight: "400",
     color: "#000000",

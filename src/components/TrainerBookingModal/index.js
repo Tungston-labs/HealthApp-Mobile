@@ -1,101 +1,160 @@
-// components/TrainerBookingModal.js
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
-    Modal,
-    View,
-    Text,
-    TouchableOpacity,
-    Image,
-    TextInput,
-    ScrollView,
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 import TrainerInfoCard from "../TrainerInfoCard";
 
 const workoutOptions = ["Single", "Couple", "Group"];
 
-const TrainerBookingModal = ({ visible, onClose, trainer }) => {
-    const [selected, setSelected] = useState("Single");
-    const navigation=useNavigation();
-    if (!trainer) return null;
+const TrainerBookingModal = ({ visible, onClose, plan }) => {
+  const navigation = useNavigation();
 
-    return (
-        <Modal visible={visible} animationType="slide" transparent>
-            <View style={styles.overlay}>
-                <View style={styles.modalContainer}>
-                    {/* Close Button */}
-                    <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-                        <Icon name="close" size={26} color="#000" />
-                    </TouchableOpacity>
+  const [selected, setSelected] = useState("Single");
+  const [address, setAddress] = useState("");
 
-                    <ScrollView
-                        showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ paddingBottom: 120 }}
-                    >
-                        {/* Header */}
-                        <View style={styles.headerSection}>
-                            <Image
-                                source={require("../../../assets/trainer2.jpg")}
-                                style={styles.profileImage}
-                            />
+  const { loading, data, error } = useSelector(
+    (state) => state.trainerDetail
+  );
 
-                          <TrainerInfoCard
-                          name="Cristofer Bator"
-                        experience="5 years"
-                        sessionTiming="60 min"
-                        numSessions="12"
-                        workoutType="Yoga"
+  // ✅ Reset state when modal closes
+  useEffect(() => {
+    if (!visible) {
+      setSelected("Single");
+      setAddress("");
+    }
+  }, [visible]);
 
-                          />
-                        </View>
+  // ✅ Safe price calculation
+  const amount = useMemo(() => {
+    if (!plan) return 0;
 
-                        <Text style={styles.sectionTitle}>Choose your workout type</Text>
+    switch (selected) {
+      case "Single":
+        return plan.single_price;
+      case "Couple":
+        return plan.couple_price;
+      case "Group":
+        return plan.group_price;
+      default:
+        return 0;
+    }
+  }, [selected, plan]);
 
-                        <View style={styles.optionRow}>
-                            {workoutOptions.map((item) => (
-                                <TouchableOpacity
-                                    key={item}
-                                    onPress={() => setSelected(item)}
-                                    style={[
-                                        styles.optionBtn,
-                                        selected === item && styles.optionBtnActive,
-                                    ]}
-                                >
-                                    <Text
-                                        style={[
-                                            styles.optionText,
-                                            selected === item && styles.optionTextActive,
-                                        ]}
-                                    >
-                                        {item}
-                                    </Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
+  return (
+    <Modal visible={visible} animationType="slide" transparent>
+      <View style={styles.overlay}>
+        <View style={styles.modalContainer}>
+          {/* Close */}
+          <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+            <Icon name="close" size={26} color="#000" />
+          </TouchableOpacity>
 
-                        {/* Address */}
-                        <Text style={[styles.sectionTitle, { marginTop: 15 }]}>Address</Text>
+          {/* BODY — always rendered */}
+          <View style={{ flex: 1 }}>
+            {loading && <ActivityIndicator size="large" />}
 
-                        <TextInput
-                            style={styles.addressInput}
-                            placeholder="Lorem Ipsum is simply dummy text of the printing and typesetting 
-                            industry......."
-                            placeholderTextColor="#777"
-                            multiline
-                        />
-                    </ScrollView>
+            {!loading && error && (
+              <Text style={styles.errorText}>{error}</Text>
+            )}
 
-                    <View style={styles.footer}>
-                        <TouchableOpacity style={styles.payBtn} onPress={()=>navigation.navigate("Payment")}>
-                            <Text style={styles.payText}>Pay 2500</Text>
-                        </TouchableOpacity>
-                    </View>
+            {!loading && !error && data && (
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={styles.headerSection}>
+                  <Image
+                    source={
+                      data.profile_pic
+                        ? { uri: data.profile_pic }
+                        : require("../../../assets/trainer2.jpg")
+                    }
+                    style={styles.profileImage}
+                  />
+
+                  <TrainerInfoCard
+                    name={data.name}
+                    experience={data.experience}
+                    sessionTiming={data.section_timing}
+                    numSessions={data.no_of_section}
+                    workoutType={plan?.name}
+                  />
                 </View>
+
+                <Text style={styles.sectionTitle}>
+                  Choose your workout type
+                </Text>
+
+                <View style={styles.optionRow}>
+                  {workoutOptions.map((item) => (
+                    <TouchableOpacity
+                      key={item}
+                      onPress={() => setSelected(item)}
+                      style={[
+                        styles.optionBtn,
+                        selected === item && styles.optionBtnActive,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.optionText,
+                          selected === item && styles.optionTextActive,
+                        ]}
+                      >
+                        {item}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                <Text style={[styles.sectionTitle, { marginTop: 15 }]}>
+                  Address
+                </Text>
+
+                <TextInput
+                  style={styles.addressInput}
+                  multiline
+                  placeholder="Enter your address"
+                  value={address}
+                  onChangeText={setAddress}
+                />
+              </ScrollView>
+            )}
+          </View>
+
+          {/* Footer */}
+          {!!data && !loading && (
+            <View style={styles.footer}>
+              <TouchableOpacity
+                style={styles.payBtn}
+                disabled={!amount}
+                onPress={() =>
+                  navigation.navigate("Payment", {
+                    trainerId: data.id,
+                    plan_id: plan.id,
+                    booking_type: selected.toLowerCase(),
+                    amount: amount,
+                    address: address,
+                  })
+                }
+              >
+                <Text style={styles.payText}>Pay ₹{amount}</Text>
+              </TouchableOpacity>
             </View>
-        </Modal>
-    );
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
 };
 
 export default TrainerBookingModal;
+                 

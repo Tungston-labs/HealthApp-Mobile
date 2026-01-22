@@ -1,3 +1,4 @@
+
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
@@ -6,9 +7,13 @@ export default StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
 
+  scrollContent: {
+    paddingBottom: 50, 
+  },
+
   formWrapper: {
     paddingHorizontal: 22,
-    paddingTop: 20,
+    paddingTop: 30, 
   },
 
   label: {
@@ -52,9 +57,9 @@ export default StyleSheet.create({
   },
 
   saveWrapper: {
-    alignItems: "flex-end",
-    marginTop: 30,
-    marginBottom: 40,
+    alignItems: "flex-end", 
+    marginTop: 32,
+    marginBottom: 20,
   },
 
   saveBtn: {
@@ -62,6 +67,8 @@ export default StyleSheet.create({
     paddingHorizontal: 28,
     paddingVertical: 12,
     borderRadius: 30,
+    minWidth: 100,
+    alignItems: "center",
   },
 
   saveText: {

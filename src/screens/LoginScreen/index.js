@@ -16,57 +16,71 @@ import { useIsFocused } from "@react-navigation/native";
 
 export default function LoginScreen({ navigation }) {
   const dispatch = useDispatch();
+  const isFocused = useIsFocused();
 
-const { loading, isLoggedIn,user, error } = useSelector(
-  (state) => state.auth || {
-    loading: false,
-    isLoggedIn: false,
-    error: null,
-  }
-);
+  const {
+    loading,
+    isLoggedIn,
+    user,
+    role,
+    isVerified,
+    error,
+  } = useSelector(state => state.auth);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-   const isFocused = useIsFocused();
 
   const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Email and password are required");
-      return;
-    }
+    if (loading) return;
 
-   dispatch(
-  loginClientThunk({
-    email_or_phno: email, 
-    password,
-  })
-);
+    dispatch(
+      loginClientThunk({
+        email_or_phno: email,
+        password,
+      })
+    );
   };
-useEffect(() => {
-  if (isLoggedIn && user) {
-    if (user.role === "trainer") {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "TrainerNavigator" }],
-      });
+
+  /* 🔥 LOGIN NAVIGATION LOGIC */
+  useEffect(() => {
+    if (!isLoggedIn || !user) return;
+
+    if (role === "trainer") {
+      if (isVerified) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "TrainerNavigator" }],
+        });
+      } else {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "ThankYouScreen" }],
+        });
+      }
     } else {
       navigation.reset({
         index: 0,
-        routes: [{ name: "workout" }],
+        routes: [
+          {
+            name: "MainApp",
+            params: { screen: "workout" },
+          },
+        ],
       });
     }
-  }
-}, [isLoggedIn, user]);
-useEffect(() => {
+  }, [isLoggedIn, role, isVerified]);
+
+ useEffect(() => {
   if (error && isFocused) {
-    setTimeout(() => {
-      Alert.alert("Login Failed", error);
-      dispatch(resetAuthState());
-    }, 100);
+    Alert.alert("Login Failed", error);
+    dispatch(resetAuthState());
   }
 }, [error, isFocused]);
+
+
   return (
-    <SafeAreaView style={styles.container}>
+  <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
         <Text style={styles.logoText}>LOGIN</Text>
       </View>

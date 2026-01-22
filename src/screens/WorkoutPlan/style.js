@@ -10,13 +10,11 @@ export default StyleSheet.create({
      marginTop: 10,
   },
 
-  gridContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    paddingHorizontal: 12,
-    marginTop: 10,
-  },
+ gridContainer: {
+  justifyContent: "space-between",
+  paddingHorizontal: 12,
+},
+
 
   card: {
     width: cardWidth,

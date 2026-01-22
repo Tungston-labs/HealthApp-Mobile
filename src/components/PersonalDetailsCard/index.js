@@ -5,11 +5,19 @@ import styles from './style';
 import MaterialIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format, parse } from 'date-fns';
 
-const PersonalDetailsCard = ({ isOpen, onToggle, data, time, progress }) => {
+const PersonalDetailsCard = ({
+  isOpen,
+  onToggle,
+  data,
+  time,
+  progress,
+  startDate,
+  endDate,
+}) => {
   return (
     <View style={styles.card}>
       <View style={styles.topRow}>
-        <Image source={data?.profile_pic_url} style={styles.avatar} />
+        <Image source={{uri:data?.profile_pic_url}} style={styles.avatar} />
 
         <View style={styles.info}>
           <Text style={styles.name}>{data?.name}</Text>
@@ -46,12 +54,18 @@ const PersonalDetailsCard = ({ isOpen, onToggle, data, time, progress }) => {
       <View style={styles.dateRow}>
         <View style={styles.dateBlock}>
           <Text style={styles.label}>Start date</Text>
-          <Text style={styles.value}>need to change</Text>
+          <Text style={styles.value}>
+            {' '}
+            {startDate ? format(new Date(startDate), 'dd MMM yyyy') : ''}
+          </Text>
         </View>
 
         <View style={styles.dateBlock}>
           <Text style={styles.label}>End date</Text>
-          <Text style={styles.value}>need to change</Text>
+          <Text style={styles.value}>
+            {' '}
+            {endDate ? format(new Date(endDate), 'dd MMM yyyy') : ''}
+          </Text>
         </View>
       </View>
 
@@ -61,7 +75,12 @@ const PersonalDetailsCard = ({ isOpen, onToggle, data, time, progress }) => {
 
           <View style={styles.section}>
             <Text style={styles.label}>Workout Goals</Text>
-            <Text style={styles.value}>need to change</Text>
+            <Text style={styles.value}>
+              {Array.isArray(data?.wellness_goal) &&
+              data.wellness_goal.length > 0
+                ? data.wellness_goal.join(', ')
+                : 'No workout goals'}
+            </Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.section}>
@@ -71,7 +90,7 @@ const PersonalDetailsCard = ({ isOpen, onToggle, data, time, progress }) => {
             <Text style={styles.value}>{data?.health_issues}</Text>
           </View>
 
-          <View style={styles.row}>
+          {/* <View style={styles.row}>
             <View style={styles.half}>
               <Text style={styles.label}>Pin code</Text>
               <Text style={styles.value}>need to change</Text>
@@ -85,7 +104,7 @@ const PersonalDetailsCard = ({ isOpen, onToggle, data, time, progress }) => {
           <View style={styles.section}>
             <Text style={styles.label}>Landmark</Text>
             <Text style={styles.value}>need to change</Text>
-          </View>
+          </View> */}
           <View style={styles.divider} />
           <View style={styles.section}>
             <Text style={styles.label}>Address</Text>

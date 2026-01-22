@@ -17,16 +17,14 @@ import { getCurrentLocation } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { Image } from 'react-native';
-import { uploadImageApi } from '../../services/trainerServices';
+import { validateSignup, validateUserStep2 } from "../../utils/Validators";
+import {showError} from "../../utils/toast";
+import { validateUserStep1 } from "../../utils/Validators";
+
 export default function SignupDetailsScreenUser() {
   const navigation = useNavigation();
-  const [uploading, setUploading] = useState(false);
 
   const dispatch = useDispatch();
-  const profileImage = useSelector(
-    state => state.registration.profile_pic
-  );
-
   const registration = useSelector(state => state.registration);
 
   const [showLocationFields, setShowLocationFields] = useState(true);
@@ -37,16 +35,18 @@ export default function SignupDetailsScreenUser() {
     dispatch(updateRegistration({ [field]: value }));
   };
 
-  const handleContinue = () => {
-    const { name, email, phno, password } = registration;
+const handleContinue = () => {
+  
+  const result = validateUserStep1(registration);
 
-    if (!name || !email || !phno || !password) {
-      Alert.alert('Missing details', 'Please fill all required fields');
-      return;
-    }
+  if (!result.ok) {
+    showError(result.msg);
+    return;
+  }
 
-    navigation.navigate('MainWizardScreen');
-  };
+  navigation.navigate('MainWizardScreen');
+};
+
   const handlePickProfileImage = async () => {
     launchImageLibrary(
       { mediaType: 'photo', quality: 0.7 },
@@ -67,43 +67,38 @@ export default function SignupDetailsScreenUser() {
       }
     );
   };
-  const resolveProfileImage = () => {
-    if (!profileImage) return null;
-
-    // local image object
-    if (typeof profileImage === "object" && profileImage.uri) {
-      return { uri: profileImage.uri };
-    }
-
-    // backend image string
-    if (typeof profileImage === "string") {
-      return { uri: profileImage };
-    }
-
-    return null;
-  };
 
 
-  const handleUseLocation = async () => {
-    try {
-      const coords = await getCurrentLocation();
-      const address = await reverseGeocode(coords.latitude, coords.longitude);
+const handleUseLocation = async () => {
+  try {
+    const coords = await getCurrentLocation();
+    const { latitude, longitude } = coords;
 
-      setLocation(address);
+    const address = await reverseGeocode(latitude, longitude);
 
-      dispatch(
-        updateRegistration({
-          address: address,
-        }),
-      );
+    setLocation(address);
 
-      Alert.alert('Success', '📍 Location fetched successfully');
-      console.log(' Location:', address);
-    } catch (err) {
-      console.log(' Location error:', err);
-      Alert.alert('Error', 'Unable to fetch location. Please try again.');
-    }
-  };
+    dispatch(
+      updateRegistration({
+        address: address,
+        latitude: latitude,
+        longitude: longitude,
+      })
+    );
+
+    Alert.alert(
+      'Success',
+      `📍 Location fetched\nLat: ${latitude}\nLng: ${longitude}`
+    );
+
+    console.log('Latitude:', latitude);
+    console.log('Longitude:', longitude);
+  } catch (err) {
+    console.log('Location error:', err);
+    Alert.alert('Error', 'Unable to fetch location. Please try again.');
+  }
+};
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -119,18 +114,19 @@ export default function SignupDetailsScreenUser() {
         <Text style={styles.subtitle}>Enter basic details</Text>
 
         <View style={styles.profileRow}>
-          <TouchableOpacity onPress={handlePickProfileImage}>
-            {resolveProfileImage() ? (
-              <Image
-                source={resolveProfileImage()}
-                style={styles.profileImage}
-              />
-            ) : (
-              <View style={styles.profilePlaceholder}>
-                <Ionicons name="camera-outline" size={26} color="#777" />
-              </View>
-            )}
-          </TouchableOpacity>
+      <TouchableOpacity onPress={handlePickProfileImage}>
+  {registration.profile_pic?.uri ? (
+    <Image
+      source={{ uri: registration.profile_pic.uri }}
+      style={styles.profileImage}
+    />
+  ) : (
+    <View style={styles.profilePlaceholder}>
+      <Ionicons name="camera-outline" size={26} color="#777" />
+    </View>
+  )}
+</TouchableOpacity>
+
 
 
           <View style={styles.nameInputWrapper}>

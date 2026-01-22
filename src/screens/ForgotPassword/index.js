@@ -17,7 +17,6 @@ import {
 } from "../../redux/slices/forgotPasswordSlice";
 import styles from "./style";
 
-
 export default function ForgotPasswordScreen({ navigation }) {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
@@ -55,7 +54,6 @@ export default function ForgotPasswordScreen({ navigation }) {
   }
 }, [success, error]);
 
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.centerWrapper}>
@@ -92,7 +90,6 @@ export default function ForgotPasswordScreen({ navigation }) {
           )}
         </TouchableOpacity>
 
-      
       </View>
       
     </SafeAreaView>

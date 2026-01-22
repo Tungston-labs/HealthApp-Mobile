@@ -1,37 +1,36 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import api from "./api";
 
-export const registerClientApi = async (data) => {
-  const formData = new FormData();
 
-  Object.entries(data).forEach(([key, value]) => {
-    if (!value) return;
-
-    if (key === "profile_pic") {
-      formData.append("profile_pic", {
-        uri: value.uri,
-        type: value.type || "image/jpeg",
-        name: value.name || "profile.jpg",
-      });
-    } 
-    else if (Array.isArray(value)) {
-      value.forEach(item => formData.append(key, item));
-    } 
-    else {
-      formData.append(key, value);
-    }
-  });
-
-  return api.post("client/register/", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-};
+export const registerClientApi = (data) =>
+  api.post("client/register/", data);
 
 export const getClientProfile = () =>
   api.get("client/profile/");
 
+export const fetchClientTrainersAPI = async (payload = {}) => {
+  try {
+    const response = await api.get("client/booked-trainers/", {
+      params: payload, // GET params
+    });
+    console.log("API CALL SUCCESS", response.data);
+    return response.data; // Return the actual data
+  } catch (err) {
+    console.log("API CALL ERROR", err.response || err);
+    throw err;
+  }
+};
+export const ClientCancelTraining = async () => {
+  const response = await api.post("refund/training/cancel/");
+  return response.data;
+};
+export const requestNutritionAPI = async (payload) => {
+  const response = await api.post(
+    "nutrition/request/",
+    payload
+  );
+  return response.data;
+};
 export const updateClientProfile = (id, data) =>
   api.patch(`client/${id}/`, data);
 
@@ -43,4 +42,35 @@ export const dashboardCounts = () =>
 
 export const planList = () => {
   return api.get("plan/clientlist/");
+};
+
+export const fetchMobProfileApi = async () => {
+  const response = await api.get("client/mob/profile/");
+  return response.data;
+};
+
+
+export const updateProfileApi = (payload) => {
+  console.log("SENDING PATCH PAYLOAD:", payload);
+
+  return api.patch(
+    "client/profile/edit/",
+    payload,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+};
+
+export const getUnbookedPlans = () => {
+  return api.get("client/plans/unbooked/");
+};
+
+
+
+export const fetchClientBMI = async () => {
+  const response = await api.get("client/client/bmi/");
+  return response.data;
 };

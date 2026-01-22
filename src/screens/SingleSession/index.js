@@ -2,7 +2,6 @@ import React from "react";
 import { View, Text, Image, ScrollView, TextInput } from "react-native";
 import HeaderWithBack from "../../components/HeaderWithBack";
 import TrainerInfoCard from "../../components/TrainerInfoCard";
-import TrainingProgressSelector from "../../components/TrainingProgressSelector";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
 
@@ -41,13 +40,6 @@ const SingleSession = ({ route }) => {
           <Text style={styles.ratingText}>4.6</Text>
         </View>
       </View>
-
-
-
-      <TrainingProgressSelector
-        progressDay={1}
-        progressTime="01:02 Hrs"
-      />
 
 
       <View style={styles.notesContainer}>

@@ -24,7 +24,7 @@ const generateDatesForYear = () => {
 
 const TrainingProgressSelector = ({
   onDateSelect,
-  progressDay = 1,
+  progressDay ,
   progressTime = '00:00 Hrs',
   time,
 }) => {
@@ -46,7 +46,7 @@ const TrainingProgressSelector = ({
   return (
     <View style={styles.container}>
       <View style={styles.dayBar}>
-        <Text style={styles.dayText}>Day {progressDay}</Text>
+        <Text style={styles.dayText}>{progressDay}</Text>
         <View style={styles.timeRow}>
           <Text style={styles.timeText}>{progressTime}</Text>
           <Icon name="time-outline" size={16} color="#fff" />
@@ -56,7 +56,7 @@ const TrainingProgressSelector = ({
         Training Time{' '}
         {time ? format(parse(time, 'HH:mm:ss', new Date()), 'HH:mm') : '00:00'}
       </Text>
-
+{/* 
       <FlatList
         data={dates}
         horizontal
@@ -81,7 +81,7 @@ const TrainingProgressSelector = ({
             </TouchableOpacity>
           );
         }}
-      />
+      /> */}
     </View>
   );
 };

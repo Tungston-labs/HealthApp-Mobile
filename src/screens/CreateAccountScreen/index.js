@@ -7,6 +7,8 @@ import {
   ScrollView,
   Image,
   SafeAreaView,
+  Platform,
+  Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import styles from './style';
@@ -14,16 +16,17 @@ import { getCurrentLocation } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerTrainerThunk } from '../../redux/slices/trainerRegistrationSlice';
-
 import { launchImageLibrary } from 'react-native-image-picker';
 import DOBPicker from './DOBPicker';
 import { uploadImageApi } from '../../services/trainerServices';
+import Toast from 'react-native-toast-message';
+import { validateSignup } from '../../utils/Validators';
 export default function CreateAccountScreen({ navigation }) {
   const [images, setImages] = useState([]);
   const dispatch = useDispatch();
 
   const { loading, error, success } = useSelector(state => state.trainerReg);
-const [isUploading, setIsUploading] = useState(false);  const [name, setName] = useState('');
+  const [isUploading, setIsUploading] = useState(false); const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phno, setPhno] = useState('');
   const [dob, setDob] = useState('');
@@ -36,10 +39,13 @@ const [isUploading, setIsUploading] = useState(false);  const [name, setName] = 
   const [password, setPassword] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [aadhaarImage, setAadhaarImage] = useState(null);
-
   const [genderOpen, setGenderOpen] = useState(false);
   const [genderValue, setGenderValue] = useState('');
-
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [pincode, setPincode] = useState("");
+  const [landmark, setLandmark] = useState("");
+  const [coords, setCoords] = useState(null);
   const [expertiseOpen, setExpertiseOpen] = useState(false);
   const [expertiseValue, setExpertiseValue] = useState('');
   const expertiseMap = {
@@ -70,42 +76,64 @@ const [isUploading, setIsUploading] = useState(false);  const [name, setName] = 
       },
     );
   };
-const handlePickAadhaarImage = () => {
-  launchImageLibrary(
-    {
-      mediaType: 'photo',
-      selectionLimit: 1,
-      quality: 0.8,
-    },
-    response => {
-      if (response.didCancel || response.errorCode) return;
-      if (response.assets?.length) {
-        setAadhaarImage(response.assets[0]);
+  const handlePickAadhaarImage = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        selectionLimit: 1,
+        quality: 0.8,
+      },
+      response => {
+        if (response.didCancel || response.errorCode) return;
+        if (response.assets?.length) {
+          setAadhaarImage(response.assets[0]);
+        }
+      },
+    );
+  };
+  useEffect(() => {
+    const testConnection = async () => {
+      try {
+        const response = await fetch('http://178.248.112.16:9001/');
+        console.log(" Connection Test Success:", response.status);
+      } catch (error) {
+        console.log(" Connection Test Failed. This is a Network Config issue:", error.message);
       }
-    },
-  );
-};
-
+    };
+    testConnection();
+  }, []);
   const handleUseLocation = async () => {
     try {
-      const coords = await getCurrentLocation();
-      const address = await reverseGeocode(coords.latitude, coords.longitude);
+      const locationData = await getCurrentLocation();
 
-      setLocation(address);
+      // Round to 6 decimal places immediately
+      const roundedCoords = {
+        latitude: parseFloat(locationData.latitude.toFixed(6)),
+        longitude: parseFloat(locationData.longitude.toFixed(6)),
+      };
 
-      alert(' Location fetched successfully');
-      console.log(' Location:', address);
+      setCoords(roundedCoords); // Save the cleaned coordinates
+
+      const fullAddress = await reverseGeocode(
+        roundedCoords.latitude,
+        roundedCoords.longitude
+      );
+
+      // ... rest of your address logic
+      setAddress(fullAddress);
+      alert("Location fetched successfully");
     } catch (err) {
-      console.log(' Location error:', err);
-      alert('Unable to fetch location. Please try again.');
+      console.log("Location error:", err);
     }
   };
+
   const handlePickImage = () => {
     launchImageLibrary(
       {
         mediaType: 'photo',
         selectionLimit: 0,
         quality: 0.8,
+        forceJPG: true,
       },
       response => {
         if (response.didCancel) {
@@ -126,74 +154,128 @@ const handlePickAadhaarImage = () => {
   const handleRemoveImage = index => {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
-
 const handleSubmit = async () => {
+  // 1. Prepare Validation Data
+  const validationData = {
+    name, email, phno, dob, genderValue, expertiseValue,
+    aadhaar, password, location, landmark, address, city, pincode,
+    profileImage, aadhaarImage, images, sectionTiming
+  };
+
+  const check = validateSignup(validationData);
+  if (!check.ok) {
+    Toast.show({
+      type: 'error',
+      text1: 'Validation Error',
+      text2: check.msg,
+    });
+    return;
+  }
+
   try {
-    if (!profileImage || !aadhaarImage || images.length === 0) {
-      alert("Please select all images first.");
-      return;
+    setIsUploading(true);
+
+    // 2. Upload Images to get URLs
+    const adarImageUrl = await uploadImageApi(aadhaarImage);
+    let certUrls = [];
+    for (const img of images) {
+      const url = await uploadImageApi(img);
+      if (url) certUrls.push(url);
     }
 
-    setIsUploading(true); 
-
-    console.log("Starting image uploads...");
-    
-    const profilePicUrl = await uploadImageApi(profileImage);
-    const adarImageUrl = await uploadImageApi(aadhaarImage);
-    
-    const certificateUrls = await Promise.all(
-      images.map(img => uploadImageApi(img))
-    );
-
-    // STEP 2: Prepare Final Data
+    // 3. Prepare Form Data
     const formData = new FormData();
+    const finalLocationString = location?.trim() || [landmark, address, city, pincode].filter(Boolean).join(", ");
 
+    // Basic Info
     formData.append("name", name);
     formData.append("email", email.toLowerCase().trim());
     formData.append("phno", phno);
     formData.append("dob", dob);
     formData.append("gender", genderValue.toLowerCase());
-    
-    formData.append("training_field", expertiseMap[expertiseValue]); 
-    
-    const formattedTiming = sectionTiming.split(' ')[0];
-    formData.append("section_timing", formattedTiming); 
-
-    formData.append("location", location);
-    formData.append("expecting_salary", fee);
-    formData.append("no_of_section", sessions);
-    formData.append("adar_number", aadhaar);
-    formData.append("experience", experience);
     formData.append("password", password);
-
-    formData.append("profile_pic", profilePicUrl); 
-    formData.append("adar_image", adarImageUrl);
     
-    certificateUrls.forEach(url => {
-      formData.append("certificates", url);
+    // Address Details (Fixed syntax here)
+    formData.append("location", finalLocationString); 
+    formData.append("address", address || "");
+    formData.append("city", city || "");
+    formData.append("pincode", pincode || "");
+    formData.append("landmark", landmark || "");
+
+    // Aadhaar & Section Info
+    formData.append("adar_number", aadhaar);
+    formData.append("section_timing", sectionTiming);
+
+    // Coordinates (Fixed precision for Django)
+    if (coords?.latitude && coords?.longitude) {
+      formData.append("latitude", Number(coords.latitude).toFixed(6));
+      formData.append("longitude", Number(coords.longitude).toFixed(6));
+    }
+
+    // Professional Info
+    const planId = expertiseMap[expertiseValue];
+    if (planId) formData.append("training_field", Number(planId));
+    formData.append("experience", Number(experience) || 0);
+    formData.append("no_of_section", Number(sessions) || 0);
+    formData.append("expecting_salary", Number(fee) || 0);
+
+    // Profile Picture logic
+    if (profileImage?.uri) {
+      const fixedUri = Platform.OS === "android"
+        ? (profileImage.uri.startsWith("file://") ? profileImage.uri : `file://${profileImage.uri}`)
+        : profileImage.uri;
+
+      formData.append("profile_pic", {
+        uri: fixedUri,
+        name: profileImage.fileName || `profile_${Date.now()}.jpg`,
+        type: profileImage.type || "image/jpeg",
+      });
+    }
+
+    // URLs from step 2
+    if (adarImageUrl) formData.append("adar_image", adarImageUrl);
+    certUrls.forEach(url => {
+      formData.append("certificates[]", url);
     });
 
-    console.log("Image uploads complete. Sending registration...");
-
+    // 4. Submit to Redux
     await dispatch(registerTrainerThunk(formData)).unwrap();
-    
-    alert("Trainer registered successfully 🎉");
-  } catch (error) {
-    console.log("REGISTRATION FAILED:", error);
-    alert("Error: " + (error.message || "Something went wrong"));
+
+    Toast.show({
+      type: 'success',
+      text1: 'Success',
+      text2: 'Trainer Registered Successfully!',
+    });
+
+    navigation.reset({ index: 0, routes: [{ name: "ThankYouScreen" }] });
+
+  } catch (err) {
+    console.log("REGISTRATION ERROR:", err);
+    let errorMessage = "Something went wrong";
+
+    if (typeof err === 'string') {
+      errorMessage = err;
+    } else if (err?.message && typeof err.message === 'string') {
+      errorMessage = err.message;
+    } else if (typeof err === 'object') {
+      const values = Object.values(err);
+      if (values.length > 0) {
+        errorMessage = Array.isArray(values[0]) ? values[0][0] : JSON.stringify(values[0]);
+      }
+    }
+
+    Toast.show({
+      type: 'error',
+      text1: 'Registration Failed',
+      text2: errorMessage,
+      visibilityTime: 5000,
+    });
+
   } finally {
-    setIsUploading(false); 
+    setIsUploading(false);
   }
 };
 
-
-
-
-  useEffect(() => {
-    if (success) {
-      navigation.navigate('ThankYouScreen');
-    }
-  }, [success, navigation]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -317,44 +399,44 @@ const handleSubmit = async () => {
         <View style={styles.iconInputRow}>
           <DOBPicker value={dob} onChange={setDob} />
         </View>
-        
-       <View style={styles.iconInputRow}>
-  <Ionicons name="document-outline" size={20} color="#666" />
 
-  <TextInput
-    placeholder="Aadhaar Number"
-    placeholderTextColor="#888"
-    style={styles.inputFlex}
-    value={aadhaar}
-    onChangeText={setAadhaar}
-  />
+        <View style={styles.iconInputRow}>
+          <Ionicons name="document-outline" size={20} color="#666" />
 
-  <TouchableOpacity
-    style={styles.uploadButton}
-    onPress={handlePickAadhaarImage}
-  >
-    <Ionicons name="cloud-upload-outline" size={18} color="#fff" />
-    <Text style={styles.uploadBtnText}>Upload</Text>
-  </TouchableOpacity>
-</View>
+          <TextInput
+            placeholder="Aadhaar Number"
+            placeholderTextColor="#888"
+            style={styles.inputFlex}
+            value={aadhaar}
+            onChangeText={setAadhaar}
+          />
 
-{aadhaarImage && (
-  <View style={{ marginTop: 10 }}>
-    <View style={styles.uploadImageCard}>
-      <TouchableOpacity
-        style={styles.deleteBadge}
-        onPress={() => setAadhaarImage(null)}
-      >
-        <Ionicons name="close" size={16} color="#fff" />
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.uploadButton}
+            onPress={handlePickAadhaarImage}
+          >
+            <Ionicons name="cloud-upload-outline" size={18} color="#fff" />
+            <Text style={styles.uploadBtnText}>Upload</Text>
+          </TouchableOpacity>
+        </View>
 
-      <Image
-        source={{ uri: aadhaarImage.uri }}
-        style={styles.uploadPreviewImg}
-      />
-    </View>
-  </View>
-)}
+        {aadhaarImage && (
+          <View style={{ marginTop: 10 }}>
+            <View style={styles.uploadImageCard}>
+              <TouchableOpacity
+                style={styles.deleteBadge}
+                onPress={() => setAadhaarImage(null)}
+              >
+                <Ionicons name="close" size={16} color="#fff" />
+              </TouchableOpacity>
+
+              <Image
+                source={{ uri: aadhaarImage.uri }}
+                style={styles.uploadPreviewImg}
+              />
+            </View>
+          </View>
+        )}
 
 
         <TouchableOpacity
@@ -369,21 +451,37 @@ const handleSubmit = async () => {
             placeholder="Enter pincode"
             placeholderTextColor="#888"
             style={styles.inputUnderline}
+            value={pincode}
+            onChangeText={setPincode}
+            keyboardType="numeric"
           />
+
           <TextInput
             placeholder="City/Town"
             placeholderTextColor="#888"
             style={styles.inputUnderline}
+            value={city}
+            onChangeText={setCity}
           />
         </View>
 
-        <TextInput placeholder="Landmark" style={styles.inputUnderline} />
+
+        <TextInput
+          placeholder="Landmark"
+          placeholderTextColor="#888"
+          style={styles.inputUnderline}
+          value={landmark}
+          onChangeText={setLandmark}
+        />
         <TextInput
           placeholder="Address"
-          value={location}
-          onChangeText={setLocation}
+          placeholderTextColor="#888"
           style={styles.inputUnderline}
+          value={address}
+          onChangeText={setAddress}
+          multiline
         />
+
 
         <View style={styles.twoColRow}>
           <TextInput

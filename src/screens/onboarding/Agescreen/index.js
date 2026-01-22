@@ -1,54 +1,84 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList } from "react-native";
+import { View, Text, FlatList, TouchableOpacity } from "react-native";
 import styles from "./style";
 import { useDispatch, useSelector } from "react-redux";
 import { updateRegistration } from "../../../redux/slices/registrationSlice";
+import { validateUserStep2 } from "../../../utils/Validators";
+import { showError } from "../../../utils/toast";
+import { useNavigation } from "@react-navigation/native";
 
 export default function AgeScreen() {
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const registration = useSelector(state => state.registration);
+
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
   ];
   const years = Array.from({ length: 50 }, (_, i) => 1980 + i);
-  const dispatch=useDispatch();
-  const [selectedDay, setSelectedDay] = useState(0);
-  const [selectedMonth, setSelectedMonth] = useState(0);
-  const [selectedYear, setSelectedYear] = useState(years.length - 1);
 
   const ITEM_HEIGHT = 40;
-  const VISIBLE_ITEMS = 5; 
-  const PADDING = (VISIBLE_ITEMS - 1) / 2 * ITEM_HEIGHT;
+  const VISIBLE_ITEMS = 5;
+  const PADDING = ((VISIBLE_ITEMS - 1) / 2) * ITEM_HEIGHT;
 
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(null);
   const [age, setAge] = useState(0);
+  const [touched, setTouched] = useState(false); 
+  useEffect(() => {
+    if (
+      selectedDay === null ||
+      selectedMonth === null ||
+      selectedYear === null
+    )
+      return;
 
- useEffect(() => {
-  const birthday = new Date(
-    years[selectedYear],
-    selectedMonth,
-    selectedDay + 1
-  );
+    const birthday = new Date(
+      years[selectedYear],
+      selectedMonth,
+      days[selectedDay]
+    );
 
-  const today = new Date();
-  let diff = today.getFullYear() - birthday.getFullYear();
-  const m = today.getMonth() - birthday.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birthday.getDate())) diff--;
+    const today = new Date();
+    let diff = today.getFullYear() - birthday.getFullYear();
+    const m = today.getMonth() - birthday.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthday.getDate())) diff--;
 
-  const finalAge = diff >= 0 ? diff : 0;
-  setAge(finalAge);
+    const finalAge = diff >= 0 ? diff : 0;
+    setAge(finalAge);
 
-  dispatch(
-    updateRegistration({
-      dob: birthday.toISOString().split("T")[0],
-      age: finalAge,
-    })
-  );
-}, [selectedDay, selectedMonth, selectedYear]);
-
+    dispatch(
+      updateRegistration({
+        dob: birthday.toISOString().split("T")[0],
+        age: finalAge,
+      })
+    );
+  }, [selectedDay, selectedMonth, selectedYear]);
 
   const onScrollEnd = (event, setItem, length) => {
     const index = Math.round(event.nativeEvent.contentOffset.y / ITEM_HEIGHT);
-    if (index >= 0 && index < length) setItem(index);
+    if (index >= 0 && index < length) {
+      setTouched(true);
+      setItem(index);
+    }
+  };
+
+  const handleContinue = () => {
+    if (!touched) {
+      showError("Please select your Date of Birth");
+      return;
+    }
+
+    const result = validateUserStep2(registration);
+    if (!result.ok) {
+      showError(result.msg);
+      return;
+    }
+
+    navigation.navigate("NextUserScreen");
   };
 
   const renderItem = (item, index, selectedIndex) => (
@@ -72,15 +102,13 @@ export default function AgeScreen() {
       <View style={styles.selectionOverlay} />
 
       <View style={styles.wheelWrapper}>
-
         <FlatList
           data={days}
-          keyExtractor={(i) => i.toString()}
           style={styles.wheel}
-          showsVerticalScrollIndicator={false}
           snapToInterval={ITEM_HEIGHT}
           decelerationRate="fast"
           contentContainerStyle={{ paddingVertical: PADDING }}
+          showsVerticalScrollIndicator={false}
           onMomentumScrollEnd={(e) =>
             onScrollEnd(e, setSelectedDay, days.length)
           }
@@ -89,14 +117,14 @@ export default function AgeScreen() {
           }
         />
 
+
         <FlatList
           data={months}
-          keyExtractor={(i) => i}
           style={styles.wheel}
-          showsVerticalScrollIndicator={false}
           snapToInterval={ITEM_HEIGHT}
           decelerationRate="fast"
           contentContainerStyle={{ paddingVertical: PADDING }}
+          showsVerticalScrollIndicator={false}
           onMomentumScrollEnd={(e) =>
             onScrollEnd(e, setSelectedMonth, months.length)
           }
@@ -107,12 +135,11 @@ export default function AgeScreen() {
 
         <FlatList
           data={years}
-          keyExtractor={(i) => i.toString()}
           style={styles.wheel}
-          showsVerticalScrollIndicator={false}
           snapToInterval={ITEM_HEIGHT}
           decelerationRate="fast"
           contentContainerStyle={{ paddingVertical: PADDING }}
+          showsVerticalScrollIndicator={false}
           onMomentumScrollEnd={(e) =>
             onScrollEnd(e, setSelectedYear, years.length)
           }
@@ -120,7 +147,6 @@ export default function AgeScreen() {
             renderItem(item, index, selectedYear)
           }
         />
-
       </View>
     </View>
   );

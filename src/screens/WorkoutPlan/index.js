@@ -1,63 +1,111 @@
-import React, { useEffect, useState } from 'react';
-import { View, ScrollView, ActivityIndicator } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import Header from '../../components/Header';
-import styles from './style';
-import FilterModal from '../../components/FIlterModal';
-import PlanCard from './PlanCard';
-import { fetchPlansThunk } from '../../redux/slices/planSlice';
-import { Text } from 'react-native-svg';
+import React, { useEffect, useState } from "react";
+import { View, Text, FlatList } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+
+import Header from "../../components/Header";
+import FilterModal from "../../components/FIlterModal";
+import PlanCard from "../../components/PlanCard";
+import Skeleton from "../../components/Skelton";
+import UpcomingSessionSection from "../UpcomingSession";
+
+import { fetchPlansThunk } from "../../redux/slices/planSlice";
+import styles from "./style";
 
 const WorkoutPlan = ({ navigation }) => {
   const dispatch = useDispatch();
+
   const [showModal, setShowModal] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState(null);
+  const [selectedPlanSlot, setSelectedPlanSlot] = useState(null);
+  const [showUpcoming, setShowUpcoming] = useState(false);
 
-  const { plans, loading, error } = useSelector(state => state.planList);
-  const user = useSelector(state => state.auth?.user);
+  const { plans, loading, error } = useSelector(
+    (state) => state.planList
+  );
+
+  const { sessions } = useSelector(
+    (state) => state.weeklySessions
+  );
+
+  const user = useSelector((state) => state.auth?.user);
+
   useEffect(() => {
     dispatch(fetchPlansThunk());
-  }, []);
-
-  console.log("PLANS 👉", plans);
+  }, [dispatch]);
 
   return (
-    <>
-      <ScrollView style={styles.container}>
-        <Header
-          username={user?.name || 'User'}
-          subtitle="Your workout plans"
-          onNotificationPress={() => navigation.navigate('Notifications')}
-        />
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      {/*  FIXED HEADER */}
+      <Header
+        username={user?.name || "User"}
+        subtitle="Your workout plans"
+        onNotificationPress={() =>
+          navigation.navigate("Notifications")
+        }
+      />
 
-        {loading && <ActivityIndicator size="large" />}
-        {error && <Text>{JSON.stringify(error)}</Text>}
-
-        <View style={styles.gridContainer}>
-          {plans.length === 0 && !loading && (
-            <Text>No plans available</Text>
+      {/*  EVERYTHING BELOW SCROLLS */}
+      {loading ? (
+        <FlatList
+          data={Array.from({ length: 6 })}
+          keyExtractor={(_, index) => index.toString()}
+          numColumns={2}
+          columnWrapperStyle={styles.gridContainer}
+          renderItem={() => (
+            <Skeleton height={220} borderRadius={16} />
           )}
+        />
+      ) : (
+        <FlatList
+          data={showUpcoming ? plans.slice(0, 4) : plans}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
+          columnWrapperStyle={styles.gridContainer}
+          contentContainerStyle={{ paddingBottom: 80 }}
+          showsVerticalScrollIndicator={false}
 
-          {plans.map(item => (
+          ListHeaderComponent={
+            sessions && sessions.length > 0 ? (
+              <>
+                <UpcomingSessionSection />
+                <View style={{ height: 16 }} />
+              </>
+            ) : null
+          }
+
+          ListEmptyComponent={
+            <Text style={{ textAlign: "center", marginTop: 20 }}>
+              No plans available
+            </Text>
+          }
+
+          renderItem={({ item }) => (
             <PlanCard
-              key={item.id}
               item={item}
               onPress={() => {
                 setSelectedPlanId(item.id);
                 setShowModal(true);
+                setSelectedPlanSlot(item?.plan_type);
               }}
             />
-          ))}
+          )}
+        />
+      )}
 
-        </View>
-      </ScrollView>
+      {error && <Text>{JSON.stringify(error)}</Text>}
 
       <FilterModal
         visible={showModal}
         planId={selectedPlanId}
-        onClose={() => setShowModal(false)}
+        selectedPlanSlot={selectedPlanSlot}
+        onClose={(success = false) => {
+          setShowModal(false);
+          if (success) {
+            setShowUpcoming(true);
+          }
+        }}
       />
-    </>
+    </View>
   );
 };
 

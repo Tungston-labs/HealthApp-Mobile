@@ -15,26 +15,33 @@ export default StyleSheet.create({
     marginBottom: 20,
   },
 
-  trainerImg: {
-    width: 110,
-    height: 130,
-    borderRadius: 12,
-    objectFit:"cover",
-  },
+trainerImg: {
+  width: 100,
+  height: 100,
+  borderRadius: 12,
+},
+planName: {
+  fontSize: 12,
+  color: "#666",
+  marginTop: 2,
+},
+
 
   viewProfileBtn: {
-    position: "absolute",
-    bottom: 8,
-    alignSelf: "center",
-    backgroundColor: "#fff",
-    paddingHorizontal: 14,
-    paddingVertical: 4,
-    borderRadius: 10,
-    elevation: 2,
-  },
+  position: "absolute",
+  bottom: 14,
+  alignSelf: "center",
+  backgroundColor: "#fff",
+  paddingHorizontal: 6,
+  paddingVertical: 2,
+  borderRadius: 10,
+  elevation: 2,
+  borderWidth: 1,
+  borderColor: "#8D8D8D", // you can change this color if needed
+},
 
   viewProfileText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "600",
   },
 
@@ -75,6 +82,12 @@ export default StyleSheet.create({
     justifyContent: "space-between"
 
   },
+    inputUnderline: {
+  borderBottomWidth: 1,
+  borderBottomColor: '#1C1B1F', 
+  marginTop:10,
+  marginBottom:10,
+},
   priceRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -115,6 +128,14 @@ export default StyleSheet.create({
     
     width: 140,
   },
+fullUnderline: {
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  right: 0,
+  height: 1,
+  backgroundColor: "#1C1B1F",
+},
 
   bookText: {
     color: "#fff",

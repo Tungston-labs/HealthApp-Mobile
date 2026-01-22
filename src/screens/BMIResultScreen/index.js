@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Platform } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./style";
@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Alert } from "react-native";
 import { registerClientThunk, resetClientState } from "../../redux/slices/clientSlice";
 import { resetRegistration } from "../../redux/slices/registrationSlice";
+import { setAuth } from "../../redux/slices/authSlice";
 
 export default function BMIResultScreen({ navigation }) {
   const {
@@ -30,9 +31,7 @@ export default function BMIResultScreen({ navigation }) {
     weightUnit === "LBS" ? weight * 0.453592 : weight;
 
   const heightInMeters = height / 100;
-  if (!weight || !height) {
-    return null;
-  }
+
 
   const bmi = (
     weightInKg /
@@ -64,57 +63,75 @@ export default function BMIResultScreen({ navigation }) {
     bmiText = "Obesity";
     bmiColor = "#F5554A";
   }
-const buildRegisterPayload = (data) => {
-  const formData = new FormData();
 
-  formData.append("name", data.name);
-  formData.append("email", data.email);
-  formData.append("phno", data.phno);
-  formData.append("password", data.password);
-  formData.append("role", "user");
+  const buildRegisterPayload = (data) => {
+    const formData = new FormData();
 
-  formData.append("dob", data.dob);
-  formData.append("gender", data.gender);
-  formData.append("blood_group", data.blood_group);
+    // Basic fields
+    formData.append("name", data.name);
+    formData.append("email", data.email);
+    formData.append("phno", data.phno);
+    formData.append("password", data.password);
+    formData.append("role", data.role || "user");
+    formData.append("dob", data.dob);
+    formData.append("gender", data.gender);
+    formData.append("blood_group", data.blood_group);
+    formData.append("height", String(data.height));
+    formData.append("weight", String(data.weight));
+    formData.append(
+      "address",
+      `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`
+    );
 
-  formData.append("height", String(data.height));
-  formData.append("weight", String(data.weight));
+    // Arrays
+    formData.append(
+      "health_issues",
+      JSON.stringify(Array.isArray(data.health_issues) ? data.health_issues : [])
+    );
+    formData.append(
+      "wellness_goal",
+      JSON.stringify(Array.isArray(data.wellness_goal) ? data.wellness_goal : [])
+    );
 
-  formData.append(
-    "address",
-    `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`
-  );
-  formData.append(
-    "health_issues",
-    JSON.stringify(data.health_issues || [])
-  );
+    // Profile picture
+    if (data.profile_pic) {
+      let uri = data.profile_pic.uri;
+      if (Platform.OS === "android" && !uri.startsWith("file://")) {
+        uri = "file://" + uri;
+      }
 
-  formData.append(
-    "wellness_goal",
-    JSON.stringify(data.wellness_goal || [])
-  );
+      formData.append("profile_pic", {
+        uri,
+        type: data.profile_pic.type || "image/jpeg",
+        name: data.profile_pic.fileName || "profile.jpg",
+      });
+    }
 
-  if (data.profile_pic) {
-    formData.append("profile_pic", {
-      uri: data.profile_pic.uri,
-      type: data.profile_pic.type || "image/jpeg",
-      name: data.profile_pic.name || "profile.jpg",
-    });
-  }
+    return formData;
+  };
 
-  return formData;
-};
 
-const handleFinalSubmit = () => {
-  if (!registration.name || !registration.email || !registration.phno) {
-    Alert.alert("Incomplete profile", "Please complete signup details");
-    return;
-  }
 
+const handleFinalSubmit = async () => {
   const formData = buildRegisterPayload(registration);
+  
+  try {
+    const res = await dispatch(registerClientThunk(formData)).unwrap();
 
-  console.log("REGISTER PAYLOAD 👉", formData);
-  dispatch(registerClientThunk(formData));
+    const userData = res.user || {
+      name: registration.name,
+      email: registration.email,
+      role: registration.role || "user",
+    };
+
+    // Correctly set auth in Redux
+    dispatch(setAuth({ user: userData, access: res.token?.access }));
+
+    // Navigate to main app
+    navigation.replace("MainApp"); // or AppNavigator entry
+  } catch (err) {
+    Alert.alert("Registration failed", err?.message || err);
+  }
 };
 
 
@@ -122,24 +139,32 @@ useEffect(() => {
   if (registered) {
     dispatch(resetRegistration());
     dispatch(resetClientState());
-
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "workout" }],
-    });
   }
-}, [registered, dispatch, navigation]);
+}, [registered]);
+
 
 useEffect(() => {
   if (error && !registered) {
-    const message =
+    Alert.alert(
+      "Registration failed",
       typeof error === "string"
         ? error
-        : error.message || "Registration failed";
-
-    Alert.alert("Registration failed", message);
+        : error.message || "Registration failed"
+    );
   }
 }, [error, registered]);
+
+if (!weight || !height) {
+  return (
+    <View style={styles.container}>
+      <ActivityIndicator size="large" />
+    </View>
+  );
+}
+
+
+
+
   return (
     <View style={styles.container}>
       <View style={styles.topBackground} />
@@ -235,17 +260,17 @@ useEffect(() => {
               <View style={styles.legendItem}>
                 <View style={[styles.legendColor, { backgroundColor: "#84CDEE" }]} />
                 <Text style={styles.legendLabel}>Under Weight :</Text>
-                <Text style={styles.legendValue}> 18.5</Text>
+                <Text style={styles.legendValue}>&lt; 18.5</Text>
               </View>
 
               <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: "#FFDF32" }]} />
+                <View style={[styles.legendColor, { backgroundColor: "#78B060" }]} />
                 <Text style={styles.legendLabel}>Normal Weight :</Text>
                 <Text style={styles.legendValue}>18.5 - 24.9</Text>
               </View>
 
               <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: "#78B060" }]} />
+                <View style={[styles.legendColor, { backgroundColor: "#FFDF32" }]} />
                 <Text style={styles.legendLabel}>Over Weight :</Text>
                 <Text style={styles.legendValue}>25 - 29.9</Text>
               </View>
@@ -276,4 +301,3 @@ useEffect(() => {
     </View>
   );
 }
-  
