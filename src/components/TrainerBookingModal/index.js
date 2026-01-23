@@ -127,7 +127,6 @@ const TrainerBookingModal = ({
 
           <View style={{ flex: 1 }}>
             {loading && <ActivityIndicator size="large" />}
-
             {!loading && error && (
               <Text style={styles.errorText}>{error}</Text>
             )}

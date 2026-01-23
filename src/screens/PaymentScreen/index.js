@@ -25,6 +25,7 @@ import {
 import {
   createTrainerBookingOrder,
   verifyTrainerPayment,
+  
 } from "../../services/paymentServices";
 
 const PaymentScreen = ({ navigation, route }) => {
@@ -35,6 +36,7 @@ const PaymentScreen = ({ navigation, route }) => {
     new_trainer_id,
     old_trainer_id,
     trainerId,
+    old_trainer_id,
     plan_id,
     booking_type,
     amount = 0,
