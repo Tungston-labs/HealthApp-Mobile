@@ -11,114 +11,159 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import RazorpayCheckout from "react-native-razorpay";
 import { useDispatch, useSelector } from "react-redux";
+
 import styles from "./styles";
 import HeaderWithBack from "../../components/HeaderWithBack";
 import PaymentSuccessModal from "../../components/PaymentSuccessModal";
 import TrainerInfoCard from "../../components/TrainerInfoCard";
+
 import { fetchTrainerDetailThunk } from "../../redux/slices/trainerDetailSlice";
+import {
+  createChangeTrainerOrder,
+  verifyChangeTrainerPayment,
+} from "../../services/trainerServices";
 import {
   createTrainerBookingOrder,
   verifyTrainerPayment,
+  
 } from "../../services/paymentServices";
 
 const PaymentScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
 
-  // ✅ Params from previous screen
   const {
+    mode = "book",
     trainerId,
+    old_trainer_id,
     plan_id,
     booking_type,
     amount,
-    start_date,
-    time,
-    slot_days,
   } = route.params;
 
-  const { loading, data, error } = useSelector(
-    (state) => state.trainerDetail
-  );
+  const filters = useSelector((state) => state.trainer.filters);
+  const start_date = filters?.start_date;
+  const time = filters?.time;
+  const slot_days = filters?.slot_days;
+
+  const { loading, data } = useSelector((state) => state.trainerDetail);
 
   const [selectedMethod, setSelectedMethod] = useState("razorpay");
   const [showSuccess, setShowSuccess] = useState(false);
   const [paying, setPaying] = useState(false);
 
   useEffect(() => {
-    if (trainerId) {
-      dispatch(fetchTrainerDetailThunk(trainerId));
-    }
+    dispatch(fetchTrainerDetailThunk(trainerId));
   }, [dispatch, trainerId]);
+  console.log({trainerId});
+  
 
   const openRazorpay = async () => {
-    // ✅ Ensure plan_id exists
-    if (!plan_id) {
-      Alert.alert("Error", "Plan ID is missing. Please select a plan.");
-      return;
-    }
-
     try {
       setPaying(true);
 
-      const payload = {
-        trainer_id: trainerId,
-        plan_id,
-        booking_type,
-      };
+      /* ================= CREATE ORDER ================= */
+      const orderRes =
+        mode === "change"
+          ? await createChangeTrainerOrder({
+              old_trainer_id,
+              new_trainer_id: trainerId,
+              plan_id,
+            })
+          : await createTrainerBookingOrder({
+              trainer_id: trainerId,
+              plan_id,
+              booking_type,
+            });
 
-      console.log("Booking payload:", payload);
-
-      // 1️⃣ Create order
-      const orderRes = await createTrainerBookingOrder(payload);
-      const { order_id, amount: orderAmount, key } = orderRes.data;
-
-      const options = {
-        key,
-        amount: Math.round(orderAmount * 100), // in paise
-        currency: "INR",
-        name: "HealthApp",
-        description: "Trainer booking",
+      const {
+        order_required = true,
         order_id,
-        theme: { color: "#4CAF50" },
-      };
+        razorpay_order_id,
+        amount: backendAmount,
+        key,
+      } = orderRes.data;
 
-      console.log("RAZORPAY OPTIONS:", options);
+      /* ================= NO PAYMENT REQUIRED ================= */
+      if (mode === "change" && !order_required) {
+        await verifyChangeTrainerPayment({
+          old_trainer_id,
+          new_trainer_id: trainerId,
+          plan_id,
+        });
 
-      // 2️⃣ Open Razorpay
-      const response = await RazorpayCheckout.open(options);
+        setShowSuccess(true);
+        return;
+      }
 
-      console.log("PAYMENT SUCCESS:", response);
+      /* ================= RAZORPAY ================= */
+     const options = {
+  key,
+  currency: "INR",
+  name: "HealthApp",
+  description: "Trainer Booking",
+  order_id: order_id || razorpay_order_id,
+  amount: Math.round(backendAmount * 100),
 
-      // 3️⃣ Verify payment
-      await verifyTrainerPayment({
+  prefill: {
+    email: "test@email.com",
+    contact: "9999999999",
+    name: "Test User",
+  },
+
+  theme: { color: "#3399cc" },
+};
+
+      // const response = await RazorpayCheckout.open(options);
+      let response;
+
+try {
+  response = await RazorpayCheckout.open(options);
+  console.log("✅ PAYMENT SUCCESS RESPONSE:", response);
+} catch (e) {
+  console.log("❌ PAYMENT FAILED / CANCELLED:", e);
+  throw e;
+}
+
+
+      /* ================= VERIFY ================= */
+      const verifyPayload = {
         razorpay_order_id: response.razorpay_order_id,
         razorpay_payment_id: response.razorpay_payment_id,
         razorpay_signature: response.razorpay_signature,
-        start_date,
-        time,
-        slot_days,
-      });
+      };
+      console.log("object", verifyPayload)
+      if (mode === "change") {
+        await verifyChangeTrainerPayment({
+          ...verifyPayload,
+          old_trainer_id,
+          new_trainer_id: trainerId,
+          plan_id,
+        });
+      } else {
+        await verifyTrainerPayment({
+          ...verifyPayload,
+          trainer_id: trainerId,
+          plan_id,
+          booking_type,
+          start_date,
+          time,
+          slot_days,
+        });
+      }
 
       setShowSuccess(true);
-    } catch (error) {
-      console.log("PAYMENT ERROR:", error?.response?.data || error.message || error);
-      Alert.alert("Error", "Unable to initiate payment");
+    } catch (err) {
+      console.log("❌ PAYMENT ERROR:", err?.response?.data || err);
+      Alert.alert("Payment failed", "Please try again");
     } finally {
       setPaying(false);
     }
   };
 
-  if (loading) {
+  if (loading || !data) {
     return (
       <View style={styles.loader}>
         <ActivityIndicator size="large" />
-      </View>
-    );
-  }
-
-  if (error || !data) {
-    return (
-      <View style={styles.center}>
-        <Text>Unable to load trainer details</Text>
       </View>
     );
   }
@@ -128,13 +173,12 @@ const PaymentScreen = ({ navigation, route }) => {
       <HeaderWithBack title="Payment" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Trainer Info */}
         <Text style={styles.sectionTitle}>Trainer info</Text>
         <View style={styles.separator} />
 
         <View style={styles.workoutPlan}>
-          <Text style={styles.label}>Workout Plan - {data.plan_name}</Text>
           <Text style={styles.label}>Workout Type - {booking_type}</Text>
+          <Text style={styles.label}>Sessions - {data.no_of_section}</Text>
         </View>
 
         <View style={styles.trainerBox}>
@@ -146,6 +190,7 @@ const PaymentScreen = ({ navigation, route }) => {
             }
             style={styles.trainerImg}
           />
+
           <TrainerInfoCard
             name={data.name}
             experience={data.experience}
@@ -155,7 +200,6 @@ const PaymentScreen = ({ navigation, route }) => {
           />
         </View>
 
-        {/* Payment Method */}
         <Text style={styles.sectionTitle}>Preferred payment method</Text>
         <View style={styles.separator} />
 
@@ -167,13 +211,10 @@ const PaymentScreen = ({ navigation, route }) => {
           onPress={() => setSelectedMethod("razorpay")}
         >
           <Text style={styles.paymentText}>GPay / Razorpay</Text>
-          {selectedMethod === "razorpay" && (
-            <Icon name="checkmark-circle" size={28} color="#2ecc71" />
-          )}
+          <Icon name="checkmark-circle" size={28} color="#2ecc71" />
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Footer */}
       <View style={styles.footer}>
         <View style={styles.totalWrapper}>
           <Text style={styles.totalLabel}>Total</Text>
@@ -181,11 +222,8 @@ const PaymentScreen = ({ navigation, route }) => {
         </View>
 
         <TouchableOpacity
-          style={[
-            styles.payBtn,
-            (paying || !selectedMethod) && { opacity: 0.6 },
-          ]}
-          disabled={paying || !selectedMethod}
+          style={[styles.payBtn, paying && { opacity: 0.6 }]}
+          disabled={paying}
           onPress={openRazorpay}
         >
           <Text style={styles.payText}>
@@ -199,7 +237,7 @@ const PaymentScreen = ({ navigation, route }) => {
             setShowSuccess(false);
             navigation.reset({
               index: 0,
-              routes: [{ name: "MainApp", params: { defaultTab: "Session" } }],
+              routes: [{ name: "MainApp" }],
             });
           }}
         />

@@ -4,13 +4,21 @@ import { fetchAvailableTrainersAPI } from '../../services/trainerServices';
 export const fetchAvailableTrainersThunk = createAsyncThunk(
   'trainer/fetchAvailable',
   async (payload, { rejectWithValue }) => {
+    if (
+      !payload?.plan_id ||
+      !payload?.slot_days ||
+      !payload?.time ||
+      !payload?.start_date
+    ) {
+      console.log('⛔ BLOCKED EMPTY PAYLOAD:', payload);
+      return rejectWithValue('Invalid filter payload');
+    }
+
     try {
       const response = await fetchAvailableTrainersAPI(payload);
-      console.log(response)
-      return response.data; 
+      return response.data;
     } catch (err) {
-      console.log('🔥 BACKEND ERROR RESPONSE:', err?.response?.data);
-      return rejectWithValue(err?.response?.data || 'Failed to fetch trainers');
+      return rejectWithValue(err?.response?.data);
     }
   }
 );
@@ -20,7 +28,7 @@ const initialState = {
   trainers: [],
   plan: null,
   total: 0,
-  filters: null,   
+  filters: null,
   loading: false,
   error: null,
 };
@@ -35,6 +43,7 @@ const trainerSlice = createSlice({
       state.total = 0;
       state.filters = null;
       state.error = null;
+      state.loading = false;
     },
   },
   extraReducers: builder => {
@@ -43,17 +52,19 @@ const trainerSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-    .addCase(fetchAvailableTrainersThunk.fulfilled, (state, action) => {
-  state.loading = false;
 
-  state.trainers = action.payload?.trainers ?? [];
+      .addCase(fetchAvailableTrainersThunk.fulfilled, (state, action) => {
+        state.loading = false;
 
-  state.plan = action.payload?.plan ?? null;
+        state.trainers = action.payload?.trainers ?? [];
+        state.plan = action.payload?.plan ?? null;
+        state.total = action.payload?.total_available ?? 0;
 
-  state.total = action.payload?.total_available ?? 0;
-
-  state.filters = action.meta.arg;
-})
+        // ✅ Preserve slot filters
+        if (action.meta.arg?.slot_days) {
+          state.filters = action.meta.arg;
+        }
+      })
 
       .addCase(fetchAvailableTrainersThunk.rejected, (state, action) => {
         state.loading = false;

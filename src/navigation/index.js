@@ -19,7 +19,7 @@ import Welcome from '../screens/WelcomeScreens';
 import BMIResultScreen from '../screens/BMIResultScreen';
 import CreateAccount from '../screens/CreateAccountScreen';
 import ThankYouScreen from '../screens/ThankYouScreen';
-import RazorpayButton from '../screens/RazorPayScreen';
+// import RazorpayButton from '../screens/RazorPayScreen';
 import ScheduleEmpty from '../screens/ScheduleEmpty';
 import UserTermsAndConditions from '../screens/UserTermsAndConditions';
 import TrainerTermsAndConditions from '../screens/TrainerTermsAndConditions';
@@ -90,7 +90,7 @@ export default function Navigation() {
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
 
             <Stack.Screen name="ThankYouScreen" component={ThankYouScreen} />
-                        <Stack.Screen name="RazorPayScreen" component={RazorpayButton} />
+                        {/* <Stack.Screen name="RazorPayScreen" component={RazorpayButton} /> */}
 
             <Stack.Screen name="ScheduleEmpty" component={ScheduleEmpty} />
             <Stack.Screen name="UserTermsAndConditions" component={UserTermsAndConditions} />
