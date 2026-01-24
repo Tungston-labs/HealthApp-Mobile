@@ -42,3 +42,32 @@ if (!data.genderValue) return { ok: false, msg: 'Please select your gender' };
   if (!data.expertiseValue) return { ok: false, msg: 'Please select your expertise' };
   return { ok: true };
 };
+
+
+export const validateUserStep1 = (data) => {
+  if (!nameRegex.test(data.name))
+    return { ok: false, msg: 'Enter valid full name (min 3 chars)' };
+
+  if (!emailRegex.test(data.email))
+    return { ok: false, msg: 'Enter valid email address' };
+
+  if (!phoneRegex.test(data.phno))
+    return { ok: false, msg: 'Enter valid 10 digit phone number' };
+
+  if (!passwordRegex.test(data.password))
+    return { ok: false, msg: 'Password must be 8+ chars with 1 Capital & 1 Number' };
+
+  if (!data.profile_pic?.uri)
+    return { ok: false, msg: 'Please upload a Profile Picture' };
+
+  return { ok: true };
+};
+export const validateUserStep2 = (data) => {
+  if (!data.dob)
+    return { ok: false, msg: 'Date of Birth is required' };
+
+  if (!data.genderValue)
+    return { ok: false, msg: 'Please select your gender' };
+
+  return { ok: true };
+};

@@ -18,9 +18,11 @@ import { updateRegistration } from '../../redux/slices/registrationSlice';
 import styles from './style';
 import { getCurrentLocation } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
-import { launchImageLibrary } from 'react-native-image-picker';
-import { validateSignup } from "../../utils/Validators";
-import { showError } from "../../utils/toast";
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { Image } from 'react-native';
+import { validateSignup, validateUserStep2 } from "../../utils/Validators";
+import {showError} from "../../utils/toast";
+import { validateUserStep1 } from "../../utils/Validators";
 
 export default function SignupDetailsScreenUser() {
   const navigation = useNavigation();
@@ -35,29 +37,37 @@ export default function SignupDetailsScreenUser() {
     dispatch(updateRegistration({ [field]: value }));
   };
 
-  const handleContinue = () => {
-    const result = validateSignup(registration);
-    if (!result.ok) {
-      showError(result.msg);
-      return;
-    }
-    navigation.navigate('MainWizardScreen');
-  };
+const handleContinue = () => {
+  
+  const result = validateUserStep1(registration);
+
+  if (!result.ok) {
+    showError(result.msg);
+    return;
+  }
+
+  navigation.navigate('MainWizardScreen');
+};
 
   const handlePickProfileImage = async () => {
-    launchImageLibrary({ mediaType: 'photo', quality: 0.7 }, response => {
-      if (response.didCancel || !response.assets?.length) return;
-      const image = response.assets[0];
-      dispatch(
-        updateRegistration({
-          profile_pic: {
-            uri: image.uri,
-            type: image.type || 'image/jpeg',
-            name: image.fileName || 'profile.jpg',
-          },
-        })
-      );
-    });
+    launchImageLibrary(
+      { mediaType: 'photo', quality: 0.7 },
+      response => {
+        if (response.didCancel || !response.assets?.length) return;
+
+        const image = response.assets[0];
+
+        dispatch(
+          updateRegistration({
+            profile_pic: {
+              uri: image.uri,
+              type: image.type || 'image/jpeg',
+              name: image.fileName || 'profile.jpg',
+            },
+          })
+        );
+      }
+    );
   };
 
   const handleUseLocation = async () => {
