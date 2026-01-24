@@ -6,6 +6,8 @@ import {
   ImageBackground,
   SafeAreaView,
   Animated,
+  ScrollView,
+  KeyboardAvoidingView,
   Alert,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -37,82 +39,94 @@ export default function SelectRoleScreen() {
 
     // Immediately navigate after selection
     if (role === "trainer") {
-      navigation.navigate("CreateAccount"); 
+      navigation.navigate("CreateAccount");
     } else if (role === "user") {
       navigation.navigate("SignupDetailsScreenUser");
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Top Header */}
-      <View style={styles.topHeader}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backBtn}
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
+      >
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <Ionicons name="chevron-back" size={28} color="#000" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>Sign up as</Text>
-      </View>
-
-      {/* Center Content */}
-      <View style={styles.centerWrapper}>
-        <Text style={styles.subtitle}>
-          Choose your role to create{"\n"}the right experience for you.
-        </Text>
-        <Text style={styles.subText}>Join as a User or Trainer.</Text>
-
-        {/* Role Cards */}
-        <View style={styles.cardRow}>
-          {/* Trainer Card */}
-          <Animated.View
-            style={[
-              styles.card,
-              selected === "trainer" && styles.activeCard,
-              { transform: [{ scale: trainerScale }] },
-            ]}
-          >
+          {/* Top Header */}
+          <View style={styles.topHeader}>
             <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={() => selectRole("trainer")}
-              style={{ flex: 1 }}
+              onPress={() => navigation.goBack()}
+              style={styles.backBtn}
             >
-              <ImageBackground
-                source={require("../../../assets/trainer.png")}
-                style={styles.cardImage}
-                imageStyle={styles.cardImageStyle}
-              >
-                <Text style={styles.cardLabel}>Trainer</Text>
-              </ImageBackground>
+              <Ionicons name="chevron-back" size={28} color="#000" />
             </TouchableOpacity>
-          </Animated.View>
 
-          {/* User Card */}
-          <Animated.View
-            style={[
-              styles.card,
-              selected === "user" && styles.activeCard,
-              { transform: [{ scale: userScale }] },
-            ]}
-          >
-            <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={() => selectRole("user")}
-              style={{ flex: 1 }}
-            >
-              <ImageBackground
-                source={require("../../../assets/user2.png")}
-                style={styles.cardImage}
-                imageStyle={styles.cardImageStyle}
+            <Text style={styles.headerTitle}>Sign up as</Text>
+          </View>
+
+          {/* Center Content */}
+          <View style={styles.centerWrapper}>
+            <Text style={styles.subtitle}>
+              Choose your role to create{"\n"}the right experience for you.
+            </Text>
+            <Text style={styles.subText}>Join as a User or Trainer.</Text>
+
+            {/* Role Cards */}
+            <View style={styles.cardRow}>
+              {/* Trainer Card */}
+              <Animated.View
+                style={[
+                  styles.card,
+                  selected === "trainer" && styles.activeCard,
+                  { transform: [{ scale: trainerScale }] },
+                ]}
               >
-                <Text style={styles.cardLabel}>User</Text>
-              </ImageBackground>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
-      </View>
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => selectRole("trainer")}
+                  style={{ flex: 1 }}
+                >
+                  <ImageBackground
+                    source={require("../../../assets/trainer.png")}
+                    style={styles.cardImage}
+                    imageStyle={styles.cardImageStyle}
+                  >
+                    <Text style={styles.cardLabel}>Trainer</Text>
+                  </ImageBackground>
+                </TouchableOpacity>
+              </Animated.View>
+
+              {/* User Card */}
+              <Animated.View
+                style={[
+                  styles.card,
+                  selected === "user" && styles.activeCard,
+                  { transform: [{ scale: userScale }] },
+                ]}
+              >
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => selectRole("user")}
+                  style={{ flex: 1 }}
+                >
+                  <ImageBackground
+                    source={require("../../../assets/user2.png")}
+                    style={styles.cardImage}
+                    imageStyle={styles.cardImageStyle}
+                  >
+                    <Text style={styles.cardLabel}>User</Text>
+                  </ImageBackground>
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

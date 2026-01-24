@@ -154,127 +154,127 @@ export default function CreateAccountScreen({ navigation }) {
   const handleRemoveImage = index => {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
-const handleSubmit = async () => {
-  // 1. Prepare Validation Data
-  const validationData = {
-    name, email, phno, dob, genderValue, expertiseValue,
-    aadhaar, password, location, landmark, address, city, pincode,
-    profileImage, aadhaarImage, images, sectionTiming
-  };
+  const handleSubmit = async () => {
+    // 1. Prepare Validation Data
+    const validationData = {
+      name, email, phno, dob, genderValue, expertiseValue,
+      aadhaar, password, location, landmark, address, city, pincode,
+      profileImage, aadhaarImage, images, sectionTiming
+    };
 
-  const check = validateSignup(validationData);
-  if (!check.ok) {
-    Toast.show({
-      type: 'error',
-      text1: 'Validation Error',
-      text2: check.msg,
-    });
-    return;
-  }
-
-  try {
-    setIsUploading(true);
-
-    // 2. Upload Images to get URLs
-    const adarImageUrl = await uploadImageApi(aadhaarImage);
-    let certUrls = [];
-    for (const img of images) {
-      const url = await uploadImageApi(img);
-      if (url) certUrls.push(url);
-    }
-
-    // 3. Prepare Form Data
-    const formData = new FormData();
-    const finalLocationString = location?.trim() || [landmark, address, city, pincode].filter(Boolean).join(", ");
-
-    // Basic Info
-    formData.append("name", name);
-    formData.append("email", email.toLowerCase().trim());
-    formData.append("phno", phno);
-    formData.append("dob", dob);
-    formData.append("gender", genderValue.toLowerCase());
-    formData.append("password", password);
-    
-    // Address Details (Fixed syntax here)
-    formData.append("location", finalLocationString); 
-    formData.append("address", address || "");
-    formData.append("city", city || "");
-    formData.append("pincode", pincode || "");
-    formData.append("landmark", landmark || "");
-
-    // Aadhaar & Section Info
-    formData.append("adar_number", aadhaar);
-    formData.append("section_timing", sectionTiming);
-
-    // Coordinates (Fixed precision for Django)
-    if (coords?.latitude && coords?.longitude) {
-      formData.append("latitude", Number(coords.latitude).toFixed(6));
-      formData.append("longitude", Number(coords.longitude).toFixed(6));
-    }
-
-    // Professional Info
-    const planId = expertiseMap[expertiseValue];
-    if (planId) formData.append("training_field", Number(planId));
-    formData.append("experience", Number(experience) || 0);
-    formData.append("no_of_section", Number(sessions) || 0);
-    formData.append("expecting_salary", Number(fee) || 0);
-
-    // Profile Picture logic
-    if (profileImage?.uri) {
-      const fixedUri = Platform.OS === "android"
-        ? (profileImage.uri.startsWith("file://") ? profileImage.uri : `file://${profileImage.uri}`)
-        : profileImage.uri;
-
-      formData.append("profile_pic", {
-        uri: fixedUri,
-        name: profileImage.fileName || `profile_${Date.now()}.jpg`,
-        type: profileImage.type || "image/jpeg",
+    const check = validateSignup(validationData);
+    if (!check.ok) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: check.msg,
       });
+      return;
     }
 
-    // URLs from step 2
-    if (adarImageUrl) formData.append("adar_image", adarImageUrl);
-    certUrls.forEach(url => {
-      formData.append("certificates[]", url);
-    });
+    try {
+      setIsUploading(true);
 
-    // 4. Submit to Redux
-    await dispatch(registerTrainerThunk(formData)).unwrap();
-
-    Toast.show({
-      type: 'success',
-      text1: 'Success',
-      text2: 'Trainer Registered Successfully!',
-    });
-
-    navigation.reset({ index: 0, routes: [{ name: "ThankYouScreen" }] });
-
-  } catch (err) {
-    console.log("REGISTRATION ERROR:", err);
-    let errorMessage = "Something went wrong";
-
-    if (typeof err === 'string') {
-      errorMessage = err;
-    } else if (err?.message && typeof err.message === 'string') {
-      errorMessage = err.message;
-    } else if (typeof err === 'object') {
-      const values = Object.values(err);
-      if (values.length > 0) {
-        errorMessage = Array.isArray(values[0]) ? values[0][0] : JSON.stringify(values[0]);
+      // 2. Upload Images to get URLs
+      const adarImageUrl = await uploadImageApi(aadhaarImage);
+      let certUrls = [];
+      for (const img of images) {
+        const url = await uploadImageApi(img);
+        if (url) certUrls.push(url);
       }
+
+      // 3. Prepare Form Data
+      const formData = new FormData();
+      const finalLocationString = location?.trim() || [landmark, address, city, pincode].filter(Boolean).join(", ");
+
+      // Basic Info
+      formData.append("name", name);
+      formData.append("email", email.toLowerCase().trim());
+      formData.append("phno", phno);
+      formData.append("dob", dob);
+      formData.append("gender", genderValue.toLowerCase());
+      formData.append("password", password);
+
+      // Address Details (Fixed syntax here)
+      formData.append("location", finalLocationString);
+      formData.append("address", address || "");
+      formData.append("city", city || "");
+      formData.append("pincode", pincode || "");
+      formData.append("landmark", landmark || "");
+
+      // Aadhaar & Section Info
+      formData.append("adar_number", aadhaar);
+      formData.append("section_timing", sectionTiming);
+
+      // Coordinates (Fixed precision for Django)
+      if (coords?.latitude && coords?.longitude) {
+        formData.append("latitude", Number(coords.latitude).toFixed(6));
+        formData.append("longitude", Number(coords.longitude).toFixed(6));
+      }
+
+      // Professional Info
+      const planId = expertiseMap[expertiseValue];
+      if (planId) formData.append("training_field", Number(planId));
+      formData.append("experience", Number(experience) || 0);
+      formData.append("no_of_section", Number(sessions) || 0);
+      formData.append("expecting_salary", Number(fee) || 0);
+
+      // Profile Picture logic
+      if (profileImage?.uri) {
+        const fixedUri = Platform.OS === "android"
+          ? (profileImage.uri.startsWith("file://") ? profileImage.uri : `file://${profileImage.uri}`)
+          : profileImage.uri;
+
+        formData.append("profile_pic", {
+          uri: fixedUri,
+          name: profileImage.fileName || `profile_${Date.now()}.jpg`,
+          type: profileImage.type || "image/jpeg",
+        });
+      }
+
+      // URLs from step 2
+      if (adarImageUrl) formData.append("adar_image", adarImageUrl);
+      certUrls.forEach(url => {
+        formData.append("certificates[]", url);
+      });
+
+      // 4. Submit to Redux
+      await dispatch(registerTrainerThunk(formData)).unwrap();
+
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Trainer Registered Successfully!',
+      });
+
+      navigation.reset({ index: 0, routes: [{ name: "ThankYouScreen" }] });
+
+    } catch (err) {
+      console.log("REGISTRATION ERROR:", err);
+      let errorMessage = "Something went wrong";
+
+      if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err?.message && typeof err.message === 'string') {
+        errorMessage = err.message;
+      } else if (typeof err === 'object') {
+        const values = Object.values(err);
+        if (values.length > 0) {
+          errorMessage = Array.isArray(values[0]) ? values[0][0] : JSON.stringify(values[0]);
+        }
+      }
+
+      Toast.show({
+        type: 'error',
+        text1: 'Registration Failed',
+        text2: errorMessage,
+        visibilityTime: 5000,
+      });
+
+    } finally {
+      setIsUploading(false);
     }
-
-    Toast.show({
-      type: 'error',
-      text1: 'Registration Failed',
-      text2: errorMessage,
-      visibilityTime: 5000,
-    });
-
-  } finally {
-    setIsUploading(false);
-  }
-};
+  };
 
   useEffect(() => {
     if (success) {
@@ -286,9 +286,13 @@ const handleSubmit = async () => {
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: 120 }}
+        contentContainerStyle={{
+          paddingBottom: 120,
+          paddingHorizontal: 20, 
+        }}
         showsVerticalScrollIndicator={false}
       >
+
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={28} color="#000" />
