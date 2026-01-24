@@ -25,20 +25,23 @@ import {
 import {
   createTrainerBookingOrder,
   verifyTrainerPayment,
-  
+
 } from "../../services/paymentServices";
 
 const PaymentScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
+console.log(route.params);
 
   const {
     mode = "book",
-    trainerId,
-    old_trainer_id,
+    new_trainer_id,   // ✅ NEW trainer
+    old_trainer_id,   // ✅ OLD trainer
+    trainerId,        // only used in book mode
     plan_id,
     booking_type,
     amount,
   } = route.params;
+
 
   const filters = useSelector((state) => state.trainer.filters);
   const start_date = filters?.start_date;
@@ -52,96 +55,147 @@ const PaymentScreen = ({ navigation, route }) => {
   const [paying, setPaying] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchTrainerDetailThunk(trainerId));
-  }, [dispatch, trainerId]);
-  console.log({trainerId});
-  
+    if (mode === "book" && trainerId) {
+      dispatch(fetchTrainerDetailThunk(trainerId));
+    }
+  }, [dispatch, mode, trainerId]);
+
 
   const openRazorpay = async () => {
     try {
       setPaying(true);
 
-      /* ================= CREATE ORDER ================= */
-      const orderRes =
-        mode === "change"
-          ? await createChangeTrainerOrder({
-              old_trainer_id,
-              new_trainer_id: trainerId,
-              plan_id,
-            })
-          : await createTrainerBookingOrder({
-              trainer_id: trainerId,
-              plan_id,
-              booking_type,
-            });
+      console.log("🟢 OPEN RAZORPAY CLICKED");
+      console.log("➡️ ROUTE PARAMS:", {
+        mode,
+        trainerId,            // new trainer
+        old_trainer_id,       // old trainer
+        plan_id,
+        booking_type,
+        amount_from_route: amount,
+      });
+
+      let res;
+
+      if (mode === "change") {
+        console.log("🔁 CHANGE TRAINER FLOW STARTED");
+        console.log("📤 API PAYLOAD (CHANGE):", {
+          old_trainer_id,
+          new_trainer_id: new_trainer_id,
+          plan_id,
+        });
+
+        res = await createChangeTrainerOrder({
+          old_trainer_id,
+          new_trainer_id, // ✅ correct new trainer
+          plan_id,
+        });
+
+      } else {
+        console.log("🆕 NEW BOOKING FLOW STARTED");
+        console.log("📤 API PAYLOAD (BOOK):", {
+          trainer_id: trainerId,
+          plan_id,
+          booking_type,
+        });
+
+        res = await createTrainerBookingOrder({
+          trainer_id: trainerId,
+          plan_id,
+          booking_type,
+        });
+      }
+
+      console.log("🧾 RAW BACKEND RESPONSE:", res);
+      console.log("🧾 BACKEND DATA:", res?.data);
 
       const {
         order_required = true,
         order_id,
-        razorpay_order_id,
-        amount: backendAmount,
+        amount: backend_amount,
         key,
-      } = orderRes.data;
+        difference,
+      } = res.data || {};
 
-      /* ================= NO PAYMENT REQUIRED ================= */
-      if (mode === "change" && !order_required) {
+      console.log("📊 BACKEND PARSED VALUES:", {
+        order_required,
+        order_id,
+        backend_amount,
+        key,
+        difference,
+      });
+
+      // ✅ CHANGE MODE — NO PAYMENT REQUIRED
+      if (mode === "change" && order_required === false) {
+        console.log("⚠️ NO PAYMENT REQUIRED");
+        console.log("ℹ️ PRICE DIFFERENCE:", difference);
+
         await verifyChangeTrainerPayment({
           old_trainer_id,
-          new_trainer_id: trainerId,
+          new_trainer_id,
           plan_id,
         });
+
 
         setShowSuccess(true);
         return;
       }
 
-      /* ================= RAZORPAY ================= */
-     const options = {
-  key,
-  currency: "INR",
-  name: "HealthApp",
-  description: "Trainer Booking",
-  order_id: order_id || razorpay_order_id,
-  amount: Math.round(backendAmount * 100),
+      // ❌ SAFETY CHECK
+      if (!order_id || !key || !backend_amount) {
+        console.log("❌ ORDER INVALID — RAZORPAY WILL NOT OPEN");
+        console.log({
+          order_id,
+          key,
+          backend_amount,
+        });
+        throw new Error("Invalid order data from backend");
+      }
 
-  prefill: {
-    email: "test@email.com",
-    contact: "9999999999",
-    name: "Test User",
-  },
+      console.log("🚀 OPENING RAZORPAY WITH:", {
+        key,
+        order_id,
+        amount_in_paise: Math.round(backend_amount * 100),
+      });
 
-  theme: { color: "#3399cc" },
-};
+      // ✅ RAZORPAY OPEN
+      const response = await RazorpayCheckout.open({
+        key,
+        order_id,
+        amount: Math.round(backend_amount * 100),
+        currency: "INR",
+        name: "InFit",
+        description: "Trainer Payment",
+        prefill: {
+          email: "test@email.com",
+          contact: "9999999999",
+          name: "Test User",
+        },
+        theme: { color: "#3399cc" },
+      });
 
-      // const response = await RazorpayCheckout.open(options);
-      let response;
+      console.log("✅ RAZORPAY SUCCESS RESPONSE:", response);
 
-try {
-  response = await RazorpayCheckout.open(options);
-  console.log("✅ PAYMENT SUCCESS RESPONSE:", response);
-} catch (e) {
-  console.log("❌ PAYMENT FAILED / CANCELLED:", e);
-  throw e;
-}
-
-
-      /* ================= VERIFY ================= */
-      const verifyPayload = {
-        razorpay_order_id: response.razorpay_order_id,
-        razorpay_payment_id: response.razorpay_payment_id,
-        razorpay_signature: response.razorpay_signature,
-      };
-      console.log("object", verifyPayload)
+      // ✅ VERIFY PAYMENT
       if (mode === "change") {
+        console.log("🔐 VERIFY CHANGE TRAINER PAYMENT");
+
         await verifyChangeTrainerPayment({
-          ...verifyPayload,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
           old_trainer_id,
-          new_trainer_id: trainerId,
+          new_trainer_id,
           plan_id,
         });
+
       } else {
+        console.log("🔐 VERIFY BOOKING PAYMENT");
+
         await verifyTrainerPayment({
-          ...verifyPayload,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
           trainer_id: trainerId,
           plan_id,
           booking_type,
@@ -153,12 +207,16 @@ try {
 
       setShowSuccess(true);
     } catch (err) {
-      console.log("❌ PAYMENT ERROR:", err?.response?.data || err);
-      Alert.alert("Payment failed", "Please try again");
+      console.log("❌ PAYMENT ERROR FULL:", err);
+      console.log("❌ AXIOS ERROR DATA:", err?.response?.data);
+      Alert.alert("Payment failed", err.message || "Please try again");
     } finally {
       setPaying(false);
+      console.log("🟡 PAYMENT FLOW ENDED");
     }
   };
+
+
 
   if (loading || !data) {
     return (

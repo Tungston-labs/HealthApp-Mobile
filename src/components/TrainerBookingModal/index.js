@@ -18,7 +18,15 @@ import TrainerInfoCard from "../TrainerInfoCard";
 
 const workoutOptions = ["Single", "Couple", "Group"];
 
-const TrainerBookingModal = ({ visible, onClose, plan, trainer, mode }) => {
+const TrainerBookingModal = ({
+  visible,
+  onClose,
+  plan,
+  trainer,
+  mode,
+  oldTrainerId,
+}) => {
+
 
   const navigation = useNavigation();
 
@@ -28,6 +36,16 @@ const TrainerBookingModal = ({ visible, onClose, plan, trainer, mode }) => {
   const { loading, data, error } = useSelector(
     (state) => state.trainerDetail
   );
+
+  useEffect(() => {
+  if (mode === "change") {
+    console.log("🧠 CHANGE MODE IDS:", {
+      oldTrainerId,
+      newTrainerId: trainer?.id,
+    });
+  }
+}, [mode, oldTrainerId, trainer]);
+
 
   // Reset modal fields when it closes
   useEffect(() => {
@@ -64,16 +82,18 @@ const TrainerBookingModal = ({ visible, onClose, plan, trainer, mode }) => {
       Alert.alert("Address required", "Please enter your address");
       return;
     }
+console.log({trainer});
 
-    navigation.navigate("Payment", {
-      mode,
-      trainerId: data?.id || trainer?.id,
-      old_trainer_id: trainer?.old_trainer_id, // only in change
-      plan_id: plan.id,
-      booking_type: selected.toLowerCase(),
-      amount,
-      address,
-    });
+ navigation.navigate("Payment", {
+  mode,
+  new_trainer_id: trainer?.id,   // ✅ NEW trainer
+  old_trainer_id: oldTrainerId,  // ✅ OLD trainer
+  plan_id: plan.id,
+  booking_type: selected.toLowerCase(),
+  amount,
+});
+
+
 
   };
 
@@ -165,9 +185,9 @@ const TrainerBookingModal = ({ visible, onClose, plan, trainer, mode }) => {
               <TouchableOpacity
                 style={[
                   styles.payBtn,
-                  (!amount || !address.trim()) && { opacity: 0.6 },
+                  (!address.trim()) && { opacity: 0.6 },
                 ]}
-                disabled={!amount || !address.trim()}
+                disabled={!address.trim()}
                 onPress={handlePayment}
               >
                 <Text style={styles.payText}>

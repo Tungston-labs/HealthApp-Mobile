@@ -9,7 +9,7 @@ import { store } from '../redux/store';
 import { setAccessToken } from '../redux/slices/authSlice';
 
 // const BASE_URL = 'http://178.248.112.16:9001/api/';
-const BASE_URL = 'http://192.168.0.241:8000/api/';
+const BASE_URL = 'http://10.0.2.2:8000/api/';
 
 
 const api = axios.create({

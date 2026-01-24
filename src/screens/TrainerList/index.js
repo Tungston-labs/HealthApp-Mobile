@@ -116,7 +116,9 @@ const TrainerListScreen = () => {
         plan={plan}
         onClose={handleCloseModal}
         mode={mode}
+        oldTrainerId={trainerId}
       />
+
     </View>
   );
 };
