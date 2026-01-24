@@ -32,7 +32,6 @@ export default function BMIResultScreen({ navigation }) {
 
   const heightInMeters = height / 100;
 
-
   const bmi = (
     weightInKg /
     (heightInMeters * heightInMeters)
@@ -110,8 +109,6 @@ export default function BMIResultScreen({ navigation }) {
     return formData;
   };
 
-
-
 const handleFinalSubmit = async () => {
   const formData = buildRegisterPayload(registration);
   
@@ -134,14 +131,12 @@ const handleFinalSubmit = async () => {
   }
 };
 
-
 useEffect(() => {
   if (registered) {
     dispatch(resetRegistration());
     dispatch(resetClientState());
   }
 }, [registered]);
-
 
 useEffect(() => {
   if (error && !registered) {
@@ -161,9 +156,6 @@ if (!weight || !height) {
     </View>
   );
 }
-
-
-
 
   return (
     <View style={styles.container}>

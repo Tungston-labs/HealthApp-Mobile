@@ -31,7 +31,7 @@ const DOBPicker = ({ value, onChange }) => {
           {value || "Date of Birth"}
         </Text>
       </TouchableOpacity>
-
+ 
       {/* CALENDAR MODAL */}
       {show && (
         <DateTimePicker
