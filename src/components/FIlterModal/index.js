@@ -8,7 +8,7 @@ import {
 import styles from './styles';
 import CalendarPicker from './CalendarPicker';
 import { useNavigation } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
+import { useDispatch,useSelector } from 'react-redux';
 import { fetchAvailableTrainersThunk } from '../../redux/slices/trainerPlanSlice';
 
 const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
@@ -17,6 +17,7 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
   const [selectedTime, setSelectedTime] = useState('09:00 AM');
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const loading = useSelector(state => state.trainer.loading);
 
   useEffect(() => {
     if (!visible) return;
@@ -40,31 +41,39 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
       .padStart(2, '0')}`;
   };
 
+  // Apply filter (no GPS)
 
   const handleApply = async () => {
+    if (loading) return;   // 🔥 BLOCK DOUBLE PRESS
+
     try {
       const payload = {
         plan_id: planId,
         slot_days: selectedSlot.split(',').map(d => d.toLowerCase()),
         time: convertTo24Hour(selectedTime),
         start_date: selectedDate,
-        client_lat: 10.0158, 
-        client_lon: 76.3282,  
       };
-      console.log('🔥 SENDING PAYLOAD:', payload);
-      const response = await dispatch(fetchAvailableTrainersThunk(payload)).unwrap();
-      console.log('🔥 API RESPONSE:', response);
+
+      console.log('🔥 FINAL PAYLOAD:', payload);
+
+      await dispatch(fetchAvailableTrainersThunk(payload)).unwrap();
+
       onClose();
       navigation.navigate('TrainerList', {
         isFiltered: true,
+        mode: 'book',
         planId,
       });
+
     } catch (err) {
-      console.log('🔥 API ERROR:', err);
-      alert('Unable to fetch trainers. Please try again.');
+      console.log(err);
     }
   };
 
+
+
+
+  // Predefined time slots
   const timeSlots = [
     '09:00 AM',
     '09:45 AM',
@@ -143,9 +152,16 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
             ))}
           </View>
           <View style={styles.applyWrapper}>
-            <TouchableOpacity style={styles.applyBtn} onPress={handleApply}>
-              <Text style={styles.applyText}>Apply filter →</Text>
+            <TouchableOpacity
+              style={[styles.applyBtn, loading && { opacity: 0.5 }]}
+              disabled={loading}
+              onPress={handleApply}
+            >
+              <Text style={styles.applyText}>
+                {loading ? 'Loading...' : 'Apply filter →'}
+              </Text>
             </TouchableOpacity>
+
           </View>
         </View>
       </View>

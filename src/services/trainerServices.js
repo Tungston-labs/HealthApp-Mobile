@@ -120,3 +120,31 @@ export const updateTrainerProfileApi = async (formData) => {
   );
   return response.data;
 };
+// change trainer
+export const fetchChangeTrainer = async (trainerId) => {
+  if (!trainerId) {
+    throw new Error("trainerId is required");
+  }
+
+  const response = await api.get("trainer/change/", {
+    params: { trainer_id: trainerId },
+  });
+
+  console.log(
+    "✅ API RESPONSE (Change Trainer):",
+    JSON.stringify(response.data, null, 2)
+  );
+
+  return response.data;
+};
+
+
+
+// change trainer payments
+
+
+export const createChangeTrainerOrder = (payload) =>
+  api.post("trainer/payment/change-trainer/order/", payload);
+
+export const verifyChangeTrainerPayment = (payload) =>
+  api.post("trainer/payment/change-trainer/verify/", payload);

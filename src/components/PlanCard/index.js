@@ -16,7 +16,6 @@ const PlanCard = ({ item, onPress }) => {
                 <Text style={styles.planType}>
                     {item.plan_type === "3_days" ? "3 Days Plan" : "6 Days Plan"}
                 </Text>
-                <Text style={styles.planPrice}>₹{item.single_price}</Text>
             </View>
         </TouchableOpacity>
     );

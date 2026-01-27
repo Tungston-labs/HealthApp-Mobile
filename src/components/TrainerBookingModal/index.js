@@ -8,16 +8,28 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import TrainerInfoCard from "../TrainerInfoCard";
+import { verifyChangeTrainerPayment } from "../../services/trainerServices";
+
 
 const workoutOptions = ["Single", "Couple", "Group"];
 
-const TrainerBookingModal = ({ visible, onClose, plan }) => {
+const TrainerBookingModal = ({
+  visible,
+  onClose,
+  plan,
+  trainer,
+  mode,
+  oldTrainerId,
+}) => {
+
+
   const navigation = useNavigation();
 
   const [selected, setSelected] = useState("Single");
@@ -27,7 +39,17 @@ const TrainerBookingModal = ({ visible, onClose, plan }) => {
     (state) => state.trainerDetail
   );
 
+  useEffect(() => {
+  if (mode === "change") {
+    console.log("🧠 CHANGE MODE IDS:", {
+      oldTrainerId,
+      newTrainerId: trainer?.id,
+    });
+  }
+}, [mode, oldTrainerId, trainer]);
 
+
+  // Reset modal fields when it closes
   useEffect(() => {
     if (!visible) {
       setSelected("Single");
@@ -35,56 +57,100 @@ const TrainerBookingModal = ({ visible, onClose, plan }) => {
     }
   }, [visible]);
 
-
+  // ✅ Amount logic
   const amount = useMemo(() => {
-    if (!plan) return 0;
+    if (!data && !trainer) return 0;
 
+    if (mode === "change") {
+      // Use price_difference from backend
+      return Math.abs(Number(trainer?.price_difference || 0));
+    }
+
+    // Book mode → use selected type from trainerDetail
     switch (selected) {
       case "Single":
-        return plan.single_price;
+        return Number(data?.single_price || 0);
       case "Couple":
-        return plan.couple_price;
+        return Number(data?.couple_price || 0);
       case "Group":
-        return plan.group_price;
+        return Number(data?.group_price || 0);
       default:
         return 0;
     }
-  }, [selected, plan]);
+  }, [mode, selected, data, trainer]);
+
+
+const handlePayment = async () => {
+  if (!address.trim()) {
+    Alert.alert("Address required", "Please enter your address");
+    return;
+  }
+
+  // 🔹 CHANGE TRAINER + NO PRICE DIFFERENCE
+  if (mode === "change" && amount === 0) {
+    try {
+      const res = await verifyChangeTrainerPayment({
+        old_trainer_id: oldTrainerId,
+        new_trainer_id: trainer?.id,
+        plan_id: plan.id,
+      });
+
+      if (res.data.status) {
+        Alert.alert("Success", "Trainer changed successfully");
+        onClose();
+        navigation.replace("MySessions");
+      }
+    } catch (err) {
+      Alert.alert("Error", "Trainer change failed");
+    }
+    return; // ⛔ STOP – no navigation
+  }
+
+  // 🔹 PAYMENT REQUIRED
+  navigation.navigate("Payment", {
+    mode,
+    new_trainer_id: trainer?.id,
+    old_trainer_id: oldTrainerId,
+    plan_id: plan.id,
+    booking_type: selected.toLowerCase(),
+    amount,
+  });
+};
+
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
 
+          {/* Close */}
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
             <Icon name="close" size={26} color="#000" />
           </TouchableOpacity>
 
-
+          {/* Body */}
           <View style={{ flex: 1 }}>
             {loading && <ActivityIndicator size="large" />}
-
             {!loading && error && (
               <Text style={styles.errorText}>{error}</Text>
             )}
-
-            {!loading && !error && data && (
+            {!loading && !error && (data || trainer) && (
               <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.headerSection}>
                   <Image
                     source={
-                      data.profile_pic
-                        ? { uri: data.profile_pic }
+                      (data?.profile_pic || trainer?.profile_pic)
+                        ? { uri: data?.profile_pic || trainer?.profile_pic }
                         : require("../../../assets/trainer2.jpg")
                     }
                     style={styles.profileImage}
                   />
 
                   <TrainerInfoCard
-                    name={data.name}
-                    experience={data.experience}
-                    sessionTiming={data.section_timing}
-                    numSessions={data.no_of_section}
+                    name={data?.name || trainer?.name}
+                    experience={data?.experience || trainer?.experience}
+                    sessionTiming={data?.section_timing || trainer?.section_timing}
+                    numSessions={data?.no_of_section || trainer?.no_of_section}
                     workoutType={plan?.name}
                   />
                 </View>
@@ -97,11 +163,15 @@ const TrainerBookingModal = ({ visible, onClose, plan }) => {
                   {workoutOptions.map((item) => (
                     <TouchableOpacity
                       key={item}
-                      onPress={() => setSelected(item)}
+                      onPress={() => {
+                        if (mode !== "change") setSelected(item);
+                      }}
                       style={[
                         styles.optionBtn,
                         selected === item && styles.optionBtnActive,
+                        mode === "change" && { opacity: 0.6 } // visually disabled
                       ]}
+                      disabled={mode === "change"}
                     >
                       <Text
                         style={[
@@ -129,25 +199,26 @@ const TrainerBookingModal = ({ visible, onClose, plan }) => {
               </ScrollView>
             )}
           </View>
-          {!!data && !loading && (
+
+          {/* Footer */}
+          {(data || trainer) && !loading && (
             <View style={styles.footer}>
               <TouchableOpacity
-                style={styles.payBtn}
-                disabled={!amount}
-                onPress={() =>
-                  navigation.navigate("Payment", {
-                    trainerId: data.id,
-                    plan_id: plan.id,
-                    booking_type: selected.toLowerCase(),
-                    amount: amount,
-                    address: address,
-                  })
-                }
+                style={[
+                  styles.payBtn,
+                  (!address.trim()) && { opacity: 0.6 },
+                ]}
+                disabled={!address.trim()}
+                onPress={handlePayment}
               >
-                <Text style={styles.payText}>Pay ₹{amount}</Text>
+                <Text style={styles.payText}>
+                  {mode === "change" ? "Change-Pay ₹" : "Pay ₹"}
+                  {amount}
+                </Text>
               </TouchableOpacity>
             </View>
           )}
+
         </View>
       </View>
     </Modal>
@@ -155,4 +226,3 @@ const TrainerBookingModal = ({ visible, onClose, plan }) => {
 };
 
 export default TrainerBookingModal;
-                 
