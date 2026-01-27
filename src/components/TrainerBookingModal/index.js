@@ -15,6 +15,8 @@ import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import TrainerInfoCard from "../TrainerInfoCard";
+import { verifyChangeTrainerPayment } from "../../services/trainerServices";
+
 
 const workoutOptions = ["Single", "Couple", "Group"];
 
@@ -77,25 +79,44 @@ const TrainerBookingModal = ({
     }
   }, [mode, selected, data, trainer]);
 
-  const handlePayment = () => {
-    if (!address.trim()) {
-      Alert.alert("Address required", "Please enter your address");
-      return;
+
+const handlePayment = async () => {
+  if (!address.trim()) {
+    Alert.alert("Address required", "Please enter your address");
+    return;
+  }
+
+  // 🔹 CHANGE TRAINER + NO PRICE DIFFERENCE
+  if (mode === "change" && amount === 0) {
+    try {
+      const res = await verifyChangeTrainerPayment({
+        old_trainer_id: oldTrainerId,
+        new_trainer_id: trainer?.id,
+        plan_id: plan.id,
+      });
+
+      if (res.data.status) {
+        Alert.alert("Success", "Trainer changed successfully");
+        onClose();
+        navigation.replace("MySessions");
+      }
+    } catch (err) {
+      Alert.alert("Error", "Trainer change failed");
     }
-console.log({trainer});
+    return; // ⛔ STOP – no navigation
+  }
 
- navigation.navigate("Payment", {
-  mode,
-  new_trainer_id: trainer?.id,   // ✅ NEW trainer
-  old_trainer_id: oldTrainerId,  // ✅ OLD trainer
-  plan_id: plan.id,
-  booking_type: selected.toLowerCase(),
-  amount,
-});
+  // 🔹 PAYMENT REQUIRED
+  navigation.navigate("Payment", {
+    mode,
+    new_trainer_id: trainer?.id,
+    old_trainer_id: oldTrainerId,
+    plan_id: plan.id,
+    booking_type: selected.toLowerCase(),
+    amount,
+  });
+};
 
-
-
-  };
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
@@ -191,7 +212,7 @@ console.log({trainer});
                 onPress={handlePayment}
               >
                 <Text style={styles.payText}>
-                  {mode === "change" ? "Price Difference: ₹" : "Pay ₹"}
+                  {mode === "change" ? "Change-Pay ₹" : "Pay ₹"}
                   {amount}
                 </Text>
               </TouchableOpacity>

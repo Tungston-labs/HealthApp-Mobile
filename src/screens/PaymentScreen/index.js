@@ -25,140 +25,91 @@ import {
 import {
   createTrainerBookingOrder,
   verifyTrainerPayment,
-
 } from "../../services/paymentServices";
 
 const PaymentScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
-console.log(route.params);
 
   const {
     mode = "book",
-    new_trainer_id,   // ✅ NEW trainer
-    old_trainer_id,   // ✅ OLD trainer
-    trainerId,        // only used in book mode
+    new_trainer_id,
+    old_trainer_id,
+    trainerId,
     plan_id,
     booking_type,
-    amount,
-  } = route.params;
-
+    amount = 0,
+  } = route.params || {};
 
   const filters = useSelector((state) => state.trainer.filters);
-  const start_date = filters?.start_date;
-  const time = filters?.time;
-  const slot_days = filters?.slot_days;
+  const { start_date, time, slot_days } = filters || {};
 
   const { loading, data } = useSelector((state) => state.trainerDetail);
 
   const [selectedMethod, setSelectedMethod] = useState("razorpay");
   const [showSuccess, setShowSuccess] = useState(false);
   const [paying, setPaying] = useState(false);
+  const [orderRequired, setOrderRequired] = useState(true);
 
   useEffect(() => {
-    if (mode === "book" && trainerId) {
-      dispatch(fetchTrainerDetailThunk(trainerId));
-    }
-  }, [dispatch, mode, trainerId]);
-
+    const id = mode === "book" ? trainerId : new_trainer_id;
+    if (id) dispatch(fetchTrainerDetailThunk(id));
+  }, [dispatch, mode, trainerId, new_trainer_id]);
 
   const openRazorpay = async () => {
     try {
       setPaying(true);
 
-      console.log("🟢 OPEN RAZORPAY CLICKED");
-      console.log("➡️ ROUTE PARAMS:", {
-        mode,
-        trainerId,            // new trainer
-        old_trainer_id,       // old trainer
-        plan_id,
-        booking_type,
-        amount_from_route: amount,
-      });
-
       let res;
 
+      // 🔁 CHANGE TRAINER FLOW
       if (mode === "change") {
-        console.log("🔁 CHANGE TRAINER FLOW STARTED");
-        console.log("📤 API PAYLOAD (CHANGE):", {
-          old_trainer_id,
-          new_trainer_id: new_trainer_id,
-          plan_id,
-        });
-
         res = await createChangeTrainerOrder({
           old_trainer_id,
-          new_trainer_id, // ✅ correct new trainer
+          new_trainer_id,
           plan_id,
-        });
-
-      } else {
-        console.log("🆕 NEW BOOKING FLOW STARTED");
-        console.log("📤 API PAYLOAD (BOOK):", {
-          trainer_id: trainerId,
-          plan_id,
-          booking_type,
-        });
-
-        res = await createTrainerBookingOrder({
-          trainer_id: trainerId,
-          plan_id,
-          booking_type,
         });
       }
+      // 🆕 NEW BOOKING FLOW
+      else {
+        // 🆕 NEW BOOKING FLOW
+        res = await createTrainerBookingOrder({
+          trainer_id: trainerId || new_trainer_id,
+          plan_id,
+          booking_type,
+          start_date,
+          time,
+          slot_days,
+        });
 
-      console.log("🧾 RAW BACKEND RESPONSE:", res);
-      console.log("🧾 BACKEND DATA:", res?.data);
+      }
 
       const {
         order_required = true,
         order_id,
         amount: backend_amount,
         key,
-        difference,
-      } = res.data || {};
+      } = res?.data || {};
 
-      console.log("📊 BACKEND PARSED VALUES:", {
-        order_required,
-        order_id,
-        backend_amount,
-        key,
-        difference,
-      });
+      setOrderRequired(order_required);
 
-      // ✅ CHANGE MODE — NO PAYMENT REQUIRED
+      // ✅ NO PAYMENT REQUIRED
       if (mode === "change" && order_required === false) {
-        console.log("⚠️ NO PAYMENT REQUIRED");
-        console.log("ℹ️ PRICE DIFFERENCE:", difference);
-
         await verifyChangeTrainerPayment({
           old_trainer_id,
           new_trainer_id,
           plan_id,
         });
 
-
         setShowSuccess(true);
         return;
       }
 
       // ❌ SAFETY CHECK
-      if (!order_id || !key || !backend_amount) {
-        console.log("❌ ORDER INVALID — RAZORPAY WILL NOT OPEN");
-        console.log({
-          order_id,
-          key,
-          backend_amount,
-        });
+      if (!order_id || !backend_amount || !key) {
         throw new Error("Invalid order data from backend");
       }
 
-      console.log("🚀 OPENING RAZORPAY WITH:", {
-        key,
-        order_id,
-        amount_in_paise: Math.round(backend_amount * 100),
-      });
-
-      // ✅ RAZORPAY OPEN
+      // 🚀 OPEN RAZORPAY
       const response = await RazorpayCheckout.open({
         key,
         order_id,
@@ -174,12 +125,8 @@ console.log(route.params);
         theme: { color: "#3399cc" },
       });
 
-      console.log("✅ RAZORPAY SUCCESS RESPONSE:", response);
-
-      // ✅ VERIFY PAYMENT
+      // 🔐 VERIFY PAYMENT
       if (mode === "change") {
-        console.log("🔐 VERIFY CHANGE TRAINER PAYMENT");
-
         await verifyChangeTrainerPayment({
           razorpay_order_id: response.razorpay_order_id,
           razorpay_payment_id: response.razorpay_payment_id,
@@ -188,10 +135,7 @@ console.log(route.params);
           new_trainer_id,
           plan_id,
         });
-
       } else {
-        console.log("🔐 VERIFY BOOKING PAYMENT");
-
         await verifyTrainerPayment({
           razorpay_order_id: response.razorpay_order_id,
           razorpay_payment_id: response.razorpay_payment_id,
@@ -207,16 +151,12 @@ console.log(route.params);
 
       setShowSuccess(true);
     } catch (err) {
-      console.log("❌ PAYMENT ERROR FULL:", err);
-      console.log("❌ AXIOS ERROR DATA:", err?.response?.data);
-      Alert.alert("Payment failed", err.message || "Please try again");
+      console.log("❌ PAYMENT ERROR:", err?.response?.data || err.message);
+      Alert.alert("Payment failed", "Please try again");
     } finally {
       setPaying(false);
-      console.log("🟡 PAYMENT FLOW ENDED");
     }
   };
-
-
 
   if (loading || !data) {
     return (
@@ -230,14 +170,8 @@ console.log(route.params);
     <View style={styles.container}>
       <HeaderWithBack title="Payment" />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView>
         <Text style={styles.sectionTitle}>Trainer info</Text>
-        <View style={styles.separator} />
-
-        <View style={styles.workoutPlan}>
-          <Text style={styles.label}>Workout Type - {booking_type}</Text>
-          <Text style={styles.label}>Sessions - {data.no_of_section}</Text>
-        </View>
 
         <View style={styles.trainerBox}>
           <Image
@@ -258,15 +192,11 @@ console.log(route.params);
           />
         </View>
 
-        <Text style={styles.sectionTitle}>Preferred payment method</Text>
-        <View style={styles.separator} />
-
         <TouchableOpacity
           style={[
             styles.paymentCard,
             selectedMethod === "razorpay" && styles.paymentCardActive,
           ]}
-          onPress={() => setSelectedMethod("razorpay")}
         >
           <Text style={styles.paymentText}>GPay / Razorpay</Text>
           <Icon name="checkmark-circle" size={28} color="#2ecc71" />
@@ -274,18 +204,21 @@ console.log(route.params);
       </ScrollView>
 
       <View style={styles.footer}>
-        <View style={styles.totalWrapper}>
-          <Text style={styles.totalLabel}>Total</Text>
+        <View>
+          <Text>Total</Text>
           <Text style={styles.totalValue}>₹ {amount}</Text>
         </View>
 
         <TouchableOpacity
-          style={[styles.payBtn, paying && { opacity: 0.6 }]}
+          style={[
+            styles.payBtn,
+            (paying || (!orderRequired && mode === "change")) && { opacity: 0.6 },
+          ]}
           disabled={paying}
           onPress={openRazorpay}
         >
           <Text style={styles.payText}>
-            {paying ? "Processing..." : "Proceed to Pay"}
+            {paying ? "Processing..." : "Proceed"}
           </Text>
         </TouchableOpacity>
 

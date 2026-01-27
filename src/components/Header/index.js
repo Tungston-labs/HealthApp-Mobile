@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator, Linking } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./style";
 import { useNavigation } from "@react-navigation/native";
@@ -13,6 +13,13 @@ const Header = ({ subtitle = "" }) => {
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
 
   const { name, bmi, loading } = useSelector(state => state.clientBmi);
+  const makeEmergencyCall = () => {
+    const dummyNumber = "tel:9999999999"; // dummy phone number
+    Linking.openURL(dummyNumber).catch(err =>
+      console.error("Failed to open dialer", err)
+    );
+  };
+
 
   useEffect(() => {
     dispatch(getClientBMIThunk());
@@ -47,7 +54,10 @@ const Header = ({ subtitle = "" }) => {
       <CommonActionModal
         visible={showEmergencyModal}
         onClose={() => setShowEmergencyModal(false)}
-        onConfirm={() => setShowEmergencyModal(false)}
+        onConfirm={() => {
+          setShowEmergencyModal(false);
+          makeEmergencyCall(); // 📞 open dialer
+        }}
         iconName="call-outline"
         iconColor="green"
         title="Confirm Emergency Call"
@@ -57,6 +67,7 @@ const Header = ({ subtitle = "" }) => {
         showDropdown={false}
         showNote={false}
       />
+
     </View>
   );
 };
