@@ -72,7 +72,6 @@ const PaymentSuccessModal = ({ visible, onClose }) => {
                         { transform: [{ scale: scaleAnim }] },
                     ]}
                 >
-                    {/* Confetti Ribbons */}
                     {confettiPositions.map((item, index) => (
                         <Animated.View
                             key={index}
@@ -90,16 +89,11 @@ const PaymentSuccessModal = ({ visible, onClose }) => {
                             ]}
                         />
                     ))}
-
                     <View style={styles.tickOuterCircle}>
                         <View style={styles.tickInnerCircle}>
                             <Icon name="checkmark-outline" size={80} color="#fff" />
                         </View>
                     </View>
-
-
-
-                    {/* Text */}
                     <Text style={styles.successText}>Payment Successful</Text>
                     <Text style={styles.subText}>
                         Your payment has been completed successfully

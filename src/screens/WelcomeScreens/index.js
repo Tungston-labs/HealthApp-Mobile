@@ -46,16 +46,12 @@ export default function Welcome() {
         navigation.replace("Login");
         return;
       }
-
       slideIndex.current += 1;
-
       flatListRef.current?.scrollToOffset({
         offset: slideIndex.current * width,
         animated: true,
       });
-
     }, 2000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -76,7 +72,6 @@ export default function Welcome() {
         renderItem={({ item }) => (
           <View style={styles.slide}>
             <Image source={item.image} style={styles.image} />
-
             <View style={styles.bottomContent}>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.subtitle}>{item.subtitle}</Text>
@@ -87,7 +82,6 @@ export default function Welcome() {
 
       <View style={styles.indicatorWrapper}>
         <View style={styles.indicatorBackground} />
-
         <Animated.View
           style={[
             styles.indicatorFill,

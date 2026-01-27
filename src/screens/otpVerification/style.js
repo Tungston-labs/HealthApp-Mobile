@@ -35,7 +35,7 @@ otpContainer: {
   flexDirection: "row",
   justifyContent: "space-between",
   marginTop: 40,
-  paddingHorizontal: 30, // padding from screen edges
+  paddingHorizontal: 30, 
 },
 otpBox: {
   flex: 1,
@@ -48,7 +48,7 @@ otpBox: {
   fontSize: 20,
   color: "#000000",
   backgroundColor: "#FFFFFF",
-  maxWidth: 50, // optional cap so boxes don't get too big
+  maxWidth: 50,
 },
 
 

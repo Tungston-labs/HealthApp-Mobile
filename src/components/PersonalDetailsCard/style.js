@@ -5,9 +5,9 @@ export default StyleSheet.create({
   backgroundColor: "#EEF0FF",
   borderRadius: 20,
   padding: 10,
-  paddingBottom: 36, // 👈 space for chevron
+  paddingBottom: 36, 
   marginBottom: 16,
-  position: "relative", // 👈 REQUIRED
+  position: "relative", 
 },
 
   topRow: {

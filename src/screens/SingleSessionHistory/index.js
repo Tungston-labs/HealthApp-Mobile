@@ -50,8 +50,6 @@ console.log("ROUTE PARAMS 👉", route.params);
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <HeaderWithBack title="Session history" subtitle="SessionDetails" />
-
-      {/* Top Image */}
       <Image
         source={{
           uri:
@@ -60,13 +58,10 @@ console.log("ROUTE PARAMS 👉", route.params);
         }}
         style={styles.bannerImage}
       />
-
-      {/* Trainer + Rating */}
       <View style={styles.headerRow}>
         <Text style={styles.trainerName}>
           {session.trainer?.name}
         </Text>
-
         <View style={styles.ratingBox}>
           <Icon name="star" size={18} color="#F4C430" />
           <Text style={styles.ratingText}>
@@ -74,14 +69,11 @@ console.log("ROUTE PARAMS 👉", route.params);
           </Text>
         </View>
       </View>
-
-      {/* Info Row */}
       <View style={styles.infoRow}>
         <View style={styles.infoItem}>
           <Text style={styles.infoLabel}>Workout plan</Text>
           <Text style={styles.infoValue}>Gym</Text>
         </View>
-
         <View style={styles.infoItem}>
           <Text style={styles.infoLabel}>Session timing</Text>
           <View style={styles.inline}>
@@ -89,19 +81,13 @@ console.log("ROUTE PARAMS 👉", route.params);
             <Text style={styles.infoValue}> 60 min</Text>
           </View>
         </View>
-
         <View style={styles.infoItem}>
           <Text style={styles.infoLabel}>Workout Type</Text>
           <Text style={styles.infoValue}>Single</Text>
         </View>
       </View>
-
-      {/* Divider */}
       <View style={styles.divider} />
-
-      {/* Notes */}
       <Text style={styles.notesTitle}>Notes</Text>
-
       {Array.isArray(session.notes) && session.notes.length > 0 ? (
         session.notes.map((note, index) => (
           <View key={index} style={styles.notesBox}>
@@ -111,8 +97,6 @@ console.log("ROUTE PARAMS 👉", route.params);
       ) : (
         <Text style={styles.notesText}>No notes available</Text>
       )}
-
-
       <View style={{ height: 80 }} />
     </ScrollView>
   );

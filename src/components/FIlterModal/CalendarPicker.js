@@ -33,8 +33,6 @@ export default function CalendarPicker({ selectedDate, onSelect }) {
   const [selectedYear, setSelectedYear] = useState(
     years.indexOf(safeInitial.getFullYear())
   );
-
-  // ✅ SEND DATE TO PARENT (PAST DATES BLOCKED)
   useEffect(() => {
     const day = String(days[selectedDay]).padStart(2, "0");
     const month = String(selectedMonth + 1).padStart(2, "0");
@@ -44,7 +42,6 @@ export default function CalendarPicker({ selectedDate, onSelect }) {
     composedDate.setHours(0, 0, 0, 0);
 
     if (composedDate < today) {
-      // 🔒 Auto-fix to today
       setSelectedDay(today.getDate() - 1);
       setSelectedMonth(today.getMonth());
       setSelectedYear(years.indexOf(today.getFullYear()));
@@ -90,8 +87,6 @@ export default function CalendarPicker({ selectedDate, onSelect }) {
   return (
     <View style={styles.wheelWrapper}>
       <View style={styles.selectionOverlay} />
-
-      {/* DAY */}
       <FlatList
         ref={dayRef}
         data={days}
@@ -109,8 +104,6 @@ export default function CalendarPicker({ selectedDate, onSelect }) {
           renderItem(item.toString().padStart(2, "0"), index, selectedDay)
         }
       />
-
-      {/* MONTH */}
       <FlatList
         ref={monthRef}
         data={months}
@@ -128,8 +121,6 @@ export default function CalendarPicker({ selectedDate, onSelect }) {
           renderItem(item, index, selectedMonth)
         }
       />
-
-      {/* YEAR */}
       <FlatList
         ref={yearRef}
         data={years}
@@ -150,7 +141,6 @@ export default function CalendarPicker({ selectedDate, onSelect }) {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   wheelWrapper: {
     flexDirection: "row",

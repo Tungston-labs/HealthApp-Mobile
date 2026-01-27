@@ -1,10 +1,10 @@
-// components/BottomNav/style.js
+
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    backgroundColor: "#111", // black bar
+    backgroundColor: "#111", 
     padding: 14,
     marginHorizontal: 20,
     marginBottom: 20,
@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   },
 
   activeIconWrapper: {
-    backgroundColor: "#7774F4", // purple active background
+    backgroundColor: "#7774F4", 
   },
 });
 

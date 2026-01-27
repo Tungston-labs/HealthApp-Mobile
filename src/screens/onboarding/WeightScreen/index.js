@@ -30,8 +30,6 @@ export default function WeightScreen() {
 
   const toLbs = kg => Math.round(kg * 2.20462);
   const displayedValue = unit === 'KG' ? kgValue : toLbs(kgValue);
-
-  // 🔹 Scroll handler
   const onScroll = e => {
     const x = e.nativeEvent.contentOffset.x;
     const index = Math.round(x / ITEM_WIDTH);
@@ -74,7 +72,6 @@ export default function WeightScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Toggle */}
       <View style={styles.toggleWrapper}>
         <TouchableOpacity
           style={[styles.toggleBtn, unit === 'KG' && styles.activeToggle]}
@@ -104,15 +101,11 @@ export default function WeightScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-
-      {/* Top numbers */}
       <View style={styles.topNumbersRow}>
         <Text style={styles.sideNumber}>{leftValue}</Text>
         <Text style={styles.centerNumber}>{kgValue}</Text>
         <Text style={styles.sideNumber}>{rightValue}</Text>
       </View>
-
-      {/* Ruler */}
       <View style={styles.rulerWrapper}>
         <ScrollView
           ref={scrollRef}
@@ -151,13 +144,9 @@ export default function WeightScreen() {
 
         <View style={styles.centerLine} pointerEvents="none" />
       </View>
-
-      {/* Pointer */}
       <View style={styles.pointerWrapper}>
         <View style={styles.greenPointer} />
       </View>
-
-      {/* Selected value */}
       <View style={styles.bigValueWrapper}>
         <Text style={styles.bigValue}>{displayedValue}</Text>
         <Text style={styles.bigUnit}>{unit}</Text>

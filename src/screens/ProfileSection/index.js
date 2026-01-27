@@ -130,25 +130,20 @@ const ProfileSection = () => {
   }
 
   const fallbackImage = require("../../../assets/trainer1.jpg");
-
   const imageSource = trainer?.profile_pic
     ? { uri: trainer.profile_pic }
     : fallbackImage;
-
   const trainerTiming = trainer?.section_timing
     ? `${trainer.section_timing} min`
     : "N/A";
-
   const trainerName = trainer?.name || "N/A";
   const numSessions = trainer?.no_of_section ?? 0;
-
   const workoutType = trainer?.plan_name ?? "N/A";
   const isCancelRequested = session?.cancel_requested;
 
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
         <View style={styles.header}>
           <View>
             <Text style={styles.title}>Trainers</Text>
@@ -161,13 +156,9 @@ const ProfileSection = () => {
             <Icon name="call" size={22} color="#fff" />
           </TouchableOpacity>
         </View>
-
         <View style={styles.divider} />
-
-        {/* Trainer Card */}
         <View style={styles.trainerCard}>
           <Image source={imageSource} style={styles.trainerImage} />
-
           <View style={styles.infoRowWrapper}>
             <View style={styles.trainerInfoCardWrapper}>
               {trainer && (
@@ -180,7 +171,6 @@ const ProfileSection = () => {
                 />
               )}
             </View>
-
             <View style={styles.ratingBox}>
               <Icon name="star" size={20} color="#F4C430" />
               <Text style={styles.ratingText}>
@@ -189,13 +179,9 @@ const ProfileSection = () => {
             </View>
           </View>
         </View>
-
         <View style={styles.divider} />
-
-        {/* Workout Plan */}
         <Text style={styles.sectionTitle}>Workout plan - GYM</Text>
         <Text style={styles.workoutText}>Workout type - Single</Text>
-
         <Text style={styles.notesTitle}>Notes</Text>
         <View style={styles.notesBox}>
           <Text style={styles.notesText}>
@@ -203,27 +189,19 @@ const ProfileSection = () => {
             euismod.
           </Text>
         </View>
-
         <View style={styles.divider} />
-
-        {/* Buttons */}
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={styles.primaryButton}
-            onPress={() => setShowConsultModal(true)}
-          >
+            onPress={() => setShowConsultModal(true)} >
             <Text style={styles.buttonText}>Report</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={() => setShowCancelModal(true)}
-          >
+            onPress={() => setShowCancelModal(true)}>
             <Text style={styles.cancelText}>Cancel training</Text>
           </TouchableOpacity>
         </View>
-
-        {/* CHANGE TRAINER (FILTER FIRST) */}
         <TouchableOpacity
           style={styles.changeTrainerButton}
           onPress={() => {
@@ -238,15 +216,11 @@ const ProfileSection = () => {
           <Text style={styles.changeTrainerText}> Change trainer</Text>
         </TouchableOpacity>
       </ScrollView>
-
-      {/* FILTER MODAL */}
       <FilterModal
         visible={showFilterModal}
         onClose={() => setShowFilterModal(false)}
         planId={trainer?.plan_id}
       />
-
-      {/* MODALS */}
       <CommonActionModal
         visible={showCancelModal}
         onClose={() => setShowCancelModal(false)}
@@ -260,7 +234,6 @@ const ProfileSection = () => {
         showDropdown={false}
         showNote={false}
       />
-
       <CommonActionModal
         visible={showEmergencyModal}
         onClose={() => setShowEmergencyModal(false)}
@@ -274,7 +247,6 @@ const ProfileSection = () => {
         showDropdown={false}
         showNote={false}
       />
-
       <CommonActionModal
         visible={showConsultModal}
         onClose={() => setShowConsultModal(false)}
@@ -292,7 +264,6 @@ const ProfileSection = () => {
         noteValue={consultNote}
         onChangeNote={setConsultNote}
       />
-
     </View>
   );
 };

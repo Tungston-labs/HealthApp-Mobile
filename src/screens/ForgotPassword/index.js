@@ -89,9 +89,7 @@ export default function ForgotPasswordScreen({ navigation }) {
             </>
           )}
         </TouchableOpacity>
-
       </View>
-      
     </SafeAreaView>
   );
 }

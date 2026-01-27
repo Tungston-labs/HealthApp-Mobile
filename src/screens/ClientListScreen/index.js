@@ -1,4 +1,4 @@
-// screens/ClientListScreen/index.js
+
 import React, { useEffect } from "react";
 import { View, FlatList, ActivityIndicator } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,13 +12,11 @@ import { useNavigation } from "@react-navigation/native";
 const ClientListScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-
   const { trainers, loading } = useSelector(state => state.clientTrainer);
 console.log({trainers})
   useEffect(() => {
     dispatch(fetchClientTrainersThunk());
   }, [dispatch]);
-
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
@@ -43,12 +41,10 @@ console.log({trainers})
   return (
     <View style={styles.container}>
       <HeaderWithBack title="Trainers" subtitle="Trainer Information" />
-
       <FlatList
         data={trainers}
         keyExtractor={item => String(item.id)}
         renderItem={({ item }) => (
-          
           <TrainerCard
             trainer={item}
             showBookButton={false}
@@ -58,7 +54,6 @@ console.log({trainers})
             onPressCard={() => {
               console.log({item})
               console.log("CLIENT LIST: navigating to ProfileSection with trainer_id", item.trainer_id);
-              // Use push to ensure navigation happens in current stack
               navigation.push("ProfileSection", { trainerId: item.trainer_id });
             }}
           />

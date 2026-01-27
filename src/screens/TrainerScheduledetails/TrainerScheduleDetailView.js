@@ -42,20 +42,14 @@ const TrainerScheduleDetailView = ({
   if (isDataLoading) {
     return (
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-       
         <View style={styles.header}>
           <Skeleton width={24} height={24} borderRadius={12} />
           <Skeleton width={140} height={20} borderRadius={6} />
         </View>
-
         <Skeleton height={160} borderRadius={20} />
-
         <Skeleton height={48} borderRadius={12} />
-
         <Skeleton height={14} width="60%" borderRadius={6} />
-
         <Skeleton height={50} borderRadius={12} />
-
         <Skeleton height={44} borderRadius={12} />
       </ScrollView>
     );
@@ -128,21 +122,17 @@ const TrainerScheduleDetailView = ({
           </TouchableOpacity>
         </View>
       )}
-
       <Modal visible={showNoteModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <TouchableOpacity
               style={styles.closeIcon}
-              onPress={() => setShowNoteModal(false)}
-            >
+              onPress={() => setShowNoteModal(false)}  >
               <Icon name="close" size={22} />
             </TouchableOpacity>
-
             <Text style={styles.modalTitle}>
               {isEditing ? 'Edit note' : 'Add a note'}
             </Text>
-
             <TextInput
               placeholder="Type your note here..."
               multiline
@@ -152,7 +142,6 @@ const TrainerScheduleDetailView = ({
               onChangeText={setNoteText}
               style={styles.modalInput}
             />
-
             <TouchableOpacity
               style={[styles.submitBtn, isSubmitDisabled && { opacity: 0.6 }]}
               onPress={handleSubmitNote}

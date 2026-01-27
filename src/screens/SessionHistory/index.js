@@ -16,32 +16,23 @@ import { fetchCompletedSessionsThunk } from "../../redux/slices/SessionHistorySl
 
 const SessionHistory = ({ navigation }) => {
   const dispatch = useDispatch();
-
-  /* 🔹 AUTH */
   const { loading: authLoading, user, error: authError } = useSelector(
     (state) => state.auth || {}
   );
-
-  /* 🔹 SESSION STATE */
   const {
     sessions = [],
     loading,
     error,
   } = useSelector((state) => state.completedSessions || {});
-
   const hasPlan = user?.session;
-
-  /* 🔹 INITIAL FETCH */
   useEffect(() => {
     if (hasPlan) {
       dispatch(fetchCompletedSessionsThunk());
     }
   }, [hasPlan, dispatch]);
 
-  /* 🔹 SAFETY */
   const safeSessions = Array.isArray(sessions) ? sessions : [];
 
-  /* 🔹 NO PLAN */
   if (!hasPlan) {
     return (
       <EmptyState
@@ -60,7 +51,6 @@ const SessionHistory = ({ navigation }) => {
         onBackPress={() => navigation?.goBack()}
       />
 
-      {/* 🔹 INITIAL LOADING */}
       {loading && safeSessions.length === 0 ? (
         <ActivityIndicator size="large" style={{ marginTop: 30 }} />
       ) : error ? (

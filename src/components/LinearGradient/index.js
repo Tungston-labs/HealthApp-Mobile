@@ -13,14 +13,10 @@ const GradientCard = () => {
   locations={[0, 0.25, 0.25, 1]}
   style={styles.card}
 >
-
-        {/* Left Image overlay */}
         <Image
           source={require("../../../assets/upcoming.png")}
           style={styles.overlayImage}
         />
-
-        {/* Text Section */}
         <View style={styles.textContainer}>
           <Text style={styles.title}>
             Get personalized plans from pro nutritionists — stay consistent,

@@ -7,7 +7,6 @@ export default StyleSheet.create({
     marginBottom: 18,
   },
 
-  /* Timeline dot */
   timelineDot: {
     width: 10,
     height: 10,
@@ -17,7 +16,6 @@ export default StyleSheet.create({
     marginRight: 12,
   },
 
-  /* Card */
   card: {
     flex: 1,
     flexDirection: 'row',
@@ -82,7 +80,7 @@ export default StyleSheet.create({
   metaItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4, // if RN < 0.71, use marginRight
+    gap: 4,
   },
   startBtn: {
     flexDirection: 'row',
@@ -96,13 +94,12 @@ export default StyleSheet.create({
   },
 
 startBtnDisabled: {
-  backgroundColor: '#BDBDBD',   // greyed out
+  backgroundColor: '#BDBDBD',   
   opacity: 0.6,
 },
   startText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '400',
-    // fontFamily:'Segoe UI'
   },
 });

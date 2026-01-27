@@ -12,15 +12,12 @@ import { useDispatch } from 'react-redux';
 import { fetchAvailableTrainersThunk } from '../../redux/slices/trainerPlanSlice';
 
 const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
-  // Default values similar to Postman request
   const [selectedSlot, setSelectedSlot] = useState('Mon,Tue,Wed,Thu,Fri,Sat');
   const [selectedDate, setSelectedDate] = useState('2026-01-03');
   const [selectedTime, setSelectedTime] = useState('09:00 AM');
-
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
-  // Auto slot selection based on plan type
   useEffect(() => {
     if (!visible) return;
 
@@ -31,7 +28,6 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
     }
   }, [visible, selectedPlanSlot]);
 
-  // Convert time to 24-hour format for backend
   const convertTo24Hour = (timeStr) => {
     const [time, modifier] = timeStr.split(' ');
     let [hours, minutes] = time.split(':').map(Number);
@@ -44,7 +40,7 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
       .padStart(2, '0')}`;
   };
 
-  // Apply filter (no GPS)
+
   const handleApply = async () => {
     try {
       const payload = {
@@ -52,16 +48,12 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
         slot_days: selectedSlot.split(',').map(d => d.toLowerCase()),
         time: convertTo24Hour(selectedTime),
         start_date: selectedDate,
-        client_lat: 10.0158,  // Kakkanad latitude
-        client_lon: 76.3282,  // Kakkanad longitude
+        client_lat: 10.0158, 
+        client_lon: 76.3282,  
       };
-
       console.log('🔥 SENDING PAYLOAD:', payload);
-
       const response = await dispatch(fetchAvailableTrainersThunk(payload)).unwrap();
-
       console.log('🔥 API RESPONSE:', response);
-
       onClose();
       navigation.navigate('TrainerList', {
         isFiltered: true,
@@ -73,7 +65,6 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
     }
   };
 
-  // Predefined time slots
   const timeSlots = [
     '09:00 AM',
     '09:45 AM',
@@ -89,20 +80,15 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.overlay}>
         <View style={styles.container}>
-          {/* Close Button */}
           <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
             <Text style={styles.closeText}>✕</Text>
           </TouchableOpacity>
-
-          {/* Date Selector */}
           <Text style={styles.sectionTitle}>Select Date Slot</Text>
           <CalendarPicker
             selectedDate={selectedDate}
             onSelect={setSelectedDate}
           />
           <View style={styles.inputUnderline} />
-
-          {/* Slot Selector */}
           <Text style={styles.sectionTitle}>Select Slot</Text>
           <View style={styles.slotRow}>
             {selectedSlot === 'Mon,Tue,Wed,Thu,Fri,Sat' ? (
@@ -132,10 +118,7 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
               ))
             )}
           </View>
-
           <View style={styles.inputUnderline} />
-
-          {/* Time Selector */}
           <Text style={styles.sectionTitle}>Select Time Slot</Text>
           <View style={styles.timeSlotGrid}>
             {timeSlots.map(t => (
@@ -159,8 +142,6 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
               </TouchableOpacity>
             ))}
           </View>
-
-          {/* Apply Filter Button */}
           <View style={styles.applyWrapper}>
             <TouchableOpacity style={styles.applyBtn} onPress={handleApply}>
               <Text style={styles.applyText}>Apply filter →</Text>

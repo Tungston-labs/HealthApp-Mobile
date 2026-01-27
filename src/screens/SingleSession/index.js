@@ -16,7 +16,6 @@ const SingleSession = ({ route }) => {
     rating: "4.5",
     image: "../../../assets/trainer3.jpg",
   };
-
   return (
     <ScrollView style={styles.container}>
       <HeaderWithBack title="Session history" subtitle="SessionDetails" />

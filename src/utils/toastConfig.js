@@ -1,13 +1,12 @@
 import { ErrorToast, SuccessToast } from 'react-native-toast-message';
 
 export const toastConfig = {
-  /* Overwrite the 'error' type */
   error: (props) => (
     <ErrorToast
       {...props}
       style={{ 
         borderLeftColor: '#FF0000',
-        backgroundColor: '#FFEBEE', // Very light red background (or use #FF0000 for solid red)
+        backgroundColor: '#FFEBEE', 
         height: 70,
         width: '90%',
       }}
@@ -15,7 +14,7 @@ export const toastConfig = {
       text1Style={{
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#D32F2F', // Deep red text
+        color: '#D32F2F', 
       }}
       text2Style={{
         fontSize: 14,

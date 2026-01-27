@@ -13,13 +13,11 @@ export default function GenderScreen({ onSelectGender }) {
 
   const selectGender = (value) => {
     dispatch(updateRegistration({ gender: value }));
-    onSelectGender?.(); // move to next step
+    onSelectGender?.(); 
   };
 
   return (
     <View style={styles.container}>
-      
-      {/* FEMALE */}
       <TouchableOpacity
         style={[
           styles.genderBox,
@@ -33,14 +31,11 @@ export default function GenderScreen({ onSelectGender }) {
         <View style={styles.textWrapper}>
           <Text style={styles.genderText}>Female</Text>
         </View>
-
         <Image
           source={require("../../../Images/female.png")}
           style={styles.genderImg}
         />
       </TouchableOpacity>
-
-      {/* MALE */}
       <TouchableOpacity
         style={[
           styles.genderBox,
@@ -54,13 +49,11 @@ export default function GenderScreen({ onSelectGender }) {
         <View style={styles.textWrapper}>
           <Text style={styles.genderText}>Male</Text>
         </View>
-
         <Image
           source={require("../../../Images/male.png")}
           style={styles.genderImg}
         />
       </TouchableOpacity>
-
     </View>
   );
 }

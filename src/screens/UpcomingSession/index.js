@@ -13,7 +13,6 @@ import styles from "./styles";
 
 const UpcomingSessionSection = () => {
   const dispatch = useDispatch();
-
   const { sessions, loading } = useSelector(
     (state) => state.weeklySessions
   );
@@ -25,7 +24,6 @@ const UpcomingSessionSection = () => {
   return (
     <View>
       <GradientCard />
-
       <Text style={styles.sectionTitle}>Up-coming sessions</Text>
 
       {loading ? (
@@ -46,14 +44,12 @@ const UpcomingSessionSection = () => {
                 source={{ uri: item.trainer_profile_pic }}
                 style={styles.sessionImage}
               />
-
               <View style={styles.sessionInfo}>
                 <Text style={styles.trainerName}>
                   {item.trainer_name}
                 </Text>
                 <Text style={styles.timeText}>{item.time}</Text>
               </View>
-
               <View style={styles.dayButton}>
                 <Text style={styles.dayButtonText}>
                   {item.day}

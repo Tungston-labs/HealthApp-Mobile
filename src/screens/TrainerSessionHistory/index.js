@@ -5,8 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import styles from "./style";
 import SessionCard from "../../components/SessionCard";
 import HeaderWithBack from "../../components/HeaderWithBack";
-import Skeleton from "../../components/Skelton";
-
+import Skeleton from "../../components/Skelton"; 
 import {
   getTrainerHistory,
   resetTrainerHistory,

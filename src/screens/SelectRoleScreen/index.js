@@ -15,27 +15,18 @@ import styles from "./style";
 export default function SelectRoleScreen() {
   const navigation = useNavigation();
   const [selected, setSelected] = useState(null);
-
-  // Animated scale values
   const trainerScale = useRef(new Animated.Value(1)).current;
   const userScale = useRef(new Animated.Value(1)).current;
-
   const selectRole = (role) => {
     setSelected(role);
-
-    // Animate scale for trainer card
     Animated.spring(trainerScale, {
       toValue: role === "trainer" ? 1.08 : 1,
       useNativeDriver: true,
     }).start();
-
-    // Animate scale for user card
     Animated.spring(userScale, {
       toValue: role === "user" ? 1.08 : 1,
       useNativeDriver: true,
     }).start();
-
-    // Immediately navigate after selection
     if (role === "trainer") {
       navigation.navigate("CreateAccount"); 
     } else if (role === "user") {
@@ -45,7 +36,6 @@ export default function SelectRoleScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Top Header */}
       <View style={styles.topHeader}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -53,20 +43,14 @@ export default function SelectRoleScreen() {
         >
           <Ionicons name="chevron-back" size={28} color="#000" />
         </TouchableOpacity>
-
         <Text style={styles.headerTitle}>Sign up as</Text>
       </View>
-
-      {/* Center Content */}
       <View style={styles.centerWrapper}>
         <Text style={styles.subtitle}>
           Choose your role to create{"\n"}the right experience for you.
         </Text>
         <Text style={styles.subText}>Join as a User or Trainer.</Text>
-
-        {/* Role Cards */}
         <View style={styles.cardRow}>
-          {/* Trainer Card */}
           <Animated.View
             style={[
               styles.card,
@@ -88,8 +72,6 @@ export default function SelectRoleScreen() {
               </ImageBackground>
             </TouchableOpacity>
           </Animated.View>
-
-          {/* User Card */}
           <Animated.View
             style={[
               styles.card,

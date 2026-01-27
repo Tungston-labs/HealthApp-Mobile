@@ -41,8 +41,8 @@ export default StyleSheet.create({
   backgroundColor: "blue",
   borderRadius: 20,
   padding: 6,
-  elevation: 4, // Android shadow
-  shadowColor: "#000", // iOS shadow
+  elevation: 4,
+  shadowColor: "#000",
   shadowOpacity: 0.2,
   shadowRadius: 3,
   shadowOffset: { width: 0, height: 1 },

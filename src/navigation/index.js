@@ -81,17 +81,14 @@ export default function Navigation() {
           )
         ) : (
           <>
-            {/* Client (user) */}
             <Stack.Screen name="MainApp" component={AppNavigator} />
             <Stack.Screen name="Notifications" component={NotificationScreen} />
             <Stack.Screen name="TrainerList" component={TrainerListScreen} />
             <Stack.Screen name="TrainerDetail" component={TrainerDetailScreen} />
             <Stack.Screen name="Payment" component={PaymentScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-
             <Stack.Screen name="ThankYouScreen" component={ThankYouScreen} />
-                        <Stack.Screen name="RazorPayScreen" component={RazorpayButton} />
-
+            <Stack.Screen name="RazorPayScreen" component={RazorpayButton} />
             <Stack.Screen name="ScheduleEmpty" component={ScheduleEmpty} />
             <Stack.Screen name="UserTermsAndConditions" component={UserTermsAndConditions} />
           </>

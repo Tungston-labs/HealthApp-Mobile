@@ -7,7 +7,7 @@ export default function ScheduleEmpty() {
     <SafeAreaView style={styles.container}>
       <View style={styles.innerWrapper}>
         <Image
-          source={require("../../Images/empty.png")} // single image
+          source={require("../../Images/empty.png")}
           style={styles.statusImage}
         />
 

@@ -18,28 +18,21 @@ export default function BMIResultScreen({ navigation }) {
     gender,
   } = useSelector((state) => state.registration);
   const dispatch = useDispatch();
-
   const registration = useSelector(
     (state) => state.registration
   );
-
   const { loading, registered, error } = useSelector(
     (state) => state.client
   );
-
   const weightInKg =
     weightUnit === "LBS" ? weight * 0.453592 : weight;
 
   const heightInMeters = height / 100;
-
-
   const bmi = (
     weightInKg /
     (heightInMeters * heightInMeters)
   ).toFixed(1);
-
   const bmiValue = parseFloat(bmi);
-
   const progress = Math.min((bmiValue / 40) * 100, 100);
   const radius = 70;
   const strokeWidth = 12;
@@ -66,8 +59,6 @@ export default function BMIResultScreen({ navigation }) {
 
   const buildRegisterPayload = (data) => {
     const formData = new FormData();
-
-    // Basic fields
     formData.append("name", data.name);
     formData.append("email", data.email);
     formData.append("phno", data.phno);
@@ -82,8 +73,6 @@ export default function BMIResultScreen({ navigation }) {
       "address",
       `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`
     );
-
-    // Arrays
     formData.append(
       "health_issues",
       JSON.stringify(Array.isArray(data.health_issues) ? data.health_issues : [])
@@ -93,13 +82,11 @@ export default function BMIResultScreen({ navigation }) {
       JSON.stringify(Array.isArray(data.wellness_goal) ? data.wellness_goal : [])
     );
 
-    // Profile picture
     if (data.profile_pic) {
       let uri = data.profile_pic.uri;
       if (Platform.OS === "android" && !uri.startsWith("file://")) {
         uri = "file://" + uri;
       }
-
       formData.append("profile_pic", {
         uri,
         type: data.profile_pic.type || "image/jpeg",
@@ -117,18 +104,13 @@ const handleFinalSubmit = async () => {
   
   try {
     const res = await dispatch(registerClientThunk(formData)).unwrap();
-
     const userData = res.user || {
       name: registration.name,
       email: registration.email,
       role: registration.role || "user",
     };
-
-    // Correctly set auth in Redux
     dispatch(setAuth({ user: userData, access: res.token?.access }));
-
-    // Navigate to main app
-    navigation.replace("MainApp"); // or AppNavigator entry
+    navigation.replace("MainApp"); 
   } catch (err) {
     Alert.alert("Registration failed", err?.message || err);
   }
@@ -161,20 +143,13 @@ if (!weight || !height) {
     </View>
   );
 }
-
-
-
-
   return (
     <View style={styles.container}>
       <View style={styles.topBackground} />
-
       <Text style={styles.header}>Your BMI Result</Text>
-
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.card}>
           <View style={styles.cardInner}>
-
             <View style={styles.circleContainer}>
               <Svg width="180" height="180" style={styles.svgRotate}>
                 <Circle
@@ -185,7 +160,6 @@ if (!weight || !height) {
                   strokeWidth={strokeWidth}
                   fill="none"
                 />
-
                 <Circle
                   cx="90"
                   cy="90"
@@ -198,14 +172,11 @@ if (!weight || !height) {
                   strokeLinecap="round"
                 />
               </Svg>
-
               <Text style={styles.bmiValue}>{bmi}</Text>
             </View>
-
             <Text style={styles.bmiMessage}>
               You have {bmiText} Body Weight!
             </Text>
-
             <View style={styles.chipWrapper}>
               <View style={[styles.chip, { backgroundColor: bmiColor }]}>
                 <Text style={styles.chipText}>{bmiText}</Text>
@@ -217,8 +188,6 @@ if (!weight || !height) {
                 ]}
               />
             </View>
-
-
             <View style={styles.scaleWrapper}>
               {[
                 ...Array(10).fill("#84CDEE"),
@@ -229,8 +198,6 @@ if (!weight || !height) {
                 <View key={i} style={[styles.scaleBar, { backgroundColor: c }]} />
               ))}
             </View>
-
- 
             <View style={styles.infoRow}>
               <View style={styles.infoItem}>
                 <Text style={styles.infoValue}>
@@ -238,54 +205,44 @@ if (!weight || !height) {
                 </Text>
                 <Text style={styles.infoLabel}>Weight</Text>
               </View>
-
               <View style={styles.infoItem}>
                 <Text style={styles.infoValue}>{height} cm</Text>
                 <Text style={styles.infoLabel}>Height</Text>
               </View>
-
               <View style={styles.infoItem}>
                 <Text style={styles.infoValue}>{age}</Text>
                 <Text style={styles.infoLabel}>Age</Text>
               </View>
-
               <View style={styles.infoItem}>
                 <Text style={styles.infoValue}>{gender}</Text>
                 <Text style={styles.infoLabel}>Gender</Text>
               </View>
             </View>
-
-
             <View style={styles.legendWrapper}>
               <View style={styles.legendItem}>
                 <View style={[styles.legendColor, { backgroundColor: "#84CDEE" }]} />
                 <Text style={styles.legendLabel}>Under Weight :</Text>
                 <Text style={styles.legendValue}>&lt; 18.5</Text>
               </View>
-
               <View style={styles.legendItem}>
                 <View style={[styles.legendColor, { backgroundColor: "#78B060" }]} />
                 <Text style={styles.legendLabel}>Normal Weight :</Text>
                 <Text style={styles.legendValue}>18.5 - 24.9</Text>
               </View>
-
               <View style={styles.legendItem}>
                 <View style={[styles.legendColor, { backgroundColor: "#FFDF32" }]} />
                 <Text style={styles.legendLabel}>Over Weight :</Text>
                 <Text style={styles.legendValue}>25 - 29.9</Text>
               </View>
-
               <View style={styles.legendItem}>
                 <View style={[styles.legendColor, { backgroundColor: "#F5554A" }]} />
                 <Text style={styles.legendLabel}>Obesity :</Text>
                 <Text style={styles.legendValue}>30 - 39.9</Text>
               </View>
             </View>
-
           </View>
         </View>
       </ScrollView>
-
       <TouchableOpacity
         style={styles.floatingButton}
         onPress={handleFinalSubmit}

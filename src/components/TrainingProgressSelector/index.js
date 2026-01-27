@@ -56,32 +56,6 @@ const TrainingProgressSelector = ({
         Training Time{' '}
         {time ? format(parse(time, 'HH:mm:ss', new Date()), 'HH:mm') : '00:00'}
       </Text>
-{/* 
-      <FlatList
-        data={dates}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={{ paddingVertical: 10 }}
-        renderItem={({ item, index }) => {
-          const isActive = selectedDateIndex === index;
-          return (
-            <TouchableOpacity
-              onPress={() => handleSelect(index)}
-              style={[styles.slotCard, isActive && styles.activeSlot]}
-            >
-              <Text style={[styles.slotDay, isActive && styles.activeSlotText]}>
-                {item.date}
-              </Text>
-              <Text
-                style={[styles.slotWeek, isActive && styles.activeSlotText]}
-              >
-                {item.day}
-              </Text>
-            </TouchableOpacity>
-          );
-        }}
-      /> */}
     </View>
   );
 };

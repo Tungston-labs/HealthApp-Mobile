@@ -10,9 +10,7 @@ const PlanCard = ({ item, onPress }) => {
                 style={styles.cardImage}
                 resizeMode="cover"
             />
-
             <View style={styles.overlay} />
-
             <View style={styles.textContainer}>
                 <Text style={styles.planName}>{item.plan_name}</Text>
                 <Text style={styles.planType}>

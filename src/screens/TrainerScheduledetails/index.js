@@ -114,7 +114,6 @@ const TrainerScheduleDetailContainer = () => {
   };
 
   const onBackPress = () => {
-    // navigation.navigate('TrainerNavigator', { screen: 'TrainerHome' });
     navigation.goBack();
   };
 

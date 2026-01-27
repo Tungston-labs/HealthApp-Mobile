@@ -34,12 +34,10 @@ export const useActiveSession = () => {
     }
   }, [apiSession]);
 
-  // Initial storage load
   useEffect(() => {
     loadFromStorage();
   }, [loadFromStorage]);
 
-  // API sync
   useEffect(() => {
     syncFromApi();
   }, [syncFromApi]);
@@ -51,7 +49,7 @@ export const useActiveSession = () => {
 
   return {
     activeSession,
-    setActiveSession, // only for instant UI update
+    setActiveSession,
     clearSession,
     loading: apiLoading || !hydrated,
     reload: refetch,

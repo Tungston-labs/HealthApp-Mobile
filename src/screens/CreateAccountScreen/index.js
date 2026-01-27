@@ -105,28 +105,22 @@ export default function CreateAccountScreen({ navigation }) {
   const handleUseLocation = async () => {
     try {
       const locationData = await getCurrentLocation();
-
-      // Round to 6 decimal places immediately
       const roundedCoords = {
         latitude: parseFloat(locationData.latitude.toFixed(6)),
         longitude: parseFloat(locationData.longitude.toFixed(6)),
       };
-
-      setCoords(roundedCoords); // Save the cleaned coordinates
+      setCoords(roundedCoords); 
 
       const fullAddress = await reverseGeocode(
         roundedCoords.latitude,
         roundedCoords.longitude
       );
-
-      // ... rest of your address logic
       setAddress(fullAddress);
       alert("Location fetched successfully");
     } catch (err) {
       console.log("Location error:", err);
     }
   };
-
   const handlePickImage = () => {
     launchImageLibrary(
       {
@@ -155,7 +149,6 @@ export default function CreateAccountScreen({ navigation }) {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 const handleSubmit = async () => {
-  // 1. Prepare Validation Data
   const validationData = {
     name, email, phno, dob, genderValue, expertiseValue,
     aadhaar, password, location, landmark, address, city, pincode,
@@ -174,52 +167,39 @@ const handleSubmit = async () => {
 
   try {
     setIsUploading(true);
-
-    // 2. Upload Images to get URLs
     const adarImageUrl = await uploadImageApi(aadhaarImage);
     let certUrls = [];
     for (const img of images) {
       const url = await uploadImageApi(img);
       if (url) certUrls.push(url);
     }
-
-    // 3. Prepare Form Data
     const formData = new FormData();
     const finalLocationString = location?.trim() || [landmark, address, city, pincode].filter(Boolean).join(", ");
-
-    // Basic Info
     formData.append("name", name);
     formData.append("email", email.toLowerCase().trim());
     formData.append("phno", phno);
     formData.append("dob", dob);
     formData.append("gender", genderValue.toLowerCase());
     formData.append("password", password);
-    
-    // Address Details (Fixed syntax here)
     formData.append("location", finalLocationString); 
     formData.append("address", address || "");
     formData.append("city", city || "");
     formData.append("pincode", pincode || "");
     formData.append("landmark", landmark || "");
-
-    // Aadhaar & Section Info
     formData.append("adar_number", aadhaar);
     formData.append("section_timing", sectionTiming);
 
-    // Coordinates (Fixed precision for Django)
     if (coords?.latitude && coords?.longitude) {
       formData.append("latitude", Number(coords.latitude).toFixed(6));
       formData.append("longitude", Number(coords.longitude).toFixed(6));
     }
 
-    // Professional Info
     const planId = expertiseMap[expertiseValue];
     if (planId) formData.append("training_field", Number(planId));
     formData.append("experience", Number(experience) || 0);
     formData.append("no_of_section", Number(sessions) || 0);
     formData.append("expecting_salary", Number(fee) || 0);
 
-    // Profile Picture logic
     if (profileImage?.uri) {
       const fixedUri = Platform.OS === "android"
         ? (profileImage.uri.startsWith("file://") ? profileImage.uri : `file://${profileImage.uri}`)
@@ -232,13 +212,10 @@ const handleSubmit = async () => {
       });
     }
 
-    // URLs from step 2
     if (adarImageUrl) formData.append("adar_image", adarImageUrl);
     certUrls.forEach(url => {
       formData.append("certificates[]", url);
     });
-
-    // 4. Submit to Redux
     await dispatch(registerTrainerThunk(formData)).unwrap();
 
     Toast.show({
@@ -246,13 +223,10 @@ const handleSubmit = async () => {
       text1: 'Success',
       text2: 'Trainer Registered Successfully!',
     });
-
     navigation.reset({ index: 0, routes: [{ name: "ThankYouScreen" }] });
-
   } catch (err) {
     console.log("REGISTRATION ERROR:", err);
     let errorMessage = "Something went wrong";
-
     if (typeof err === 'string') {
       errorMessage = err;
     } else if (err?.message && typeof err.message === 'string') {
@@ -263,14 +237,12 @@ const handleSubmit = async () => {
         errorMessage = Array.isArray(values[0]) ? values[0][0] : JSON.stringify(values[0]);
       }
     }
-
     Toast.show({
       type: 'error',
       text1: 'Registration Failed',
       text2: errorMessage,
       visibilityTime: 5000,
     });
-
   } finally {
     setIsUploading(false);
   }
@@ -290,8 +262,6 @@ const handleSubmit = async () => {
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Create an account</Text>
         </View>
-
-        {/* Profile Row */}
         <View style={styles.profileRow}>
           <TouchableOpacity onPress={handlePickProfileImage}>
             {profileImage ? (
@@ -306,7 +276,6 @@ const handleSubmit = async () => {
               </View>
             )}
           </TouchableOpacity>
-
           <TextInput
             placeholder="Enter Name"
             value={name}
@@ -315,7 +284,6 @@ const handleSubmit = async () => {
             style={styles.inputUnderline}
           />
         </View>
-
         <View style={styles.twoColRow}>
           <View style={styles.iconInputRowSmall}>
             <Ionicons name="mail-outline" size={20} color="#666" />
@@ -327,7 +295,6 @@ const handleSubmit = async () => {
               style={styles.inputFlex}
             />
           </View>
-
           <View style={styles.iconInputRowSmall}>
             <Ionicons name="call-outline" size={20} color="#666" />
             <TextInput
@@ -366,7 +333,6 @@ const handleSubmit = async () => {
             </View>
           )}
         </View>
-
         <View>
           <TouchableOpacity
             style={styles.dropdownRow}
@@ -377,7 +343,6 @@ const handleSubmit = async () => {
             </Text>
             <Ionicons name="chevron-down" size={20} color="#444" />
           </TouchableOpacity>
-
           {expertiseOpen && (
             <View style={styles.dropdownList}>
               {['Cycling', 'Gym', 'Zumba', 'Swimming', 'Boxing'].map(ex => (
@@ -395,14 +360,11 @@ const handleSubmit = async () => {
             </View>
           )}
         </View>
-
         <View style={styles.iconInputRow}>
           <DOBPicker value={dob} onChange={setDob} />
         </View>
-
         <View style={styles.iconInputRow}>
           <Ionicons name="document-outline" size={20} color="#666" />
-
           <TextInput
             placeholder="Aadhaar Number"
             placeholderTextColor="#888"
@@ -410,7 +372,6 @@ const handleSubmit = async () => {
             value={aadhaar}
             onChangeText={setAadhaar}
           />
-
           <TouchableOpacity
             style={styles.uploadButton}
             onPress={handlePickAadhaarImage}
@@ -419,7 +380,6 @@ const handleSubmit = async () => {
             <Text style={styles.uploadBtnText}>Upload</Text>
           </TouchableOpacity>
         </View>
-
         {aadhaarImage && (
           <View style={{ marginTop: 10 }}>
             <View style={styles.uploadImageCard}>
@@ -429,7 +389,6 @@ const handleSubmit = async () => {
               >
                 <Ionicons name="close" size={16} color="#fff" />
               </TouchableOpacity>
-
               <Image
                 source={{ uri: aadhaarImage.uri }}
                 style={styles.uploadPreviewImg}
@@ -437,15 +396,12 @@ const handleSubmit = async () => {
             </View>
           </View>
         )}
-
-
         <TouchableOpacity
           style={styles.useLocationBtn}
           onPress={handleUseLocation}
         >
           <Text style={styles.useLocationText}>Use my location</Text>
         </TouchableOpacity>
-
         <View style={styles.twoColRow}>
           <TextInput
             placeholder="Enter pincode"
@@ -455,7 +411,6 @@ const handleSubmit = async () => {
             onChangeText={setPincode}
             keyboardType="numeric"
           />
-
           <TextInput
             placeholder="City/Town"
             placeholderTextColor="#888"
@@ -464,8 +419,6 @@ const handleSubmit = async () => {
             onChangeText={setCity}
           />
         </View>
-
-
         <TextInput
           placeholder="Landmark"
           placeholderTextColor="#888"
@@ -481,8 +434,6 @@ const handleSubmit = async () => {
           onChangeText={setAddress}
           multiline
         />
-
-
         <View style={styles.twoColRow}>
           <TextInput
             placeholder="Section timing"
@@ -497,7 +448,6 @@ const handleSubmit = async () => {
             style={styles.inputUnderline}
           />
         </View>
-
         <View style={styles.twoColRow}>
           <TextInput
             placeholder="No of session"
@@ -512,7 +462,6 @@ const handleSubmit = async () => {
             style={styles.inputUnderline}
           />
         </View>
-
         <TextInput
           placeholder="Enter password"
           secureTextEntry
@@ -520,11 +469,8 @@ const handleSubmit = async () => {
           onChangeText={setPassword}
           style={styles.inputUnderline}
         />
-
-        {/* Upload Section */}
         <View style={styles.uploadContainer}>
           <Text style={styles.uploadTitle}>Upload Certificates </Text>
-
           <View style={styles.uploadBox}>
             <TouchableOpacity
               style={styles.uploadButton}
@@ -535,7 +481,6 @@ const handleSubmit = async () => {
             </TouchableOpacity>
             <Text style={styles.uploadHelper}>Click to choose images</Text>
           </View>
-
           <View style={styles.uploadImagesRow}>
             {images.map((item, i) => (
               <View key={i} style={styles.uploadImageCard}>
@@ -545,7 +490,6 @@ const handleSubmit = async () => {
                 >
                   <Ionicons name="close" size={16} color="#fff" />
                 </TouchableOpacity>
-
                 <Image
                   source={{ uri: item.uri }}
                   style={styles.uploadPreviewImg}
@@ -558,7 +502,6 @@ const handleSubmit = async () => {
       {error && (
         <Text style={{ color: 'red', textAlign: 'center' }}>{error}</Text>
       )}
-
       <View style={styles.footerBtnWrapper}>
         <TouchableOpacity
           style={styles.continueBtn}

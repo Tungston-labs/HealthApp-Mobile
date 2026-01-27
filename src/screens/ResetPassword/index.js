@@ -23,8 +23,6 @@ export default function ResetPasswordScreen({ navigation, route }) {
 
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.resetpassword);
-
-  // Password validation function
   const validatePassword = (pass) => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     if (!pass) return "Password is required";
@@ -33,7 +31,6 @@ export default function ResetPasswordScreen({ navigation, route }) {
     return "";
   };
 
-  // Confirm password validation
   const validateConfirm = (confPass) => {
     if (!confPass) return "Confirm password is required";
     if (confPass !== password) return "Passwords do not match";

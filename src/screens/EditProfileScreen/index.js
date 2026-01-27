@@ -9,16 +9,13 @@ import {
   Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
 import { launchImageLibrary } from "react-native-image-picker";
-
 import ProfileHeader from "../../components/ProfileHeader";
 import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
 import styles from "./styles";
 import { getCurrentLocation } from "../../utils/location";
 import { reverseGeocode } from "../../utils/reverseGeocode";
-
 import {
   updateProfileThunk,
   resetProfileEditState,
@@ -28,12 +25,9 @@ const EditProfile = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
-
   const { profileData } = route.params || {};
-
   const { loading, error } = useSelector(state => state.profileEdit);
 
-  /* ---------------- FORM STATE ---------------- */
   const [form, setForm] = useState({
     name: "",
     dob: "",
@@ -47,7 +41,6 @@ const EditProfile = ({ navigation, route }) => {
 
   const [profilePic, setProfilePic] = useState(null);
 
-  /* ---------------- PREFILL ---------------- */
   useEffect(() => {
     if (profileData) {
       setForm({
@@ -67,7 +60,6 @@ const EditProfile = ({ navigation, route }) => {
     }
   }, [profileData]);
 
-  /* ---------------- IMAGE PICKER ---------------- */
   const pickImage = () => {
     launchImageLibrary(
       { mediaType: "photo", quality: 0.8 },
@@ -105,10 +97,6 @@ const EditProfile = ({ navigation, route }) => {
     );
   };
 
-
-
-
-  /* ---------------- SAVE ---------------- */
   const handleSave = async () => {
     const formData = new FormData();
 
@@ -131,9 +119,6 @@ const EditProfile = ({ navigation, route }) => {
           : []
       )
     );
-
-
-
 
     formData.append(
       "wellness_goal",
@@ -161,7 +146,6 @@ const EditProfile = ({ navigation, route }) => {
     }
   };
 
-  /* ---------------- ERROR ---------------- */
   useEffect(() => {
     if (error) {
       Alert.alert("Error", error);
@@ -169,32 +153,27 @@ const EditProfile = ({ navigation, route }) => {
     }
   }, [error]);
 
-  /* ---------------- IMAGE SOURCE ---------------- */
   const imageSource = profilePic
     ? { uri: profilePic.uri }
     : profileData?.profile_pic_url
       ? { uri: profileData.profile_pic_url }
       : require("../../../assets/trainer2.jpg");
 
-  /* ---------------- UI ---------------- */
+
   return (
     <View style={{ flex: 1, backgroundColor: "#FFF" }}>
       <StatusBar barStyle="dark-content" />
-
       <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
-
       <ScrollView style={styles.container}>
-        {/* ✅ WORKING PROFILE HEADER */}
         <ProfileHeader
           image={imageSource}
           name={form.name}
           showBack
           onBack={() => navigation.goBack()}
           showEdit
-          onEdit={pickImage}   // 🔥 THIS IS THE FIX
+          onEdit={pickImage}   
         />
 
-        {/* FORM */}
         <View style={styles.formWrapper}>
           <Text style={styles.label}>Name</Text>
           <TextInput
@@ -202,13 +181,6 @@ const EditProfile = ({ navigation, route }) => {
             value={form.name}
             onChangeText={v => setForm({ ...form, name: v })}
           />
-
-          {/* <Text style={styles.label}>Date of Birth</Text>
-          <TextInput
-            style={styles.input}
-            value={form.dob}
-            onChangeText={v => setForm({ ...form, dob: v })}
-          /> */}
 
           <Text style={styles.label}>Date of Birth</Text>
           <TextInput
@@ -218,7 +190,6 @@ const EditProfile = ({ navigation, route }) => {
             keyboardType="number-pad"
             maxLength={10}
             onChangeText={(text) => {
-              // Remove non-numeric characters
               let cleaned = text.replace(/\D/g, "");
 
               let formatted = cleaned;

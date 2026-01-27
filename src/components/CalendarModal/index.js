@@ -22,17 +22,12 @@ const CalendarModal = ({ visible, onClose, onConfirm }) => {
 
   const calendarDays = useMemo(() => {
     const days = [];
-
-    // empty slots before month start
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push(null);
     }
-
-    // actual days
     for (let i = 1; i <= daysInMonth; i++) {
       days.push(i);
     }
-
     return days;
   }, [currentMonth, currentYear]);
 
@@ -63,26 +58,20 @@ const CalendarModal = ({ visible, onClose, onConfirm }) => {
     <Modal transparent visible={visible} animationType="slide">
       <View style={styles.overlay}>
         <View style={styles.modal}>
-
-          {/* HEADER */}
           <View style={styles.header}>
             <TouchableOpacity onPress={() => changeMonth("prev")}>
               <Icon name="chevron-back" size={22} color="#7B77FF" />
             </TouchableOpacity>
-
             <Text style={styles.month}>
               {new Date(currentYear, currentMonth).toLocaleString("default", {
                 month: "long",
                 year: "numeric",
               })}
             </Text>
-
             <TouchableOpacity onPress={() => changeMonth("next")}>
               <Icon name="chevron-forward" size={22} color="#7B77FF" />
             </TouchableOpacity>
           </View>
-
-          {/* WEEK DAYS */}
           <View style={styles.weekRow}>
             {WEEK_DAYS.map((day) => (
               <Text key={day} style={styles.weekText}>
@@ -90,14 +79,11 @@ const CalendarModal = ({ visible, onClose, onConfirm }) => {
               </Text>
             ))}
           </View>
-
-          {/* DAYS GRID */}
           <View style={styles.daysGrid}>
             {calendarDays.map((day, index) => {
               if (!day) {
                 return <View key={index} style={styles.dayCell} />;
               }
-
               return (
                 <TouchableOpacity
                   key={index}
@@ -123,13 +109,10 @@ const CalendarModal = ({ visible, onClose, onConfirm }) => {
               );
             })}
           </View>
-
-          {/* ACTIONS */}
           <View style={styles.actions}>
             <TouchableOpacity style={styles.cancel} onPress={onClose}>
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
-
             <TouchableOpacity
               style={styles.setDate}
               onPress={() => {

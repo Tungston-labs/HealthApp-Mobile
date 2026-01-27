@@ -14,7 +14,6 @@ const SessionCard = ({
   return (
     <View style={styles.card}>
       <View style={styles.mainRow}>
-        {/* LEFT FIXED IMAGE */}
         <Image
           source={
             profilePic
@@ -23,32 +22,24 @@ const SessionCard = ({
           }
           style={styles.avatar}
         />
-
-        {/* RIGHT CONTENT */}
         <View style={styles.rightContent}>
-          {/* TOP RIGHT */}
           <View style={styles.topRow}>
             <View>
               <Text style={styles.name}>{clientName}</Text>
-
               <View style={styles.timeRow}>
                 <Icon name="time-outline" size={14} color="#9A9A9A" />
                 <Text style={styles.timeText}>{timeLabel}</Text>
               </View>
             </View>
-
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{sessionCount}</Text>
             </View>
           </View>
-
-          {/* BOTTOM RIGHT */}
           <View style={styles.bottomRow}>
             <View>
               <Text style={styles.label}>start date</Text>
               <Text style={styles.date}>{sessionDate}</Text>
             </View>
-
             <View>
               <Text style={styles.label}>End date</Text>
               <Text style={styles.date}>{status}</Text>

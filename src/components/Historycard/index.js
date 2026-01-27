@@ -17,11 +17,7 @@ const HistoryCard = ({ item }) => {
   navigation.navigate("SingleSessionHistory", {
     sessionId: item.session_id,
   })
-}
-
->
-
-      {/* Trainer Image */}
+}>
       <Image
         source={{
           uri:
@@ -32,7 +28,6 @@ const HistoryCard = ({ item }) => {
       />
 
       <View style={styles.contentContainer}>
-        {/* Row 1 – Trainer Name */}
         <View style={styles.row}>
           <View style={styles.column}>
             <Text style={styles.namevalue}>
@@ -40,8 +35,6 @@ const HistoryCard = ({ item }) => {
             </Text>
           </View>
         </View>
-
-        {/* Row 2 – Workout Plan & Time */}
         <View style={styles.row}>
           <View style={styles.column}>
             <Text style={styles.label}>Workout Plan</Text>
@@ -59,14 +52,10 @@ const HistoryCard = ({ item }) => {
               </Text>
             </View>
           </View>
-        </View>
-
-        {/* Row 3 – Date */}
-      
+</View>     
 <View style={styles.row}>
   <View style={styles.column}>
     <Text style={styles.label}>Date</Text>
-
     <View style={styles.valueRow}>
       <Ionicons
         name="calendar-outline"

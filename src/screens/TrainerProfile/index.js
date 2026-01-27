@@ -10,15 +10,12 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import { launchImageLibrary } from "react-native-image-picker";
 import { useFocusEffect } from "@react-navigation/native";
-
 import ProfileHeader from "../../components/ProfileHeader";
 import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
 import CommonActionModal from "../../components/ModalComponents";
 import Skeleton from "../../components/Skelton";
-
 import { logoutThunk } from "../../redux/slices/authSlice";
 import { fetchTrainerProfileThunk } from "../../redux/slices/trainerProfileSlice";
-
 import styles from "./style";
 
 const ProfileScreenTrainer = ({ navigation }) => {
@@ -28,11 +25,9 @@ const ProfileScreenTrainer = ({ navigation }) => {
   const imageSource = profile?.profile_pic_url
   ? { uri: profile.profile_pic_url }
   : require("../../../assets/trainer2.jpg");
-
   const { profile, loading } = useSelector(
     state => state.trainerProfile
   );
-
   const [profileImage, setProfileImage] = useState(
     require("../../../assets/trainer2.jpg")
   );
@@ -77,25 +72,20 @@ const ProfileScreenTrainer = ({ navigation }) => {
     return (
       <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
         <StatusBar barStyle="dark-content" />
-
         <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
-
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-          
           <Skeleton
             height={120}
             width={120}
             borderRadius={60}
             style={{ alignSelf: "center", marginTop: 40 }}
           />
-
           <Skeleton
             height={20}
             width={160}
             borderRadius={6}
             style={{ alignSelf: "center", marginTop: 16 }}
           />
-
           <View style={styles.optionsWrapper}>
             <Skeleton height={48} borderRadius={12} />
             <Skeleton height={48} borderRadius={12} />
@@ -109,22 +99,15 @@ const ProfileScreenTrainer = ({ navigation }) => {
   return (
     <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <StatusBar barStyle="dark-content" />
-
       <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
-
       <ScrollView style={styles.container}>
-
-
-<ProfileHeader
+  <ProfileHeader
   image={profileImage || imageSource}
   name={profile?.name || "Trainer"}
   showBack={false}
   showEdit
   onEdit={handlePickImage}
 />
-
-
-
         <View style={styles.optionsWrapper}>
           <TouchableOpacity
             style={styles.optionRow}
@@ -132,20 +115,16 @@ const ProfileScreenTrainer = ({ navigation }) => {
               navigation.navigate("TrainerEditProfile", {
                 trainerId: profile?.id,
               })
-            }
-          >
+            }  >
             <Icon name="person-outline" size={20} color="#111" />
             <Text style={styles.optionText}>Edit profile</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.optionRow}
-            onPress={() => navigation.navigate("TrainerTermsAndConditions")}
-          >
+            onPress={() => navigation.navigate("TrainerTermsAndConditions")} >
             <Icon name="document-text-outline" size={20} color="#111" />
             <Text style={styles.optionText}>Terms and Conditions</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.logoutRow}
             onPress={() => setLogoutVisible(true)}
@@ -155,7 +134,6 @@ const ProfileScreenTrainer = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-
       <CommonActionModal
         visible={logoutVisible}
         onClose={() => setLogoutVisible(false)}

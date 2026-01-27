@@ -7,7 +7,6 @@ const RazorpayButton = () => {
         resolve(true);
         return;
       }
-
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.onload = () => {
@@ -19,23 +18,21 @@ const RazorpayButton = () => {
       document.body.appendChild(script);
     });
   };
-
   const handlePayment = async () => {
     const isLoaded = await loadRazorpay();
-
     if (!isLoaded) {
       alert("Razorpay SDK failed to load");
       return;
     }
 
     const options = {
-      key: "rzp_test_RyugXw6o7Pl6JO", // Razorpay Key ID
-      amount: 50000, // amount in paise
+      key: "rzp_test_RyugXw6o7Pl6JO", 
+      amount: 50000, 
       currency: "INR",
       name: "Acme Corp",
       description: "Test Transaction",
       image: "https://example.com/your_logo",
-      order_id: "order_9A33XWu170gUtm", // backend-generated order_id
+      order_id: "order_9A33XWu170gUtm", 
       callback_url: "https://eneqd3r9zrjok.x.pipedream.net/",
       prefill: {
         name: "Customer Name",

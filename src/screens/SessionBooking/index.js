@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
-
 import styles from "./style";
 import SessionCard from "../../components/SessionCard";
 import CalendarModal from "../../components/CalendarModal";
@@ -24,12 +23,9 @@ const SessionBooking = () => {
         next,
     } = useSelector((state) => state.trainerUpcomingSessions);
 
-
     const [activeTab, setActiveTab] = useState("booking");
     const [calendarVisible, setCalendarVisible] = useState(false);
     const [page, setPage] = useState(1);
-
-    /* 🔄 Fetch bookings */
     useEffect(() => {
         if (activeTab === "booking") {
             dispatch(fetchTrainerBookings({ page: 1 }));
@@ -38,8 +34,6 @@ const SessionBooking = () => {
 
     return (
         <View style={styles.container}>
-
-            {/* TOGGLE */}
             <View style={styles.toggleWrapper}>
                 <TouchableOpacity
                     style={[
@@ -77,8 +71,6 @@ const SessionBooking = () => {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
-
-                {/* BOOKINGS TAB */}
                 {activeTab === "booking" && (
                     <>
                         <Text style={styles.sectionTitle}>Session bookings</Text>
@@ -98,7 +90,6 @@ const SessionBooking = () => {
                                 endDate={item.session_end_date}
                                 status={item.status}
 
-                                /* ✅ USE API VALUES */
                                 sessionCount={item.session_number}
                                 totalSessions={item.total_sessions}
                             />
@@ -107,8 +98,6 @@ const SessionBooking = () => {
 
                     </>
                 )}
-
-                {/* HISTORY TAB */}
                 {activeTab === "history" && (
                     <>
                         <View style={styles.filterRow}>
@@ -128,8 +117,6 @@ const SessionBooking = () => {
                                 <Text style={styles.dateText}>Select Date</Text>
                             </TouchableOpacity>
                         </View>
-
-                        {/* Later connect history API here */}
                     </>
                 )}
 

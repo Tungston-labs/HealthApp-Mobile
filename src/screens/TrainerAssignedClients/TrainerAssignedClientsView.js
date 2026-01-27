@@ -26,9 +26,7 @@ const TrainerAssignedClientsView = ({
         name={user?.name || 'Trainer'}
         subTitle={user?.trainer?.training_plan?.name || 'Basic Plan'}
       />
-
       <Text style={styles.sectionTitle}>All Assigned Clients</Text>
-
       {isLoading && page === 1 ? (
         Array.from({ length: 5 }).map((_, index) => (
           <Skeleton key={index} height={70} borderRadius={15} />

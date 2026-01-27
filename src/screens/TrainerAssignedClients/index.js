@@ -5,22 +5,18 @@ import Toast from 'react-native-toast-message';
 
 const TrainerAssignedClientsContainer = () => {
   const [page, setPage] = useState(1);
-
   const { data, isLoading, isFetching, error, refetch } =
     useGetAssignedClientsQuery({
       page,
       limit: 10,
     });
-
   const clients = data?.results || [];
   const hasNextPage = data?.current_page < data?.total_pages;
-
   const loadMore = useCallback(() => {
     if (!isFetching && hasNextPage) {
       setPage(prev => prev + 1);
     }
   }, [isFetching, hasNextPage]);
-
   const onRefresh = useCallback(() => {
     setPage(1);
     refetch();

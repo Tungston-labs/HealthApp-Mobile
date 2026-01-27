@@ -13,15 +13,12 @@ export default StyleSheet.create({
     alignItems: "flex-start",
   },
 
-  /* LEFT IMAGE */
   avatar: {
     width: 86,
     height: 89,
     borderRadius: 14,
     marginRight: 14,
   },
-
-  /* RIGHT CONTENT */
   rightContent: {
     flex: 1,
   },

@@ -94,7 +94,6 @@ export default function OtpScreen({ navigation, route }) {
         <Text style={styles.description}>
           Enter the code you received in your email{"\n"}below to reset your password.
         </Text>
-
         <View style={styles.otpContainer}>
           {otp.map((digit, index) => (
             <TextInput
@@ -110,7 +109,6 @@ export default function OtpScreen({ navigation, route }) {
             />
           ))}
         </View>
-
         <TouchableOpacity onPress={() => navigation.navigate("Login")}>
           <Text style={styles.backToLogin}>
             Back to <Text style={styles.loginText}>Log in</Text>

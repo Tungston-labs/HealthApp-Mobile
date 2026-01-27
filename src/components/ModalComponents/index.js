@@ -41,13 +41,11 @@ const consultationTypes = [
     <Modal transparent visible={visible} animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.card}>
-
           {iconName && (
             <View style={[styles.iconCircle, { borderColor: iconColor }]}>
               <Icon name={iconName} size={28} color={iconColor} />
             </View>
           )}
-
           {illustration && (
             <Image
               source={illustration}
@@ -58,16 +56,11 @@ const consultationTypes = [
               }}
             />
           )}
-
-
           <Text style={styles.title}>{title}</Text>
-
           <Text style={styles.desc}>{description}</Text>
-
           {showDropdown && (
             <>
               <Text style={styles.label}>Consultation type</Text>
-
               <TouchableOpacity
                 style={styles.dropdown}
                 onPress={() => setShowDropdownList(!showDropdownList)}
@@ -84,7 +77,7 @@ const consultationTypes = [
                     <TouchableOpacity
                       key={i}
                       onPress={() => {
-                        onSelectValue(type);      // ✅ parent setter
+                        onSelectValue(type);      
                         setShowDropdownList(false);
                       }}
                       style={styles.dropdownItem}
@@ -100,7 +93,6 @@ const consultationTypes = [
           {showNote && (
             <>
               <Text style={styles.label}>Note</Text>
-
               <TextInput
                 style={styles.noteBox}
                 placeholder="Enter note"
@@ -116,7 +108,6 @@ const consultationTypes = [
             <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
               <Text style={styles.cancelText}>{cancelText}</Text>
             </TouchableOpacity>
-
             <TouchableOpacity
               style={styles.confirmBtn}
               onPress={onConfirm}
@@ -124,7 +115,6 @@ const consultationTypes = [
               <Text style={styles.confirmText}>{confirmText}</Text>
             </TouchableOpacity>
           </View>
-
         </View>
       </View>
     </Modal>

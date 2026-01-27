@@ -24,7 +24,6 @@ import {
 const PaymentScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
 
-  // ✅ Params from previous screen
   const {
     trainerId,
     plan_id,
@@ -50,7 +49,6 @@ const PaymentScreen = ({ navigation, route }) => {
   }, [dispatch, trainerId]);
 
   const openRazorpay = async () => {
-    // ✅ Ensure plan_id exists
     if (!plan_id) {
       Alert.alert("Error", "Plan ID is missing. Please select a plan.");
       return;
@@ -66,14 +64,12 @@ const PaymentScreen = ({ navigation, route }) => {
       };
 
       console.log("Booking payload:", payload);
-
-      // 1️⃣ Create order
       const orderRes = await createTrainerBookingOrder(payload);
       const { order_id, amount: orderAmount, key } = orderRes.data;
 
       const options = {
         key,
-        amount: Math.round(orderAmount * 100), // in paise
+        amount: Math.round(orderAmount * 100), 
         currency: "INR",
         name: "HealthApp",
         description: "Trainer booking",
@@ -82,13 +78,9 @@ const PaymentScreen = ({ navigation, route }) => {
       };
 
       console.log("RAZORPAY OPTIONS:", options);
-
-      // 2️⃣ Open Razorpay
       const response = await RazorpayCheckout.open(options);
 
       console.log("PAYMENT SUCCESS:", response);
-
-      // 3️⃣ Verify payment
       await verifyTrainerPayment({
         razorpay_order_id: response.razorpay_order_id,
         razorpay_payment_id: response.razorpay_payment_id,
@@ -126,9 +118,7 @@ const PaymentScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <HeaderWithBack title="Payment" />
-
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Trainer Info */}
         <Text style={styles.sectionTitle}>Trainer info</Text>
         <View style={styles.separator} />
 
@@ -136,7 +126,6 @@ const PaymentScreen = ({ navigation, route }) => {
           <Text style={styles.label}>Workout Plan - {data.plan_name}</Text>
           <Text style={styles.label}>Workout Type - {booking_type}</Text>
         </View>
-
         <View style={styles.trainerBox}>
           <Image
             source={
@@ -154,11 +143,8 @@ const PaymentScreen = ({ navigation, route }) => {
             workoutType={data.plan_name}
           />
         </View>
-
-        {/* Payment Method */}
         <Text style={styles.sectionTitle}>Preferred payment method</Text>
         <View style={styles.separator} />
-
         <TouchableOpacity
           style={[
             styles.paymentCard,
@@ -172,14 +158,11 @@ const PaymentScreen = ({ navigation, route }) => {
           )}
         </TouchableOpacity>
       </ScrollView>
-
-      {/* Footer */}
       <View style={styles.footer}>
         <View style={styles.totalWrapper}>
           <Text style={styles.totalLabel}>Total</Text>
           <Text style={styles.totalValue}>₹ {amount}</Text>
         </View>
-
         <TouchableOpacity
           style={[
             styles.payBtn,
@@ -192,7 +175,6 @@ const PaymentScreen = ({ navigation, route }) => {
             {paying ? "Processing..." : "Proceed to Pay"}
           </Text>
         </TouchableOpacity>
-
         <PaymentSuccessModal
           visible={showSuccess}
           onClose={() => {

@@ -17,9 +17,7 @@ const TrainerTermsAndConditions = () => {
         <SafeAreaView style={styles.safeArea}>
             <ScrollView
                 contentContainerStyle={styles.container}
-                showsVerticalScrollIndicator={false}
-            >
-
+                showsVerticalScrollIndicator={false}>
                 <View style={styles.headerRow}>
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}
@@ -28,18 +26,13 @@ const TrainerTermsAndConditions = () => {
                     >
                         <Icon name="chevron-back" size={24} color="#000" />
                     </TouchableOpacity>
-                    <Text style={styles.title}>      Terms & Conditions</Text>
+                    <Text style={styles.title}>Terms & Conditions</Text>
                 </View>
-
-
                 <Text style={styles.paragraph}>
                     This Privacy Policy & Terms apply to fitness trainers using the Infit
                     Fitness App to provide fitness guidance or services.
                 </Text>
-
-
                 <Text style={styles.subTitle}>1. Eligibility</Text>
-
                 <Text style={styles.paragraph}>• Trainers must be 18 years or older.</Text>
                 <Text style={styles.paragraph}>
                     • Trainers must be legally eligible to provide fitness training
@@ -48,7 +41,6 @@ const TrainerTermsAndConditions = () => {
                 <Text style={styles.paragraph}>
                     • Trainers must provide accurate and verifiable information.
                 </Text>
-
                 <Text style={styles.subTitle}>
                     2. Information We Collect (Trainer Side)
                 </Text>
@@ -65,8 +57,6 @@ const TrainerTermsAndConditions = () => {
                 <Text style={styles.paragraph}>
                     • Professional certificates uploaded by the Trainer
                 </Text>
-
-
                 <Text style={styles.subTitle}>3. Purpose of Data Collection</Text>
                 <View style={styles.underline} />
                 <Text style={styles.paragraph}>
@@ -84,8 +74,6 @@ const TrainerTermsAndConditions = () => {
                 <Text style={styles.paragraph}>
                     • Process payments, if applicable
                 </Text>
-
-
                 <Text style={styles.subTitle}>4. Trainer Responsibilities</Text>
                 <View style={styles.underline} />
                 <Text style={styles.paragraph}>
@@ -100,8 +88,6 @@ const TrainerTermsAndConditions = () => {
                 <Text style={styles.paragraph}>
                     • Maintain confidentiality of user information.
                 </Text>
-
-
                 <Text style={styles.subTitle}>5. Data Sharing</Text>
                 <View style={styles.underline} />
                 <Text style={styles.paragraph}>
@@ -116,8 +102,6 @@ const TrainerTermsAndConditions = () => {
                 <Text style={styles.paragraph}>
                     • To enable core App functionality.
                 </Text>
-
-
                 <Text style={styles.subTitle}>
                     6. Content & Certification Responsibility
                 </Text>
@@ -129,8 +113,6 @@ const TrainerTermsAndConditions = () => {
                 <Text style={styles.paragraph}>
                     • Infit Fitness does not guarantee or endorse trainer qualifications.
                 </Text>
-
-
                 <Text style={styles.subTitle}>
                     7. Account Suspension & Termination
                 </Text>
@@ -147,7 +129,6 @@ const TrainerTermsAndConditions = () => {
                 <Text style={styles.paragraph}>
                     • User complaints or policy violations
                 </Text>
-
                 <Text style={styles.subTitle}>8. Limitation of Liability</Text>
                 <View style={styles.underline} />
                 <Text style={styles.paragraph}>
@@ -157,16 +138,12 @@ const TrainerTermsAndConditions = () => {
                     • Infit Fitness is not responsible for disputes or injuries arising from
                     trainer guidance.
                 </Text>
-
-
                 <Text style={styles.subTitle}>9. Data Security</Text>
                 <View style={styles.underline} />
                 <Text style={styles.paragraph}>
                     Trainer information is protected using appropriate technical and
                     organizational security measures.
                 </Text>
-
-
                 <Text style={styles.subTitle}>10. Changes to This Policy</Text>
                 <View style={styles.underline} />
                 <Text style={styles.paragraph}>

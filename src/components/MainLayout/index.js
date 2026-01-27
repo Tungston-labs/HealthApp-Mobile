@@ -6,7 +6,6 @@ import styles from "./style";
 export default function MainLayout({ title, step, onBack, onNext, children }) {
   return (
     <SafeAreaView style={styles.container}>
-
       <View style={styles.headerWrapper}>
         <View style={styles.progressContainer}>
           {[1, 2, 3, 4, 5, 6, 7].map((item) => (
@@ -19,16 +18,12 @@ export default function MainLayout({ title, step, onBack, onNext, children }) {
             />
           ))}
         </View>
-
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
-
       <Text style={styles.headerTitle}>{title}</Text>
-
       <View style={styles.centerContainer}>{children}</View>
-
       <View style={styles.footer}>
         {step !== 1 && (
           <TouchableOpacity onPress={onNext} style={styles.nextButton}>

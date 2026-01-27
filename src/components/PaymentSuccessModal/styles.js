@@ -19,8 +19,6 @@ export default StyleSheet.create({
     alignItems: "center",
     overflow: "hidden",
   },
-
-  /** Confetti styles */
   confetti: {
     position: "absolute",
     width: 10,
@@ -33,7 +31,7 @@ tickOuterCircle: {
   width: 130,
   height: 130,
   borderRadius: 65,
-  backgroundColor: "#588C47", // outer color
+  backgroundColor: "#588C47", 
   justifyContent: "center",
   alignItems: "center",
   marginBottom: 20,
@@ -42,13 +40,10 @@ tickInnerCircle: {
   width: 110,
   height: 110,
   borderRadius: 55,
-  backgroundColor: "#6DC152", // inner color
+  backgroundColor: "#6DC152", 
   justifyContent: "center",
   alignItems: "center",
 },
-
-
-
   successText: {
     fontSize: 22,
     fontWeight: "bold",

@@ -27,7 +27,7 @@ const TrainerBookingModal = ({ visible, onClose, plan }) => {
     (state) => state.trainerDetail
   );
 
-  // ✅ Reset state when modal closes
+
   useEffect(() => {
     if (!visible) {
       setSelected("Single");
@@ -35,7 +35,7 @@ const TrainerBookingModal = ({ visible, onClose, plan }) => {
     }
   }, [visible]);
 
-  // ✅ Safe price calculation
+
   const amount = useMemo(() => {
     if (!plan) return 0;
 
@@ -55,12 +55,12 @@ const TrainerBookingModal = ({ visible, onClose, plan }) => {
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          {/* Close */}
+
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
             <Icon name="close" size={26} color="#000" />
           </TouchableOpacity>
 
-          {/* BODY — always rendered */}
+
           <View style={{ flex: 1 }}>
             {loading && <ActivityIndicator size="large" />}
 
@@ -129,8 +129,6 @@ const TrainerBookingModal = ({ visible, onClose, plan }) => {
               </ScrollView>
             )}
           </View>
-
-          {/* Footer */}
           {!!data && !loading && (
             <View style={styles.footer}>
               <TouchableOpacity

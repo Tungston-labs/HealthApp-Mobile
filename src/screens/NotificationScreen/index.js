@@ -39,9 +39,7 @@ export default function NotificationScreen() {
   return (
     <View style={styles.container}>
       <HeaderWithBack title="Notifications" />
-
       <Text style={styles.title}>Today</Text>
-
       {notifications.map((item) => (
         <View key={item.id} style={styles.card}>
           <Icon
@@ -50,7 +48,6 @@ export default function NotificationScreen() {
             color="#000"
             style={styles.icon}
           />
-
           <View style={styles.textContainer}>
             <Text style={styles.header}>{item.title}</Text>
             <Text style={styles.description}>{item.text}</Text>

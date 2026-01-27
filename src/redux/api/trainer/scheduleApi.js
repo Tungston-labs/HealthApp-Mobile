@@ -6,7 +6,7 @@ export const scheduleApi = createApi({
   reducerPath: 'scheduleApi',
   baseQuery: axiosBaseQuery({
     axiosInstance: api,
-    baseUrl: '/', // axios already has baseURL
+    baseUrl: '/', 
   }),
   tagTypes: [
     'UpcomingSessions',

@@ -5,7 +5,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 
 const formatDate = (date) => {
   const d = new Date(date);
-  return d.toISOString().split("T")[0]; // YYYY-MM-DD
+  return d.toISOString().split("T")[0]; 
 };
 
 const DOBPicker = ({ value, onChange }) => {
@@ -21,7 +21,6 @@ const DOBPicker = ({ value, onChange }) => {
 
   return (
     <View>
-      {/* INPUT ROW */}
       <TouchableOpacity
         onPress={() => setShow(true)}
         style={{ flexDirection: "row", alignItems: "center" }}
@@ -31,14 +30,12 @@ const DOBPicker = ({ value, onChange }) => {
           {value || "Date of Birth"}
         </Text>
       </TouchableOpacity>
-
-      {/* CALENDAR MODAL */}
       {show && (
         <DateTimePicker
           value={value ? new Date(value) : new Date()}
           mode="date"
           display={Platform.OS === "ios" ? "spinner" : "default"}
-          maximumDate={new Date()} // DOB cannot be future
+          maximumDate={new Date()} 
           onChange={handleChange}
         />
       )}

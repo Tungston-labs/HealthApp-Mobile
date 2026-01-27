@@ -1,4 +1,3 @@
-// screens/TrainerList/Trainercard.js
 import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -23,10 +22,9 @@ const TrainerCard = ({
 
   return (
     <View style={styles.card}>
-      {/* IMAGE + PROFILE */}
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => onPressCard && onPressCard()} // <- call safely
+        onPress={() => onPressCard && onPressCard()} 
       >
         <Image
           source={imageSource}
@@ -34,8 +32,6 @@ const TrainerCard = ({
           resizeMode="cover"
         />
       </TouchableOpacity>
-
-      {/* View Profile */}
       {showViewProfileButton && (
         <TouchableOpacity
           style={styles.viewProfileBtn}
@@ -46,14 +42,11 @@ const TrainerCard = ({
           <Text style={styles.viewProfileText}>View Profile</Text>
         </TouchableOpacity>
       )}
-
-      {/* INFO */}
       <View style={styles.info}>
         <Text style={styles.trainerName}>
           {trainer.trainer_name || trainer.name || "Trainer"}
         </Text>
         <Text style={styles.exp}>{trainer.experience ?? 0} Years experience</Text>
-
         {(showPrice || showRating) && (
           <View style={styles.ratingplan}>
             {showPrice && (
@@ -74,8 +67,6 @@ const TrainerCard = ({
             )}
           </View>
         )}
-
-        {/* Book Now */}
         {showBookButton && (
           <TouchableOpacity onPress={onBookNow} style={styles.bookBtn}>
             <Text style={styles.bookText}>Book Now</Text>

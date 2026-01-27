@@ -11,10 +11,10 @@ export const getClientProfile = () =>
 export const fetchClientTrainersAPI = async (payload = {}) => {
   try {
     const response = await api.get("client/booked-trainers/", {
-      params: payload, // GET params
+      params: payload,
     });
     console.log("API CALL SUCCESS", response.data);
-    return response.data; // Return the actual data
+    return response.data; 
   } catch (err) {
     console.log("API CALL ERROR", err.response || err);
     throw err;

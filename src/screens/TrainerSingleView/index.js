@@ -1,4 +1,3 @@
-// screens/TrainerDetail/TrainerDetailScreen.js
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -11,7 +10,6 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation, useRoute } from "@react-navigation/native";
-
 import styles from "./styles";
 import RatingBar from "../../components/TrainerDetail/RatingCard";
 import ReviewCard from "../../components/TrainerDetail/ReviewCard";
@@ -67,7 +65,6 @@ const TrainerDetailScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
       >
-        {/* Close Button */}
         <TouchableOpacity
           style={styles.closeBtn}
           onPress={() => navigation.goBack()}
@@ -75,7 +72,6 @@ const TrainerDetailScreen = () => {
           <Icon name="close" size={28} color="#000" />
         </TouchableOpacity>
 
-        {/* Header */}
         <View style={styles.headerSection}>
           <Image
             source={
@@ -96,7 +92,6 @@ const TrainerDetailScreen = () => {
           />
         </View>
 
-        {/* Certificates */}
         <View style={styles.certContainer}>
           <TouchableOpacity
             style={styles.certHeader}
@@ -150,8 +145,6 @@ const TrainerDetailScreen = () => {
 
         </View>
 
-
-        {/* Rating Section */}
         <Text style={styles.sectionTitle}>Rating and feedback</Text>
         <View style={styles.divider} />
 
@@ -181,7 +174,6 @@ const TrainerDetailScreen = () => {
           </View>
         </View>
 
-        {/* Reviews */}
         {data.reviews?.length > 0 ? (
           data.reviews.map((review, index) => (
             <ReviewCard
@@ -212,7 +204,6 @@ const TrainerDetailScreen = () => {
           visible={showBookingModal}
           onClose={() => setShowBookingModal(false)}
           trainerId={trainerId}
-        // Pass any data needed like plan/pricing
         />
       </View>
     </View>

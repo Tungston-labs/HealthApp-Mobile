@@ -18,13 +18,10 @@ import { useRoute } from "@react-navigation/native";
 const TrainerListScreen = () => {
   const dispatch = useDispatch();
   const route = useRoute();
-
   const { trainers, plan, loading, error } = useSelector(
     (state) => state.trainer
   );
-
   const [selectedTrainerId, setSelectedTrainerId] = useState(null);
-
   const trainersList = Array.isArray(trainers) ? trainers : [];
   const planId = route.params?.planId;
   const isFiltered = route.params?.isFiltered;
@@ -57,7 +54,6 @@ const TrainerListScreen = () => {
     <View style={styles.container}>
       <HeaderWithBack title={plan?.name || "Trainers"} />
       <Text style={styles.subtitle}>Available Trainers</Text>
-
       {error ? (
         <View style={styles.center}>
           <Ionicons name="alert-circle-outline" size={50} color="red" />
@@ -75,7 +71,6 @@ const TrainerListScreen = () => {
           )}
         />
       )}
-
       <TrainerBookingModal
         visible={!!selectedTrainerId}
         onClose={handleCloseModal}

@@ -41,8 +41,6 @@ export default function LoginScreen({ navigation }) {
       })
     );
   };
-
-  /* 🔥 LOGIN NAVIGATION LOGIC */
   useEffect(() => {
     if (!isLoggedIn || !user) return;
 
@@ -148,13 +146,18 @@ export default function LoginScreen({ navigation }) {
           )}
         </TouchableOpacity>
       </View>
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Don't have an account?</Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("SelectRoleScreen")}>
-          <Text style={styles.signUp}> Sign Up</Text>
-        </TouchableOpacity>
-      </View>
+     <View style={styles.footer}>
+  <Text style={styles.footerText}>
+    Don't have an account?
+    <Text
+      style={styles.signUp}
+      onPress={() => navigation.navigate("SelectRoleScreen")}
+    >
+      Sign Up
+    </Text>
+  </Text>
+</View>
+
     </SafeAreaView>
   );
 }

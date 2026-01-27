@@ -8,7 +8,6 @@ export default StyleSheet.create({
     paddingTop: 36,
   },
 
-  /* Toggle */
   toggleWrapper: {
     flexDirection: "row",
     backgroundColor: "#E6E6E6",
@@ -35,7 +34,6 @@ export default StyleSheet.create({
     color: "#fff",
   },
 
-  /* Big number display */
   bigDisplayWrapper: {
     flexDirection: "row",
     alignItems: "flex-end",
@@ -56,7 +54,6 @@ export default StyleSheet.create({
     fontFamily: "Segoe UI",
   },
 
-  /* Ruler row */
   rulerRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -64,7 +61,6 @@ export default StyleSheet.create({
     marginTop: 6,
   },
 
-  /* Left labels */
   leftLabels: {
     width: 60,
     alignItems: "flex-end",
@@ -81,7 +77,6 @@ export default StyleSheet.create({
     fontSize: 26,
   },
 
-  /* Blue ruler bar */
   rulerContainer: {
     width: 80,
     height: "100%",
@@ -92,29 +87,27 @@ export default StyleSheet.create({
     alignItems: "center",
   },
 
-  /* TICK LINES — EXACT LIKE SECOND IMAGE */
   tickLine: {
     backgroundColor: "#111",
   },
 
-  /* Small ticks */
+ 
   smallTick: {
-    width: 22,   // thin short line
+    width: 22,   
     height: 2,
   },
 
-  /* Big ticks (every 5 cm) */
+
   bigTick: {
-    width: 40,   // longer line like image
+    width: 40, 
     height: 4,
   },
 
-  /* Highlighted tick */
+
   activeTick: {
     backgroundColor: "#F2E64A",
   },
 
-  /* Yellow center line */
   centerHighlight: {
     position: "absolute",
     width: "70%",
@@ -124,7 +117,7 @@ export default StyleSheet.create({
     transform: [{ translateY: -1.5 }],
   },
 
-  /* Green pointer */
+
   pointerWrapper: {
     width: 30,
     alignItems: "center",

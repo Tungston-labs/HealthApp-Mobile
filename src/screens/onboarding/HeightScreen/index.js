@@ -14,8 +14,6 @@ const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export default function HeightPicker() {
   const dispatch = useDispatch();
-
-  // Redux state
   const { height, heightUnit } = useSelector(
     (state) => state.registration
   );
@@ -23,23 +21,15 @@ export default function HeightPicker() {
   const MIN_CM = 120;
   const MAX_CM = 210;
   const ITEM_HEIGHT = 10;
-
-  // 🔹 Defaults
   const initialCm = height ?? 165;
-
   const [unit, setUnit] = useState(heightUnit || "Cm");
   const [cmValue, setCmValue] = useState(initialCm);
-
   const scrollRef = useRef(null);
-
   const numbers = Array.from(
     { length: MAX_CM - MIN_CM + 1 },
     (_, i) => MIN_CM + i
   );
-
   const sidePadding = SCREEN_HEIGHT / 2 - ITEM_HEIGHT / 2;
-
-  // 🔹 cm → ft/in
   const cmToFeetInches = (cm) => {
     const totalFeet = cm / 30.48;
     const feet = Math.floor(totalFeet);
@@ -48,25 +38,20 @@ export default function HeightPicker() {
       ? { feet: feet + 1, inches: 0 }
       : { feet, inches };
   };
-
   const formatDisplayed = () => {
     if (unit === "Cm") return cmValue;
     const { feet, inches } = cmToFeetInches(cmValue);
     return `${feet}' ${inches}"`;
   };
-
   const handleScroll = (e) => {
     const y = e.nativeEvent.contentOffset.y;
     const index = Math.round(y / ITEM_HEIGHT);
     const invertedIndex = numbers.length - 1 - index;
-
     const clamped = Math.max(
       0,
       Math.min(numbers.length - 1, invertedIndex)
     );
-
     const newCm = numbers[clamped];
-
     if (newCm !== cmValue) {
       setCmValue(newCm);
       dispatch(
@@ -79,7 +64,6 @@ export default function HeightPicker() {
   };
   const formatSideLabel = (cm) => {
     if (unit === "Cm") return cm;
-
     const { feet, inches } = cmToFeetInches(cm);
     return `${feet}'${inches}"`;
   };
@@ -92,7 +76,6 @@ export default function HeightPicker() {
     });
   }, []);
 
-  //  Unit change handler
   const changeUnit = (newUnit) => {
     setUnit(newUnit);
 
@@ -103,8 +86,6 @@ export default function HeightPicker() {
       })
     );
   };
-
-  //  Label logic (unchanged)
   let mid = Math.round(cmValue / 5) * 5;
   const fixedLabels = [
     Math.min(MAX_CM, mid + 10),
@@ -145,8 +126,6 @@ export default function HeightPicker() {
           </Text>
         </TouchableOpacity>
       </View>
-
-      {/* Big display */}
       <View style={styles.bigDisplayWrapper}>
         <Text style={styles.bigNumber}>{formatDisplayed()}</Text>
         <Text style={styles.bigUnit}>{unit}</Text>
@@ -173,8 +152,6 @@ export default function HeightPicker() {
             </View>
           ))}
         </View>
-
-        {/* Ruler */}
         <View style={styles.rulerContainer}>
           <ScrollView
             ref={scrollRef}
@@ -214,8 +191,6 @@ export default function HeightPicker() {
 
           <View style={styles.centerHighlight} />
         </View>
-
-        {/* Pointer */}
         <View style={styles.pointerWrapper}>
           <View style={styles.greenPointer} />
         </View>

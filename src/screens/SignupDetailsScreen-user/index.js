@@ -140,9 +140,6 @@ const handleUseLocation = async () => {
             />
           </View>
         </View>
-
-
-
         <View style={styles.inputRow}>
           <Ionicons name="mail-outline" size={18} color="#777" />
           <TextInput
@@ -241,8 +238,6 @@ const handleUseLocation = async () => {
           <Text style={styles.backLogin}>Back to Log in</Text>
         </TouchableOpacity>
       </ScrollView>
-
-      {/* CONTINUE */}
       <View style={styles.continueFixed}>
         <TouchableOpacity style={styles.continueBtn} onPress={handleContinue}>
           <Text style={styles.continueText}>Continue</Text>

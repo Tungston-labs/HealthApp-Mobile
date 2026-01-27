@@ -1,4 +1,3 @@
-// screens/Trainers/styles.js
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
@@ -37,7 +36,7 @@ planName: {
   borderRadius: 10,
   elevation: 2,
   borderWidth: 1,
-  borderColor: "#8D8D8D", // you can change this color if needed
+  borderColor: "#8D8D8D", 
 },
 
   viewProfileText: {

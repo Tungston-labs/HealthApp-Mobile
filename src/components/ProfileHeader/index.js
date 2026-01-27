@@ -1,4 +1,3 @@
-// components/ProfileHeader.js
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -27,8 +26,8 @@ const ProfileHeader = ({
           <Image
             source={
               typeof image === "string"
-                ? { uri: image }       // API string URL
-                : image                // { uri: ... } or require(...)
+                ? { uri: image }    
+                : image              
             }
             style={styles.profileImg}
             resizeMode="cover"

@@ -1,41 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-
 import Header from "../../components/Header";
 import FilterModal from "../../components/FIlterModal";
 import PlanCard from "../../components/PlanCard";
 import Skeleton from "../../components/Skelton";
 import UpcomingSessionSection from "../UpcomingSession";
-
 import { fetchPlansThunk } from "../../redux/slices/planSlice";
 import styles from "./style";
 
 const WorkoutPlan = ({ navigation }) => {
   const dispatch = useDispatch();
-
   const [showModal, setShowModal] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [selectedPlanSlot, setSelectedPlanSlot] = useState(null);
   const [showUpcoming, setShowUpcoming] = useState(false);
-
   const { plans, loading, error } = useSelector(
     (state) => state.planList
   );
-
   const { sessions } = useSelector(
     (state) => state.weeklySessions
   );
-
   const user = useSelector((state) => state.auth?.user);
-
   useEffect(() => {
     dispatch(fetchPlansThunk());
   }, [dispatch]);
-
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/*  FIXED HEADER */}
       <Header
         username={user?.name || "User"}
         subtitle="Your workout plans"
@@ -43,8 +34,6 @@ const WorkoutPlan = ({ navigation }) => {
           navigation.navigate("Notifications")
         }
       />
-
-      {/*  EVERYTHING BELOW SCROLLS */}
       {loading ? (
         <FlatList
           data={Array.from({ length: 6 })}
@@ -63,7 +52,6 @@ const WorkoutPlan = ({ navigation }) => {
           columnWrapperStyle={styles.gridContainer}
           contentContainerStyle={{ paddingBottom: 80 }}
           showsVerticalScrollIndicator={false}
-
           ListHeaderComponent={
             sessions && sessions.length > 0 ? (
               <>
@@ -72,13 +60,11 @@ const WorkoutPlan = ({ navigation }) => {
               </>
             ) : null
           }
-
           ListEmptyComponent={
             <Text style={{ textAlign: "center", marginTop: 20 }}>
               No plans available
             </Text>
           }
-
           renderItem={({ item }) => (
             <PlanCard
               item={item}
@@ -93,7 +79,6 @@ const WorkoutPlan = ({ navigation }) => {
       )}
 
       {error && <Text>{JSON.stringify(error)}</Text>}
-
       <FilterModal
         visible={showModal}
         planId={selectedPlanId}

@@ -27,9 +27,7 @@ export default function ThankYouScreen() {
           source={require("../../Images/thankyou.png")}
           style={styles.clockImage}
         />
-
         <Text style={styles.title}>Thank you!</Text>
-
         <Text style={styles.description}>
           {isApproved ? (
             <>
@@ -47,7 +45,6 @@ export default function ThankYouScreen() {
             </>
           )}
         </Text>
-
         <View style={styles.loginBtnWrapper}>
           <TouchableOpacity
             style={[

@@ -7,11 +7,11 @@ export default function ConditionScreen() {
   const dispatch = useDispatch();
   const CONDITION_OPTIONS = [
     { label: 'Other', value: 'other' },
-    { label: 'Arthritis / Joint Stiffness', value: 'arthritis' }, // optional
+    { label: 'Arthritis / Joint Stiffness', value: 'arthritis' }, 
     { label: 'Asthma / Breathing Difficulty', value: 'asthma' },
     { label: 'High Blood Pressure', value: 'bp' },
     { label: 'Diabetes', value: 'diabetes' },
-    { label: 'Obesity / Overweight', value: 'obesity' }, // optional
+    { label: 'Obesity / Overweight', value: 'obesity' }, 
   ];
 
   const selected = useSelector(state => state.registration.health_issues || []);

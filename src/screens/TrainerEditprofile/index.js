@@ -110,7 +110,6 @@ const TrainerEditProfile = ({ navigation }) => {
           Alert.alert("Success", "Location fetched successfully");
         } catch (err) {
           console.log("GEOCODE ERROR:", err);
-          // Alert.alert("Error", "Unable to fetch address");
         } finally {
           setFetchingLocation(false);
         }
@@ -126,10 +125,6 @@ const TrainerEditProfile = ({ navigation }) => {
       }
     );
   };
-
-
-
-
   const handleSave = async () => {
     setSaving(true);
 
@@ -230,7 +225,6 @@ const TrainerEditProfile = ({ navigation }) => {
             keyboardType="number-pad"
             maxLength={10}
             onChangeText={(text) => {
-              // Remove non-numeric characters
               let cleaned = text.replace(/\D/g, "");
 
               let formatted = cleaned;
