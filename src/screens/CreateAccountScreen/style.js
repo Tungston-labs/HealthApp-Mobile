@@ -1,4 +1,25 @@
 import { StyleSheet } from "react-native";
+export const pickerSelectStyles = {
+  inputIOS: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#898989",
+    paddingVertical: 16,
+    fontSize: 15,
+    fontFamily: "Segoe UI",
+    color: "#000",
+  },
+  inputAndroid: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#898989",
+    paddingVertical: 16,
+    fontSize: 15,
+    fontFamily: "Segoe UI",
+    color: "#000",
+  },
+  placeholder: {
+    color: "#888",
+  },
+};
 
 export default StyleSheet.create({
   container: {
@@ -70,7 +91,6 @@ placeholderText: {
     gap: 10,
   },
 
-  /* NEW - SMALL ROWS FOR EMAIL + PHONE */
   iconInputRowSmall: {
     flex: 1,
     flexDirection: "row",
@@ -103,15 +123,17 @@ placeholderText: {
     fontFamily: "Segoe UI",
   },
 
-  /* NEW STYLES FOR DROPDOWN LIST */
-  dropdownList: {
-    backgroundColor: "#EEEEFF",
-    borderWidth: 1,
-    borderColor: "#D5D5D5",
-    borderRadius: 6,
-    marginBottom: 10,
-    textAlign: "center",
-  },
+dropdownList: {
+  position: "absolute",
+  top: 52,              // just below dropdownRow
+  left: 0,
+  right: 0,
+  backgroundColor: "#EEEEFF",
+  borderWidth: 1,
+  borderColor: "#D5D5D5",
+  borderRadius: 6,
+  zIndex: 999,
+},
 
   dropdownItem: {
     paddingVertical: 12,
@@ -139,11 +161,11 @@ placeholderText: {
   },
 
   twoColRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 20,
-    marginBottom: 10,
-  },
+  flexDirection: "row",
+  justifyContent: "space-between",
+  gap: 20,
+  marginBottom: 10,
+},
 
   uploadContainer: {
     marginTop: 20,
