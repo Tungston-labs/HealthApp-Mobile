@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, Modal, TouchableOpacity, Platform } from "react-native";
+import { View, Text, TouchableOpacity, Platform } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 const formatDate = (date) => {
   const d = new Date(date);
-  return d.toISOString().split("T")[0]; // YYYY-MM-DD
+  return d.toISOString().split("T")[0]; 
 };
 
 const DOBPicker = ({ value, onChange }) => {
@@ -31,15 +31,19 @@ const DOBPicker = ({ value, onChange }) => {
           {value || "Date of Birth"}
         </Text>
       </TouchableOpacity>
- 
-      {/* CALENDAR MODAL */}
+
+      {/* DATE PICKER */}
       {show && (
         <DateTimePicker
           value={value ? new Date(value) : new Date()}
           mode="date"
           display={Platform.OS === "ios" ? "spinner" : "default"}
-          maximumDate={new Date()} // DOB cannot be future
+          maximumDate={new Date()}
           onChange={handleChange}
+          {...(Platform.OS === "ios" && {
+            themeVariant: "light", 
+            textColor: "#000",    
+          })}
         />
       )}
     </View>
