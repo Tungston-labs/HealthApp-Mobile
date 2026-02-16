@@ -25,6 +25,7 @@ import weeklySessionsReducer from "./slices/UpcomingSessionSlice"
 import trainerReducer from "./slices/trainerSlice";
 import ClientTrainerReducer from "./slices/clientTrainerSlice"
 import clientBmiReducer from "./slices/clientBmiSlice";
+import trainerChangeReducer from "./slices/changeTrainerSlice";
 
 export const store = configureStore({
   reducer: {
@@ -49,6 +50,7 @@ export const store = configureStore({
 
     profileEdit: clientProfileEditReducer,
     clientBmi: clientBmiReducer,
+    trainerChange: trainerChangeReducer,
 
 
 

@@ -65,37 +65,43 @@ const consultationTypes = [
           <Text style={styles.desc}>{description}</Text>
 
           {showDropdown && (
-            <>
-              <Text style={styles.label}>Consultation type</Text>
+  <>
+    <Text style={styles.label}>Consultation type</Text>
 
-              <TouchableOpacity
-                style={styles.dropdown}
-                onPress={() => setShowDropdownList(!showDropdownList)}
-              >
-                <Text style={styles.dropdownText}>
-                  {selectedValue || "Select type"}
-                </Text>
-                <Icon name="chevron-down" size={20} color="#777" />
-              </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.dropdown}
+      onPress={() => setShowDropdownList(!showDropdownList)}
+    >
+      <Text style={styles.dropdownText}>
+        {
+          consultationTypes.find(t => t.value === selectedValue)?.label
+          || "Select type"
+        }
+      </Text>
+      <Icon name="chevron-down" size={20} color="#777" />
+    </TouchableOpacity>
 
-              {showDropdownList && (
-                <View style={styles.dropdownList}>
-                  {consultationTypes.map((type, i) => (
-                    <TouchableOpacity
-                      key={i}
-                      onPress={() => {
-                        onSelectValue(type);      // ✅ parent setter
-                        setShowDropdownList(false);
-                      }}
-                      style={styles.dropdownItem}
-                    >
-                      <Text style={styles.dropdownItemText}>{type}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </>
-          )}
+    {showDropdownList && (
+      <View style={styles.dropdownList}>
+        {consultationTypes.map((type, i) => (
+          <TouchableOpacity
+            key={i}
+            style={styles.dropdownItem}
+            onPress={() => {
+              onSelectValue(type.value);   // ✅ STRING ONLY
+              setShowDropdownList(false);
+            }}
+          >
+            <Text style={styles.dropdownItemText}>
+              {type.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    )}
+  </>
+)}
+
 
           {showNote && (
             <>

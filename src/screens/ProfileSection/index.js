@@ -1,72 +1,112 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Linking,
+} from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
+
 import CommonActionModal from "../../components/ModalComponents";
 import TrainerInfoCard from "../../components/TrainerInfoCard";
 import EmptyState from "../../components/EmptyState";
-import FilterModal from "../../components/FIlterModal";
 
 import { useDispatch, useSelector } from "react-redux";
-import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
+
 import { fetchTrainerDetailThunk } from "../../redux/slices/trainerDetailSlice";
-import { cancelTrainingThunk, resetCancelState } from "../../redux/slices/CancelTrainingSlice";
-import { requestNutritionThunk, resetNutritionState } from "../../redux/slices/NutritionRequestSlice";
+import {
+  cancelTrainingThunk,
+  resetCancelState,
+} from "../../redux/slices/CancelTrainingSlice";
+import {
+  requestNutritionThunk,
+  resetNutritionState,
+} from "../../redux/slices/NutritionRequestSlice";
+
+import {
+  fetchChangeTrainerThunk,
+  resetTrainerChange,
+} from "../../redux/slices/changeTrainerSlice";
 
 const ProfileSection = () => {
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const route = useRoute();
+
+  /* ===================== LOCAL STATE ===================== */
   const [consultType, setConsultType] = useState("call");
   const [consultNote, setConsultNote] = useState("");
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
   const [showConsultModal, setShowConsultModal] = useState(false);
-  const [showFilterModal, setShowFilterModal] = useState(false);
 
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
-  const route = useRoute();
-
+  /* ===================== REDUX STATE ===================== */
   const { user } = useSelector((state) => state.auth || {});
   const session = user?.session ?? null;
 
   const trainerId = route.params?.trainerId;
 
-  const { loading, data } = useSelector((state) => state.trainerDetail);
+  const { loading, data } = useSelector(
+    (state) => state.trainerDetail || {}
+  );
+
+  const {
+    loading: changeLoading,
+    data: changeData,
+    error: changeError,
+  } = useSelector((state) => state.trainerChange || {});
 
   const trainer = trainerId ? data ?? null : session;
+  console.log({trainer});
+  
 
+  /* ===================== FETCH TRAINER ===================== */
   useEffect(() => {
     if (trainerId) {
       dispatch(fetchTrainerDetailThunk(trainerId));
     }
-  }, [trainerId]);
+  }, [trainerId, dispatch]);
 
-  const {
-    loading: cancelLoading,
-    success: cancelSuccess,
-    error: cancelError,
-  } = useSelector((state) => state.cancelTraining);
-  const {
-    loading: nutritionLoading,
-    success: nutritionSuccess,
-    error: nutritionError,
-  } = useSelector((state) => state.nutritionRequest);
+  /* ===================== TRAINER PHONE ===================== */
+  const trainerPhone =
+    trainer?.phno ||
+    null;
 
-  const handleCancelTraining = () => {
-    dispatch(cancelTrainingThunk());
+  const handleEmergencyCall = () => {
+    if (!trainerPhone) {
+      alert("Trainer phone number not available");
+      return;
+    }
+    Linking.openURL(`tel:${trainerPhone}`).catch(() =>
+      alert("Unable to make the call")
+    );
+    setShowEmergencyModal(false);
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      dispatch(resetCancelState());
+  /* ===================== CANCEL TRAINING ===================== */
+  const {
+    success: cancelSuccess,
+    error: cancelError,
+  } = useSelector((state) => state.cancelTraining || {});
 
-      return () => { };
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(resetCancelState());
     }, [dispatch])
   );
+
   useEffect(() => {
     if (cancelSuccess) {
-      setShowCancelModal(false);
       alert("Cancellation request submitted successfully");
-
+      setShowCancelModal(false);
       dispatch(resetCancelState());
     }
 
@@ -74,7 +114,14 @@ const ProfileSection = () => {
       alert(cancelError);
       dispatch(resetCancelState());
     }
-  }, [cancelSuccess, cancelError]);
+  }, [cancelSuccess, cancelError, dispatch]);
+
+  /* ===================== CONSULTATION ===================== */
+  const {
+    loading: nutritionLoading,
+    success: nutritionSuccess,
+    error: nutritionError,
+  } = useSelector((state) => state.nutritionRequest || {});
 
   const handleConsultSubmit = () => {
     if (!consultNote.trim()) {
@@ -103,13 +150,40 @@ const ProfileSection = () => {
       alert(nutritionError);
       dispatch(resetNutritionState());
     }
-  }, [nutritionSuccess, nutritionError]);
+  }, [nutritionSuccess, nutritionError, dispatch]);
+
+  /* ===================== CHANGE TRAINER ===================== */
+const handleChangeTrainer = () => {
+  if (!trainer?.id) {
+    alert("Trainer not available");
+    return;
+  }
+
+  navigation.navigate("TrainerList", {
+    mode: "change",
+    trainerId: trainer.id, 
+  });
+};
+
+
 
 
   useEffect(() => {
-    console.log("ProfileSection received trainerId 👉", trainerId);
-  }, [trainerId]);
+    if (changeData) {
+      alert("Trainer change request successful");
+      dispatch(resetTrainerChange());
 
+      // refresh trainer data if needed
+      dispatch(fetchTrainerDetailThunk(trainer.id));
+    }
+
+    if (changeError) {
+      alert(changeError);
+      dispatch(resetTrainerChange());
+    }
+  }, [changeData, changeError, dispatch, trainer]);
+
+  /* ===================== EMPTY STATES ===================== */
   if (!session && !trainerId) {
     return (
       <EmptyState
@@ -129,6 +203,7 @@ const ProfileSection = () => {
     );
   }
 
+  /* ===================== DISPLAY DATA ===================== */
   const fallbackImage = require("../../../assets/trainer1.jpg");
 
   const imageSource = trainer?.profile_pic
@@ -139,21 +214,22 @@ const ProfileSection = () => {
     ? `${trainer.section_timing} min`
     : "N/A";
 
-  const trainerName = trainer?.name || "N/A";
-  const numSessions = trainer?.no_of_section ?? 0;
+  const workoutPlan = trainer?.plan_name || "N/A";
+  const workoutTypeText = trainer?.workout_type || "N/A";
+  const trainerNotes = trainer?.notes || "No notes available";
+  
 
-  const workoutType = trainer?.plan_name ?? "N/A";
-  const isCancelRequested = session?.cancel_requested;
-
+  /* ===================== UI ===================== */
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
+        {/* HEADER */}
         <View style={styles.header}>
           <View>
             <Text style={styles.title}>Trainers</Text>
             <Text style={styles.subtitle}>Trainer Details</Text>
           </View>
+
           <TouchableOpacity
             style={styles.callIcon}
             onPress={() => setShowEmergencyModal(true)}
@@ -164,49 +240,35 @@ const ProfileSection = () => {
 
         <View style={styles.divider} />
 
-        {/* Trainer Card */}
+        {/* TRAINER CARD */}
         <View style={styles.trainerCard}>
           <Image source={imageSource} style={styles.trainerImage} />
 
-          <View style={styles.infoRowWrapper}>
-            <View style={styles.trainerInfoCardWrapper}>
-              {trainer && (
-                <TrainerInfoCard
-                  name={trainerName}
-                  experience={trainer?.experience ?? 0}
-                  trainerTiming={trainerTiming}
-                  numSessions={numSessions}
-                  workoutType={workoutType}
-                />
-              )}
-            </View>
+          <TrainerInfoCard
+  
 
-            <View style={styles.ratingBox}>
-              <Icon name="star" size={20} color="#F4C430" />
-              <Text style={styles.ratingText}>
-                {session?.rating || "4.6"}
-              </Text>
-            </View>
-          </View>
+            name={trainer?.name || "N/A"}
+            experience={trainer?.experience ?? 0}
+            sessionTiming={trainerTiming}
+            numSessions={trainer?.no_of_section ?? 0}
+            workoutType={workoutPlan}
+          />
         </View>
 
         <View style={styles.divider} />
 
-        {/* Workout Plan */}
-        <Text style={styles.sectionTitle}>Workout plan - GYM</Text>
-        <Text style={styles.workoutText}>Workout type - Single</Text>
+        {/* DETAILS */}
+        <Text style={styles.sectionTitle}>Workout plan - {workoutPlan}</Text>
+        <Text style={styles.workoutText}>Workout type - {workoutTypeText}</Text>
 
         <Text style={styles.notesTitle}>Notes</Text>
         <View style={styles.notesBox}>
-          <Text style={styles.notesText}>
-            Lorem ipsum dolor sit amet consectetur. Nec quis facilisis fusce eget
-            euismod.
-          </Text>
+          <Text style={styles.notesText}>{trainerNotes}</Text>
         </View>
 
         <View style={styles.divider} />
 
-        {/* Buttons */}
+        {/* ACTION BUTTONS */}
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={styles.primaryButton}
@@ -223,56 +285,47 @@ const ProfileSection = () => {
           </TouchableOpacity>
         </View>
 
-        {/* CHANGE TRAINER (FILTER FIRST) */}
-        <TouchableOpacity
-          style={styles.changeTrainerButton}
-          onPress={() => {
-            if (trainer?.plan_id) {
-              setShowFilterModal(true);
-            } else {
-              console.warn("Plan ID not available for this trainer!");
-            }
-          }}
-        >
-          <Icon name="person-outline" size={18} color="#fff" />
-          <Text style={styles.changeTrainerText}> Change trainer</Text>
-        </TouchableOpacity>
-      </ScrollView>
+        {/* CHANGE TRAINER */}
+       <TouchableOpacity
+  style={styles.changeTrainerButton}
+  onPress={handleChangeTrainer}
+>
+  <Icon name="person-outline" size={18} color="#fff" />
+  <Text style={styles.changeTrainerText}>Change trainer</Text>
+</TouchableOpacity>
 
-      {/* FILTER MODAL */}
-      <FilterModal
-        visible={showFilterModal}
-        onClose={() => setShowFilterModal(false)}
-        planId={trainer?.plan_id}
-      />
+      </ScrollView>
 
       {/* MODALS */}
       <CommonActionModal
         visible={showCancelModal}
         onClose={() => setShowCancelModal(false)}
-        onConfirm={() => setShowCancelModal(false)}
+        onConfirm={() => {
+          dispatch(cancelTrainingThunk());
+          setShowCancelModal(false);
+        }}
         iconName="close-circle-outline"
         iconColor="red"
         title="Cancel training"
         description="Refunds are available only before completing 7 sessions."
         cancelText="Cancel"
         confirmText="Confirm"
-        showDropdown={false}
-        showNote={false}
       />
 
       <CommonActionModal
         visible={showEmergencyModal}
         onClose={() => setShowEmergencyModal(false)}
-        onConfirm={() => setShowEmergencyModal(false)}
+        onConfirm={handleEmergencyCall}
         iconName="call-outline"
         iconColor="green"
         title="Confirm Emergency Call"
-        description="Are you sure you want to make an emergency call?"
+        description={
+          trainerPhone
+            ? `Call trainer at ${trainerPhone}?`
+            : "Trainer phone number not available"
+        }
         cancelText="Cancel"
         confirmText="Call now"
-        showDropdown={false}
-        showNote={false}
       />
 
       <CommonActionModal
@@ -285,14 +338,13 @@ const ProfileSection = () => {
         description="Choose your consultation type and leave a short note."
         cancelText="Cancel"
         confirmText={nutritionLoading ? "Sending..." : "Send"}
-        showDropdown={true}
-        showNote={true}
+        showDropdown
+        showNote
         selectedValue={consultType}
         onSelectValue={setConsultType}
         noteValue={consultNote}
         onChangeNote={setConsultNote}
       />
-
     </View>
   );
 };
