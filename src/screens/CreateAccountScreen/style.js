@@ -26,23 +26,29 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: 20,
-    paddingVertical: 60,
+    paddingVertical: 10,
   },
 
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    marginBottom: 20,
+    marginBottom: 10,
   },
 
   headerTitle: {
     flex: 1,
-    textAlign: "center",
-    fontSize: 20,
+    textAlign: "left",
+    fontSize: 24,
     fontFamily: "Segoe UI",
-    fontWeight: "600",
-    marginRight: 28,
+    fontWeight: "900",
+  },
+  headerText:{
+    textAlign: "left",
+        paddingHorizontal: 10,
+
+    
+
   },
 profilePlaceholder: {
   width: 80,
@@ -51,25 +57,23 @@ profilePlaceholder: {
   backgroundColor: '#eee',
   alignItems: 'center',
   justifyContent: 'center',
-},
+  backgroundColor:"#EDF4FF",
 
-placeholderText: {
-  fontSize: 10,
-  color: '#888',
-  marginTop: 4,
 },
 
   profileRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 15,
-    gap: 10,
+    justifyContent:"center",
+    marginBottom: 10,
+    marginTop:10,
   },
 
   profileImage: {
     width: 80,
     height: 80,
     borderRadius: 60,
+
   },
 
   inputUnderline: {

@@ -11,6 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import  NewHeader  from '../../components/NewHeader';
 import styles, { pickerSelectStyles } from './style';
 import { getCurrentLocation } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
@@ -270,7 +271,11 @@ export default function CreateAccountScreen({ navigation }) {
 
 
   return (
+    <>
+                  <NewHeader/>
+
     <SafeAreaView style={styles.container}>
+
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 120 }}
@@ -280,9 +285,11 @@ export default function CreateAccountScreen({ navigation }) {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={28} color="#000" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Create an account</Text>
+          <Text style={styles.headerTitle}>Sign up!</Text>
         </View>
-
+        
+          <Text style={styles.headerText}>Create account by filling the form below </Text>
+        
         {/* Profile Row */}
         <View style={styles.profileRow}>
           <TouchableOpacity onPress={handlePickProfileImage}>
@@ -293,20 +300,20 @@ export default function CreateAccountScreen({ navigation }) {
               />
             ) : (
               <View style={styles.profilePlaceholder}>
-                <Ionicons name="camera-outline" size={28} color="#888" />
-                <Text style={styles.placeholderText}>Add Photo</Text>
+                <Ionicons name="camera-outline" size={28} color="#7774F4" />
               </View>
             )}
           </TouchableOpacity>
 
-          <TextInput
+         
+        </View>
+ <TextInput
             placeholder="Enter Name"
             value={name}
             onChangeText={setName}
             placeholderTextColor="#888"
             style={styles.inputUnderline}
           />
-        </View>
 
         <View style={styles.twoColRow}>
           <View style={styles.iconInputRowSmall}>
@@ -594,5 +601,6 @@ export default function CreateAccountScreen({ navigation }) {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+    </>
   );
 }
