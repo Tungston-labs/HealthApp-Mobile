@@ -1,16 +1,7 @@
-import { TouchableOpacity, View } from "react-native";
+import React from "react";
+import { View } from "react-native";
 import styles from "./styles";
 
-const NewHeader = ({ navigation }) => {
-  return (
-    <View style={styles.headerContainer}>
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={styles.backBtn}
-      >
-      </TouchableOpacity>
-    </View>
-  );
-};
+const NewHeader = () => <View style={styles.headerContainer} />;
 
 export default NewHeader;

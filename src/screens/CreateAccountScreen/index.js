@@ -1,235 +1,282 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  SafeAreaView,
   Platform,
-  Alert,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import  NewHeader  from '../../components/NewHeader';
-import styles, { pickerSelectStyles } from './style';
-import { getCurrentLocation } from '../../utils/location';
-import { reverseGeocode } from '../../utils/reverseGeocode';
 import { useDispatch, useSelector } from 'react-redux';
-import { registerTrainerThunk } from '../../redux/slices/trainerRegistrationSlice';
 import { launchImageLibrary } from 'react-native-image-picker';
-import DOBPicker from './DOBPicker';
-import { uploadImageApi } from '../../services/trainerServices';
 import Toast from 'react-native-toast-message';
-import { sectionTimingRegex, validateSignup } from '../../utils/Validators';
-import RNPickerSelect from 'react-native-picker-select';
+
+import styles from './style';
+import NewHeader from '../../components/NewHeader';
+import CreateAccountStepOne from './CreateAccountStepOne';
+import CreateAccountStepTwo from './CreateAccountStepTwo';
+import CreateAccountStepThree from './CreateAccountStepThree';
+import { getCurrentLocation } from '../../utils/location';
+import { reverseGeocodeDetails } from '../../utils/reverseGeocode';
+import { registerTrainerThunk } from '../../redux/slices/trainerRegistrationSlice';
+import { uploadImageApi } from '../../services/trainerServices';
+import {
+  validateSignup,
+  validateTrainerStep1,
+  validateTrainerStep2,
+  validateTrainerStep3,
+} from '../../utils/Validators';
+
+const INITIAL_FORM = {
+  name: '',
+  email: '',
+  phno: '',
+  dob: '',
+  aadhaar: '',
+  location: '',
+  sectionTiming: '',
+  experience: '',
+  sessions: '',
+  fee: '',
+  password: '',
+  confirmPassword: '',
+  profileImage: null,
+  aadhaarImage: null,
+  genderValue: '',
+  address: '',
+  city: '',
+  pincode: '',
+  landmark: '',
+  coords: null,
+  expertiseValue: '',
+  images: [],
+  acceptTerms: false,
+};
+
+const expertiseMap = {
+  Cycling: 1,
+  Gym: 2,
+  Zumba: 3,
+  Swimming: 4,
+  Boxing: 5,
+};
 
 export default function CreateAccountScreen({ navigation }) {
-  const [images, setImages] = useState([]);
   const dispatch = useDispatch();
-  const [sectionOpen, setSectionOpen] = useState(false);
+  const { loading, error } = useSelector(state => state.trainerReg);
 
-  const { loading, error, success } = useSelector(state => state.trainerReg);
-  const [isUploading, setIsUploading] = useState(false); const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phno, setPhno] = useState('');
-  const [dob, setDob] = useState('');
-  const [aadhaar, setAadhaar] = useState('');
-  const [location, setLocation] = useState('');
-  const [sectionTiming, setSectionTiming] = useState('');
-  const [experience, setExperience] = useState('');
-  const [sessions, setSessions] = useState('');
-  const [fee, setFee] = useState('');
-  const [password, setPassword] = useState('');
-  const [profileImage, setProfileImage] = useState(null);
-  const [aadhaarImage, setAadhaarImage] = useState(null);
-  const [genderOpen, setGenderOpen] = useState(false);
-  const [genderValue, setGenderValue] = useState('');
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [pincode, setPincode] = useState("");
-  const [landmark, setLandmark] = useState("");
-  const [coords, setCoords] = useState(null);
-  const [expertiseOpen, setExpertiseOpen] = useState(false);
-  const [expertiseValue, setExpertiseValue] = useState('');
-  const expertiseMap = {
-    Cycling: 1,
-    Gym: 2,
-    Zumba: 3,
-    Swimming: 4,
-    Boxing: 5,
+  const [step, setStep] = useState(1);
+  const [form, setForm] = useState(INITIAL_FORM);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const isSubmitting = loading || isUploading;
+
+  const updateField = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }));
   };
-  const handlePickProfileImage = () => {
+
+  const showValidationError = message => {
+    Toast.show({
+      type: 'error',
+      text1: 'Validation Error',
+      text2: message,
+    });
+  };
+
+  const handlePickSingleImage = field => {
     launchImageLibrary(
       {
         mediaType: 'photo',
         selectionLimit: 1,
         quality: 0.8,
-      },
-      response => {
-        if (response.didCancel) return;
-
-        if (response.errorCode) {
-          alert('Failed to pick image');
-          return;
-        }
-
-        if (response.assets?.length) {
-          setProfileImage(response.assets[0]);
-        }
-      },
-    );
-  };
-  const handlePickAadhaarImage = () => {
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-        selectionLimit: 1,
-        quality: 0.8,
-      },
-      response => {
-        if (response.didCancel || response.errorCode) return;
-        if (response.assets?.length) {
-          setAadhaarImage(response.assets[0]);
-        }
-      },
-    );
-  };
-  useEffect(() => {
-    const testConnection = async () => {
-      try {
-        const response = await fetch('http://178.248.112.16:9001/');
-        console.log(" Connection Test Success:", response.status);
-      } catch (error) {
-        console.log(" Connection Test Failed. This is a Network Config issue:", error.message);
-      }
-    };
-    testConnection();
-  }, []);
-  const handleUseLocation = async () => {
-    try {
-      const locationData = await getCurrentLocation();
-
-      // Round to 6 decimal places immediately
-      const roundedCoords = {
-        latitude: parseFloat(locationData.latitude.toFixed(6)),
-        longitude: parseFloat(locationData.longitude.toFixed(6)),
-      };
-
-      setCoords(roundedCoords); // Save the cleaned coordinates
-
-      const fullAddress = await reverseGeocode(
-        roundedCoords.latitude,
-        roundedCoords.longitude
-      );
-
-      // ... rest of your address logic
-      setAddress(fullAddress);
-      alert("Location fetched successfully");
-    } catch (err) {
-      console.log("Location error:", err);
-    }
-  };
-
-  const handlePickImage = () => {
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-        selectionLimit: 0,
-        quality: 0.8,
-        forceJPG: true,
       },
       response => {
         if (response.didCancel) {
           return;
         }
 
-        if (response.errorCode) {
-          alert('Image pick error');
+        if (response.errorCode || !response.assets?.length) {
+          showValidationError('Unable to pick image right now');
           return;
         }
 
-        if (response.assets?.length) {
-          setImages(prev => [...prev, ...response.assets]);
-        }
+        updateField(field, response.assets[0]);
       },
     );
   };
-  const handleRemoveImage = index => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-  };
-  const handleSubmit = async () => {
-    const validationData = {
-      name, email, phno, dob, genderValue, expertiseValue,
-      aadhaar, password, location, landmark, address, city, pincode,
-      profileImage, aadhaarImage, images, sectionTiming
-    };
 
-    const check = validateSignup(validationData);
-    if (!check.ok) {
+  const handlePickCertificates = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        selectionLimit: 0,
+        quality: 0.8,
+      },
+      response => {
+        if (response.didCancel) {
+          return;
+        }
+
+        if (response.errorCode || !response.assets?.length) {
+          showValidationError('Unable to pick certificate images');
+          return;
+        }
+
+        setForm(prev => ({
+          ...prev,
+          images: [...prev.images, ...response.assets],
+        }));
+      },
+    );
+  };
+
+  const handleUseLocation = async () => {
+    try {
+      const locationData = await getCurrentLocation();
+      const roundedCoords = {
+        latitude: parseFloat(locationData.latitude.toFixed(6)),
+        longitude: parseFloat(locationData.longitude.toFixed(6)),
+      };
+
+      const locationDetails = await reverseGeocodeDetails(
+        roundedCoords.latitude,
+        roundedCoords.longitude,
+      );
+
+      const fallbackAddress =
+        locationDetails.formatted ||
+        [
+          locationDetails.landmark,
+          locationDetails.city,
+          locationDetails.pincode,
+        ]
+          .filter(Boolean)
+          .join(', ');
+
+      setForm(prev => ({
+        ...prev,
+        coords: roundedCoords,
+        location: locationDetails.formatted,
+        address: locationDetails.addressLine || fallbackAddress,
+        city: locationDetails.city || prev.city,
+        pincode: locationDetails.pincode || prev.pincode,
+        landmark: locationDetails.landmark || prev.landmark,
+      }));
+
       Toast.show({
-        type: 'error',
-        text1: 'Validation Error',
-        text2: check.msg,
+        type: 'success',
+        text1: 'Location fetched',
+        text2: 'Address details have been added to the form',
       });
+    } catch (locationError) {
+      console.log('Location error:', locationError);
+      showValidationError('Unable to fetch your location right now');
+    }
+  };
+
+  const handleNext = () => {
+    const validationResult =
+      step === 1 ? validateTrainerStep1(form) : validateTrainerStep2(form);
+
+    if (!validationResult.ok) {
+      showValidationError(validationResult.msg);
+      return;
+    }
+
+    setStep(prev => prev + 1);
+  };
+
+  const handleBack = () => {
+    if (step === 1) {
+      navigation.goBack();
+      return;
+    }
+
+    setStep(prev => prev - 1);
+  };
+
+  const handleSubmit = async () => {
+    const stepValidation = validateTrainerStep3(form);
+    if (!stepValidation.ok) {
+      showValidationError(stepValidation.msg);
+      return;
+    }
+
+    const fullValidation = validateSignup(form);
+    if (!fullValidation.ok) {
+      showValidationError(fullValidation.msg);
       return;
     }
 
     try {
       setIsUploading(true);
 
-      const adarImageUrl = await uploadImageApi(aadhaarImage);
-      let certUrls = [];
-      for (const img of images) {
-        const url = await uploadImageApi(img);
-        if (url) certUrls.push(url);
+      const adarImageUrl = await uploadImageApi(form.aadhaarImage);
+      const certUrls = [];
+
+      for (const img of form.images) {
+        const imageUrl = await uploadImageApi(img);
+        if (imageUrl) {
+          certUrls.push(imageUrl);
+        }
       }
 
       const formData = new FormData();
-      const finalLocationString = location?.trim() || [landmark, address, city, pincode].filter(Boolean).join(", ");
+      const finalLocationString =
+        [form.landmark, form.address, form.city, form.pincode]
+          .filter(Boolean)
+          .join(', ') || (form.location || '').trim();
 
-      formData.append("name", name);
-      formData.append("email", email.toLowerCase().trim());
-      formData.append("phno", phno);
-      formData.append("dob", dob);
-      formData.append("gender", genderValue.toLowerCase());
-      formData.append("password", password);
+      formData.append('name', form.name);
+      formData.append('email', form.email.toLowerCase().trim());
+      formData.append('phno', form.phno);
+      formData.append('dob', form.dob);
+      formData.append('gender', form.genderValue.toLowerCase());
+      formData.append('password', form.password);
 
-      formData.append("location", finalLocationString);
-      formData.append("address", address || "");
-      formData.append("city", city || "");
-      formData.append("pincode", pincode || "");
-      formData.append("landmark", landmark || "");
+      formData.append('location', finalLocationString);
+      formData.append('address', form.address || '');
+      formData.append('city', form.city || '');
+      formData.append('pincode', form.pincode || '');
+      formData.append('landmark', form.landmark || '');
 
-      formData.append("adar_number", aadhaar);
-      formData.append("section_timing", Number(sectionTiming));
+      formData.append('adar_number', form.aadhaar);
+      formData.append('section_timing', Number(form.sectionTiming));
 
-      if (coords?.latitude && coords?.longitude) {
-        formData.append("latitude", Number(coords.latitude).toFixed(6));
-        formData.append("longitude", Number(coords.longitude).toFixed(6));
+      if (form.coords?.latitude && form.coords?.longitude) {
+        formData.append('latitude', Number(form.coords.latitude).toFixed(6));
+        formData.append('longitude', Number(form.coords.longitude).toFixed(6));
       }
 
-      const planId = expertiseMap[expertiseValue];
-      if (planId) formData.append("training_field", Number(planId));
-      formData.append("experience", Number(experience) || 0);
-      formData.append("no_of_section", Number(sessions) || 0);
-      formData.append("expecting_salary", Number(fee) || 0);
+      const planId = expertiseMap[form.expertiseValue];
+      if (planId) {
+        formData.append('training_field', Number(planId));
+      }
 
-      if (profileImage?.uri) {
-        const fixedUri = Platform.OS === "android"
-          ? (profileImage.uri.startsWith("file://") ? profileImage.uri : `file://${profileImage.uri}`)
-          : profileImage.uri;
+      formData.append('experience', Number(form.experience) || 0);
+      formData.append('no_of_section', Number(form.sessions) || 0);
+      formData.append('expecting_salary', Number(form.fee) || 0);
 
-        formData.append("profile_pic", {
+      if (form.profileImage?.uri) {
+        const fixedUri =
+          Platform.OS === 'android' || form.profileImage.uri.startsWith('file://')
+            ? form.profileImage.uri
+            : `file://${form.profileImage.uri}`;
+
+        formData.append('profile_pic', {
           uri: fixedUri,
-          name: profileImage.fileName || `profile_${Date.now()}.jpg`,
-          type: profileImage.type || "image/jpeg",
+          name: form.profileImage.fileName || `profile_${Date.now()}.jpg`,
+          type: form.profileImage.type || 'image/jpeg',
         });
       }
 
-      if (adarImageUrl) formData.append("adar_image", adarImageUrl);
+      if (adarImageUrl) {
+        formData.append('adar_image', adarImageUrl);
+      }
+
       certUrls.forEach(url => {
-        formData.append("certificates[]", url);
+        formData.append('certificates[]', url);
       });
 
       await dispatch(registerTrainerThunk(formData)).unwrap();
@@ -237,23 +284,25 @@ export default function CreateAccountScreen({ navigation }) {
       Toast.show({
         type: 'success',
         text1: 'Success',
-        text2: 'Trainer Registered Successfully!',
+        text2: 'Trainer registered successfully',
       });
 
-      navigation.reset({ index: 0, routes: [{ name: "ThankYouScreen" }] });
+      navigation.reset({ index: 0, routes: [{ name: 'ThankYouScreen' }] });
+    } catch (submitError) {
+      console.log('REGISTRATION ERROR:', submitError);
 
-    } catch (err) {
-      console.log("REGISTRATION ERROR:", err);
-      let errorMessage = "Something went wrong";
+      let errorMessage = 'Something went wrong';
 
-      if (typeof err === 'string') {
-        errorMessage = err;
-      } else if (err?.message && typeof err.message === 'string') {
-        errorMessage = err.message;
-      } else if (typeof err === 'object') {
-        const values = Object.values(err);
+      if (typeof submitError === 'string') {
+        errorMessage = submitError;
+      } else if (submitError?.message && typeof submitError.message === 'string') {
+        errorMessage = submitError.message;
+      } else if (typeof submitError === 'object' && submitError !== null) {
+        const values = Object.values(submitError);
         if (values.length > 0) {
-          errorMessage = Array.isArray(values[0]) ? values[0][0] : JSON.stringify(values[0]);
+          errorMessage = Array.isArray(values[0])
+            ? values[0][0]
+            : JSON.stringify(values[0]);
         }
       }
 
@@ -263,344 +312,89 @@ export default function CreateAccountScreen({ navigation }) {
         text2: errorMessage,
         visibilityTime: 5000,
       });
-
     } finally {
       setIsUploading(false);
     }
   };
 
+  const renderStep = () => {
+    if (step === 1) {
+      return (
+        <CreateAccountStepOne
+          form={form}
+          onBack={handleBack}
+          onChangeField={updateField}
+          onPickProfileImage={() => handlePickSingleImage('profileImage')}
+          onPickAadhaarImage={() => handlePickSingleImage('aadhaarImage')}
+        />
+      );
+    }
+
+    if (step === 2) {
+      return (
+        <CreateAccountStepTwo
+          form={form}
+          onChangeField={updateField}
+          onUseLocation={handleUseLocation}
+        />
+      );
+    }
+
+    return (
+      <CreateAccountStepThree
+        form={form}
+        onChangeField={updateField}
+        onPickCertificates={handlePickCertificates}
+      />
+    );
+  };
 
   return (
-    <>
-                  <NewHeader/>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.screenContainer}>
+        <NewHeader />
 
-    <SafeAreaView style={styles.container}>
-
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: 120 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={28} color="#000" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Sign up!</Text>
-        </View>
-        
-          <Text style={styles.headerText}>Create account by filling the form below </Text>
-        
-        {/* Profile Row */}
-        <View style={styles.profileRow}>
-          <TouchableOpacity onPress={handlePickProfileImage}>
-            {profileImage ? (
-              <Image
-                source={{ uri: profileImage.uri }}
-                style={styles.profileImage}
-              />
-            ) : (
-              <View style={styles.profilePlaceholder}>
-                <Ionicons name="camera-outline" size={28} color="#7774F4" />
-              </View>
-            )}
-          </TouchableOpacity>
-
-         
-        </View>
- <TextInput
-            placeholder="Enter Name"
-            value={name}
-            onChangeText={setName}
-            placeholderTextColor="#888"
-            style={styles.inputUnderline}
-          />
-
-        <View style={styles.twoColRow}>
-          <View style={styles.iconInputRowSmall}>
-            <Ionicons name="mail-outline" size={20} color="#666" />
-            <TextInput
-              placeholder="Enter Email"
-              placeholderTextColor="#888"
-              value={email}
-              onChangeText={setEmail}
-              style={styles.inputFlex}
-            />
-          </View>
-
-          <View style={styles.iconInputRowSmall}>
-            <Ionicons name="call-outline" size={20} color="#666" />
-            <TextInput
-              placeholder="Ph number"
-              placeholderTextColor="#888"
-              style={styles.inputFlex}
-              value={phno}
-              onChangeText={setPhno}
-            />
-          </View>
-        </View>
-
-        <View>
-          <TouchableOpacity
-            style={styles.dropdownRow}
-            onPress={() => setGenderOpen(!genderOpen)}
+        <View style={styles.formCard}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
           >
-            <Text style={styles.dropdownText}>{genderValue || 'Gender'}</Text>
-            <Ionicons name="chevron-down" size={20} color="#444" />
-          </TouchableOpacity>
+            {renderStep()}
+          </ScrollView>
 
-          {genderOpen && (
-            <View style={styles.dropdownList}>
-              {['Male', 'Female', 'Other'].map(g => (
-                <TouchableOpacity
-                  key={g}
-                  onPress={() => {
-                    setGenderValue(g);
-                    setGenderOpen(false);
-                  }}
-                  style={styles.dropdownItem}
-                >
-                  <Text style={styles.dropdownItemText}>{g}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-        </View>
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        <View>
-          <TouchableOpacity
-            style={styles.dropdownRow}
-            onPress={() => setExpertiseOpen(!expertiseOpen)}
-          >
-            <Text style={styles.dropdownText}>
-              {expertiseValue || 'Expertise'}
-            </Text>
-            <Ionicons name="chevron-down" size={20} color="#444" />
-          </TouchableOpacity>
-
-          {expertiseOpen && (
-            <View style={styles.dropdownList}>
-              {['Cycling', 'Gym', 'Zumba', 'Swimming', 'Boxing'].map(ex => (
-                <TouchableOpacity
-                  key={ex}
-                  onPress={() => {
-                    setExpertiseValue(ex);
-                    setExpertiseOpen(false);
-                  }}
-                  style={styles.dropdownItem}
-                >
-                  <Text style={styles.dropdownItemText}>{ex}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-        </View>
-
-        <View style={styles.iconInputRow}>
-          <DOBPicker value={dob} onChange={setDob} />
-        </View>
-
-        <View style={styles.iconInputRow}>
-          <Ionicons name="document-outline" size={20} color="#666" />
-
-          <TextInput
-            placeholder="Aadhaar Number"
-            placeholderTextColor="#888"
-            style={styles.inputFlex}
-            value={aadhaar}
-            onChangeText={setAadhaar}
-          />
-
-          <TouchableOpacity
-            style={styles.uploadButton}
-            onPress={handlePickAadhaarImage}
-          >
-            <Ionicons name="cloud-upload-outline" size={18} color="#fff" />
-            <Text style={styles.uploadBtnText}>Upload</Text>
-          </TouchableOpacity>
-        </View>
-
-        {aadhaarImage && (
-          <View style={{ marginTop: 10 }}>
-            <View style={styles.uploadImageCard}>
-              <TouchableOpacity
-                style={styles.deleteBadge}
-                onPress={() => setAadhaarImage(null)}
-              >
-                <Ionicons name="close" size={16} color="#fff" />
+          <View style={[styles.footerActions, step === 1 && styles.footerActionsSingle]}>
+            {step > 1 ? (
+              <TouchableOpacity style={styles.secondaryAction} onPress={handleBack}>
+                <View style={styles.buttonContent}>
+                  <Ionicons name="chevron-back" size={18} color="#181818" />
+                  <Text style={styles.secondaryActionText}>Back</Text>
+                </View>
               </TouchableOpacity>
+            ) : null}
 
-              <Image
-                source={{ uri: aadhaarImage.uri }}
-                style={styles.uploadPreviewImg}
-              />
-            </View>
-          </View>
-        )}
-
-
-        <TouchableOpacity
-          style={styles.useLocationBtn}
-          onPress={handleUseLocation}
-        >
-          <Text style={styles.useLocationText}>Use my location</Text>
-        </TouchableOpacity>
-
-        <View style={styles.twoColRow}>
-          <TextInput
-            placeholder="Enter pincode"
-            placeholderTextColor="#888"
-            style={styles.inputUnderline}
-            value={pincode}
-            onChangeText={setPincode}
-            keyboardType="numeric"
-          />
-
-          <TextInput
-            placeholder="City/Town"
-            placeholderTextColor="#888"
-            style={styles.inputUnderline}
-            value={city}
-            onChangeText={setCity}
-          />
-        </View>
-
-
-        <TextInput
-          placeholder="Landmark"
-          placeholderTextColor="#888"
-          style={styles.inputUnderline}
-          value={landmark}
-          onChangeText={setLandmark}
-        />
-        <TextInput
-          placeholder="Address"
-          placeholderTextColor="#888"
-          style={styles.inputUnderline}
-          value={address}
-          onChangeText={setAddress}
-          multiline
-        />
-<View style={styles.twoColRow}>
-
-  {/* SECTION TIMING */}
-  <View style={{ flex: 1, position: "relative" }}>
-    <TouchableOpacity
-      style={styles.dropdownRow}
-      onPress={() => setSectionOpen(!sectionOpen)}
-    >
-      <Text
-        style={[
-          styles.dropdownText,
-          sectionTiming && { color: "#000" }
-        ]}
-      >
-        {sectionTiming ? `${sectionTiming} min` : "Section timing"}
-      </Text>
-    </TouchableOpacity>
-
-    {sectionOpen && (
-      <View style={styles.dropdownList}>
-        {["15", "20", "30", "45", "60"].map(t => (
-          <TouchableOpacity
-            key={t}
-            style={styles.dropdownItem}
-            onPress={() => {
-              setSectionTiming(t);
-              setSectionOpen(false);
-            }}
-          >
-            <Text style={styles.dropdownItemText}>{t} min</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    )}
-  </View>
-
-  {/* EXPERIENCE (WILL NOT MOVE) */}
-  <TextInput
-    placeholder="Experience (yr)"
-    value={experience}
-    onChangeText={setExperience}
-    keyboardType="numeric"
-    style={[styles.inputUnderline, { flex: 1 }]}
-  />
-
-</View>
-
-
-
-        <View style={styles.twoColRow}>
-          <TextInput
-            placeholder="No of session"
-            value={sessions}
-            onChangeText={setSessions}
-            style={styles.inputUnderline}
-          />
-          <TextInput
-            placeholder="Fee / Session"
-            value={fee}
-            onChangeText={setFee}
-            style={styles.inputUnderline}
-          />
-        </View>
-
-        <TextInput
-          placeholder="Enter password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          style={styles.inputUnderline}
-        />
-
-        <View style={styles.uploadContainer}>
-          <Text style={styles.uploadTitle}>Upload Certificates </Text>
-
-          <View style={styles.uploadBox}>
             <TouchableOpacity
-              style={styles.uploadButton}
-              onPress={handlePickImage}
+              style={[
+                styles.primaryAction,
+                step === 3 && styles.submitAction,
+                isSubmitting && styles.disabledAction,
+              ]}
+              onPress={step === 3 ? handleSubmit : handleNext}
+              disabled={isSubmitting}
             >
-              <Ionicons name="cloud-upload-outline" size={18} color="#fff" />
-              <Text style={styles.uploadBtnText}>Upload</Text>
-            </TouchableOpacity>
-            <Text style={styles.uploadHelper}>Click to choose images</Text>
-          </View>
-
-          <View style={styles.uploadImagesRow}>
-            {images.map((item, i) => (
-              <View key={i} style={styles.uploadImageCard}>
-                <TouchableOpacity
-                  style={styles.deleteBadge}
-                  onPress={() => handleRemoveImage(i)}
-                >
-                  <Ionicons name="close" size={16} color="#fff" />
-                </TouchableOpacity>
-
-                <Image
-                  source={{ uri: item.uri }}
-                  style={styles.uploadPreviewImg}
-                />
+              <View style={styles.buttonContent}>
+                <Text style={styles.primaryActionText}>
+                  {step === 3 ? (isSubmitting ? 'Submitting...' : 'Submit') : 'Next'}
+                </Text>
+                {step !== 3 ? (
+                  <Ionicons name="chevron-forward" size={18} color="#FFFFFF" />
+                ) : null}
               </View>
-            ))}
+            </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
-      {error && (
-        <Text style={{ color: 'red', textAlign: 'center' }}>{error}</Text>
-      )}
-
-      <View style={styles.footerBtnWrapper}>
-        <TouchableOpacity
-          style={styles.continueBtn}
-          disabled={loading}
-          onPress={handleSubmit}
-        >
-          <Text style={styles.continueText}>
-            {loading ? 'Submitting...' : 'Save & Continue'}
-          </Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
-    </>
   );
 }
