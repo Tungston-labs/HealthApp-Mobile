@@ -90,21 +90,6 @@ const PersonalDetailsCard = ({
             <Text style={styles.value}>{data?.health_issues}</Text>
           </View>
 
-          {/* <View style={styles.row}>
-            <View style={styles.half}>
-              <Text style={styles.label}>Pin code</Text>
-              <Text style={styles.value}>need to change</Text>
-            </View>
-            <View style={styles.half}>
-              <Text style={styles.label}>City / Town</Text>
-              <Text style={styles.value}>need to change</Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.section}>
-            <Text style={styles.label}>Landmark</Text>
-            <Text style={styles.value}>need to change</Text>
-          </View> */}
           <View style={styles.divider} />
           <View style={styles.section}>
             <Text style={styles.label}>Address</Text>

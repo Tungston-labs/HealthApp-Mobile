@@ -27,7 +27,6 @@ const TrainerDetailScreen = () => {
   const { trainerId } = route.params;
   const [selectedCert, setSelectedCert] = useState(null);
 
-
   const { loading, data, error } = useSelector(
     (state) => state.trainerDetail
   );
@@ -75,7 +74,6 @@ const TrainerDetailScreen = () => {
           <Icon name="close" size={28} color="#000" />
         </TouchableOpacity>
 
-        {/* Header */}
         <View style={styles.headerSection}>
           <Image
             source={
@@ -96,7 +94,6 @@ const TrainerDetailScreen = () => {
           />
         </View>
 
-        {/* Certificates */}
         <View style={styles.certContainer}>
           <TouchableOpacity
             style={styles.certHeader}
@@ -150,8 +147,6 @@ const TrainerDetailScreen = () => {
 
         </View>
 
-
-        {/* Rating Section */}
         <Text style={styles.sectionTitle}>Rating and feedback</Text>
         <View style={styles.divider} />
 
@@ -181,7 +176,6 @@ const TrainerDetailScreen = () => {
           </View>
         </View>
 
-        {/* Reviews */}
         {data.reviews?.length > 0 ? (
           data.reviews.map((review, index) => (
             <ReviewCard
@@ -212,7 +206,6 @@ const TrainerDetailScreen = () => {
           visible={showBookingModal}
           onClose={() => setShowBookingModal(false)}
           trainerId={trainerId}
-        // Pass any data needed like plan/pricing
         />
       </View>
     </View>

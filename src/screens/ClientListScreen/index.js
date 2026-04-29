@@ -14,7 +14,7 @@ const ClientListScreen = () => {
   const navigation = useNavigation();
 
   const { trainers, loading } = useSelector(state => state.clientTrainer);
-console.log({trainers})
+  console.log({ trainers })
   useEffect(() => {
     dispatch(fetchClientTrainersThunk());
   }, [dispatch]);
@@ -48,7 +48,7 @@ console.log({trainers})
         data={trainers}
         keyExtractor={item => String(item.id)}
         renderItem={({ item }) => (
-          
+
           <TrainerCard
             trainer={item}
             showBookButton={false}
@@ -56,7 +56,7 @@ console.log({trainers})
             showRating={false}
             showViewProfileButton={false}
             onPressCard={() => {
-              console.log({item})
+              console.log({ item })
               console.log("CLIENT LIST: navigating to ProfileSection with trainer_id", item.trainer_id);
               // Use push to ensure navigation happens in current stack
               navigation.push("ProfileSection", { trainerId: item.trainer_id });

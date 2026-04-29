@@ -4,8 +4,9 @@ const { width } = Dimensions.get("window");
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    paddingHorizontal: 25,
+    backgroundColor: "#faf8f8",
+    paddingHorizontal: 30,
+    paddingVertical: 40,
   },
 
   logo: {
@@ -135,7 +136,7 @@ export default StyleSheet.create({
   backLogin: {
     textAlign: "center",
     fontSize: 15,
-    color: "#7774F4",
+    color: "",
     fontWeight: "600",
   },
   continueBtn: {
@@ -144,7 +145,7 @@ export default StyleSheet.create({
     paddingHorizontal: 22,
     borderRadius: 30,
     marginTop: 25,
-    marginBottom: 40,
+    marginBottom: 25,
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
@@ -169,9 +170,8 @@ export default StyleSheet.create({
 
   continueFixed: {
     position: "absolute",
-    bottom: 25,
+    bottom: -10,
     right: 25,
   },
-
 
 });

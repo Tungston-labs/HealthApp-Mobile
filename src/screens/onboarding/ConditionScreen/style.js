@@ -5,8 +5,8 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
-    paddingHorizontal: 20,
+    backgroundColor: "#ffffff",
+    paddingHorizontal: 10,
     marginTop:20,
   },
 
@@ -17,7 +17,7 @@ export default StyleSheet.create({
   },
 
   card: {
-    width: "100%",
+    width: "93%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -25,13 +25,13 @@ export default StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#C0C0C0",
-    backgroundColor: "#FFFFFF",
+    borderColor: "#d6d4d4",
+    backgroundColor: "#ffffff",
     marginBottom: 15,
   },
 
   cardActive: {
-    borderColor: "#7774F4", // Active border color
+    borderColor: "#7774F4", 
   },
 
   label: {
@@ -54,6 +54,7 @@ export default StyleSheet.create({
     width: 15,
     height: 15,
     borderRadius: 15 / 2,
-    backgroundColor: "#7774F4", // Selected color
+    backgroundColor: "#7774F4", 
   },
+
 });

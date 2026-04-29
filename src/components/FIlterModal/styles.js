@@ -9,15 +9,15 @@ export default StyleSheet.create({
   },
 
   container: {
-    backgroundColor: "#fff",
+    backgroundColor: "#fcf9f9",
     borderRadius: 25,
-    padding: 10,
+    padding: 20,
   },
 
   closeBtn: {
     position: "absolute",
-    top: 2,
-    right: 2,
+    top: 14,
+    right: 16,
     padding: 4,
     borderRadius: 25 / 2,
   },

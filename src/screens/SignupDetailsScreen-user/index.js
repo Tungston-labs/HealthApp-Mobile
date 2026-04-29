@@ -18,7 +18,7 @@ import { reverseGeocode } from '../../utils/reverseGeocode';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { Image } from 'react-native';
 import { validateSignup, validateUserStep2 } from "../../utils/Validators";
-import {showError} from "../../utils/toast";
+import { showError } from "../../utils/toast";
 import { validateUserStep1 } from "../../utils/Validators";
 
 export default function SignupDetailsScreenUser() {
@@ -35,17 +35,17 @@ export default function SignupDetailsScreenUser() {
     dispatch(updateRegistration({ [field]: value }));
   };
 
-const handleContinue = () => {
-  
-  const result = validateUserStep1(registration);
+  const handleContinue = () => {
 
-  if (!result.ok) {
-    showError(result.msg);
-    return;
-  }
+    const result = validateUserStep1(registration);
 
-  navigation.navigate('MainWizardScreen');
-};
+    if (!result.ok) {
+      showError(result.msg);
+      return;
+    }
+
+    navigation.navigate('MainWizardScreen');
+  };
 
   const handlePickProfileImage = async () => {
     launchImageLibrary(
@@ -69,36 +69,35 @@ const handleContinue = () => {
   };
 
 
-const handleUseLocation = async () => {
-  try {
-    const coords = await getCurrentLocation();
-    const { latitude, longitude } = coords;
+  const handleUseLocation = async () => {
+    try {
+      const coords = await getCurrentLocation();
+      const { latitude, longitude } = coords;
 
-    const address = await reverseGeocode(latitude, longitude);
+      const address = await reverseGeocode(latitude, longitude);
 
-    setLocation(address);
+      setLocation(address);
 
-    dispatch(
-      updateRegistration({
-        address: address,
-        latitude: latitude,
-        longitude: longitude,
-      })
-    );
+      dispatch(
+        updateRegistration({
+          address: address,
+          latitude: latitude,
+          longitude: longitude,
+        })
+      );
 
-    Alert.alert(
-      'Success',
-      `📍 Location fetched\nLat: ${latitude}\nLng: ${longitude}`
-    );
+      Alert.alert(
+        'Success',
+        `📍 Location fetched\nLat: ${latitude}\nLng: ${longitude}`
+      );
 
-    console.log('Latitude:', latitude);
-    console.log('Longitude:', longitude);
-  } catch (err) {
-    console.log('Location error:', err);
-    Alert.alert('Error', 'Unable to fetch location. Please try again.');
-  }
-};
-
+      console.log('Latitude:', latitude);
+      console.log('Longitude:', longitude);
+    } catch (err) {
+      console.log('Location error:', err);
+      Alert.alert('Error', 'Unable to fetch location. Please try again.');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -114,20 +113,18 @@ const handleUseLocation = async () => {
         <Text style={styles.subtitle}>Enter basic details</Text>
 
         <View style={styles.profileRow}>
-      <TouchableOpacity onPress={handlePickProfileImage}>
-  {registration.profile_pic?.uri ? (
-    <Image
-      source={{ uri: registration.profile_pic.uri }}
-      style={styles.profileImage}
-    />
-  ) : (
-    <View style={styles.profilePlaceholder}>
-      <Ionicons name="camera-outline" size={26} color="#777" />
-    </View>
-  )}
-</TouchableOpacity>
-
-
+          <TouchableOpacity onPress={handlePickProfileImage}>
+            {registration.profile_pic?.uri ? (
+              <Image
+                source={{ uri: registration.profile_pic.uri }}
+                style={styles.profileImage}
+              />
+            ) : (
+              <View style={styles.profilePlaceholder}>
+                <Ionicons name="camera-outline" size={26} color="#777" />
+              </View>
+            )}
+          </TouchableOpacity>
 
           <View style={styles.nameInputWrapper}>
             <Ionicons name="person-outline" size={18} color="#777" />
@@ -140,8 +137,6 @@ const handleUseLocation = async () => {
             />
           </View>
         </View>
-
-
 
         <View style={styles.inputRow}>
           <Ionicons name="mail-outline" size={18} color="#777" />

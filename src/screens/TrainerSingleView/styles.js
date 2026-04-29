@@ -6,7 +6,7 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: "#ffffff",
     padding: 16,
-    marginTop:32,
+    marginTop: 32,
   },
 
   closeBtn: {
@@ -21,7 +21,6 @@ export default StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-
 
   profileImage: {
     width: 90,
@@ -42,16 +41,15 @@ export default StyleSheet.create({
   },
 
   row: {
-   flexDirection: "row",
-  alignItems: "flex-start",
-  marginTop: 10,
-  gap: 20, 
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginTop: 10,
+    gap: 20,
   },
   rowSingle: {
-  flexDirection: "row",
-  marginTop: 10,
-},
-
+    flexDirection: "row",
+    marginTop: 10,
+  },
 
   label: {
     fontSize: 12,
@@ -83,86 +81,79 @@ export default StyleSheet.create({
     fontFamily: "SegoeUI",
   },
 
-sectionTitle: {
-  marginTop: 30,
-  fontSize: 18,
-  fontWeight: "500",
-  fontFamily: "SegoeUI",
-  textAlign: "center",       
-  width: "100%",              
-},
-certContainer: {
-  backgroundColor: "#E0E0E0",
-  borderRadius: 14,
-  padding: 10,
-  marginTop: 20,
-},
+  sectionTitle: {
+    marginTop: 30,
+    fontSize: 18,
+    fontWeight: "500",
+    fontFamily: "SegoeUI",
+    textAlign: "center",
+    width: "100%",
+  },
+  certContainer: {
+    backgroundColor: "#ffffff",
+    borderRadius: 14,
+    padding: 10,
+    marginTop: 20,
+  },
+  certHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+  },
 
-certHeader: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  paddingHorizontal: 6,
-  paddingVertical: 4,
-},
+  certTitle: {
+    fontSize: 15,
+    fontFamily: "SegoeUI-Semibold",
+    color: "#000",
+  },
 
-certTitle: {
-  fontSize: 15,
-  fontFamily: "SegoeUI-Semibold",
-  color: "#000",
-},
-
-certList: {
-  paddingTop: 10,
-},
-
-certCard: {
-  backgroundColor: "#D9D9D9",
-  borderRadius: 10,
-  marginRight: 10,
-  padding: 6,
-  elevation: 3,
-  shadowColor: "#000",
-  shadowOpacity: 0.2,
-  shadowRadius: 4,
-  shadowOffset: { width: 0, height: 2 },
-},
-
-certImage: {
-  width: 160,
-  height: 110,
-  borderRadius: 6,
-  resizeMode: "cover",
-},
-certModal: {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: "rgba(0,0,0,0.9)",
-  justifyContent: "center",
-  alignItems: "center",
-  zIndex: 999,
-},
-
-certFullImage: {
-  width: "90%",
-  height: "80%",
-},
-
-certClose: {
-  position: "absolute",
-  top: 40,
-  right: 20,
-  zIndex: 10,
-},
-
-
+  certList: {
+    paddingTop: 10,
+  },
+  certCard: {
+    backgroundColor: "#D9D9D9",
+    borderRadius: 10,
+    marginRight: 10,
+    padding: 6,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  certImage: {
+    width: 160,
+    height: 110,
+    borderRadius: 6,
+    resizeMode: "cover",
+  },
+  certModal: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+  certFullImage: {
+    width: "90%",
+    height: "80%",
+  },
+  certClose: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 10,
+  },
   divider: {
     marginTop: 8,
     height: 1,
-    backgroundColor: "#ccc",
+    backgroundColor: "#f8f0f0",
   },
 
   ratingContainer: {
@@ -182,20 +173,20 @@ certClose: {
     width: "55%",
   },
 
-footer: {
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  right: 0,
-  padding: 16,
-  backgroundColor: "#ffffff",
-  alignItems: "flex-end",
-  elevation: 10,
-  shadowColor: "#000",
-  shadowOpacity: 0.1,
-  shadowRadius: 8,
-  shadowOffset: { width: 0, height: -2 },
-},
+  footer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    backgroundColor: "#ffffff",
+    alignItems: "flex-end",
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: -2 },
+  },
 
   bookBtn: {
     backgroundColor: "#7774F4",
@@ -203,7 +194,7 @@ footer: {
     borderRadius: 25,
     alignItems: "center",
     borderWidth: 1,
-    marginBottom:32,
+    marginBottom: 32,
     width: 140,
     borderColor: "#5B59D6",
   },

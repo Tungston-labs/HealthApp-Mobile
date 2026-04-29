@@ -473,52 +473,52 @@ export default function CreateAccountScreen({ navigation }) {
           onChangeText={setAddress}
           multiline
         />
-<View style={styles.twoColRow}>
+        <View style={styles.twoColRow}>
 
-  {/* SECTION TIMING */}
-  <View style={{ flex: 1, position: "relative" }}>
-    <TouchableOpacity
-      style={styles.dropdownRow}
-      onPress={() => setSectionOpen(!sectionOpen)}
-    >
-      <Text
-        style={[
-          styles.dropdownText,
-          sectionTiming && { color: "#000" }
-        ]}
-      >
-        {sectionTiming ? `${sectionTiming} min` : "Section timing"}
-      </Text>
-    </TouchableOpacity>
+          {/* SECTION TIMING */}
+          <View style={{ flex: 1, position: "relative" }}>
+            <TouchableOpacity
+              style={styles.dropdownRow}
+              onPress={() => setSectionOpen(!sectionOpen)}
+            >
+              <Text
+                style={[
+                  styles.dropdownText,
+                  sectionTiming && { color: "#000" }
+                ]}
+              >
+                {sectionTiming ? `${sectionTiming} min` : "Section timing"}
+              </Text>
+            </TouchableOpacity>
 
-    {sectionOpen && (
-      <View style={styles.dropdownList}>
-        {["15", "20", "30", "45", "60"].map(t => (
-          <TouchableOpacity
-            key={t}
-            style={styles.dropdownItem}
-            onPress={() => {
-              setSectionTiming(t);
-              setSectionOpen(false);
-            }}
-          >
-            <Text style={styles.dropdownItemText}>{t} min</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    )}
-  </View>
+            {sectionOpen && (
+              <View style={styles.dropdownList}>
+                {["15", "20", "30", "45", "60"].map(t => (
+                  <TouchableOpacity
+                    key={t}
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setSectionTiming(t);
+                      setSectionOpen(false);
+                    }}
+                  >
+                    <Text style={styles.dropdownItemText}>{t} min</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </View>
 
-  {/* EXPERIENCE (WILL NOT MOVE) */}
-  <TextInput
-    placeholder="Experience (yr)"
-    value={experience}
-    onChangeText={setExperience}
-    keyboardType="numeric"
-    style={[styles.inputUnderline, { flex: 1 }]}
-  />
+          {/* EXPERIENCE (WILL NOT MOVE) */}
+          <TextInput
+            placeholder="Experience (yr)"
+            value={experience}
+            onChangeText={setExperience}
+            keyboardType="numeric"
+            style={[styles.inputUnderline, { flex: 1 }]}
+          />
 
-</View>
+        </View>
 
 
 
