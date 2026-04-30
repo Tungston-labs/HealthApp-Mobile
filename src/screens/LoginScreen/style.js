@@ -16,10 +16,9 @@ export default StyleSheet.create({
         marginBottom: 40 * scale,
     },
 
-    logoText: {
-        fontSize: 28 * scale,
-        fontWeight: "700",
-        color: "#000",
+    logo: {
+        height: 28 * scale,   // same as your old text height
+        width: 120 * scale,   // adjust based on your logo ratio
     },
 
     inputContainer: {
@@ -59,8 +58,9 @@ export default StyleSheet.create({
 
     forgotPassword: {
         alignSelf: "flex-end",
-        color: "#7774F4",
+        color: "#DA9307",
         marginTop: 6 * scale,
+        fontWeight: "900",
         fontSize: 12 * scale,
         fontFamily: "Roboto-Regular",
     },
@@ -76,7 +76,7 @@ export default StyleSheet.create({
     },
 
     loginBtn: {
-        backgroundColor: "#7774F4",
+        backgroundColor: "#EF0707",
         paddingVertical: 8 * scale,
         paddingHorizontal: 22 * scale,
         borderRadius: 20 * scale,
@@ -103,9 +103,9 @@ export default StyleSheet.create({
     },
 
     signUp: {
-        color: "#6C63FF",
+        color: "#DA9307",
         fontSize: 14 * scale,
-        fontWeight: "600",
+        fontWeight: "900",
         fontFamily: "Roboto-Medium",
     },
 });

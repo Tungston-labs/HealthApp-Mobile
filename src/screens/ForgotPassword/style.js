@@ -17,13 +17,14 @@ export default StyleSheet.create({
   },
 
   logoContainer: {
-    marginBottom: 20 * scale,
-    alignItems: "center",
-  },
-  logo: {
-    width: 160 * scale,
-    height: 160 * scale,
-  },
+        alignItems: "center",
+        marginBottom: 40 * scale,
+    },
+
+    logo: {
+        height: 28 * scale,   // same as your old text height
+        width: 120 * scale,   // adjust based on your logo ratio
+    },
 
   description: {
     textAlign: "center",
@@ -71,7 +72,7 @@ export default StyleSheet.create({
   flexDirection: "row",
   alignItems: "center",
   justifyContent: "center",
-  backgroundColor: "#7774F4",
+  backgroundColor: "#EF0707",
   paddingVertical: 10 * scale,
   paddingHorizontal: 18 * scale,   
   borderRadius: 20 * scale,
@@ -92,7 +93,7 @@ innerShadow: {
   right: 2,
   bottom: 2,
   borderRadius: 20 * scale,
-  backgroundColor: "#7774F4",
+  backgroundColor: "#EF0707",
 
   shadowColor: "#000",
   shadowOpacity: 0.25,
@@ -122,7 +123,7 @@ innerShadow: {
   backLogin: {
     fontSize: 14 * scale,
     fontWeight: "700",
-    color: "#6C63FF",
+    color: "#EF0707",
   },
 
     backToLogin: {
@@ -132,7 +133,8 @@ innerShadow: {
   },
 
   loginText: {
-    color: "#7774F4",
+    color: "#DA9307",
     fontWeight: "600",
   },
+  
 });

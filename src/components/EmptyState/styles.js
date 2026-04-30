@@ -29,3 +29,4 @@ export default StyleSheet.create({
     lineHeight: 18,
   },
 });
+
