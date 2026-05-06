@@ -28,7 +28,7 @@ export default StyleSheet.create({
     fontFamily: "Segoe UI",
   },
   activeToggle: {
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
     elevation: 6,
   },
   activeToggleText: {
@@ -85,7 +85,7 @@ export default StyleSheet.create({
   rulerContainer: {
     width: 80,
     height: "100%",
-    backgroundColor: "#7774F4",
+    backgroundColor: "#DA9307",
     borderRadius: 12,
     marginHorizontal: 10,
     overflow: "hidden",

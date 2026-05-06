@@ -34,7 +34,7 @@ export default StyleSheet.create({
   },
 
   loginBtn: {
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
     paddingVertical: 8 * scale,
     paddingHorizontal: 22 * scale,
     borderRadius: 20 * scale,

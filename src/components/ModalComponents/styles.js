@@ -9,7 +9,7 @@ export default StyleSheet.create({
   },
   card: {
     width: "85%",
-    backgroundColor: "#fff",
+    backgroundColor: "#EFEEE9",
     borderRadius: 16,
     padding: 20,
     alignItems: "center",
@@ -54,7 +54,7 @@ dropdown: {
   alignItems: "center",
   borderWidth: 1,
   borderColor: "#D8D7F5",
-  backgroundColor: "#F2F1FF",
+  backgroundColor: "#EFEEE9",
   height: 48,
   width:300,
   paddingHorizontal: 12,
@@ -102,14 +102,14 @@ noteBox: {
 },
 
   cancelBtn: {
-    backgroundColor: "#F44336",
+    backgroundColor: "#DA9307",
     paddingVertical: 12,
     borderRadius: 25,
     width: "45%",
     alignItems: "center",
   },
   confirmBtn: {
-    backgroundColor: "#6C6AF5",
+    backgroundColor: "#EF0707",
     paddingVertical: 12,
     borderRadius: 25,
     width: "45%",

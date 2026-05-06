@@ -56,7 +56,7 @@ export default StyleSheet.create({
     justifyContent: "center",
     alignSelf: "center",
 
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
     paddingVertical: 12 * scale,
     paddingHorizontal: 18 * scale,
     borderRadius: 25 * scale,
@@ -91,7 +91,16 @@ export default StyleSheet.create({
 
   loginLink: {
     fontSize: 13 * scale,
-    color: "#6054E4",
+    color: "#DA9307",
     fontWeight: "700",
   },
+  logoContainer: {
+        alignItems: "center",
+        marginBottom: 40 * scale,
+    },
+
+    logo: {
+        height: 28 * scale,   
+        width: 120 * scale,  
+    },
 });

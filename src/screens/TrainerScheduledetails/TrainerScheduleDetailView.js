@@ -124,7 +124,7 @@ const TrainerScheduleDetailView = ({
             onPress={openEditNote}
             style={{ alignSelf: 'flex-end', marginTop: 8 }}
           >
-            <Icon name="create-outline" size={20} color="#6C63FF" />
+            <Icon name="create-outline" size={20} color="#DA9307" />
           </TouchableOpacity>
         </View>
       )}

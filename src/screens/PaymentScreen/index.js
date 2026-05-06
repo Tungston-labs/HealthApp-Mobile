@@ -61,7 +61,6 @@ const PaymentScreen = ({ navigation, route }) => {
 
       let res;
 
-      // 🔁 CHANGE TRAINER FLOW
       if (mode === "change") {
         res = await createChangeTrainerOrder({
           old_trainer_id,

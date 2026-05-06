@@ -4,7 +4,7 @@ export default StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#EEF0FF",
+    backgroundColor: "#EFEEE9",
     borderRadius: 12,
     padding: 12,
   },

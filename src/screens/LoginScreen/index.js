@@ -13,7 +13,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginClientThunk, resetAuthState } from "../../redux/slices/authSlice";
 import styles from "./style";
 import { useIsFocused } from "@react-navigation/native";
-import Logo from "../../Images/logo.svg";
+import Logo from "../../Images/logo.png";
+import { Image } from "react-native";
 
 export default function LoginScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -42,7 +43,6 @@ export default function LoginScreen({ navigation }) {
       })
     );
   };
-
 
   useEffect(() => {
     if (!isLoggedIn || !user) return;
@@ -83,7 +83,7 @@ export default function LoginScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
-        <Logo style={styles.logo} />
+        <Image source={Logo} style={styles.logo} />
       </View>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Email</Text>

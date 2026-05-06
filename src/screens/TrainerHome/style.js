@@ -14,7 +14,7 @@ export default StyleSheet.create({
   },
 
   bell: {
-    backgroundColor: '#F2F2F2',
+    backgroundColor: '#EFEEE9',
     width: 40,
     height: 40,
     borderRadius: 20,

@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   callIcon: {
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
     width: 44,
     height: 44,
     borderRadius: 22,

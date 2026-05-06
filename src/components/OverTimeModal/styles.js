@@ -39,7 +39,7 @@ export default StyleSheet.create({
 
   modalButton: {
     alignSelf: 'center',
-    backgroundColor: '#7774F4',
+    backgroundColor: '#EF0707',
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 8,

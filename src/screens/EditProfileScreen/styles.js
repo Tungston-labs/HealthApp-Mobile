@@ -67,7 +67,7 @@ export default StyleSheet.create({
   },
    
   saveBtn: {
-    backgroundColor: "#6B4EFF",
+    backgroundColor: "#EF0707",
     paddingVertical: 15,
     borderRadius: 30,
     alignItems: "center",

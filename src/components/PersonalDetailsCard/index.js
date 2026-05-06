@@ -17,7 +17,7 @@ const PersonalDetailsCard = ({
   return (
     <View style={styles.card}>
       <View style={styles.topRow}>
-        <Image source={{uri:data?.profile_pic_url}} style={styles.avatar} />
+        <Image source={{ uri: data?.profile_pic_url }} style={styles.avatar} />
 
         <View style={styles.info}>
           <Text style={styles.name}>{data?.name}</Text>
@@ -77,7 +77,7 @@ const PersonalDetailsCard = ({
             <Text style={styles.label}>Workout Goals</Text>
             <Text style={styles.value}>
               {Array.isArray(data?.wellness_goal) &&
-              data.wellness_goal.length > 0
+                data.wellness_goal.length > 0
                 ? data.wellness_goal.join(', ')
                 : 'No workout goals'}
             </Text>

@@ -16,8 +16,8 @@ import {
 
 const SingleSessionHistory = ({ route }) => {
   const dispatch = useDispatch();
-const sessionId = route?.params?.sessionId;
-console.log("ROUTE PARAMS 👉", route.params);
+  const sessionId = route?.params?.sessionId;
+  console.log("ROUTE PARAMS 👉", route.params);
 
   const { session, loading, error } = useSelector(
     (state) => state.completedSessionDetail

@@ -268,7 +268,6 @@ export default function CreateAccountScreen({ navigation }) {
     }
   };
 
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView

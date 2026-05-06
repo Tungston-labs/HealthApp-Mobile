@@ -6,13 +6,13 @@ import styles from "./styles";
 const GradientCard = () => {
   return (
     <View style={styles.container}>
-   <LinearGradient
-  colors={["#D3DAE4", "#D3DAE4", "#7774F4", "#7774F4"]}
-  start={{ x: 0, y: 0 }}
-  end={{ x: 1, y: 0 }}
-  locations={[0, 0.25, 0.25, 1]}
-  style={styles.card}
->
+      <LinearGradient
+        colors={["#D3DAE4", "#D3DAE4", "#EF0707", "#EF0707"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        locations={[0, 0.25, 0.25, 1]}
+        style={styles.card}
+      >
 
         {/* Left Image overlay */}
         <Image

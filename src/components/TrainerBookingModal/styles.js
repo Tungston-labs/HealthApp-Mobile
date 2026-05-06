@@ -91,8 +91,8 @@ modalContainer: {
   },
 
   optionBtnActive: {
-    backgroundColor: "#7774F4",
-    borderColor: "#7774F4",
+    backgroundColor: "#DA9307",
+    borderColor: "#DA9307",
   },
 
   optionText: {
@@ -126,7 +126,7 @@ modalContainer: {
   },
 
   payBtn: {
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
     paddingVertical: 16,
     borderRadius: 30,
     alignItems: "center",

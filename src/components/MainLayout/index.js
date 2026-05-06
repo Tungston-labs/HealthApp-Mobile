@@ -14,7 +14,7 @@ export default function MainLayout({ title, step, onBack, onNext, children }) {
               key={item}
               style={[
                 styles.progressBar,
-                { backgroundColor: step >= item ? "#7774F4" : "#EFEFEF" }
+                { backgroundColor: step >= item ? "#EF0707" : "#EFEFEF" }
               ]}
             />
           ))}

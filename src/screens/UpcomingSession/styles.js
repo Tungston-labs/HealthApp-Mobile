@@ -121,7 +121,7 @@ progressTrack: {
 progressFill: {
   height: "100%",
   width: "45%",  
-  backgroundColor: "#7774F4",
+  backgroundColor: "#EF0707",
 },
 planGrid: {
   flexDirection: "row",

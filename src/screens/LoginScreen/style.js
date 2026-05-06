@@ -17,8 +17,8 @@ export default StyleSheet.create({
     },
 
     logo: {
-        height: 28 * scale,   // same as your old text height
-        width: 120 * scale,   // adjust based on your logo ratio
+        height: 38 * scale,
+        resizeMode: "contain", // ✅ important
     },
 
     inputContainer: {

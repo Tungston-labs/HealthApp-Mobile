@@ -191,7 +191,7 @@ const EditProfile = ({ navigation, route }) => {
           showBack
           onBack={() => navigation.goBack()}
           showEdit
-          onEdit={pickImage}   // 🔥 THIS IS THE FIX
+          onEdit={pickImage}   
         />
 
         {/* FORM */}

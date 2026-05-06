@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   },
 
   activeIconWrapper: {
-    backgroundColor: "#7774F4", // purple active background
+    backgroundColor: "#EF0707", // purple active background
   },
 });
 

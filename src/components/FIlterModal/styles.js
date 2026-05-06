@@ -9,7 +9,7 @@ export default StyleSheet.create({
   },
 
   container: {
-    backgroundColor: "#fcf9f9",
+    backgroundColor: "#EFEEE9",
     borderRadius: 25,
     padding: 20,
   },
@@ -45,13 +45,13 @@ export default StyleSheet.create({
     flex: 1,
     padding: 12,
     borderRadius: 12,
-    backgroundColor: "#E7E7E9",
+    backgroundColor: "#EFEEE9",
     alignItems: "center",
   },
 
   activeSlot: {
-    backgroundColor: "#7774F4",
-      borderColor: "#6966f7ff", 
+    backgroundColor: "#DA9307",
+      borderColor: "#DA9307", 
 
   },
 
@@ -74,7 +74,7 @@ export default StyleSheet.create({
   },
 
   timeBtn: {
-    backgroundColor: "#E8E8EC",
+    backgroundColor: "#EFEEE9",
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderRadius: 10,
@@ -87,8 +87,8 @@ export default StyleSheet.create({
   },
 
   activeTimeBtn: {
-    backgroundColor: "#7774F4",
-      borderColor: "#6966f7ff", 
+    backgroundColor: "#DA9307",
+      borderColor: "#DA9307", 
 
   },
 
@@ -103,7 +103,7 @@ export default StyleSheet.create({
   dateBox: {
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: "#E6E5E8",
+    backgroundColor: "#EFEEE9",
     borderRadius: 25,
     padding: 20,
     marginTop: 10,
@@ -132,14 +132,14 @@ export default StyleSheet.create({
     marginTop: 20,
   },
 applyBtn: {
-  backgroundColor: "#7774F4",
+  backgroundColor: "#EF0707",
   paddingVertical: 14,
   borderRadius: 25,
   width: 200,
   alignItems: "center",
 
   borderWidth: 1.5,
-  borderColor: "#6966f7ff", 
+  borderColor: "#EF0707", 
 },
 
 

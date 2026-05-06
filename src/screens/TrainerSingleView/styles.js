@@ -67,7 +67,7 @@ export default StyleSheet.create({
 
   dropdownBtn: {
     marginTop: 25,
-    backgroundColor: "#D9D9D9",
+    backgroundColor: "#1C1B1F",
     padding: 12,
     borderRadius: 10,
     flexDirection: "row",
@@ -113,7 +113,7 @@ export default StyleSheet.create({
     paddingTop: 10,
   },
   certCard: {
-    backgroundColor: "#D9D9D9",
+    backgroundColor: "#EFEEE9",
     borderRadius: 10,
     marginRight: 10,
     padding: 6,
@@ -153,7 +153,7 @@ export default StyleSheet.create({
   divider: {
     marginTop: 8,
     height: 1,
-    backgroundColor: "#f8f0f0",
+    backgroundColor: "#D8D8D8",
   },
 
   ratingContainer: {
@@ -189,14 +189,14 @@ export default StyleSheet.create({
   },
 
   bookBtn: {
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
     paddingVertical: 14,
     borderRadius: 25,
     alignItems: "center",
     borderWidth: 1,
     marginBottom: 32,
     width: 140,
-    borderColor: "#5B59D6",
+    borderColor: "#EF0707",
   },
 
   bookText: {

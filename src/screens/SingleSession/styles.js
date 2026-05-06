@@ -60,7 +60,7 @@ export default StyleSheet.create({
   },
 
   notesBox: {
-    backgroundColor: "#EDEAFF",
+    backgroundColor: "#EFEEE9",
     padding: 16,
     height:130,
     borderRadius: 12,

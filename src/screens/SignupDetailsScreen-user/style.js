@@ -4,17 +4,18 @@ const { width } = Dimensions.get("window");
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#faf8f8",
+    backgroundColor: "#EFEEE9",
     paddingHorizontal: 30,
     paddingVertical: 40,
   },
 
   logo: {
-    width: 160,
-    height: 60,
-    marginTop: 20,
-    marginBottom: 30,
-  },
+  width: 140,
+  height: 50,
+  resizeMode: 'contain',
+  alignSelf: 'flex-start', // 👈 left aligned
+  marginBottom: 10,
+},
 
   welcomeText: {
     fontSize: 24,
@@ -111,7 +112,7 @@ export default StyleSheet.create({
   },
 
   clearBtn: {
-    backgroundColor: "#7774F4",
+    backgroundColor: "#DA9307",
     paddingVertical: 6,
     paddingHorizontal: 14,
     borderRadius: 20,
@@ -136,11 +137,11 @@ export default StyleSheet.create({
   backLogin: {
     textAlign: "center",
     fontSize: 15,
-    color: "",
+    color: "#DA9307",
     fontWeight: "600",
   },
   continueBtn: {
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
     paddingVertical: 14,
     paddingHorizontal: 22,
     borderRadius: 30,
@@ -174,4 +175,5 @@ export default StyleSheet.create({
     right: 25,
   },
 
+  
 });

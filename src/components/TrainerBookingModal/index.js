@@ -200,7 +200,6 @@ const handlePayment = async () => {
             )}
           </View>
 
-          {/* Footer */}
           {(data || trainer) && !loading && (
             <View style={styles.footer}>
               <TouchableOpacity

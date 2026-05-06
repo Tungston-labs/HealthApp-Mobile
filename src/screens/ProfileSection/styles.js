@@ -26,7 +26,7 @@ export default StyleSheet.create({
     },
 
     callIcon: {
-        backgroundColor: "#7774F4",
+        backgroundColor: "#EF0707",
         width: 44,
         height: 44,
         borderRadius: 22,
@@ -35,7 +35,7 @@ export default StyleSheet.create({
     },
 
     dayBar: {
-        backgroundColor: "#7774F4",
+        backgroundColor: "#DA9307",
         borderRadius: 10,
         padding: 12,
         flexDirection: "row",
@@ -81,7 +81,7 @@ export default StyleSheet.create({
     },
 
     activeSlot: {
-        backgroundColor: "#7774F4",
+        backgroundColor: "#DA9307",
     },
 
     slotDay: {
@@ -167,7 +167,7 @@ export default StyleSheet.create({
     },
 
     notesBox: {
-        backgroundColor: "#EEF1FF",
+        backgroundColor: "#EFEEE9",
         borderRadius: 10,
         padding: 12,
         marginTop: 6,
@@ -187,7 +187,7 @@ export default StyleSheet.create({
     },
 
     primaryButton: {
-        backgroundColor: "#7774F4",
+        backgroundColor: "#EF0707",
         borderRadius: 30,
         paddingVertical: 12,
         paddingHorizontal: 60,
@@ -199,7 +199,7 @@ export default StyleSheet.create({
     },
 
     cancelButton: {
-        backgroundColor: "#F4511E",
+        backgroundColor: "#DA9307",
         borderRadius: 30,
         paddingVertical: 12,
         paddingHorizontal: 40,
@@ -211,7 +211,7 @@ export default StyleSheet.create({
     },
 
     changeTrainerButton: {
-        backgroundColor: "#7774F4",
+        backgroundColor: "#EF0707",
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",

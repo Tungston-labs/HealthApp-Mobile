@@ -33,7 +33,7 @@ const ClickButton = ({
   title = "Punch In",
   successTitle = "Punched In",
   onPress,
-  backgroundColor ="#7774F4" ,
+  backgroundColor ="#EF0707" ,
   activeColor = "#E2E2FF",
   textColor = "#fff",
   fontSize = 17,

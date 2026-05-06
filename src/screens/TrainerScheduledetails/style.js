@@ -28,7 +28,7 @@ export default StyleSheet.create({
 
   locationBox: {
     flexDirection: "row",
-    backgroundColor: "#F3F3FF",
+    backgroundColor: "#EFEEE9",
     padding: 12,
     borderRadius: 12,
     gap: 10,
@@ -38,7 +38,7 @@ export default StyleSheet.create({
   locationText: {
     flex: 1,
     fontSize: 14,
-    color: "#0085F7",
+    color: "#000000",
   },
 
   sectionTitle: {
@@ -56,7 +56,7 @@ export default StyleSheet.create({
   addNoteBtn: {
     flexDirection: "row",
     alignSelf: "center",
-    backgroundColor: "#6C63FF",
+    backgroundColor: "#EF0707",
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 14,
@@ -71,7 +71,7 @@ export default StyleSheet.create({
   },
 
   noteBox: {
-    backgroundColor: "#F2F2FF",
+    backgroundColor: "#EFEEE9",
     borderRadius: 12,
     padding: 12,
     marginBottom: 10,
@@ -107,7 +107,7 @@ export default StyleSheet.create({
   },
 
   modalInput: {
-    backgroundColor: "#F2F2FF",
+    backgroundColor: "#EFEEE9",
     borderRadius: 12,
     padding: 12,
     minHeight: 120,
@@ -116,7 +116,7 @@ export default StyleSheet.create({
   },
 
   submitBtn: {
-    backgroundColor: "#6C63FF",
+    backgroundColor: "#EF0707",
     paddingVertical: 14,
     borderRadius: 25,
     alignItems: "center",
@@ -129,7 +129,7 @@ export default StyleSheet.create({
     fontSize: 16,
   },
   startSessionBtn: {
-  backgroundColor: "#6C63FF",
+  backgroundColor: "#EF0707",
   paddingVertical: 14,
   borderRadius: 12,
   alignItems: "center",

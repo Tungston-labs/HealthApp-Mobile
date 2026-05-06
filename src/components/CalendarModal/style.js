@@ -61,7 +61,7 @@ export default StyleSheet.create({
   },
 
   selectedDay: {
-    backgroundColor: "#7B77FF",
+    backgroundColor: "#EF0707",
     borderRadius: 8,
   },
 
@@ -90,7 +90,7 @@ export default StyleSheet.create({
   },
 
   setDate: {
-    backgroundColor: "#7B77FF",
+    backgroundColor: "#EF0707",
     paddingVertical: 12,
     borderRadius: 24,
     flex: 1,
