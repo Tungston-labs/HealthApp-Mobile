@@ -39,7 +39,7 @@ export default StyleSheet.create({
   },
 
   progressBadge: {
-    backgroundColor: "#DA9307",
+    backgroundColor: "#050505",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
@@ -118,7 +118,7 @@ export default StyleSheet.create({
   width: 30,
   height: 30,
   borderRadius: 18,
-  backgroundColor: "#DA9307",
+  backgroundColor: "#000000",
   alignItems: "center",
   justifyContent: "center",
   elevation: 6,           

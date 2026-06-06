@@ -21,8 +21,6 @@ import { validateSignup, validateUserStep2 } from "../../utils/Validators";
 import { showError } from "../../utils/toast";
 import { validateUserStep1 } from "../../utils/Validators";
 
-
-
 export default function SignupDetailsScreenUser() {
   const navigation = useNavigation();
 
@@ -111,7 +109,7 @@ export default function SignupDetailsScreenUser() {
           paddingBottom: 120,
         }}
       >
-       
+
 
         <Text style={styles.welcomeText}>Welcome to health app</Text>
         <Text style={styles.subtitle}>Enter basic details</Text>

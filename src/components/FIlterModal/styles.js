@@ -50,8 +50,8 @@ export default StyleSheet.create({
   },
 
   activeSlot: {
-    backgroundColor: "#DA9307",
-      borderColor: "#DA9307", 
+    backgroundColor: "#030303",
+    borderColor: "#000000",
 
   },
 
@@ -87,8 +87,8 @@ export default StyleSheet.create({
   },
 
   activeTimeBtn: {
-    backgroundColor: "#DA9307",
-      borderColor: "#DA9307", 
+    backgroundColor: "#000000",
+    borderColor: "#000000",
 
   },
 
@@ -131,16 +131,16 @@ export default StyleSheet.create({
     alignItems: "flex-end",
     marginTop: 20,
   },
-applyBtn: {
-  backgroundColor: "#EF0707",
-  paddingVertical: 14,
-  borderRadius: 25,
-  width: 200,
-  alignItems: "center",
+  applyBtn: {
+    backgroundColor: "#EF0707",
+    paddingVertical: 14,
+    borderRadius: 25,
+    width: 200,
+    alignItems: "center",
 
-  borderWidth: 1.5,
-  borderColor: "#EF0707", 
-},
+    borderWidth: 1.5,
+    borderColor: "#EF0707",
+  },
 
 
   applyText: {
@@ -149,10 +149,10 @@ applyBtn: {
     fontWeight: "600",
   },
   inputUnderline: {
-  borderBottomWidth: 1,
-  borderBottomColor: '#1C1B1F', 
-  marginTop:10,
-  marginBottom:10,
-},
+    borderBottomWidth: 1,
+    borderBottomColor: '#1C1B1F',
+    marginTop: 10,
+    marginBottom: 10,
+  },
 
 });

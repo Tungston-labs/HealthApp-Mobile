@@ -65,8 +65,7 @@ const ProfileSection = () => {
   } = useSelector((state) => state.trainerChange || {});
 
   const trainer = trainerId ? data ?? null : session;
-  console.log({trainer});
-  
+  console.log({ trainer });
 
   /* ===================== FETCH TRAINER ===================== */
   useEffect(() => {
@@ -153,20 +152,17 @@ const ProfileSection = () => {
   }, [nutritionSuccess, nutritionError, dispatch]);
 
   /* ===================== CHANGE TRAINER ===================== */
-const handleChangeTrainer = () => {
-  if (!trainer?.id) {
-    alert("Trainer not available");
-    return;
-  }
+  const handleChangeTrainer = () => {
+    if (!trainer?.id) {
+      alert("Trainer not available");
+      return;
+    }
 
-  navigation.navigate("TrainerList", {
-    mode: "change",
-    trainerId: trainer.id, 
-  });
-};
-
-
-
+    navigation.navigate("TrainerList", {
+      mode: "change",
+      trainerId: trainer.id,
+    });
+  };
 
   useEffect(() => {
     if (changeData) {
@@ -217,7 +213,6 @@ const handleChangeTrainer = () => {
   const workoutPlan = trainer?.plan_name || "N/A";
   const workoutTypeText = trainer?.workout_type || "N/A";
   const trainerNotes = trainer?.notes || "No notes available";
-  
 
   /* ===================== UI ===================== */
   return (
@@ -245,7 +240,7 @@ const handleChangeTrainer = () => {
           <Image source={imageSource} style={styles.trainerImage} />
 
           <TrainerInfoCard
-  
+
 
             name={trainer?.name || "N/A"}
             experience={trainer?.experience ?? 0}
@@ -286,13 +281,13 @@ const handleChangeTrainer = () => {
         </View>
 
         {/* CHANGE TRAINER */}
-       <TouchableOpacity
-  style={styles.changeTrainerButton}
-  onPress={handleChangeTrainer}
->
-  <Icon name="person-outline" size={18} color="#fff" />
-  <Text style={styles.changeTrainerText}>Change trainer</Text>
-</TouchableOpacity>
+        <TouchableOpacity
+          style={styles.changeTrainerButton}
+          onPress={handleChangeTrainer}
+        >
+          <Icon name="person-outline" size={18} color="#fff" />
+          <Text style={styles.changeTrainerText}>Change trainer</Text>
+        </TouchableOpacity>
 
       </ScrollView>
 
@@ -333,7 +328,7 @@ const handleChangeTrainer = () => {
         onClose={() => setShowConsultModal(false)}
         onConfirm={!nutritionLoading ? handleConsultSubmit : undefined}
         iconName="chatbubble-ellipses-outline"
-        iconColor="#6C63FF"
+        iconColor="#000000"
         title="Request a Consultation"
         description="Choose your consultation type and leave a short note."
         cancelText="Cancel"

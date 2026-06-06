@@ -6,7 +6,7 @@ export default StyleSheet.create({
         marginVertical: 10,
     },
     dayBar: {
-        backgroundColor: "#DA9307",
+        backgroundColor: "#000000",
         borderRadius: 10,
         padding: 12,
         flexDirection: "row",
@@ -45,7 +45,7 @@ export default StyleSheet.create({
         marginRight: 8,
     },
     activeSlot: {
-        backgroundColor: "#DA9307",
+        backgroundColor: "#000000",
     },
     slotDay: {
         fontWeight: "600",

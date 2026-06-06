@@ -51,7 +51,7 @@ export default StyleSheet.create({
   },
 
   badge: {
-    backgroundColor: "#DA9307",
+    backgroundColor: "#000000",
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 8,

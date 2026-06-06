@@ -112,7 +112,7 @@ export default StyleSheet.create({
   },
 
   clearBtn: {
-    backgroundColor: "#DA9307",
+    backgroundColor: "#000000",
     paddingVertical: 6,
     paddingHorizontal: 14,
     borderRadius: 20,
@@ -137,7 +137,7 @@ export default StyleSheet.create({
   backLogin: {
     textAlign: "center",
     fontSize: 15,
-    color: "#DA9307",
+    color: "#000000",
     fontWeight: "600",
   },
   continueBtn: {

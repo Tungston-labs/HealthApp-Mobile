@@ -85,7 +85,7 @@ export default StyleSheet.create({
   rulerContainer: {
     width: 80,
     height: "100%",
-    backgroundColor: "#DA9307",
+    backgroundColor: "#EF0707",
     borderRadius: 12,
     marginHorizontal: 10,
     overflow: "hidden",

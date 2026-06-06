@@ -91,7 +91,7 @@ export default StyleSheet.create({
 
   loginLink: {
     fontSize: 13 * scale,
-    color: "#DA9307",
+    color: "#020202",
     fontWeight: "700",
   },
   logoContainer: {

@@ -13,7 +13,7 @@ export default StyleSheet.create({
     height: 10,
     borderRadius: 5,
     borderWidth: 1.5,
-    borderColor: '#DA9307',
+    borderColor: '#000000',
     marginRight: 12,
   },
 
@@ -30,7 +30,7 @@ export default StyleSheet.create({
 
   time: {
     width: 48,
-    color: '#DA9307',
+    color: '#080808',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -75,7 +75,7 @@ export default StyleSheet.create({
 
   progressText: {
     fontSize: 11,
-    color: '#DA9307',
+    color: '#000000',
     fontWeight: '600',
   },
 

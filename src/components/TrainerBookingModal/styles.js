@@ -91,8 +91,8 @@ modalContainer: {
   },
 
   optionBtnActive: {
-    backgroundColor: "#DA9307",
-    borderColor: "#DA9307",
+    backgroundColor: "#000000",
+    borderColor: "#000000",
   },
 
   optionText: {

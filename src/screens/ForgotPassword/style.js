@@ -133,7 +133,7 @@ innerShadow: {
   },
 
   loginText: {
-    color: "#DA9307",
+    color: "#000000",
     fontWeight: "600",
   },
   

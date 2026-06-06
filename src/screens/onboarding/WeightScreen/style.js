@@ -48,7 +48,7 @@ export default StyleSheet.create({
   rulerWrapper: {
     width: "100%",
     height: 90,
-    backgroundColor: "#DA9307",
+    backgroundColor: "#EF0707",
     borderRadius: 12,
     marginTop: -2,
     overflow: "hidden",

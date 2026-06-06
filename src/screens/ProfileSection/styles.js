@@ -35,7 +35,7 @@ export default StyleSheet.create({
     },
 
     dayBar: {
-        backgroundColor: "#DA9307",
+        backgroundColor: "#000000",
         borderRadius: 10,
         padding: 12,
         flexDirection: "row",
@@ -81,7 +81,7 @@ export default StyleSheet.create({
     },
 
     activeSlot: {
-        backgroundColor: "#DA9307",
+        backgroundColor: "#000000",
     },
 
     slotDay: {
@@ -199,7 +199,7 @@ export default StyleSheet.create({
     },
 
     cancelButton: {
-        backgroundColor: "#DA9307",
+        backgroundColor: "#EF0707",
         borderRadius: 30,
         paddingVertical: 12,
         paddingHorizontal: 40,
