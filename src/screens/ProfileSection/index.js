@@ -41,14 +41,12 @@ const ProfileSection = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  /* ===================== LOCAL STATE ===================== */
   const [consultType, setConsultType] = useState("call");
   const [consultNote, setConsultNote] = useState("");
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
   const [showConsultModal, setShowConsultModal] = useState(false);
 
-  /* ===================== REDUX STATE ===================== */
   const { user } = useSelector((state) => state.auth || {});
   const session = user?.session ?? null;
 
@@ -67,14 +65,12 @@ const ProfileSection = () => {
   const trainer = trainerId ? data ?? null : session;
   console.log({ trainer });
 
-  /* ===================== FETCH TRAINER ===================== */
   useEffect(() => {
     if (trainerId) {
       dispatch(fetchTrainerDetailThunk(trainerId));
     }
   }, [trainerId, dispatch]);
 
-  /* ===================== TRAINER PHONE ===================== */
   const trainerPhone =
     trainer?.phno ||
     null;
@@ -90,7 +86,6 @@ const ProfileSection = () => {
     setShowEmergencyModal(false);
   };
 
-  /* ===================== CANCEL TRAINING ===================== */
   const {
     success: cancelSuccess,
     error: cancelError,
@@ -115,7 +110,6 @@ const ProfileSection = () => {
     }
   }, [cancelSuccess, cancelError, dispatch]);
 
-  /* ===================== CONSULTATION ===================== */
   const {
     loading: nutritionLoading,
     success: nutritionSuccess,
@@ -151,7 +145,6 @@ const ProfileSection = () => {
     }
   }, [nutritionSuccess, nutritionError, dispatch]);
 
-  /* ===================== CHANGE TRAINER ===================== */
   const handleChangeTrainer = () => {
     if (!trainer?.id) {
       alert("Trainer not available");
@@ -179,7 +172,6 @@ const ProfileSection = () => {
     }
   }, [changeData, changeError, dispatch, trainer]);
 
-  /* ===================== EMPTY STATES ===================== */
   if (!session && !trainerId) {
     return (
       <EmptyState
@@ -199,7 +191,6 @@ const ProfileSection = () => {
     );
   }
 
-  /* ===================== DISPLAY DATA ===================== */
   const fallbackImage = require("../../../assets/trainer1.jpg");
 
   const imageSource = trainer?.profile_pic
@@ -214,11 +205,9 @@ const ProfileSection = () => {
   const workoutTypeText = trainer?.workout_type || "N/A";
   const trainerNotes = trainer?.notes || "No notes available";
 
-  /* ===================== UI ===================== */
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* HEADER */}
         <View style={styles.header}>
           <View>
             <Text style={styles.title}>Trainers</Text>
@@ -235,13 +224,9 @@ const ProfileSection = () => {
 
         <View style={styles.divider} />
 
-        {/* TRAINER CARD */}
         <View style={styles.trainerCard}>
           <Image source={imageSource} style={styles.trainerImage} />
-
           <TrainerInfoCard
-
-
             name={trainer?.name || "N/A"}
             experience={trainer?.experience ?? 0}
             sessionTiming={trainerTiming}
@@ -249,10 +234,8 @@ const ProfileSection = () => {
             workoutType={workoutPlan}
           />
         </View>
-
         <View style={styles.divider} />
 
-        {/* DETAILS */}
         <Text style={styles.sectionTitle}>Workout plan - {workoutPlan}</Text>
         <Text style={styles.workoutText}>Workout type - {workoutTypeText}</Text>
 
@@ -263,7 +246,6 @@ const ProfileSection = () => {
 
         <View style={styles.divider} />
 
-        {/* ACTION BUTTONS */}
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={styles.primaryButton}
@@ -280,7 +262,6 @@ const ProfileSection = () => {
           </TouchableOpacity>
         </View>
 
-        {/* CHANGE TRAINER */}
         <TouchableOpacity
           style={styles.changeTrainerButton}
           onPress={handleChangeTrainer}
@@ -291,7 +272,6 @@ const ProfileSection = () => {
 
       </ScrollView>
 
-      {/* MODALS */}
       <CommonActionModal
         visible={showCancelModal}
         onClose={() => setShowCancelModal(false)}

@@ -418,7 +418,7 @@ export default function CreateAccountScreen({ navigation }) {
                 style={styles.deleteBadge}
                 onPress={() => setAadhaarImage(null)}
               >
-                <Ionicons name="close" size={16} color="#fff" />
+                <Ionicons name="close" size={16} color="#ffffff" />
               </TouchableOpacity>
 
               <Image
