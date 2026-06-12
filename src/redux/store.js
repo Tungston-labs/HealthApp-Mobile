@@ -52,8 +52,6 @@ export const store = configureStore({
     clientBmi: clientBmiReducer,
     trainerChange: trainerChangeReducer,
 
-
-
     completedSessions: completedSessionreducer,
     weeklySessions: weeklySessionsReducer,
     trainerSessions: trainerReducer,

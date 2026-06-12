@@ -3,156 +3,144 @@ import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "center",
-    paddingHorizontal: 8,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "flex-end",
   },
 
   container: {
-    backgroundColor: "#EFEEE9",
-    borderRadius: 25,
-    padding: 20,
+    backgroundColor: "#F3F2EE",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 16,
+    paddingBottom: 30,
+    paddingTop: 0,
+  },
+
+  headerContainer: {
+    backgroundColor: "#F40404",
+    height: 75,
+    justifyContent: "center",
+    paddingHorizontal: 25,
+    marginHorizontal: -16,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+  },
+
+  headerTitle: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "700",
   },
 
   closeBtn: {
     position: "absolute",
-    top: 14,
-    right: 16,
-    padding: 4,
-    borderRadius: 25 / 2,
+    top: 25,
+    right: 20,
+    zIndex: 100,
   },
 
   closeText: {
-    fontFamily: "Segoe UI",
-    fontSize: 20,
-    color: "#000000",
+    color: "#fff",
+    fontSize: 22,
+    fontWeight: "700",
   },
 
   sectionTitle: {
-    fontFamily: "Segoe UI",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "700",
+    color: "#000",
+    marginBottom: 14,
     marginTop: 20,
-    marginBottom: 10,
   },
 
   slotRow: {
     flexDirection: "row",
-    gap: 10,
+    justifyContent: "space-between",
+    gap: 14,
   },
 
   slotBtn: {
     flex: 1,
-    padding: 12,
+    height: 48,
     borderRadius: 12,
-    backgroundColor: "#EFEEE9",
+    borderWidth: 1,
+    borderColor: "#111",
+    justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
   },
 
   activeSlot: {
-    backgroundColor: "#030303",
-    borderColor: "#000000",
-
+    backgroundColor: "#000",
   },
 
   activeSlotText: {
     color: "#fff",
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: "700",
   },
 
   inactiveSlotText: {
-    color: "#000000",
+    color: "#555",
+    fontSize: 16,
     fontWeight: "500",
-    fontFamily: "Segoe UI",
-
   },
 
   timeSlotGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 6,
+    justifyContent: "space-between",
+    rowGap: 12,
   },
 
   timeBtn: {
-    backgroundColor: "#EFEEE9",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
+    width: "23%",
+    height: 48,
+    backgroundColor: "#E9E9E9",
     borderRadius: 10,
-  },
-  rowHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
-    marginTop: 15,
   },
 
   activeTimeBtn: {
-    backgroundColor: "#000000",
-    borderColor: "#000000",
-
+    backgroundColor: "#000",
   },
 
-  timeTextActive: {
-    color: "#fff",
+  activeTimeText: {
+    color: "#ffffff",
+    fontWeight: "400",
+    fontSize: 15,
   },
 
-  timeTextInactive: {
-    color: "#000000",
+  inactiveTimeText: {
+    color: "#555",
+    fontWeight: "500",
+    fontSize: 15,
   },
 
-  dateBox: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: "#EFEEE9",
-    borderRadius: 25,
-    padding: 20,
-    marginTop: 10,
+  inputUnderline: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#CFCFCF",
+    marginVertical: 15,
   },
 
-  dateColumn: {
-    alignItems: "center",
-  },
-
-  dateItem: {
-    color: "#000000",
-    fontSize: 14,
-    marginVertical: 6,
-  },
-
-  dateItemBold: {
-    fontFamily: "Segoe UI",
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#000",
-    marginVertical: 6,
-  },
   applyWrapper: {
-    width: "100%",
-    alignItems: "flex-end",
-    marginTop: 20,
-  },
-  applyBtn: {
-    backgroundColor: "#EF0707",
-    paddingVertical: 14,
-    borderRadius: 25,
-    width: 200,
+    marginTop: 28,
     alignItems: "center",
-
-    borderWidth: 1.5,
-    borderColor: "#EF0707",
   },
 
+  applyBtn: {
+    width: "72%",
+    height: 48,
+    backgroundColor: "#F40404",
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 
   applyText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
   },
-  inputUnderline: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#1C1B1F',
-    marginTop: 10,
-    marginBottom: 10,
-  },
-
 });

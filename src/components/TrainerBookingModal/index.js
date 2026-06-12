@@ -9,6 +9,8 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
@@ -16,7 +18,6 @@ import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import TrainerInfoCard from "../TrainerInfoCard";
 import { verifyChangeTrainerPayment } from "../../services/trainerServices";
-
 
 const workoutOptions = ["Single", "Couple", "Group"];
 
@@ -29,7 +30,6 @@ const TrainerBookingModal = ({
   oldTrainerId,
 }) => {
 
-
   const navigation = useNavigation();
 
   const [selected, setSelected] = useState("Single");
@@ -40,16 +40,14 @@ const TrainerBookingModal = ({
   );
 
   useEffect(() => {
-  if (mode === "change") {
-    console.log("🧠 CHANGE MODE IDS:", {
-      oldTrainerId,
-      newTrainerId: trainer?.id,
-    });
-  }
-}, [mode, oldTrainerId, trainer]);
+    if (mode === "change") {
+      console.log("🧠 CHANGE MODE IDS:", {
+        oldTrainerId,
+        newTrainerId: trainer?.id,
+      });
+    }
+  }, [mode, oldTrainerId, trainer]);
 
-
-  // Reset modal fields when it closes
   useEffect(() => {
     if (!visible) {
       setSelected("Single");
@@ -57,7 +55,6 @@ const TrainerBookingModal = ({
     }
   }, [visible]);
 
-  // ✅ Amount logic
   const amount = useMemo(() => {
     if (!data && !trainer) return 0;
 
@@ -79,68 +76,78 @@ const TrainerBookingModal = ({
     }
   }, [mode, selected, data, trainer]);
 
-
-const handlePayment = async () => {
-  if (!address.trim()) {
-    Alert.alert("Address required", "Please enter your address");
-    return;
-  }
-
-  // 🔹 CHANGE TRAINER + NO PRICE DIFFERENCE
-  if (mode === "change" && amount === 0) {
-    try {
-      const res = await verifyChangeTrainerPayment({
-        old_trainer_id: oldTrainerId,
-        new_trainer_id: trainer?.id,
-        plan_id: plan.id,
-      });
-
-      if (res.data.status) {
-        Alert.alert("Success", "Trainer changed successfully");
-        onClose();
-        navigation.replace("MySessions");
-      }
-    } catch (err) {
-      Alert.alert("Error", "Trainer change failed");
+  const handlePayment = async () => {
+    if (!address.trim()) {
+      Alert.alert("Address required", "Please enter your address");
+      return;
     }
-    return; // ⛔ STOP – no navigation
-  }
 
-  // 🔹 PAYMENT REQUIRED
-  navigation.navigate("Payment", {
-    mode,
-    new_trainer_id: trainer?.id,
-    old_trainer_id: oldTrainerId,
-    plan_id: plan.id,
-    booking_type: selected.toLowerCase(),
-    amount,
-  });
-};
+    // 🔹 CHANGE TRAINER + NO PRICE DIFFERENCE
+    if (mode === "change" && amount === 0) {
+      try {
+        const res = await verifyChangeTrainerPayment({
+          old_trainer_id: oldTrainerId,
+          new_trainer_id: trainer?.id,
+          plan_id: plan.id,
+        });
 
+        if (res.data.status) {
+          Alert.alert("Success", "Trainer changed successfully");
+          onClose();
+          navigation.replace("MySessions");
+        }
+      } catch (err) {
+        Alert.alert("Error", "Trainer change failed");
+      }
+      return; // ⛔ STOP – no navigation
+    }
+
+    // 🔹 PAYMENT REQUIRED
+    navigation.navigate("Payment", {
+      mode,
+      new_trainer_id: trainer?.id,
+      old_trainer_id: oldTrainerId,
+      plan_id: plan.id,
+      booking_type: selected.toLowerCase(),
+      amount,
+    });
+  };
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-
+        <KeyboardAvoidingView
+          style={styles.modalContainer}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
           {/* Close */}
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
             <Icon name="close" size={26} color="#000" />
           </TouchableOpacity>
 
-          {/* Body */}
           <View style={{ flex: 1 }}>
             {loading && <ActivityIndicator size="large" />}
+
             {!loading && error && (
               <Text style={styles.errorText}>{error}</Text>
             )}
+
             {!loading && !error && (data || trainer) && (
-              <ScrollView showsVerticalScrollIndicator={false}>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                contentContainerStyle={styles.scrollContent}
+              >
+                {/* Trainer Info */}
                 <View style={styles.headerSection}>
                   <Image
                     source={
-                      (data?.profile_pic || trainer?.profile_pic)
-                        ? { uri: data?.profile_pic || trainer?.profile_pic }
+                      data?.profile_pic || trainer?.profile_pic
+                        ? {
+                          uri:
+                            data?.profile_pic ||
+                            trainer?.profile_pic,
+                        }
                         : require("../../../assets/trainer2.jpg")
                     }
                     style={styles.profileImage}
@@ -149,8 +156,14 @@ const handlePayment = async () => {
                   <TrainerInfoCard
                     name={data?.name || trainer?.name}
                     experience={data?.experience || trainer?.experience}
-                    sessionTiming={data?.section_timing || trainer?.section_timing}
-                    numSessions={data?.no_of_section || trainer?.no_of_section}
+                    sessionTiming={
+                      data?.section_timing ||
+                      trainer?.section_timing
+                    }
+                    numSessions={
+                      data?.no_of_section ||
+                      trainer?.no_of_section
+                    }
                     workoutType={plan?.name}
                   />
                 </View>
@@ -164,19 +177,25 @@ const handlePayment = async () => {
                     <TouchableOpacity
                       key={item}
                       onPress={() => {
-                        if (mode !== "change") setSelected(item);
+                        if (mode !== "change") {
+                          setSelected(item);
+                        }
                       }}
                       style={[
                         styles.optionBtn,
-                        selected === item && styles.optionBtnActive,
-                        mode === "change" && { opacity: 0.6 } // visually disabled
+                        selected === item &&
+                        styles.optionBtnActive,
+                        mode === "change" && {
+                          opacity: 0.6,
+                        },
                       ]}
                       disabled={mode === "change"}
                     >
                       <Text
                         style={[
                           styles.optionText,
-                          selected === item && styles.optionTextActive,
+                          selected === item &&
+                          styles.optionTextActive,
                         ]}
                       >
                         {item}
@@ -185,17 +204,32 @@ const handlePayment = async () => {
                   ))}
                 </View>
 
-                <Text style={[styles.sectionTitle, { marginTop: 15 }]}>
-                  Address
-                </Text>
+                {/* Address Header */}
+                <View style={styles.addressHeader}>
+                  <Text style={styles.sectionTitle}>
+                    Address
+                  </Text>
 
+                  <TouchableOpacity>
+                    <Text style={styles.addNewText}>
+                      + Add New
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Address Input */}
                 <TextInput
                   style={styles.addressInput}
                   multiline
+                  scrollEnabled={true}
                   placeholder="Enter your address"
                   value={address}
                   onChangeText={setAddress}
+                  textAlignVertical="top"
                 />
+
+                {/* Extra Space for Footer */}
+                <View style={{ height: 100 }} />
               </ScrollView>
             )}
           </View>
@@ -205,20 +239,23 @@ const handlePayment = async () => {
               <TouchableOpacity
                 style={[
                   styles.payBtn,
-                  (!address.trim()) && { opacity: 0.6 },
+                  !address.trim() && {
+                    opacity: 0.6,
+                  },
                 ]}
                 disabled={!address.trim()}
                 onPress={handlePayment}
               >
                 <Text style={styles.payText}>
-                  {mode === "change" ? "Change-Pay ₹" : "Pay ₹"}
+                  {mode === "change"
+                    ? "Change-Pay ₹"
+                    : "Pay ₹"}
                   {amount}
                 </Text>
               </TouchableOpacity>
             </View>
           )}
-
-        </View>
+        </KeyboardAvoidingView>
       </View>
     </Modal>
   );

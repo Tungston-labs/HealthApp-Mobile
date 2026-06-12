@@ -23,7 +23,6 @@ export const fetchAvailableTrainersThunk = createAsyncThunk(
   }
 );
 
-
 const initialState = {
   trainers: [],
   plan: null,

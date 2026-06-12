@@ -79,7 +79,7 @@ const ProfileScreen = ({ navigation }) => {
             style={styles.optionRow}
             onPress={() =>
               navigation.navigate("EditProfile", {
-                profileData: profile,   // ✅ always fresh
+                profileData: profile,
               })
             }
           >
@@ -108,7 +108,7 @@ const ProfileScreen = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      
+
       <CommonActionModal
         visible={logoutVisible}
         onClose={() => setLogoutVisible(false)}

@@ -114,7 +114,7 @@ const PaymentScreen = ({ navigation, route }) => {
         order_id,
         amount: Math.round(backend_amount * 100),
         currency: "INR",
-        name: "InFit",
+        name: "FitSapio",
         description: "Trainer Payment",
         prefill: {
           email: "test@email.com",

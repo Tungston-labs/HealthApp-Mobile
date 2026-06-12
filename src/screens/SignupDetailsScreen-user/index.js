@@ -68,7 +68,6 @@ export default function SignupDetailsScreenUser() {
     );
   };
 
-
   const handleUseLocation = async () => {
     try {
       const coords = await getCurrentLocation();
@@ -109,7 +108,6 @@ export default function SignupDetailsScreenUser() {
           paddingBottom: 120,
         }}
       >
-
 
         <Text style={styles.welcomeText}>Welcome to health app</Text>
         <Text style={styles.subtitle}>Enter basic details</Text>
