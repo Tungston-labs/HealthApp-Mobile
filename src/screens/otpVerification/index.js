@@ -12,6 +12,9 @@ import {
 } from "react-native";
 import styles from "./style";
 import { verifyOtpAction, resetOtpState } from "../../redux/slices/verifyOtpSlice";
+import Logo from "../../Images/logo.png";
+import { Image } from "react-native";
+
 
 export default function OtpScreen({ navigation, route }) {
   const dispatch = useDispatch();
@@ -90,7 +93,9 @@ export default function OtpScreen({ navigation, route }) {
         behavior={Platform.OS === "ios" ? "padding" : null}
         style={styles.innerContainer}
       >
-        <Text style={styles.brand}>OTP</Text>
+        <View style={styles.logoContainer}>
+          <Image source={Logo} style={styles.logo} />
+        </View>
         <Text style={styles.description}>
           Enter the code you received in your email{"\n"}below to reset your password.
         </Text>

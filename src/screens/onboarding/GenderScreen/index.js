@@ -25,7 +25,7 @@ export default function GenderScreen({ onSelectGender }) {
           styles.genderBox,
           selectedGender === "female" && {
             borderWidth: 2,
-            borderColor: "#7A5AF8",
+            borderColor: "#EF0707",
           },
         ]}
         onPress={() => selectGender("female")}
@@ -46,7 +46,7 @@ export default function GenderScreen({ onSelectGender }) {
           styles.genderBox,
           selectedGender === "male" && {
             borderWidth: 2,
-            borderColor: "#7A5AF8",
+            borderColor: "#EF0707",
           },
         ]}
         onPress={() => selectGender("male")}

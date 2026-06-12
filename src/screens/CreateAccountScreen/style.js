@@ -191,7 +191,7 @@ dropdownList: {
   uploadButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#7774F4",
+    backgroundColor: "#000000",
     paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 20,
@@ -249,7 +249,7 @@ dropdownList: {
   },
 
   continueBtn: {
-    backgroundColor: "#6c63ff",
+    backgroundColor: "#EF0707",
     paddingVertical: 18,
     borderRadius: 30,
   },

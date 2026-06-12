@@ -9,14 +9,13 @@ export default function CalendarPicker({ selectedDate, onSelect }) {
     ? new Date(selectedDate)
     : new Date();
 
-  
   const safeInitial =
     initialDate < today ? today : initialDate;
 
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const months = [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ];
   const years = Array.from({ length: 60 }, (_, i) => 2020 + i);
 
@@ -156,7 +155,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     height: 200,
-    backgroundColor: "#E6E5E8",
+    backgroundColor: "#EFEEE9",
     justifyContent: "space-between",
     position: "relative",
     marginTop: 10,

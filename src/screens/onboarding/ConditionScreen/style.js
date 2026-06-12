@@ -31,7 +31,7 @@ export default StyleSheet.create({
   },
 
   cardActive: {
-    borderColor: "#7774F4", 
+    borderColor: "#000000", 
   },
 
   label: {
@@ -54,7 +54,7 @@ export default StyleSheet.create({
     width: 15,
     height: 15,
     borderRadius: 15 / 2,
-    backgroundColor: "#7774F4", 
+    backgroundColor: "#000000", 
   },
 
 });

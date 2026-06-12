@@ -7,14 +7,13 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-     marginTop: 10,
+    marginTop: 10,
   },
 
- gridContainer: {
-  justifyContent: "space-between",
-  paddingHorizontal: 12,
-},
-
+  gridContainer: {
+    justifyContent: "space-between",
+    paddingHorizontal: 12,
+  },
 
   card: {
     width: cardWidth,
@@ -67,7 +66,6 @@ export default StyleSheet.create({
     fontWeight: "700",
     color: "#FFD700",
     fontFamily: "SegoeUI",
-
     marginTop: 6,
   },
 });

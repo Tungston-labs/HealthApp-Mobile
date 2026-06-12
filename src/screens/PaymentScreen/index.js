@@ -61,7 +61,6 @@ const PaymentScreen = ({ navigation, route }) => {
 
       let res;
 
-      // 🔁 CHANGE TRAINER FLOW
       if (mode === "change") {
         res = await createChangeTrainerOrder({
           old_trainer_id,
@@ -115,7 +114,7 @@ const PaymentScreen = ({ navigation, route }) => {
         order_id,
         amount: Math.round(backend_amount * 100),
         currency: "INR",
-        name: "InFit",
+        name: "FitSapio",
         description: "Trainer Payment",
         prefill: {
           email: "test@email.com",

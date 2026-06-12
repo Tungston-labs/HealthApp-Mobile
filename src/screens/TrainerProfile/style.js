@@ -40,7 +40,7 @@ export default StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 6,
-    borderColor: "#6B63F6", 
+    borderColor: "#EF0707", 
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#fff",
@@ -116,7 +116,7 @@ export default StyleSheet.create({
   logoutText: {
     marginLeft: 12,
     fontSize: 16,
-    color: "#E2574C",
+    color: "#eb1607",
     fontWeight: "600",
   },
 });

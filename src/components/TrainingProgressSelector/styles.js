@@ -6,7 +6,7 @@ export default StyleSheet.create({
         marginVertical: 10,
     },
     dayBar: {
-        backgroundColor: "#7774F4",
+        backgroundColor: "#000000",
         borderRadius: 10,
         padding: 12,
         flexDirection: "row",
@@ -36,7 +36,7 @@ export default StyleSheet.create({
         marginRight: 6,
     },
     slotCard: {
-        backgroundColor: "#DFDEF3",
+        backgroundColor: "#EFEEE9",
         width: 40,
         height: 60,
         borderRadius: 4,
@@ -45,7 +45,7 @@ export default StyleSheet.create({
         marginRight: 8,
     },
     activeSlot: {
-        backgroundColor: "#7774F4",
+        backgroundColor: "#000000",
     },
     slotDay: {
         fontWeight: "600",

@@ -56,7 +56,7 @@ otpBox: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
     paddingVertical: 10 * scale,
     paddingHorizontal: 18 * scale,
     borderRadius: 20 * scale,
@@ -92,7 +92,16 @@ otpBox: {
   },
 
   loginText: {
-    color: "#7774F4",
+    color: "#000000",
     fontWeight: "600",
   },
+  logoContainer: {
+        alignItems: "center",
+        marginBottom: 40 * scale,
+    },
+
+    logo: {
+        height: 38 * scale,
+        resizeMode: "contain", 
+    },
 });

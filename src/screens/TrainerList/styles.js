@@ -30,6 +30,7 @@ planName: {
   viewProfileBtn: {
   position: "absolute",
   bottom: 14,
+  left: 27,
   alignSelf: "center",
   backgroundColor: "#fff",
   paddingHorizontal: 6,
@@ -119,7 +120,7 @@ planName: {
   },
 
   bookBtn: {
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
     paddingVertical: 12,
     borderRadius: 20,
     borderColor:"20px solic black",

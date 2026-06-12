@@ -79,7 +79,7 @@ const ProfileScreen = ({ navigation }) => {
             style={styles.optionRow}
             onPress={() =>
               navigation.navigate("EditProfile", {
-                profileData: profile,   // ✅ always fresh
+                profileData: profile,
               })
             }
           >
@@ -101,14 +101,14 @@ const ProfileScreen = ({ navigation }) => {
             style={styles.logoutRow}
             onPress={() => setLogoutVisible(true)}
           >
-            <Icon name="log-out" size={20} color="#E2574C" />
+            <Icon name="log-out" size={20} color="#EF0707" />
             <Text style={styles.logoutText}>Log out</Text>
           </TouchableOpacity>
 
         </View>
       </ScrollView>
 
-      {/* 🔹 LOGOUT MODAL */}
+
       <CommonActionModal
         visible={logoutVisible}
         onClose={() => setLogoutVisible(false)}

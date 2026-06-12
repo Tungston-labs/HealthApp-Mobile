@@ -8,11 +8,11 @@ import {
 import styles from './styles';
 import CalendarPicker from './CalendarPicker';
 import { useNavigation } from '@react-navigation/native';
-import { useDispatch,useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchAvailableTrainersThunk } from '../../redux/slices/trainerPlanSlice';
 
 const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
-  // Default values similar to Postman request
+
   const [selectedSlot, setSelectedSlot] = useState('Mon,Tue,Wed,Thu,Fri,Sat');
   const [selectedDate, setSelectedDate] = useState('2026-01-03');
   const [selectedTime, setSelectedTime] = useState('09:00 AM');
@@ -21,7 +21,6 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
   const navigation = useNavigation();
   const loading = useSelector(state => state.trainer.loading);
 
-  // Auto slot selection based on plan type
   useEffect(() => {
     if (!visible) return;
 
@@ -32,7 +31,6 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
     }
   }, [visible, selectedPlanSlot]);
 
-  // Convert time to 24-hour format for backend
   const convertTo24Hour = (timeStr) => {
     const [time, modifier] = timeStr.split(' ');
     let [hours, minutes] = time.split(':').map(Number);
@@ -45,10 +43,8 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
       .padStart(2, '0')}`;
   };
 
-  // Apply filter (no GPS)
-
   const handleApply = async () => {
-    if (loading) return;   // 🔥 BLOCK DOUBLE PRESS
+    if (loading) return;
 
     try {
       const payload = {
@@ -74,10 +70,6 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
     }
   };
 
-
-
-
-  // Predefined time slots
   const timeSlots = [
     '09:00 AM',
     '09:45 AM',
@@ -93,48 +85,47 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.overlay}>
         <View style={styles.container}>
-          {/* Close Button */}
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-            <Text style={styles.closeText}>✕</Text>
-          </TouchableOpacity>
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerTitle}>
+              Please select date
+            </Text>
 
-          {/* Date Selector */}
-          <Text style={styles.sectionTitle}>Select Date Slot</Text>
+            <TouchableOpacity
+              style={styles.closeBtn}
+              onPress={onClose}
+            >
+              <Text style={styles.closeText}>✕</Text>
+            </TouchableOpacity>
+          </View>
           <CalendarPicker
             selectedDate={selectedDate}
             onSelect={setSelectedDate}
           />
           <View style={styles.inputUnderline} />
 
-          {/* Slot Selector */}
           <Text style={styles.sectionTitle}>Select Slot</Text>
+
           <View style={styles.slotRow}>
-            {selectedSlot === 'Mon,Tue,Wed,Thu,Fri,Sat' ? (
-              <TouchableOpacity style={[styles.slotBtn, styles.activeSlot]}>
-                <Text style={styles.activeSlotText}>Mon–Sat</Text>
-              </TouchableOpacity>
-            ) : (
-              ['Mon,Wed,Fri', 'Tue,Thu,Sat'].map(slot => (
-                <TouchableOpacity
-                  key={slot}
-                  style={[
-                    styles.slotBtn,
-                    selectedSlot === slot && styles.activeSlot,
-                  ]}
-                  onPress={() => setSelectedSlot(slot)}
+            {['Mon,Wed,Fri', 'Tue,Thu,Sat'].map(slot => (
+              <TouchableOpacity
+                key={slot}
+                style={[
+                  styles.slotBtn,
+                  selectedSlot === slot && styles.activeSlot,
+                ]}
+                onPress={() => setSelectedSlot(slot)}
+              >
+                <Text
+                  style={
+                    selectedSlot === slot
+                      ? styles.activeSlotText
+                      : styles.inactiveSlotText
+                  }
                 >
-                  <Text
-                    style={
-                      selectedSlot === slot
-                        ? styles.activeSlotText
-                        : styles.inactiveSlotText
-                    }
-                  >
-                    {slot}
-                  </Text>
-                </TouchableOpacity>
-              ))
-            )}
+                  {slot}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
 
           <View style={styles.inputUnderline} />
@@ -164,7 +155,6 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
             ))}
           </View>
 
-          {/* Apply Filter Button */}
           <View style={styles.applyWrapper}>
             <TouchableOpacity
               style={[styles.applyBtn, loading && { opacity: 0.5 }]}
@@ -172,7 +162,7 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
               onPress={handleApply}
             >
               <Text style={styles.applyText}>
-                {loading ? 'Loading...' : 'Apply filter →'}
+                {loading ? 'Loading...' : 'View Available Trainers →'}
               </Text>
             </TouchableOpacity>
 

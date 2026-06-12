@@ -42,7 +42,7 @@ const TrainerScheduleDetailView = ({
   if (isDataLoading) {
     return (
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-       
+
         <View style={styles.header}>
           <Skeleton width={24} height={24} borderRadius={12} />
           <Skeleton width={140} height={20} borderRadius={6} />
@@ -124,7 +124,7 @@ const TrainerScheduleDetailView = ({
             onPress={openEditNote}
             style={{ alignSelf: 'flex-end', marginTop: 8 }}
           >
-            <Icon name="create-outline" size={20} color="#6C63FF" />
+            <Icon name="create-outline" size={20} color="#000000" />
           </TouchableOpacity>
         </View>
       )}

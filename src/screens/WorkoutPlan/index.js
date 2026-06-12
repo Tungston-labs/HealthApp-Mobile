@@ -44,7 +44,6 @@ const WorkoutPlan = ({ navigation }) => {
         }
       />
 
-      {/*  EVERYTHING BELOW SCROLLS */}
       {loading ? (
         <FlatList
           data={Array.from({ length: 6 })}

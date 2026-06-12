@@ -41,14 +41,12 @@ const ProfileSection = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  /* ===================== LOCAL STATE ===================== */
   const [consultType, setConsultType] = useState("call");
   const [consultNote, setConsultNote] = useState("");
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
   const [showConsultModal, setShowConsultModal] = useState(false);
 
-  /* ===================== REDUX STATE ===================== */
   const { user } = useSelector((state) => state.auth || {});
   const session = user?.session ?? null;
 
@@ -65,17 +63,14 @@ const ProfileSection = () => {
   } = useSelector((state) => state.trainerChange || {});
 
   const trainer = trainerId ? data ?? null : session;
-  console.log({trainer});
-  
+  console.log({ trainer });
 
-  /* ===================== FETCH TRAINER ===================== */
   useEffect(() => {
     if (trainerId) {
       dispatch(fetchTrainerDetailThunk(trainerId));
     }
   }, [trainerId, dispatch]);
 
-  /* ===================== TRAINER PHONE ===================== */
   const trainerPhone =
     trainer?.phno ||
     null;
@@ -91,7 +86,6 @@ const ProfileSection = () => {
     setShowEmergencyModal(false);
   };
 
-  /* ===================== CANCEL TRAINING ===================== */
   const {
     success: cancelSuccess,
     error: cancelError,
@@ -116,7 +110,6 @@ const ProfileSection = () => {
     }
   }, [cancelSuccess, cancelError, dispatch]);
 
-  /* ===================== CONSULTATION ===================== */
   const {
     loading: nutritionLoading,
     success: nutritionSuccess,
@@ -152,21 +145,17 @@ const ProfileSection = () => {
     }
   }, [nutritionSuccess, nutritionError, dispatch]);
 
-  /* ===================== CHANGE TRAINER ===================== */
-const handleChangeTrainer = () => {
-  if (!trainer?.id) {
-    alert("Trainer not available");
-    return;
-  }
+  const handleChangeTrainer = () => {
+    if (!trainer?.id) {
+      alert("Trainer not available");
+      return;
+    }
 
-  navigation.navigate("TrainerList", {
-    mode: "change",
-    trainerId: trainer.id, 
-  });
-};
-
-
-
+    navigation.navigate("TrainerList", {
+      mode: "change",
+      trainerId: trainer.id,
+    });
+  };
 
   useEffect(() => {
     if (changeData) {
@@ -183,7 +172,6 @@ const handleChangeTrainer = () => {
     }
   }, [changeData, changeError, dispatch, trainer]);
 
-  /* ===================== EMPTY STATES ===================== */
   if (!session && !trainerId) {
     return (
       <EmptyState
@@ -203,7 +191,6 @@ const handleChangeTrainer = () => {
     );
   }
 
-  /* ===================== DISPLAY DATA ===================== */
   const fallbackImage = require("../../../assets/trainer1.jpg");
 
   const imageSource = trainer?.profile_pic
@@ -217,13 +204,10 @@ const handleChangeTrainer = () => {
   const workoutPlan = trainer?.plan_name || "N/A";
   const workoutTypeText = trainer?.workout_type || "N/A";
   const trainerNotes = trainer?.notes || "No notes available";
-  
 
-  /* ===================== UI ===================== */
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* HEADER */}
         <View style={styles.header}>
           <View>
             <Text style={styles.title}>Trainers</Text>
@@ -240,13 +224,9 @@ const handleChangeTrainer = () => {
 
         <View style={styles.divider} />
 
-        {/* TRAINER CARD */}
         <View style={styles.trainerCard}>
           <Image source={imageSource} style={styles.trainerImage} />
-
           <TrainerInfoCard
-  
-
             name={trainer?.name || "N/A"}
             experience={trainer?.experience ?? 0}
             sessionTiming={trainerTiming}
@@ -254,10 +234,8 @@ const handleChangeTrainer = () => {
             workoutType={workoutPlan}
           />
         </View>
-
         <View style={styles.divider} />
 
-        {/* DETAILS */}
         <Text style={styles.sectionTitle}>Workout plan - {workoutPlan}</Text>
         <Text style={styles.workoutText}>Workout type - {workoutTypeText}</Text>
 
@@ -268,7 +246,6 @@ const handleChangeTrainer = () => {
 
         <View style={styles.divider} />
 
-        {/* ACTION BUTTONS */}
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={styles.primaryButton}
@@ -285,18 +262,16 @@ const handleChangeTrainer = () => {
           </TouchableOpacity>
         </View>
 
-        {/* CHANGE TRAINER */}
-       <TouchableOpacity
-  style={styles.changeTrainerButton}
-  onPress={handleChangeTrainer}
->
-  <Icon name="person-outline" size={18} color="#fff" />
-  <Text style={styles.changeTrainerText}>Change trainer</Text>
-</TouchableOpacity>
+        <TouchableOpacity
+          style={styles.changeTrainerButton}
+          onPress={handleChangeTrainer}
+        >
+          <Icon name="person-outline" size={18} color="#fff" />
+          <Text style={styles.changeTrainerText}>Change trainer</Text>
+        </TouchableOpacity>
 
       </ScrollView>
 
-      {/* MODALS */}
       <CommonActionModal
         visible={showCancelModal}
         onClose={() => setShowCancelModal(false)}
@@ -333,7 +308,7 @@ const handleChangeTrainer = () => {
         onClose={() => setShowConsultModal(false)}
         onConfirm={!nutritionLoading ? handleConsultSubmit : undefined}
         iconName="chatbubble-ellipses-outline"
-        iconColor="#6C63FF"
+        iconColor="#000000"
         title="Request a Consultation"
         description="Choose your consultation type and leave a short note."
         cancelText="Cancel"

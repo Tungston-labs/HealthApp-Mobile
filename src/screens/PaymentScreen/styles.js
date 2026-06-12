@@ -136,7 +136,7 @@ workout:{
   },
 
   payBtn: {
-    backgroundColor: "#7C74F9",
+    backgroundColor: "#EF0707",
     paddingVertical: 12,
     paddingHorizontal: 45,
     borderRadius: 25,

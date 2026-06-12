@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   card: {
-    backgroundColor: "#ECECFF",
+    backgroundColor: "#EFEEE9",
     borderRadius: 18,
     padding: 14,
     marginBottom: 14,
@@ -51,7 +51,7 @@ export default StyleSheet.create({
   },
 
   badge: {
-    backgroundColor: "#DEDDFE",
+    backgroundColor: "#000000",
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 8,
@@ -60,7 +60,7 @@ export default StyleSheet.create({
   badgeText: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#6C63FF",
+    color: "#ffffff",
   },
 
   bottomRow: {

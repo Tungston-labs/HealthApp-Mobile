@@ -150,7 +150,7 @@ const ProfileScreenTrainer = ({ navigation }) => {
             style={styles.logoutRow}
             onPress={() => setLogoutVisible(true)}
           >
-            <Icon name="log-out" size={20} color="#E2574C" />
+            <Icon name="log-out" size={20} color="#eb1405" />
             <Text style={styles.logoutText}>Log out</Text>
           </TouchableOpacity>
         </View>

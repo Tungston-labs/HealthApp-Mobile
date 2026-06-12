@@ -2,12 +2,12 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
  card: {
-  backgroundColor: "#EEF0FF",
+  backgroundColor: "#EFEEE9",
   borderRadius: 20,
   padding: 10,
-  paddingBottom: 36, // 👈 space for chevron
+  paddingBottom: 36, 
   marginBottom: 16,
-  position: "relative", // 👈 REQUIRED
+  position: "relative", 
 },
 
   topRow: {
@@ -39,7 +39,7 @@ export default StyleSheet.create({
   },
 
   progressBadge: {
-    backgroundColor: "#D7DBFF",
+    backgroundColor: "#050505",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
@@ -48,7 +48,7 @@ export default StyleSheet.create({
   progressText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#6C63FF",
+    color: "#fcfaf6",
   },
 
   metaRow: {
@@ -118,7 +118,7 @@ export default StyleSheet.create({
   width: 30,
   height: 30,
   borderRadius: 18,
-  backgroundColor: "#6C63FF",
+  backgroundColor: "#000000",
   alignItems: "center",
   justifyContent: "center",
   elevation: 6,           

@@ -4,21 +4,18 @@ import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
     justifyContent: "flex-end",
   },
 
-modalContainer: {
-  backgroundColor: "#fff",
-  height: "60%",      
-  borderTopLeftRadius: 30,
-  borderTopRightRadius: 30,
-  paddingHorizontal: 20,
-  position: "absolute",
-  width: "100%",
-},
-
-
+  modalContainer: {
+    backgroundColor: "#fff",
+    height: "70%",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 20,
+    width: "100%",
+  },
   closeBtn: {
     position: "absolute",
     top: 15,
@@ -91,8 +88,8 @@ modalContainer: {
   },
 
   optionBtnActive: {
-    backgroundColor: "#7774F4",
-    borderColor: "#7774F4",
+    backgroundColor: "#EF0707",
+    borderColor: "#EF0707",
   },
 
   optionText: {
@@ -126,7 +123,7 @@ modalContainer: {
   },
 
   payBtn: {
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
     paddingVertical: 16,
     borderRadius: 30,
     alignItems: "center",
@@ -137,4 +134,22 @@ modalContainer: {
     fontSize: 18,
     fontWeight: "700",
   },
+  scrollContent: {
+    paddingTop: 10,
+    paddingBottom: 80,
+  },
+
+  addressHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 20,
+  },
+
+  addNewText: {
+    color: "#EF0707",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+
 });

@@ -54,7 +54,7 @@ export default StyleSheet.create({
   indicatorFill: {
     width: "33%",
     height: 2,
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
     position: "absolute",
     top: 1,
   },

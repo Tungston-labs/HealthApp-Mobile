@@ -67,7 +67,7 @@ const CalendarModal = ({ visible, onClose, onConfirm }) => {
           {/* HEADER */}
           <View style={styles.header}>
             <TouchableOpacity onPress={() => changeMonth("prev")}>
-              <Icon name="chevron-back" size={22} color="#7B77FF" />
+              <Icon name="chevron-back" size={22} color="#EF0707" />
             </TouchableOpacity>
 
             <Text style={styles.month}>
@@ -78,7 +78,7 @@ const CalendarModal = ({ visible, onClose, onConfirm }) => {
             </Text>
 
             <TouchableOpacity onPress={() => changeMonth("next")}>
-              <Icon name="chevron-forward" size={22} color="#7B77FF" />
+              <Icon name="chevron-forward" size={22} color="#EF0707" />
             </TouchableOpacity>
           </View>
 

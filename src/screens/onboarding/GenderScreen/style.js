@@ -20,7 +20,7 @@ export default StyleSheet.create({
 
   genderBoxActive: {
     borderWidth: 2,
-    borderColor: "#7A5AF8",
+    borderColor: "#6df85a",
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     height: 180,

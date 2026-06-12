@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
   },
 
   activeIconWrapper: {
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
   },
 });
 

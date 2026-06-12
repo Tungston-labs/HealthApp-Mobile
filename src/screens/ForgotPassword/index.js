@@ -16,7 +16,8 @@ import {
   resetForgotPasswordState,
 } from "../../redux/slices/forgotPasswordSlice";
 import styles from "./style";
-import Logo from "../../Images/logo.svg";
+import Logo from "../../Images/logo.png";
+import { Image } from "react-native";
 
 export default function ForgotPasswordScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -60,7 +61,7 @@ export default function ForgotPasswordScreen({ navigation }) {
       <View style={styles.centerWrapper}>
 
         <View style={styles.logoContainer}>
-          <Logo style={styles.logo} />
+          <Image source={Logo} style={styles.logo} />
         </View>
 
         <Text style={styles.description}>

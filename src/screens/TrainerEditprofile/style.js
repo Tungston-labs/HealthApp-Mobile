@@ -25,7 +25,7 @@ export default StyleSheet.create({
 
   input: {
     borderBottomWidth: 1,
-    borderColor: "#E0E0E0",
+    borderColor: "#EFEEE9",
     paddingVertical: 6,
     fontSize: 15,
     color: "#000",
@@ -63,7 +63,7 @@ export default StyleSheet.create({
   },
 
   saveBtn: {
-    backgroundColor: "#6B4EFF",
+    backgroundColor: "#EF0707",
     paddingHorizontal: 28,
     paddingVertical: 12,
     borderRadius: 30,

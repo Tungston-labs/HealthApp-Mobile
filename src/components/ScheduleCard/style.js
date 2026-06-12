@@ -13,7 +13,7 @@ export default StyleSheet.create({
     height: 10,
     borderRadius: 5,
     borderWidth: 1.5,
-    borderColor: '#6C63FF',
+    borderColor: '#000000',
     marginRight: 12,
   },
 
@@ -21,7 +21,7 @@ export default StyleSheet.create({
   card: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#EDEDFF',
+    backgroundColor: '#EFEEE9',
     borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 12,
@@ -30,7 +30,7 @@ export default StyleSheet.create({
 
   time: {
     width: 48,
-    color: '#6C63FF',
+    color: '#080808',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -67,7 +67,7 @@ export default StyleSheet.create({
   progressBadge: {
     marginTop: 6,
     alignSelf: 'flex-start',
-    backgroundColor: '#D7DBFF',
+    backgroundColor: '#EFEEE9',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
@@ -75,7 +75,7 @@ export default StyleSheet.create({
 
   progressText: {
     fontSize: 11,
-    color: '#6C63FF',
+    color: '#000000',
     fontWeight: '600',
   },
 
@@ -91,7 +91,7 @@ export default StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: 12,
-    backgroundColor: '#7774F4',
+    backgroundColor: '#EF0707',
     
   },
 

@@ -9,9 +9,9 @@ export default StyleSheet.create({
   topBackground: {
     position: "absolute",
     top: 0,
-    height: 450,
+    height: 400,
     width: "100%",
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
   },
 
   header: {
@@ -19,7 +19,7 @@ export default StyleSheet.create({
     fontWeight: "700",
     color: "#fff",
     marginLeft: 20,
-    marginTop: 80,
+    marginTop: 40,
   },
 
   card: {
@@ -165,12 +165,11 @@ scaleBar: {
   textAlign: "left",   
 },
 
-
   floatingButton: {
     position: "absolute",
-    bottom: 45,
+    bottom: 25,
     right: 25,
-    backgroundColor: "#7774F4",
+    backgroundColor: "#EF0707",
     width: 40,
     height: 40,
     borderRadius: 40,
@@ -178,4 +177,5 @@ scaleBar: {
     alignItems: "center",
     elevation: 8,
   },
+  
 });

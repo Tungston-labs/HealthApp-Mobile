@@ -17,8 +17,8 @@ export default StyleSheet.create({
     },
 
     logo: {
-        height: 28 * scale,   // same as your old text height
-        width: 120 * scale,   // adjust based on your logo ratio
+        height: 38 * scale,
+        resizeMode: "contain", // ✅ important
     },
 
     inputContainer: {
@@ -58,7 +58,7 @@ export default StyleSheet.create({
 
     forgotPassword: {
         alignSelf: "flex-end",
-        color: "#DA9307",
+        color: "#000000",
         marginTop: 6 * scale,
         fontWeight: "900",
         fontSize: 12 * scale,
@@ -103,7 +103,7 @@ export default StyleSheet.create({
     },
 
     signUp: {
-        color: "#DA9307",
+        color: "#000000",
         fontSize: 14 * scale,
         fontWeight: "900",
         fontFamily: "Roboto-Medium",

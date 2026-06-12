@@ -19,7 +19,7 @@ export default StyleSheet.create({
   imageWrapper: {
     marginTop: 60,
     borderWidth: 4,
-    borderColor: "#A48CFB",
+    borderColor: "#EF0707",
     borderRadius: 80,
     padding: 3,
   },

@@ -5,7 +5,6 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-
   progressCard: {
     backgroundColor: "#2F2F2F",
     marginHorizontal: 16,
@@ -94,7 +93,6 @@ export default StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
   },
-
   dayButton: {
     backgroundColor: "#6C63FF",
     borderRadius: 8,
@@ -107,28 +105,26 @@ export default StyleSheet.create({
     fontWeight: "600",
   },
   progressContainer: {
-  marginVertical: 12,
-},
-
-progressTrack: {
-  height: 8,
-  width: "100%",
-  backgroundColor: "#E0E0E0",
-  borderRadius: 10,
-  overflow: "hidden",
-},
-
-progressFill: {
-  height: "100%",
-  width: "45%",  
-  backgroundColor: "#7774F4",
-},
-planGrid: {
-  flexDirection: "row",
-  flexWrap: "wrap",
-  justifyContent: "space-between",
-  paddingHorizontal: 20,
-  marginTop: 12,
-},
+    marginVertical: 12,
+  },
+  progressTrack: {
+    height: 8,
+    width: "100%",
+    backgroundColor: "#E0E0E0",
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    width: "45%",
+    backgroundColor: "#EF0707",
+  },
+  planGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    marginTop: 12,
+  },
 
 });
