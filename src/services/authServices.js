@@ -1,19 +1,17 @@
-import api from "./api";
+import api, { publicApi } from "./api";
 
 
 
 export const loginApi = (payload) => {
-  return api.post("auth/login/", payload, {
-    skipAuth: true,
-  });
+  return publicApi.post("auth/login/", payload);
 };
 
 
 export const logoutApi = (refresh) =>
-  api.post("auth/logout/", { refresh });
+  publicApi.post("auth/logout/", { refresh });
 
 export const refreshTokenApi = (refresh) =>
-  api.post("auth/token/refresh/", { refresh });
+  publicApi.post("auth/token/refresh/", { refresh });
 
 export const forgotPasswordStep = (payload) =>
   api.post("auth/forgot-password/step1/", payload);

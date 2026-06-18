@@ -19,6 +19,13 @@ export const getCurrentLocation = async () => {
     }
   }
 
+  if (Platform.OS === 'ios') {
+    const auth = await Geolocation.requestAuthorization('whenInUse');
+    if (auth !== 'granted') {
+      throw new Error('Location permission denied');
+    }
+  }
+
   return new Promise((resolve, reject) => {
     Geolocation.getCurrentPosition(
       position => {
@@ -26,7 +33,7 @@ export const getCurrentLocation = async () => {
       },
       error => {
         console.log('LOCATION ERROR:', error);
-        reject(error);
+        reject(new Error(error?.message || 'Unable to fetch location'));
       },
       {
         enableHighAccuracy: true,

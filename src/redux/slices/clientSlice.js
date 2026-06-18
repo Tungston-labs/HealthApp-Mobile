@@ -2,11 +2,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { registerClientApi } from "../../services/clientServices";
 import { setToken } from "../../storage/asyncStorage";
-import { setAuth } from "../slices/authSlice"; // ✅ import setAuth
+import { extractApiErrorMessage } from "../../utils/registrationErrors";
 
 export const registerClientThunk = createAsyncThunk(
   "client/register",
-  async (payload, { rejectWithValue, dispatch }) => {
+  async (payload, { rejectWithValue }) => {
     try {
       const res = await registerClientApi(payload);
       const { token, user } = res.data;
@@ -15,11 +15,16 @@ export const registerClientThunk = createAsyncThunk(
         await setToken(token.access, token.refresh);
       }
 
-      dispatch(setAuth({ user, access: token?.access }));
+      // Don't set auth here - user must login first to establish proper session
+      // Auth will be set when user logs in successfully
 
       return res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data || "Registration failed");
+      const message = extractApiErrorMessage(
+        err.response?.data,
+        err.message || "Registration failed"
+      );
+      return rejectWithValue(message);
     }
   }
 );

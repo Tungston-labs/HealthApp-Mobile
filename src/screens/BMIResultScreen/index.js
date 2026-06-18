@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Platform } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import Toast from 'react-native-toast-message';
 import styles from "./style";
 import { useSelector, useDispatch } from "react-redux";
 import { Alert } from "react-native";
@@ -118,17 +119,14 @@ const handleFinalSubmit = async () => {
   try {
     const res = await dispatch(registerClientThunk(formData)).unwrap();
 
-    const userData = res.user || {
-      name: registration.name,
-      email: registration.email,
-      role: registration.role || "user",
-    };
+    Toast.show({
+      type: 'success',
+      text1: 'Registration Successful',
+      text2: 'Please log in with your credentials.',
+    });
 
-    // Correctly set auth in Redux
-    dispatch(setAuth({ user: userData, access: res.token?.access }));
-
-    // Navigate to main app
-    navigation.replace("MainApp"); // or AppNavigator entry
+    // Navigate to Login screen to complete authentication
+    navigation.replace("Login");
   } catch (err) {
     Alert.alert("Registration failed", err?.message || err);
   }

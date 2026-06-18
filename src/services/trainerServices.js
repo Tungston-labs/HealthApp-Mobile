@@ -1,6 +1,5 @@
 import { Platform } from "react-native";
-import api from "./api";
-import axios from "axios";
+import api, { publicApi } from "./api";
 
 export const uploadImageApi = async (file) => {
   const formData = new FormData();
@@ -18,8 +17,8 @@ export const uploadImageApi = async (file) => {
 
   console.log("📤 Uploading:", uri);
 
-  return axios.post(
-    "http://178.248.112.16:9001/api/trainer/upload-image/",
+  return publicApi.post(
+    "trainer/upload-image/",
     formData,
     {
       headers: {
@@ -27,15 +26,15 @@ export const uploadImageApi = async (file) => {
         "Content-Type": "multipart/form-data",
       },
       timeout: 30000,
-      withCredentials: false, 
+      withCredentials: false,
     }
   ).then(res => res.data.url);
 };
 
 
 export const registerTrainerApi = async (formData) => {
-  return axios.post(
-    "http://178.248.112.16:9001/api/trainer/",
+  return publicApi.post(
+    "trainer/",
     formData,
     {
       headers: {

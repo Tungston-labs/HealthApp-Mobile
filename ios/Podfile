@@ -1,17 +1,37 @@
-# Resolve react_native_pods.rb with node to allow for hoisting
-require Pod::Executable.execute_command('node', ['-p',
-  'require.resolve(
-    "react-native/scripts/react_native_pods.rb",
-    {paths: [process.argv[1]]},
-  )', __dir__]).strip
+require Pod::Executable.execute_command(
+  'node',
+  [
+    '-p',
+    'require.resolve(
+      "react-native/scripts/react_native_pods.rb",
+      {paths: [process.argv[1]]},
+    )',
+    __dir__
+  ]
+).strip
 
-platform :ios, min_ios_version_supported
+platform :ios, '15.1'
+
 prepare_react_native_project!
 
-linkage = ENV['USE_FRAMEWORKS']
-if linkage != nil
-  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
-  use_frameworks! :linkage => linkage.to_sym
+def patch_fmt_consteval_for_xcode_26(installer)
+  fmt_base_header = File.join(
+    installer.sandbox.root.to_s,
+    'fmt',
+    'include',
+    'fmt',
+    'base.h'
+  )
+  return unless File.exist?(fmt_base_header)
+
+  contents = File.read(fmt_base_header)
+  original_check = '#elif defined(__apple_build_version__) && __apple_build_version__ < 14000029L'
+  patched_check = '#elif defined(__apple_build_version__) && (__apple_build_version__ < 14000029L || __apple_build_version__ >= 21000000L)'
+  return if contents.include?(patched_check)
+  return unless contents.include?(original_check)
+
+  File.chmod(0644, fmt_base_header)
+  File.write(fmt_base_header, contents.sub(original_check, patched_check))
 end
 
 target 'HealthApp' do
@@ -19,7 +39,6 @@ target 'HealthApp' do
 
   use_react_native!(
     :path => config[:reactNativePath],
-    # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
@@ -27,8 +46,29 @@ target 'HealthApp' do
     react_native_post_install(
       installer,
       config[:reactNativePath],
-      :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
+      :mac_catalyst_enabled => false
     )
+    patch_fmt_consteval_for_xcode_26(installer)
+
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
+
+        # React Native 0.82 requires C++20
+        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
+        config.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'
+
+        # Don't fail on warnings
+        config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+
+        # Enable modules
+        config.build_settings['CLANG_CXX_ENABLE_MODULES'] = 'YES'
+
+        # ARC
+        config.build_settings['CLANG_ENABLE_OBJC_ARC'] = 'YES'
+
+      end
+    end
   end
 end
