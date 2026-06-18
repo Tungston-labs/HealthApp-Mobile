@@ -11,7 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import styles from './style';
+import styles, { pickerSelectStyles } from './style';
 import { getCurrentLocation } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,10 +20,13 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import DOBPicker from './DOBPicker';
 import { uploadImageApi } from '../../services/trainerServices';
 import Toast from 'react-native-toast-message';
-import { validateSignup } from '../../utils/Validators';
+import { sectionTimingRegex, validateSignup } from '../../utils/Validators';
+import RNPickerSelect from 'react-native-picker-select';
+
 export default function CreateAccountScreen({ navigation }) {
   const [images, setImages] = useState([]);
   const dispatch = useDispatch();
+  const [sectionOpen, setSectionOpen] = useState(false);
 
   const { loading, error, success } = useSelector(state => state.trainerReg);
   const [isUploading, setIsUploading] = useState(false); const [name, setName] = useState('');
@@ -490,22 +493,54 @@ export default function CreateAccountScreen({ navigation }) {
           onChangeText={setAddress}
           multiline
         />
+<View style={styles.twoColRow}>
+
+  {/* SECTION TIMING */}
+  <View style={{ flex: 1, position: "relative" }}>
+    <TouchableOpacity
+      style={styles.dropdownRow}
+      onPress={() => setSectionOpen(!sectionOpen)}
+    >
+      <Text
+        style={[
+          styles.dropdownText,
+          sectionTiming && { color: "#000" }
+        ]}
+      >
+        {sectionTiming ? `${sectionTiming} min` : "Section timing"}
+      </Text>
+    </TouchableOpacity>
+
+    {sectionOpen && (
+      <View style={styles.dropdownList}>
+        {["15", "20", "30", "45", "60"].map(t => (
+          <TouchableOpacity
+            key={t}
+            style={styles.dropdownItem}
+            onPress={() => {
+              setSectionTiming(t);
+              setSectionOpen(false);
+            }}
+          >
+            <Text style={styles.dropdownItemText}>{t} min</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    )}
+  </View>
+
+  {/* EXPERIENCE (WILL NOT MOVE) */}
+  <TextInput
+    placeholder="Experience (yr)"
+    value={experience}
+    onChangeText={setExperience}
+    keyboardType="numeric"
+    style={[styles.inputUnderline, { flex: 1 }]}
+  />
+
+</View>
 
 
-        <View style={styles.twoColRow}>
-          <TextInput
-            placeholder="Section timing"
-            value={sectionTiming}
-            onChangeText={setSectionTiming}
-            style={styles.inputUnderline}
-          />
-          <TextInput
-            placeholder="Experience ( yr )"
-            value={experience}
-            onChangeText={setExperience}
-            style={styles.inputUnderline}
-          />
-        </View>
 
         <View style={styles.twoColRow}>
           <TextInput
@@ -530,7 +565,6 @@ export default function CreateAccountScreen({ navigation }) {
           style={styles.inputUnderline}
         />
 
-        {/* Upload Section */}
         <View style={styles.uploadContainer}>
           <Text style={styles.uploadTitle}>Upload Certificates </Text>
 
