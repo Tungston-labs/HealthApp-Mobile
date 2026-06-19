@@ -18,7 +18,7 @@ export default StyleSheet.create({
 
     logo: {
         height: 38 * scale,
-        resizeMode: "contain", // ✅ important
+        resizeMode: "contain", 
     },
 
     inputContainer: {

@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # App Icon Setup Script
-# This script converts FITSAPIO.svg to app icons for both iOS and Android
+# This script converts FITSAPIO.png to app icons for both iOS and Android
 # Prerequisites: ImageMagick (convert command) or similar tool
 
 set -e
 
-echo "🎨 Setting up app icons from FITSAPIO.svg..."
+echo "🎨 Setting up app icons from FITSAPIO.png..."
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -14,9 +14,13 @@ BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Check if FITSAPIO.svg exists
-if [ ! -f "assets/FITSAPIO.svg" ]; then
-    echo -e "${RED}❌ Error: assets/FITSAPIO.svg not found${NC}"
+# Path to source PNG icon
+SOURCE_ICON="assets/FITSAPIO.png"
+
+# Check if FITSAPIO.png exists
+if [ ! -f "$SOURCE_ICON" ]; then
+    echo -e "${YELLOW}⚠️  Warning: $SOURCE_ICON not found.${NC}"
+    echo "Please add your FITSAPIO.png to the assets folder and rerun the script."
     exit 1
 fi
 
@@ -24,8 +28,6 @@ fi
 if ! command -v convert &> /dev/null; then
     echo -e "${YELLOW}⚠️  ImageMagick not found. Please install it:${NC}"
     echo "   macOS: brew install imagemagick"
-    echo "   Or use an online SVG to PNG converter:"
-    echo "   https://convertio.co/svg-png/"
     exit 1
 fi
 
@@ -37,15 +39,15 @@ mkdir -p ios_icons_temp
 # iOS icon sizes (width x height @ scale)
 # 20x20@2x, 20x20@3x, 29x29@2x, 29x29@3x, 40x40@2x, 40x40@3x, 60x60@2x, 60x60@3x, 1024x1024@1x
 
-convert assets/FITSAPIO.svg -resize 40x40 ios_icons_temp/icon-20-2x.png
-convert assets/FITSAPIO.svg -resize 60x60 ios_icons_temp/icon-20-3x.png
-convert assets/FITSAPIO.svg -resize 58x58 ios_icons_temp/icon-29-2x.png
-convert assets/FITSAPIO.svg -resize 87x87 ios_icons_temp/icon-29-3x.png
-convert assets/FITSAPIO.svg -resize 80x80 ios_icons_temp/icon-40-2x.png
-convert assets/FITSAPIO.svg -resize 120x120 ios_icons_temp/icon-40-3x.png
-convert assets/FITSAPIO.svg -resize 120x120 ios_icons_temp/icon-60-2x.png
-convert assets/FITSAPIO.svg -resize 180x180 ios_icons_temp/icon-60-3x.png
-convert assets/FITSAPIO.svg -resize 1024x1024 ios_icons_temp/icon-1024.png
+convert "$SOURCE_ICON" -background transparent -gravity center -resize 40x40 -extent 40x40 ios_icons_temp/icon-20-2x.png
+convert "$SOURCE_ICON" -background transparent -gravity center -resize 60x60 -extent 60x60 ios_icons_temp/icon-20-3x.png
+convert "$SOURCE_ICON" -background transparent -gravity center -resize 58x58 -extent 58x58 ios_icons_temp/icon-29-2x.png
+convert "$SOURCE_ICON" -background transparent -gravity center -resize 87x87 -extent 87x87 ios_icons_temp/icon-29-3x.png
+convert "$SOURCE_ICON" -background transparent -gravity center -resize 80x80 -extent 80x80 ios_icons_temp/icon-40-2x.png
+convert "$SOURCE_ICON" -background transparent -gravity center -resize 120x120 -extent 120x120 ios_icons_temp/icon-40-3x.png
+convert "$SOURCE_ICON" -background transparent -gravity center -resize 120x120 -extent 120x120 ios_icons_temp/icon-60-2x.png
+convert "$SOURCE_ICON" -background transparent -gravity center -resize 180x180 -extent 180x180 ios_icons_temp/icon-60-3x.png
+convert "$SOURCE_ICON" -background transparent -gravity center -resize 1024x1024 -extent 1024x1024 ios_icons_temp/icon-1024.png
 
 # Copy to iOS AppIcon.appiconset
 iOS_ICON_PATH="ios/HealthApp/Images.xcassets/AppIcon.appiconset"
@@ -72,18 +74,18 @@ mkdir -p android/app/src/main/res/mipmap-xxhdpi
 mkdir -p android/app/src/main/res/mipmap-xxxhdpi
 
 # Android icon sizes (mdpi is baseline 48x48)
-convert assets/FITSAPIO.svg -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-convert assets/FITSAPIO.svg -resize 72x72 android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-convert assets/FITSAPIO.svg -resize 96x96 android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-convert assets/FITSAPIO.svg -resize 144x144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-convert assets/FITSAPIO.svg -resize 192x192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+convert "$SOURCE_ICON" -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+convert "$SOURCE_ICON" -resize 72x72 android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+convert "$SOURCE_ICON" -resize 96x96 android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+convert "$SOURCE_ICON" -resize 144x144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+convert "$SOURCE_ICON" -resize 192x192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 
 # Also create ic_launcher_round for Android 7.1+
-convert assets/FITSAPIO.svg -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
-convert assets/FITSAPIO.svg -resize 72x72 android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
-convert assets/FITSAPIO.svg -resize 96x96 android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
-convert assets/FITSAPIO.svg -resize 144x144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
-convert assets/FITSAPIO.svg -resize 192x192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+convert "$SOURCE_ICON" -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+convert "$SOURCE_ICON" -resize 72x72 android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+convert "$SOURCE_ICON" -resize 96x96 android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
+convert "$SOURCE_ICON" -resize 144x144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
+convert "$SOURCE_ICON" -resize 192x192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
 
 echo -e "${GREEN}✅ Android icons created${NC}"
 

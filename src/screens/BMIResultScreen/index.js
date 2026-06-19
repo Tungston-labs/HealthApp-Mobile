@@ -118,15 +118,18 @@ const handleFinalSubmit = async () => {
   
   try {
     const res = await dispatch(registerClientThunk(formData)).unwrap();
+    const user = res?.user;
+    const access = res?.access;
+
+    if (user && access) {
+      dispatch(setAuth({ user, access }));
+    }
 
     Toast.show({
       type: 'success',
       text1: 'Registration Successful',
-      text2: 'Please log in with your credentials.',
+      text2: 'Welcome! Redirecting to the app.',
     });
-
-    // Navigate to Login screen to complete authentication
-    navigation.replace("Login");
   } catch (err) {
     Alert.alert("Registration failed", err?.message || err);
   }

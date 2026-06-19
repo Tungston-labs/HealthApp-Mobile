@@ -1,10 +1,10 @@
 # App Icon Setup Guide
 
-Your FITSAPIO.svg has been configured as the app icon. Follow these steps to apply it:
+Your `FITSAPIO.png` has been configured as the app icon. Follow these steps to apply it:
 
 ## Prerequisites
 
-You need **ImageMagick** installed to convert the SVG to PNG icons:
+You need **ImageMagick** installed to resize the PNG into platform-specific icons:
 
 ```bash
 # macOS
@@ -29,17 +29,16 @@ chmod +x setup-app-icon.sh
 ```
 
 This will:
-- Convert FITSAPIO.svg to all required iOS sizes
-- Convert FITSAPIO.svg to all required Android sizes
+- Resize `FITSAPIO.png` to all required iOS sizes
+- Resize `FITSAPIO.png` to all required Android sizes
 - Place icons in the correct directories
 
 ## Option 2: Manual Setup
 
-If you can't run the script, use an online SVG-to-PNG converter:
+If you can't run the script, use an online PNG resizer or editor:
 
-1. Visit https://convertio.co/svg-png/ or similar
-2. Upload `assets/FITSAPIO.svg`
-3. Convert to PNG at these sizes:
+1. Open `assets/FITSAPIO.png` in your tool of choice
+2. Export/rescale to the required sizes listed below
 
 ### iOS Sizes (replace in `ios/HealthApp/Images.xcassets/AppIcon.appiconset/`)
 - 40×40 → Icon-20@2x.png
@@ -86,6 +85,6 @@ npx react-native run-android
   - iOS: `rm -rf ios/build && rm -rf ~/Library/Developer/Xcode/DerivedData/*`
   - Android: `./gradlew clean`
   
-- **SVG conversion issues**: Use an online converter and manually place files
+- **PNG resize issues**: Use an online converter or image editor and manually place the correctly sized files
 
 - **Wrong icon showing**: Clear app cache on device and reinstall

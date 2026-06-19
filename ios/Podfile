@@ -62,8 +62,30 @@ target 'HealthApp' do
         # Don't fail on warnings
         config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
 
+        # Disable Xcode 26 strict errors for RN pod source files
+        config.build_settings['OTHER_CFLAGS'] ||= ['$(inherited)']
+        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=deprecated-objc-isa-usage'
+        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=return-type'
+        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=unreachable-code'
+        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=unused-variable'
+        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=unused-function'
+        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=objc-root-class'
+        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=non-modular-include-in-framework-module'
+
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] ||= ['$(inherited)']
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=deprecated-objc-isa-usage'
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=return-type'
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=unreachable-code'
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=unused-variable'
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=unused-function'
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=objc-root-class'
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=non-modular-include-in-framework-module'
+
         # Enable modules
         config.build_settings['CLANG_CXX_ENABLE_MODULES'] = 'YES'
+
+        # Allow non-modular includes inside framework modules for pods that require it
+        config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
 
         # ARC
         config.build_settings['CLANG_ENABLE_OBJC_ARC'] = 'YES'

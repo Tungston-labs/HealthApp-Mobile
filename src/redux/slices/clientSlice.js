@@ -9,16 +9,15 @@ export const registerClientThunk = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const res = await registerClientApi(payload);
-      const { token, user } = res.data;
+      const user = res.data?.data;
+      const access = res.data?.access;
+      const refresh = res.data?.refresh;
 
-      if (token) {
-        await setToken(token.access, token.refresh);
+      if (access || refresh) {
+        await setToken(access, refresh);
       }
 
-      // Don't set auth here - user must login first to establish proper session
-      // Auth will be set when user logs in successfully
-
-      return res.data;
+      return { user, access, refresh };
     } catch (err) {
       const message = extractApiErrorMessage(
         err.response?.data,
@@ -53,9 +52,10 @@ const clientSlice = createSlice({
                 state.loading = false;
                 state.registered = true;
 
-                const token = action.payload?.token;
-                if (token) {
-                    setToken(token.access, token.refresh);
+                const access = action.payload?.access;
+                const refresh = action.payload?.refresh;
+                if (access || refresh) {
+                    setToken(access, refresh);
                 }
             })
 
