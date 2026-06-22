@@ -50,8 +50,30 @@ export const registerTrainerApi = async (formData) => {
 
 
 export const fetchAvailableTrainersAPI = async (payload) => {
-  const response = await api.post("trainer/available-trainers/", payload);
-  return response;
+  // Normalize payload to avoid platform-specific formatting issues
+  const normalized = { ...payload };
+
+  if (normalized.slot_days) {
+    if (typeof normalized.slot_days === 'string') {
+      normalized.slot_days = normalized.slot_days
+        .split(',')
+        .map(s => s.trim().toLowerCase());
+    } else if (Array.isArray(normalized.slot_days)) {
+      normalized.slot_days = normalized.slot_days.map(s => String(s).trim().toLowerCase());
+    }
+  }
+
+  console.log('➡️ POST trainer/available-trainers/ payload:', JSON.stringify(normalized));
+
+  try {
+    const response = await api.post('trainer/available-trainers/', normalized);
+    console.log('✅ trainer/available-trainers/ response status:', response.status);
+    return response;
+  } catch (err) {
+    console.log('❌ trainer/available-trainers/ error status:', err?.response?.status);
+    console.log('❌ trainer/available-trainers/ error data:', err?.response?.data);
+    throw err;
+  }
 };
 
 export const getTrainerDetailService = (trainerId) => {

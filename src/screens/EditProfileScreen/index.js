@@ -23,6 +23,7 @@ import {
   updateProfileThunk,
   resetProfileEditState,
 } from "../../redux/slices/clientProfileEditSlice";
+import { fetchMobProfileThunk } from "../../redux/slices/mobProfileSlice";
 
 const EditProfile = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -157,6 +158,8 @@ const EditProfile = ({ navigation, route }) => {
     if (res.meta.requestStatus === "fulfilled") {
       Alert.alert("Success", "Profile updated successfully");
       dispatch(resetProfileEditState());
+      // Refresh mobile profile so other screens see updated latitude/longitude
+      dispatch(fetchMobProfileThunk());
       navigation.goBack();
     }
   };
@@ -256,7 +259,7 @@ const EditProfile = ({ navigation, route }) => {
             value={form.height}
             onChangeText={v => setForm({ ...form, height: v })}
           />
-          <TouchableOpacity style={styles.locationBtn}>
+          <TouchableOpacity style={styles.locationBtn} onPress={handleUseLocation}>
             <Text style={styles.locationText}>Use my location</Text>
           </TouchableOpacity>
 

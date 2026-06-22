@@ -4,21 +4,21 @@ import { fetchAvailableTrainersAPI } from '../../services/trainerServices';
 export const fetchAvailableTrainersThunk = createAsyncThunk(
   'trainer/fetchAvailable',
   async (payload, { rejectWithValue }) => {
-    if (
-      !payload?.plan_id ||
-      !payload?.slot_days ||
-      !payload?.time ||
-      !payload?.start_date
-    ) {
-      console.log('⛔ BLOCKED EMPTY PAYLOAD:', payload);
-      return rejectWithValue('Invalid filter payload');
+    // Basic sanity log for incoming payloads (helps diagnose 400s)
+    console.log('🔎 fetchAvailableTrainersThunk payload:', JSON.stringify(payload));
+
+    // Allow server to validate payload; still perform light validation to avoid trivially empty calls
+    if (!payload || !payload.plan_id) {
+      console.log('⛔ Missing plan_id in payload:', payload);
+      return rejectWithValue('Invalid filter payload: plan_id required');
     }
 
     try {
       const response = await fetchAvailableTrainersAPI(payload);
       return response.data;
     } catch (err) {
-      return rejectWithValue(err?.response?.data);
+      console.log('❗ fetchAvailableTrainersThunk caught error:', err?.response?.status, err?.response?.data);
+      return rejectWithValue(err?.response?.data || err?.message || 'Unknown error');
     }
   }
 );

@@ -9,6 +9,8 @@ import { Alert } from "react-native";
 import { registerClientThunk, resetClientState } from "../../redux/slices/clientSlice";
 import { resetRegistration } from "../../redux/slices/registrationSlice";
 import { setAuth } from "../../redux/slices/authSlice";
+import { getCurrentLocation } from "../../utils/location";
+import { reverseGeocode } from "../../utils/reverseGeocode";
 
 export default function BMIResultScreen({ navigation }) {
   const {
@@ -108,13 +110,50 @@ export default function BMIResultScreen({ navigation }) {
       });
     }
 
+    // include lat/lng if available — round to 6 decimals to match backend DecimalField
+    if (data.latitude != null) {
+      const lat = Number(data.latitude);
+      if (!Number.isNaN(lat)) {
+        formData.append("latitude", String(lat.toFixed(6)));
+      }
+    }
+    if (data.longitude != null) {
+      const lon = Number(data.longitude);
+      if (!Number.isNaN(lon)) {
+        formData.append("longitude", String(lon.toFixed(6)));
+      }
+    }
+
     return formData;
   };
 
 
 
 const handleFinalSubmit = async () => {
-  const formData = buildRegisterPayload(registration);
+  // Ensure we send latitude/longitude if available — try to fetch device location when missing
+  let regData = { ...registration };
+
+  if (!regData.latitude || !regData.longitude) {
+    try {
+      const coords = await getCurrentLocation();
+      regData.latitude = coords.latitude;
+      regData.longitude = coords.longitude;
+
+      // Only fill address when it's empty to avoid overwriting user-entered address
+      if (!regData.address) {
+        try {
+          regData.address = await reverseGeocode(coords.latitude, coords.longitude);
+        } catch (e) {
+          console.log('Reverse geocode failed:', e?.message || e);
+        }
+      }
+    } catch (e) {
+      console.log('Unable to fetch device location during registration:', e?.message || e);
+      // proceed without lat/lng — user can set later
+    }
+  }
+
+  const formData = buildRegisterPayload(regData);
   
   try {
     const res = await dispatch(registerClientThunk(formData)).unwrap();

@@ -4,11 +4,13 @@ import {
   Text,
   Modal,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import styles from './styles';
 import CalendarPicker from './CalendarPicker';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
+import { fetchMobProfileThunk } from '../../redux/slices/mobProfileSlice';
 import { fetchAvailableTrainersThunk } from '../../redux/slices/trainerPlanSlice';
 
 const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
@@ -17,12 +19,24 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
   const [selectedDate, setSelectedDate] = useState('2026-01-03');
   const [selectedTime, setSelectedTime] = useState('09:00 AM');
 
+  const slotOptions = ['Mon,Wed,Fri', 'Tue,Thu,Sat'];
+
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const loading = useSelector(state => state.trainer.loading);
+  const user = useSelector(state => state.auth?.user);
+  const profile = useSelector(state => state.mobProfile?.profile);
+
+  // Require explicit latitude & longitude — backend checks these fields
+  const hasUserLocation = !!(
+    (profile && profile.latitude && profile.longitude) ||
+    (user && user.latitude && user.longitude)
+  );
 
   useEffect(() => {
     if (!visible) return;
+    // refresh mobile profile when opening modal to ensure latest lat/lng
+    dispatch(fetchMobProfileThunk());
 
     if (selectedPlanSlot === '3_days') {
       setSelectedSlot('Mon,Wed,Fri');
@@ -45,6 +59,13 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
 
   const handleApply = async () => {
     if (loading) return;
+    if (!hasUserLocation) {
+      Alert.alert(
+        'Location Required',
+        'Please update your profile with an address or location before searching for trainers.'
+      );
+      return;
+    }
 
     try {
       const payload = {
@@ -106,7 +127,7 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
           <Text style={styles.sectionTitle}>Select Slot</Text>
 
           <View style={styles.slotRow}>
-            {['Mon,Wed,Fri', 'Tue,Thu,Sat'].map(slot => (
+            {slotOptions.map(slot => (
               <TouchableOpacity
                 key={slot}
                 style={[
