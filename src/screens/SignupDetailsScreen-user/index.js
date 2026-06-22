@@ -79,6 +79,7 @@ export default function SignupDetailsScreenUser() {
 
       dispatch(
         updateRegistration({
+          location: address,
           address: address,
           latitude: latitude,
           longitude: longitude,

@@ -4,6 +4,7 @@ import {
   Text,
   Modal,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import styles from './styles';
 import CalendarPicker from './CalendarPicker';
@@ -20,6 +21,18 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const loading = useSelector(state => state.trainer.loading);
+  const user = useSelector(state => state.auth.user);
+  const profile = useSelector(state => state.mobProfile.profile);
+
+  const locationSource = profile || user;
+  const hasUserLocation = !!(
+    locationSource?.location ||
+    locationSource?.address ||
+    locationSource?.city ||
+    locationSource?.pincode ||
+    locationSource?.latitude ||
+    locationSource?.longitude
+  );
 
   useEffect(() => {
     if (!visible) return;
@@ -46,6 +59,14 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
   const handleApply = async () => {
     if (loading) return;
 
+    if (!hasUserLocation) {
+      Alert.alert(
+        'Location Required',
+        'Please update your profile with an address or location before searching for trainers.'
+      );
+      return;
+    }
+
     try {
       const payload = {
         plan_id: planId,
@@ -58,7 +79,9 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
 
       await dispatch(fetchAvailableTrainersThunk(payload)).unwrap();
 
-      onClose();
+      // Close modal and indicate success so parent can react
+      onClose(true);
+
       navigation.navigate('TrainerList', {
         isFiltered: true,
         mode: 'book',
@@ -66,7 +89,14 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
       });
 
     } catch (err) {
-      console.log(err);
+      console.log('Fetch available trainers error:', err);
+
+      const message =
+        typeof err === 'string'
+          ? err
+          : err?.message || (err && JSON.stringify(err)) || 'Failed to fetch trainers';
+
+      Alert.alert('Unable to load trainers', message);
     }
   };
 
@@ -156,9 +186,15 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
           </View>
 
           <View style={styles.applyWrapper}>
+            {!hasUserLocation && (
+              <Text style={{ color: '#D32F2F', marginBottom: 12, textAlign: 'center' }}>
+                Location is required in your profile before filtering trainers.
+              </Text>
+            )}
+
             <TouchableOpacity
-              style={[styles.applyBtn, loading && { opacity: 0.5 }]}
-              disabled={loading}
+              style={[styles.applyBtn, (loading || !hasUserLocation) && { opacity: 0.5 }]}
+              disabled={loading || !hasUserLocation}
               onPress={handleApply}
             >
               <Text style={styles.applyText}>

@@ -79,10 +79,43 @@ export default function BMIResultScreen({ navigation }) {
     formData.append("blood_group", data.blood_group);
     formData.append("height", String(data.height));
     formData.append("weight", String(data.weight));
-    formData.append(
-      "address",
-      `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`
-    );
+    const addressParts = [
+      data.address?.trim(),
+      data.landmark?.trim(),
+      data.city?.trim(),
+      data.pincode?.trim(),
+    ].filter(Boolean);
+
+    const fullAddress = addressParts.join(", ");
+    const locationValue = data.location?.trim() || fullAddress;
+
+    if (locationValue) {
+      formData.append("location", locationValue);
+    }
+
+    if (fullAddress) {
+      formData.append("address", fullAddress);
+    }
+
+    if (data.city) {
+      formData.append("city", data.city);
+    }
+
+    if (data.pincode) {
+      formData.append("pincode", data.pincode);
+    }
+
+    if (data.landmark) {
+      formData.append("landmark", data.landmark);
+    }
+
+    if (data.latitude != null) {
+      formData.append("latitude", Number(data.latitude).toFixed(6));
+    }
+
+    if (data.longitude != null) {
+      formData.append("longitude", Number(data.longitude).toFixed(6));
+    }
 
     // Arrays
     formData.append(
