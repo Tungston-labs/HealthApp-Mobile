@@ -8,6 +8,7 @@ import { Alert } from "react-native";
 import { registerClientThunk, resetClientState } from "../../redux/slices/clientSlice";
 import { resetRegistration } from "../../redux/slices/registrationSlice";
 import { setAuth } from "../../redux/slices/authSlice";
+import Toast from "react-native-toast-message";
 
 export default function BMIResultScreen({ navigation }) {
   const {
@@ -116,19 +117,13 @@ const handleFinalSubmit = async () => {
   const formData = buildRegisterPayload(registration);
   
   try {
-    const res = await dispatch(registerClientThunk(formData)).unwrap();
+    await dispatch(registerClientThunk(formData)).unwrap();
 
-    const userData = res.user || {
-      name: registration.name,
-      email: registration.email,
-      role: registration.role || "user",
-    };
-
-    // Correctly set auth in Redux
-    dispatch(setAuth({ user: userData, access: res.token?.access }));
-
-    // Navigate to main app
-    navigation.replace("MainApp"); // or AppNavigator entry
+    Toast.show({
+      type: 'success',
+      text1: 'Registration Successful',
+      text2: 'Welcome! Redirecting to the app.',
+    });
   } catch (err) {
     Alert.alert("Registration failed", err?.message || err);
   }
