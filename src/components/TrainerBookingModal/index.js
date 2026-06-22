@@ -81,6 +81,17 @@ const TrainerBookingModal = ({
       Alert.alert("Address required", "Please enter your address");
       return;
     }
+console.log({trainer});
+
+ navigation.navigate("Payment", {
+  mode,
+  new_trainer_id: trainer?.id,   // ✅ NEW trainer
+  old_trainer_id: oldTrainerId,  // ✅ OLD trainer
+  plan_id: plan.id,
+  booking_type: selected.toLowerCase(),
+  amount,
+});
+
 
     // 🔹 CHANGE TRAINER + NO PRICE DIFFERENCE
     if (mode === "change" && amount === 0) {
