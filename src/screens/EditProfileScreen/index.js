@@ -167,7 +167,7 @@ const EditProfile = ({ navigation, route }) => {
       Alert.alert("Error", error);
       dispatch(resetProfileEditState());
     }
-  }, [error]);
+  }, [error, dispatch]);
 
   /* ---------------- IMAGE SOURCE ---------------- */
   const imageSource = profilePic
@@ -256,7 +256,7 @@ const EditProfile = ({ navigation, route }) => {
             value={form.height}
             onChangeText={v => setForm({ ...form, height: v })}
           />
-          <TouchableOpacity style={styles.locationBtn}>
+          <TouchableOpacity style={styles.locationBtn} onPress={handleUseLocation}>
             <Text style={styles.locationText}>Use my location</Text>
           </TouchableOpacity>
 

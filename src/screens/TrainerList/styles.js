@@ -146,4 +146,10 @@ fullUnderline: {
     lineHeight: 16,
     letterSpacing: 0,
   },
+  plansName: {
+  fontSize: 14,
+  fontWeight: "500",
+  color: "#666",
+  marginTop: 2,
+},
 });

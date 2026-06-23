@@ -205,13 +205,31 @@ const ProfileSection = () => {
   const workoutTypeText = trainer?.workout_type || "N/A";
   const trainerNotes = trainer?.notes || "No notes available";
 
+  const handleBack = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+      return;
+    }
+
+    navigation.navigate("ClientList");
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <View>
-            <Text style={styles.title}>Trainers</Text>
-            <Text style={styles.subtitle}>Trainer Details</Text>
+          <View style={styles.headerLeft}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={handleBack}
+            >
+              <Icon name="chevron-back" size={24} color="#000" />
+            </TouchableOpacity>
+
+            <View>
+              <Text style={styles.title}>Trainers</Text>
+              <Text style={styles.subtitle}>Trainer Details</Text>
+            </View>
           </View>
 
           <TouchableOpacity

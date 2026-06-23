@@ -26,6 +26,8 @@ const TrainerBookingModal = ({
   onClose,
   plan,
   trainer,
+  trainerId,
+  planId,
   mode,
   oldTrainerId,
 }) => {
@@ -39,14 +41,18 @@ const TrainerBookingModal = ({
     (state) => state.trainerDetail
   );
 
+  const bookingMode = mode || "book";
+  const selectedTrainerId = trainer?.id || trainerId || data?.id;
+  const selectedPlanId = plan?.id || planId || data?.plan_id || data?.plan?.id;
+
   useEffect(() => {
-    if (mode === "change") {
+    if (bookingMode === "change") {
       console.log("🧠 CHANGE MODE IDS:", {
         oldTrainerId,
-        newTrainerId: trainer?.id,
+        newTrainerId: selectedTrainerId,
       });
     }
-  }, [mode, oldTrainerId, trainer]);
+  }, [bookingMode, oldTrainerId, selectedTrainerId]);
 
   useEffect(() => {
     if (!visible) {
@@ -58,7 +64,7 @@ const TrainerBookingModal = ({
   const amount = useMemo(() => {
     if (!data && !trainer) return 0;
 
-    if (mode === "change") {
+    if (bookingMode === "change") {
       // Use price_difference from backend
       return Math.abs(Number(trainer?.price_difference || 0));
     }
@@ -74,7 +80,7 @@ const TrainerBookingModal = ({
       default:
         return 0;
     }
-  }, [mode, selected, data, trainer]);
+  }, [bookingMode, selected, data, trainer]);
 
   const handlePayment = async () => {
     if (!address.trim()) {
@@ -83,19 +89,36 @@ const TrainerBookingModal = ({
     }
 
     // 🔹 CHANGE TRAINER + NO PRICE DIFFERENCE
-    if (mode === "change" && amount === 0) {
+    if (!selectedTrainerId) {
+      Alert.alert("Trainer unavailable", "Please select a trainer again.");
+      return;
+    }
+
+    if (!selectedPlanId) {
+      Alert.alert("Plan unavailable", "Please select a workout plan again before booking.");
+      return;
+    }
+
+    if (bookingMode === "change" && !oldTrainerId) {
+      Alert.alert("Trainer unavailable", "Current trainer details are missing.");
+      return;
+    }
+
+    // 🔹 CHANGE TRAINER + NO PRICE DIFFERENCE
+    if (bookingMode === "change" && amount === 0) {
       try {
         const res = await verifyChangeTrainerPayment({
           old_trainer_id: oldTrainerId,
-          new_trainer_id: trainer?.id,
-          plan_id: plan.id,
+          new_trainer_id: selectedTrainerId,
+          plan_id: selectedPlanId,
         });
 
         if (res.data.status) {
           Alert.alert("Success", "Trainer changed successfully");
           onClose();
-          navigation.replace("MySessions");
-        }
+navigation.navigate("MainApp", {
+  screen: "MySessions",
+});        }
       } catch (err) {
         Alert.alert("Error", "Trainer change failed");
       }
@@ -104,10 +127,11 @@ const TrainerBookingModal = ({
 
     // 🔹 PAYMENT REQUIRED
     navigation.navigate("Payment", {
-      mode,
-      new_trainer_id: trainer?.id,
+      mode: bookingMode,
+      trainerId: bookingMode === "book" ? selectedTrainerId : undefined,
+      new_trainer_id: bookingMode === "change" ? selectedTrainerId : undefined,
       old_trainer_id: oldTrainerId,
-      plan_id: plan.id,
+      plan_id: selectedPlanId,
       booking_type: selected.toLowerCase(),
       amount,
     });
@@ -164,7 +188,7 @@ const TrainerBookingModal = ({
                       data?.no_of_section ||
                       trainer?.no_of_section
                     }
-                    workoutType={plan?.name}
+                    workoutType={plan?.name || data?.plan_name}
                   />
                 </View>
 
@@ -177,7 +201,7 @@ const TrainerBookingModal = ({
                     <TouchableOpacity
                       key={item}
                       onPress={() => {
-                        if (mode !== "change") {
+                        if (bookingMode !== "change") {
                           setSelected(item);
                         }
                       }}
@@ -185,11 +209,11 @@ const TrainerBookingModal = ({
                         styles.optionBtn,
                         selected === item &&
                         styles.optionBtnActive,
-                        mode === "change" && {
+                        bookingMode === "change" && {
                           opacity: 0.6,
                         },
                       ]}
-                      disabled={mode === "change"}
+                      disabled={bookingMode === "change"}
                     >
                       <Text
                         style={[
@@ -247,7 +271,7 @@ const TrainerBookingModal = ({
                 onPress={handlePayment}
               >
                 <Text style={styles.payText}>
-                  {mode === "change"
+                  {bookingMode === "change"
                     ? "Change-Pay ₹"
                     : "Pay ₹"}
                   {amount}

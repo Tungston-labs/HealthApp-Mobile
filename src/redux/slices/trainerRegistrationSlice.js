@@ -18,7 +18,11 @@ export const registerTrainerThunk = createAsyncThunk(
   } else {
     console.log("ERROR MESSAGE:", error.message);
   }
-  return rejectWithValue(error.message || "Registration failed");
+  return rejectWithValue(
+    error.response?.data ||
+    error.message ||
+    "Registration failed"
+  );
 }
   }
 );

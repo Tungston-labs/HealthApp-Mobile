@@ -103,6 +103,7 @@ const TrainerListScreen = () => {
           renderItem={({ item }) => (
             <TrainerCard
               trainer={item}
+              planId={plan?.id || planId}
               onBookNow={() => handleBookNow(item)}
             />
           )}
@@ -114,6 +115,8 @@ const TrainerListScreen = () => {
         visible={!!selectedTrainer}
         trainer={selectedTrainer}
         plan={plan}
+        trainerId={selectedTrainer?.id}
+        planId={plan?.id || planId}
         onClose={handleCloseModal}
         mode={mode}
         oldTrainerId={trainerId}

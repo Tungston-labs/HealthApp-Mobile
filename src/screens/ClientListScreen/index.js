@@ -18,7 +18,6 @@ const ClientListScreen = () => {
   useEffect(() => {
     dispatch(fetchClientTrainersThunk());
   }, [dispatch]);
-
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
@@ -42,11 +41,12 @@ const ClientListScreen = () => {
 
   return (
     <View style={styles.container}>
-      <HeaderWithBack title="Trainers" subtitle="Trainer Information" />
+      <HeaderWithBack title="Trainers" subtitle="Trainer Informations" />
 
       <FlatList
         data={trainers}
         keyExtractor={item => String(item.id)}
+        
         renderItem={({ item }) => (
 
           <TrainerCard

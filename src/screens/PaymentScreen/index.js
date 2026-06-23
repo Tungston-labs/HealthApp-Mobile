@@ -57,6 +57,23 @@ const PaymentScreen = ({ navigation, route }) => {
 
   const openRazorpay = async () => {
     try {
+      const paymentTrainerId = mode === "book" ? trainerId : new_trainer_id;
+
+      if (!paymentTrainerId) {
+        Alert.alert("Trainer unavailable", "Please select a trainer again.");
+        return;
+      }
+
+      if (!plan_id) {
+        Alert.alert("Plan unavailable", "Please select a workout plan again before payment.");
+        return;
+      }
+
+      if (mode === "book" && (!booking_type || !start_date || !time || !slot_days?.length)) {
+        Alert.alert("Booking details missing", "Please select date, slot, and time again.");
+        return;
+      }
+
       setPaying(true);
 
       let res;
@@ -72,7 +89,7 @@ const PaymentScreen = ({ navigation, route }) => {
       else {
         // 🆕 NEW BOOKING FLOW
         res = await createTrainerBookingOrder({
-          trainer_id: trainerId || new_trainer_id,
+          trainer_id: paymentTrainerId,
           plan_id,
           booking_type,
           start_date,
@@ -139,7 +156,7 @@ const PaymentScreen = ({ navigation, route }) => {
           razorpay_order_id: response.razorpay_order_id,
           razorpay_payment_id: response.razorpay_payment_id,
           razorpay_signature: response.razorpay_signature,
-          trainer_id: trainerId,
+          trainer_id: paymentTrainerId,
           plan_id,
           booking_type,
           start_date,

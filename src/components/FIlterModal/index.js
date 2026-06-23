@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -11,8 +11,8 @@ import CalendarPicker from './CalendarPicker';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAvailableTrainersThunk } from '../../redux/slices/trainerPlanSlice';
+import { getCurrentLocation } from '../../utils/location';
 
-const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
 const getTodayDate = () => {
   const today = new Date();
 
@@ -23,9 +23,43 @@ const getTodayDate = () => {
   ).padStart(2, "0")}`;
 };
 
+const normalizeCoordinates = (...sources) => {
+  for (const source of sources) {
+    const rawLatitude = source?.latitude;
+    const rawLongitude = source?.longitude;
+
+    if (
+      rawLatitude === null ||
+      rawLatitude === undefined ||
+      rawLatitude === '' ||
+      rawLongitude === null ||
+      rawLongitude === undefined ||
+      rawLongitude === ''
+    ) {
+      continue;
+    }
+
+    const latitude = Number(rawLatitude);
+    const longitude = Number(rawLongitude);
+
+    if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+      return {
+        latitude: Number(latitude.toFixed(6)),
+        longitude: Number(longitude.toFixed(6)),
+      };
+    }
+  }
+
+  return null;
+};
+
+const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
   const [selectedSlot, setSelectedSlot] = useState('Mon,Tue,Wed,Thu,Fri,Sat');
-const [selectedDate, setSelectedDate] = useState(getTodayDate());
+  const [selectedDate, setSelectedDate] = useState(getTodayDate());
   const [selectedTime, setSelectedTime] = useState('09:00 AM');
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [resolvingLocation, setResolvingLocation] = useState(false);
+  const [attemptedLocationLookup, setAttemptedLocationLookup] = useState(false);
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -33,14 +67,78 @@ const [selectedDate, setSelectedDate] = useState(getTodayDate());
   const user = useSelector(state => state.auth.user);
   const profile = useSelector(state => state.mobProfile.profile);
 
-  const locationSource = profile || user;
-  const hasUserLocation =
-    locationSource?.latitude != null && locationSource?.longitude != null;
+  const storedLocation = useMemo(
+    () =>
+      normalizeCoordinates(
+        profile,
+        user,
+        user?.client,
+        user?.profile,
+      ),
+    [profile, user],
+  );
+
+  const fetchDeviceLocation = useCallback(async () => {
+    try {
+      setResolvingLocation(true);
+      const coords = await getCurrentLocation();
+      const location = normalizeCoordinates(coords);
+
+      if (!location) {
+        throw new Error('Invalid location coordinates');
+      }
+
+      setCurrentLocation(location);
+      return location;
+    } catch (err) {
+      console.log('Unable to resolve trainer search location:', err);
+      return null;
+    } finally {
+      setResolvingLocation(false);
+    }
+  }, []);
+
+  const resolveSearchLocation = useCallback(async ({ showAlert = false } = {}) => {
+    if (currentLocation) {
+      return currentLocation;
+    }
+
+    const liveLocation = await fetchDeviceLocation();
+
+    if (liveLocation) {
+      return liveLocation;
+    }
+
+    if (storedLocation) {
+      return storedLocation;
+    }
+
+    if (showAlert) {
+      Alert.alert(
+        'Location Required',
+        'Please allow location access so we can find available trainers near you.'
+      );
+    }
+
+    return null;
+  }, [currentLocation, fetchDeviceLocation, storedLocation]);
+
+  const refreshDeviceLocation = useCallback(async () => {
+    const liveLocation = await fetchDeviceLocation();
+
+    if (!liveLocation && storedLocation) {
+      return storedLocation;
+    }
+
+    return liveLocation;
+  }, [fetchDeviceLocation, storedLocation]);
 
 useEffect(() => {
   if (!visible) return;
 
   setSelectedDate(getTodayDate());
+  setCurrentLocation(null);
+  setAttemptedLocationLookup(false);
 
   if (selectedPlanSlot === "3_days") {
     setSelectedSlot("Mon,Wed,Fri");
@@ -48,10 +146,31 @@ useEffect(() => {
     setSelectedSlot("Mon,Tue,Wed,Thu,Fri,Sat");
   }
 }, [visible, selectedPlanSlot]);
+
+useEffect(() => {
+  if (
+    !visible ||
+    currentLocation ||
+    resolvingLocation ||
+    attemptedLocationLookup
+  ) {
+    return;
+  }
+
+  setAttemptedLocationLookup(true);
+  refreshDeviceLocation();
+}, [
+  visible,
+  currentLocation,
+  resolvingLocation,
+  attemptedLocationLookup,
+  refreshDeviceLocation,
+]);
+
 useEffect(() => {
   console.log("TODAY:", getTodayDate());
   console.log("SELECTED DATE:", selectedDate);
-}, [visible]);
+}, [visible, selectedDate]);
   const convertTo24Hour = (timeStr) => {
     const [time, modifier] = timeStr.split(' ');
     let [hours, minutes] = time.split(':').map(Number);
@@ -65,16 +184,13 @@ useEffect(() => {
   };
 
   const handleApply = async () => {
-    if (loading) return;
-console.log("Trainer Search Location:", {
-  latitude: locationSource?.latitude,
-  longitude: locationSource?.longitude,
-});
-    if (!hasUserLocation) {
-      Alert.alert(
-        'Location Required',
-        'Please update your profile with coordinates by using "Use my location" or editing your profile before searching for trainers.'
-      );
+    if (loading || resolvingLocation) return;
+
+    const location = await resolveSearchLocation({ showAlert: true });
+
+    console.log("Trainer Search Location:", location);
+
+    if (!location) {
       return;
     }
 
@@ -84,8 +200,8 @@ console.log("Trainer Search Location:", {
         slot_days: selectedSlot.split(',').map(d => d.toLowerCase()),
         time: convertTo24Hour(selectedTime),
         start_date: selectedDate,
-         latitude: locationSource?.latitude,
-         longitude: locationSource?.longitude,
+        latitude: location.latitude,
+        longitude: location.longitude,
       };
 
       console.log('🔥 FINAL PAYLOAD:', payload);
@@ -201,19 +317,13 @@ console.log("Trainer Search Location:", {
           </View>
 
           <View style={styles.applyWrapper}>
-            {!hasUserLocation && (
-              <Text style={{ color: '#D32F2F', marginBottom: 12, textAlign: 'center' }}>
-                Location coordinates are required in your profile before filtering trainers.
-              </Text>
-            )}
-
             <TouchableOpacity
-              style={[styles.applyBtn, (loading || !hasUserLocation) && { opacity: 0.5 }]}
-              disabled={loading || !hasUserLocation}
+              style={[styles.applyBtn, (loading || resolvingLocation) && { opacity: 0.5 }]}
+              disabled={loading || resolvingLocation}
               onPress={handleApply}
             >
               <Text style={styles.applyText}>
-                {loading ? 'Loading...' : 'View Available Trainers →'}
+                {loading || resolvingLocation ? 'Loading...' : 'View Available Trainers →'}
               </Text>
             </TouchableOpacity>
 

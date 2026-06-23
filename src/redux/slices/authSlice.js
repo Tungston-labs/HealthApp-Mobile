@@ -26,17 +26,25 @@ export const loginClientThunk = createAsyncThunk(
 
       return { user, access };
     } catch (err) {
-      if (err.response?.data?.message) {
-        return rejectWithValue(err.response.data.message);
-      }
+  const data = err.response?.data;
 
-      if (err.response?.data?.detail) {
-        return rejectWithValue(err.response.data.detail);
-      }
+  if (!err.response) {
+    return rejectWithValue(
+      "Unable to connect to server. Please try again."
+    );
+  }
 
-      return rejectWithValue("Invalid credentials");
-    }
+  const errorMessage =
+    data?.errors?.non_field_errors?.[0] ||
+    data?.errors?.email?.[0] ||
+    data?.errors?.password?.[0] ||
+    data?.error ||
+    data?.message ||
+    data?.detail ||
+    `Server error (${err.response.status})`;
 
+  return rejectWithValue(errorMessage);
+}
   }
 );
 
