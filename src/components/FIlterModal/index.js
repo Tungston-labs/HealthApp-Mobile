@@ -13,9 +13,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAvailableTrainersThunk } from '../../redux/slices/trainerPlanSlice';
 
 const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
+const getTodayDate = () => {
+  const today = new Date();
+
+  return `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}-${String(
+    today.getDate()
+  ).padStart(2, "0")}`;
+};
 
   const [selectedSlot, setSelectedSlot] = useState('Mon,Tue,Wed,Thu,Fri,Sat');
-  const [selectedDate, setSelectedDate] = useState('2026-01-03');
+const [selectedDate, setSelectedDate] = useState(getTodayDate());
   const [selectedTime, setSelectedTime] = useState('09:00 AM');
 
   const dispatch = useDispatch();
@@ -28,16 +37,21 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
   const hasUserLocation =
     locationSource?.latitude != null && locationSource?.longitude != null;
 
-  useEffect(() => {
-    if (!visible) return;
+useEffect(() => {
+  if (!visible) return;
 
-    if (selectedPlanSlot === '3_days') {
-      setSelectedSlot('Mon,Wed,Fri');
-    } else {
-      setSelectedSlot('Mon,Tue,Wed,Thu,Fri,Sat');
-    }
-  }, [visible, selectedPlanSlot]);
+  setSelectedDate(getTodayDate());
 
+  if (selectedPlanSlot === "3_days") {
+    setSelectedSlot("Mon,Wed,Fri");
+  } else {
+    setSelectedSlot("Mon,Tue,Wed,Thu,Fri,Sat");
+  }
+}, [visible, selectedPlanSlot]);
+useEffect(() => {
+  console.log("TODAY:", getTodayDate());
+  console.log("SELECTED DATE:", selectedDate);
+}, [visible]);
   const convertTo24Hour = (timeStr) => {
     const [time, modifier] = timeStr.split(' ');
     let [hours, minutes] = time.split(':').map(Number);
@@ -52,7 +66,10 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
 
   const handleApply = async () => {
     if (loading) return;
-
+console.log("Trainer Search Location:", {
+  latitude: locationSource?.latitude,
+  longitude: locationSource?.longitude,
+});
     if (!hasUserLocation) {
       Alert.alert(
         'Location Required',
@@ -67,6 +84,8 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
         slot_days: selectedSlot.split(',').map(d => d.toLowerCase()),
         time: convertTo24Hour(selectedTime),
         start_date: selectedDate,
+         latitude: locationSource?.latitude,
+         longitude: locationSource?.longitude,
       };
 
       console.log('🔥 FINAL PAYLOAD:', payload);
@@ -121,10 +140,12 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
               <Text style={styles.closeText}>✕</Text>
             </TouchableOpacity>
           </View>
-          <CalendarPicker
-            selectedDate={selectedDate}
-            onSelect={setSelectedDate}
-          />
+         
+<CalendarPicker
+  key={selectedDate}
+  selectedDate={selectedDate}
+  onSelect={setSelectedDate}
+/>
           <View style={styles.inputUnderline} />
 
           <Text style={styles.sectionTitle}>Select Slot</Text>

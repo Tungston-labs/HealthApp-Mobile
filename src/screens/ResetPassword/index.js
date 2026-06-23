@@ -12,7 +12,7 @@ import styles from "./style";
 import { useDispatch, useSelector } from "react-redux";
 import { resetPasswordAction, resetState } from "../../redux/slices/resetPasswordSlice";
 import Logo from "../../Images/logo.png";
-
+import { Image } from "react-native";
 export default function ResetPasswordScreen({ navigation, route }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -73,7 +73,8 @@ export default function ResetPasswordScreen({ navigation, route }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
-        <Logo style={styles.logo} />
+        <Image source={Logo} 
+        style={styles.logo} />
       </View>
       <Text style={styles.title}>
         Create your new password and confirm{"\n"}it to regain access

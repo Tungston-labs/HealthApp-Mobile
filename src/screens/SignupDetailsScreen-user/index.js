@@ -95,7 +95,7 @@ export default function SignupDetailsScreenUser() {
       console.log('Latitude:', latitude);
       console.log('Longitude:', longitude);
     } catch (err) {
-      console.log('Location error:', err);
+      console.log('Location error:', err); 
       Alert.alert('Error', 'Unable to fetch location. Please try again.');
     }
   };
