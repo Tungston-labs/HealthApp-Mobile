@@ -1,14 +1,16 @@
 import React, { useEffect } from "react";
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Platform } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Platform, Alert } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./style";
 import { useSelector, useDispatch } from "react-redux";
-import { Alert } from "react-native";
 import { registerClientThunk, resetClientState } from "../../redux/slices/clientSlice";
-import { resetRegistration } from "../../redux/slices/registrationSlice";
+import { resetRegistration, updateRegistration } from "../../redux/slices/registrationSlice";
+import { fetchMobProfileThunk } from "../../redux/slices/mobProfileSlice";
 import { setAuth } from "../../redux/slices/authSlice";
 import Toast from "react-native-toast-message";
+import { getCurrentLocation } from "../../utils/location";
+import { reverseGeocode } from "../../utils/reverseGeocode";
 
 export default function BMIResultScreen({ navigation }) {
   const {
@@ -87,7 +89,12 @@ export default function BMIResultScreen({ navigation }) {
     ].filter(Boolean);
 
     const fullAddress = addressParts.join(", ");
-    const locationValue = data.location?.trim() || fullAddress;
+    const locationValue =
+      data.location?.trim() ||
+      fullAddress ||
+      (data.latitude != null && data.longitude != null
+        ? `Lat: ${Number(data.latitude).toFixed(6)}, Lng: ${Number(data.longitude).toFixed(6)}`
+        : "");
 
     if (locationValue) {
       formData.append("location", locationValue);
@@ -146,11 +153,77 @@ export default function BMIResultScreen({ navigation }) {
 
 
 
+const ensureRegistrationLocation = async (data) => {
+  if (data.latitude != null && data.longitude != null) {
+    return data;
+  }
+
+  const coords = await getCurrentLocation();
+  const latitude = Number(coords.latitude.toFixed(6));
+  const longitude = Number(coords.longitude.toFixed(6));
+
+  const addressParts = [
+    data.address?.trim(),
+    data.landmark?.trim(),
+    data.city?.trim(),
+    data.pincode?.trim(),
+  ].filter(Boolean);
+
+  let locationValue = data.location?.trim();
+  let addressValue = data.address?.trim();
+  const fullAddress = addressParts.join(", ");
+
+  if (!locationValue && fullAddress) {
+    locationValue = fullAddress;
+    addressValue = addressValue || fullAddress;
+  }
+
+  if (!locationValue) {
+    try {
+      const reverseAddress = await reverseGeocode(latitude, longitude);
+      locationValue = reverseAddress;
+      addressValue = addressValue || reverseAddress;
+    } catch (err) {
+      console.warn("Reverse geocode failed", err);
+      if (!locationValue) {
+        locationValue = `Lat: ${latitude}, Lng: ${longitude}`;
+        addressValue = addressValue || locationValue;
+      }
+    }
+  }
+
+  const updated = {
+    ...data,
+    latitude,
+    longitude,
+    location: locationValue,
+    address: addressValue,
+  };
+
+  dispatch(updateRegistration(updated));
+  return updated;
+};
+
 const handleFinalSubmit = async () => {
-  const formData = buildRegisterPayload(registration);
+  let registrationData = registration;
+
+  try {
+    if (registrationData.latitude == null || registrationData.longitude == null) {
+      registrationData = await ensureRegistrationLocation(registrationData);
+    }
+  } catch (err) {
+    Alert.alert(
+      'Location Required',
+      'Please allow location access or use the profile location option before continuing.'
+    );
+    return;
+  }
+
+  const formData = buildRegisterPayload(registrationData);
   
   try {
     await dispatch(registerClientThunk(formData)).unwrap();
+    await dispatch(fetchMobProfileThunk()).unwrap();
 
     Toast.show({
       type: 'success',

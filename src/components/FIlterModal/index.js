@@ -25,14 +25,8 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
   const profile = useSelector(state => state.mobProfile.profile);
 
   const locationSource = profile || user;
-  const hasUserLocation = !!(
-    locationSource?.location ||
-    locationSource?.address ||
-    locationSource?.city ||
-    locationSource?.pincode ||
-    locationSource?.latitude ||
-    locationSource?.longitude
-  );
+  const hasUserLocation =
+    locationSource?.latitude != null && locationSource?.longitude != null;
 
   useEffect(() => {
     if (!visible) return;
@@ -62,7 +56,7 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
     if (!hasUserLocation) {
       Alert.alert(
         'Location Required',
-        'Please update your profile with an address or location before searching for trainers.'
+        'Please update your profile with coordinates by using "Use my location" or editing your profile before searching for trainers.'
       );
       return;
     }
@@ -188,7 +182,7 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
           <View style={styles.applyWrapper}>
             {!hasUserLocation && (
               <Text style={{ color: '#D32F2F', marginBottom: 12, textAlign: 'center' }}>
-                Location is required in your profile before filtering trainers.
+                Location coordinates are required in your profile before filtering trainers.
               </Text>
             )}
 

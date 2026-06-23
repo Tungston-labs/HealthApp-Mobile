@@ -71,7 +71,8 @@ export default function SignupDetailsScreenUser() {
   const handleUseLocation = async () => {
     try {
       const coords = await getCurrentLocation();
-      const { latitude, longitude } = coords;
+      const latitude = Number(coords.latitude.toFixed(6));
+      const longitude = Number(coords.longitude.toFixed(6));
 
       const address = await reverseGeocode(latitude, longitude);
 
@@ -81,8 +82,8 @@ export default function SignupDetailsScreenUser() {
         updateRegistration({
           location: address,
           address: address,
-          latitude: latitude,
-          longitude: longitude,
+          latitude,
+          longitude,
         })
       );
 
