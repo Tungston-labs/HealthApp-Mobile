@@ -67,7 +67,6 @@ export const fetchAvailableTrainersAPI = async (payload) => {
 
   try {
     const response = await api.post('trainer/available-trainers/', normalized);
-    console.log('✅ trainer/available-trainers/ response status:', response.status);
     return response;
   } catch (err) {
     console.log('❌ trainer/available-trainers/ error status:', err?.response?.status);
