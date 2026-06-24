@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import TrainerInfoCard from "../TrainerInfoCard";
 import { verifyChangeTrainerPayment } from "../../services/trainerServices";
@@ -26,6 +26,8 @@ const TrainerBookingModal = ({
   onClose,
   plan,
   trainer,
+  trainerId,
+  planId,
   mode,
   oldTrainerId,
 }) => {
@@ -38,15 +40,21 @@ const TrainerBookingModal = ({
   const { loading, data, error } = useSelector(
     (state) => state.trainerDetail
   );
-
+const route=useRoute()
+  const bookingMode = mode || "book";
+  const selectedTrainerId = trainer?.id || trainerId || data?.id;
+  const selectedPlanId = plan?.id || planId || data?.plan_id || data?.plan?.id;
+useEffect(() => {
+  console.log("PAYMENT PARAMS", route.params);
+}, []);
   useEffect(() => {
-    if (mode === "change") {
+    if (bookingMode === "change") {
       console.log("🧠 CHANGE MODE IDS:", {
         oldTrainerId,
-        newTrainerId: trainer?.id,
+        newTrainerId: selectedTrainerId,
       });
     }
-  }, [mode, oldTrainerId, trainer]);
+  }, [bookingMode, oldTrainerId, selectedTrainerId]);
 
   useEffect(() => {
     if (!visible) {
@@ -58,7 +66,7 @@ const TrainerBookingModal = ({
   const amount = useMemo(() => {
     if (!data && !trainer) return 0;
 
-    if (mode === "change") {
+    if (bookingMode === "change") {
       // Use price_difference from backend
       return Math.abs(Number(trainer?.price_difference || 0));
     }
@@ -74,51 +82,57 @@ const TrainerBookingModal = ({
       default:
         return 0;
     }
-  }, [mode, selected, data, trainer]);
+  }, [bookingMode, selected, data, trainer]);
 
   const handlePayment = async () => {
     if (!address.trim()) {
       Alert.alert("Address required", "Please enter your address");
       return;
     }
-console.log({trainer});
-
- navigation.navigate("Payment", {
-  mode,
-  new_trainer_id: trainer?.id,   // ✅ NEW trainer
-  old_trainer_id: oldTrainerId,  // ✅ OLD trainer
-  plan_id: plan.id,
-  booking_type: selected.toLowerCase(),
-  amount,
-});
-
 
     // 🔹 CHANGE TRAINER + NO PRICE DIFFERENCE
-    if (mode === "change" && amount === 0) {
+    if (!selectedTrainerId) {
+      Alert.alert("Trainer unavailable", "Please select a trainer again.");
+      return;
+    }
+
+    if (!selectedPlanId) {
+      Alert.alert("Plan unavailable", "Please select a workout plan again before booking.");
+      return;
+    }
+
+    if (bookingMode === "change" && !oldTrainerId) {
+      Alert.alert("Trainer unavailable", "Current trainer details are missing.");
+      return;
+    }
+
+    // 🔹 CHANGE TRAINER + NO PRICE DIFFERENCE
+    if (bookingMode === "change" && amount === 0) {
       try {
         const res = await verifyChangeTrainerPayment({
           old_trainer_id: oldTrainerId,
-          new_trainer_id: trainer?.id,
-          plan_id: plan.id,
+          new_trainer_id: selectedTrainerId,
+          plan_id: selectedPlanId,
         });
 
         if (res.data.status) {
           Alert.alert("Success", "Trainer changed successfully");
           onClose();
-          navigation.replace("MySessions");
-        }
+navigation.navigate("MainApp", {
+  screen: "MySessions",
+});        }
       } catch (err) {
         Alert.alert("Error", "Trainer change failed");
       }
       return; // ⛔ STOP – no navigation
     }
-
-    // 🔹 PAYMENT REQUIRED
+    onClose()
     navigation.navigate("Payment", {
-      mode,
-      new_trainer_id: trainer?.id,
+      mode: bookingMode,
+      trainerId: bookingMode === "book" ? selectedTrainerId : undefined,
+      new_trainer_id: bookingMode === "change" ? selectedTrainerId : undefined,
       old_trainer_id: oldTrainerId,
-      plan_id: plan.id,
+      plan_id: selectedPlanId,
       booking_type: selected.toLowerCase(),
       amount,
     });
@@ -138,6 +152,7 @@ console.log({trainer});
 
           <View style={{ flex: 1 }}>
             {loading && <ActivityIndicator size="large" />}
+
             {!loading && error && (
               <Text style={styles.errorText}>{error}</Text>
             )}
@@ -174,7 +189,7 @@ console.log({trainer});
                       data?.no_of_section ||
                       trainer?.no_of_section
                     }
-                    workoutType={plan?.name}
+                    workoutType={plan?.name || data?.plan_name}
                   />
                 </View>
 
@@ -187,7 +202,7 @@ console.log({trainer});
                     <TouchableOpacity
                       key={item}
                       onPress={() => {
-                        if (mode !== "change") {
+                        if (bookingMode !== "change") {
                           setSelected(item);
                         }
                       }}
@@ -195,11 +210,11 @@ console.log({trainer});
                         styles.optionBtn,
                         selected === item &&
                         styles.optionBtnActive,
-                        mode === "change" && {
+                        bookingMode === "change" && {
                           opacity: 0.6,
                         },
                       ]}
-                      disabled={mode === "change"}
+                      disabled={bookingMode === "change"}
                     >
                       <Text
                         style={[
@@ -257,7 +272,7 @@ console.log({trainer});
                 onPress={handlePayment}
               >
                 <Text style={styles.payText}>
-                  {mode === "change"
+                  {bookingMode === "change"
                     ? "Change-Pay ₹"
                     : "Pay ₹"}
                   {amount}

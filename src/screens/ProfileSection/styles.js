@@ -14,6 +14,21 @@ export default StyleSheet.create({
         alignItems: "center",
     },
 
+    headerLeft: {
+        flexDirection: "row",
+        alignItems: "center",
+        flex: 1,
+    },
+
+    backButton: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        justifyContent: "center",
+        alignItems: "center",
+        marginRight: 8,
+    },
+
     title: {
         fontSize: 22,
         fontWeight: "700",

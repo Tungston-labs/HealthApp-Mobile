@@ -24,7 +24,7 @@ const TrainerDetailScreen = () => {
   const route = useRoute();
   const dispatch = useDispatch();
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const { trainerId } = route.params;
+  const { trainerId, planId } = route.params || {};
   const [selectedCert, setSelectedCert] = useState(null);
 
   const { loading, data, error } = useSelector(
@@ -37,7 +37,7 @@ const TrainerDetailScreen = () => {
     if (trainerId) {
       dispatch(fetchTrainerDetailThunk(trainerId));
     }
-  }, [trainerId]);
+  }, [dispatch, trainerId]);
   console.log("TrainerDetailScreen route.params", route.params);
   console.log("Trainer ID received:", trainerId);
   if (loading) {
@@ -206,6 +206,8 @@ const TrainerDetailScreen = () => {
           visible={showBookingModal}
           onClose={() => setShowBookingModal(false)}
           trainerId={trainerId}
+          planId={planId || data?.plan_id || data?.plan?.id}
+          mode="book"
         />
       </View>
     </View>

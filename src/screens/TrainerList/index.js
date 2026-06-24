@@ -26,7 +26,6 @@ const TrainerListScreen = () => {
     planId,
     trainerId,
     isFiltered = false, // indicates if we came from filtered search
-    filters: routeFilters = null,
   } = route.params || {};
 
   const [selectedTrainer, setSelectedTrainer] = useState(null);
@@ -52,21 +51,16 @@ const TrainerListScreen = () => {
 
   // ---------------- FETCH LOGIC ----------------
   useEffect(() => {
-    if (mode === "book") {
-      if (isFiltered && planId) {
-        if (!loading && trainersList.length === 0 && routeFilters) {
-          dispatch(fetchAvailableTrainersThunk({ plan_id: planId, ...routeFilters }));
-        }
-      } else if (planId) {
-        dispatch(fetchAvailableTrainersThunk({ plan_id: planId }));
-      }
+    // Fetch unfiltered trainers if we are booking and not coming from filter
+    if (mode === "book" && !isFiltered && planId) {
+      dispatch(fetchAvailableTrainersThunk({ plan_id: planId }));
     }
 
     if (mode === "change" && trainerId) {
       dispatch(resetTrainerChange());
       dispatch(fetchChangeTrainerThunk(trainerId));
     }
-  }, [dispatch, mode, planId, trainerId, isFiltered, routeFilters, loading, trainersList.length]);
+  }, [dispatch, mode, planId, trainerId, isFiltered]);
 
   // ---------------- ACTIONS ----------------
   const handleBookNow = (trainer) => {
@@ -109,6 +103,7 @@ const TrainerListScreen = () => {
           renderItem={({ item }) => (
             <TrainerCard
               trainer={item}
+              planId={plan?.id || planId}
               onBookNow={() => handleBookNow(item)}
             />
           )}
@@ -120,6 +115,8 @@ const TrainerListScreen = () => {
         visible={!!selectedTrainer}
         trainer={selectedTrainer}
         plan={plan}
+        trainerId={selectedTrainer?.id}
+        planId={plan?.id || planId}
         onClose={handleCloseModal}
         mode={mode}
         oldTrainerId={trainerId}

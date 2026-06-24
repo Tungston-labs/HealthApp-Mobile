@@ -9,6 +9,7 @@ const fallbackImage = require('../../../assets/trainer1.jpg');
 
 const TrainerCard = ({
   trainer = {},
+  planId,
   onBookNow,
   showBookButton = true,
   showPrice = true,
@@ -20,7 +21,15 @@ const TrainerCard = ({
   const imageSource = trainer.trainer_profile_pic || trainer.profile_pic
     ? { uri: trainer.trainer_profile_pic || trainer.profile_pic }
     : fallbackImage;
-
+  const experienceValue = [
+    trainer.years_of_experience,
+    trainer.experience,
+    trainer.trainer_experience,
+  ].find(value => value !== null && value !== undefined && value !== "");
+  const experience = Number.isFinite(Number(experienceValue))
+    ? Number(experienceValue)
+    : 0;
+console.log("TRAINER CARD DATA:", trainer);
   return (
     <View style={styles.card}>
       {/* IMAGE + PROFILE */}
@@ -40,7 +49,10 @@ const TrainerCard = ({
         <TouchableOpacity
           style={styles.viewProfileBtn}
           onPress={() =>
-            navigation.navigate("TrainerDetail", { trainerId: trainer.id })
+            navigation.navigate("TrainerDetail", {
+              trainerId: trainer.id,
+              planId: planId || trainer.plan?.id || trainer.plan_id,
+            })
           }
         >
           <Text style={styles.viewProfileText}>View Profile</Text>
@@ -52,7 +64,13 @@ const TrainerCard = ({
         <Text style={styles.trainerName}>
           {trainer.trainer_name || trainer.name || "Trainer"}
         </Text>
-        <Text style={styles.exp}>{trainer.experience ?? 0} Years experience</Text>
+        <Text style={styles.plansName}>
+  {trainer.plan_name || trainer.plan?.name || ""}
+</Text>
+
+        <Text style={styles.exp}>
+          {experience} {experience === 1 ? "Year" : "Years"} experience
+        </Text>
 
         {(showPrice || showRating) && (
           <View style={styles.ratingplan}>

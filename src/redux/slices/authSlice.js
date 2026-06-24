@@ -3,7 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loginApi, logoutApi } from '../../services/authServices';
 import api, { publicApi } from '../../services/api';
 import { clearStorage } from '../../storage/asyncStorage';
-import { extractApiErrorMessage } from '../../utils/registrationErrors';
 
 export const loginClientThunk = createAsyncThunk(
   "auth/login",
@@ -27,13 +26,25 @@ export const loginClientThunk = createAsyncThunk(
 
       return { user, access };
     } catch (err) {
-      const message = extractApiErrorMessage(
-        err.response?.data,
-        err.message || 'Invalid credentials'
-      );
-      return rejectWithValue(message);
-    }
+  const data = err.response?.data;
 
+  if (!err.response) {
+    return rejectWithValue(
+      "Unable to connect to server. Please try again."
+    );
+  }
+
+  const errorMessage =
+    data?.errors?.non_field_errors?.[0] ||
+    data?.errors?.email?.[0] ||
+    data?.errors?.password?.[0] ||
+    data?.error ||
+    data?.message ||
+    data?.detail ||
+    `Server error (${err.response.status})`;
+
+  return rejectWithValue(errorMessage);
+}
   }
 );
 

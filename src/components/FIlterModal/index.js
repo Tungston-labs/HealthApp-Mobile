@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,41 +10,167 @@ import styles from './styles';
 import CalendarPicker from './CalendarPicker';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchMobProfileThunk } from '../../redux/slices/mobProfileSlice';
 import { fetchAvailableTrainersThunk } from '../../redux/slices/trainerPlanSlice';
+import { getCurrentLocation } from '../../utils/location';
+
+const getTodayDate = () => {
+  const today = new Date();
+
+  return `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}-${String(
+    today.getDate()
+  ).padStart(2, "0")}`;
+};
+
+const normalizeCoordinates = (...sources) => {
+  for (const source of sources) {
+    const rawLatitude = source?.latitude;
+    const rawLongitude = source?.longitude;
+
+    if (
+      rawLatitude === null ||
+      rawLatitude === undefined ||
+      rawLatitude === '' ||
+      rawLongitude === null ||
+      rawLongitude === undefined ||
+      rawLongitude === ''
+    ) {
+      continue;
+    }
+
+    const latitude = Number(rawLatitude);
+    const longitude = Number(rawLongitude);
+
+    if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+      return {
+        latitude: Number(latitude.toFixed(6)),
+        longitude: Number(longitude.toFixed(6)),
+      };
+    }
+  }
+
+  return null;
+};
 
 const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
-
   const [selectedSlot, setSelectedSlot] = useState('Mon,Tue,Wed,Thu,Fri,Sat');
-  const [selectedDate, setSelectedDate] = useState('2026-01-03');
+  const [selectedDate, setSelectedDate] = useState(getTodayDate());
   const [selectedTime, setSelectedTime] = useState('09:00 AM');
-
-  const slotOptions = ['Mon,Wed,Fri', 'Tue,Thu,Sat'];
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [resolvingLocation, setResolvingLocation] = useState(false);
+  const [attemptedLocationLookup, setAttemptedLocationLookup] = useState(false);
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const loading = useSelector(state => state.trainer.loading);
-  const user = useSelector(state => state.auth?.user);
-  const profile = useSelector(state => state.mobProfile?.profile);
+  const user = useSelector(state => state.auth.user);
+  const profile = useSelector(state => state.mobProfile.profile);
 
-  // Require explicit latitude & longitude — backend checks these fields
-  const hasUserLocation = !!(
-    (profile && profile.latitude && profile.longitude) ||
-    (user && user.latitude && user.longitude)
+  const storedLocation = useMemo(
+    () =>
+      normalizeCoordinates(
+        profile,
+        user,
+        user?.client,
+        user?.profile,
+      ),
+    [profile, user],
   );
 
-  useEffect(() => {
-    if (!visible) return;
-    // refresh mobile profile when opening modal to ensure latest lat/lng
-    dispatch(fetchMobProfileThunk());
+  const fetchDeviceLocation = useCallback(async () => {
+    try {
+      setResolvingLocation(true);
+      const coords = await getCurrentLocation();
+      const location = normalizeCoordinates(coords);
 
-    if (selectedPlanSlot === '3_days') {
-      setSelectedSlot('Mon,Wed,Fri');
-    } else {
-      setSelectedSlot('Mon,Tue,Wed,Thu,Fri,Sat');
+      if (!location) {
+        throw new Error('Invalid location coordinates');
+      }
+
+      setCurrentLocation(location);
+      return location;
+    } catch (err) {
+      console.log('Unable to resolve trainer search location:', err);
+      return null;
+    } finally {
+      setResolvingLocation(false);
     }
-  }, [visible, selectedPlanSlot]);
+  }, []);
 
+  const resolveSearchLocation = useCallback(async ({ showAlert = false } = {}) => {
+    if (currentLocation) {
+      return currentLocation;
+    }
+
+    const liveLocation = await fetchDeviceLocation();
+
+    if (liveLocation) {
+      return liveLocation;
+    }
+
+    if (storedLocation) {
+      return storedLocation;
+    }
+
+    if (showAlert) {
+      Alert.alert(
+        'Location Required',
+        'Please allow location access so we can find available trainers near you.'
+      );
+    }
+
+    return null;
+  }, [currentLocation, fetchDeviceLocation, storedLocation]);
+
+  const refreshDeviceLocation = useCallback(async () => {
+    const liveLocation = await fetchDeviceLocation();
+
+    if (!liveLocation && storedLocation) {
+      return storedLocation;
+    }
+
+    return liveLocation;
+  }, [fetchDeviceLocation, storedLocation]);
+
+useEffect(() => {
+  if (!visible) return;
+
+  setSelectedDate(getTodayDate());
+  setCurrentLocation(null);
+  setAttemptedLocationLookup(false);
+
+  if (selectedPlanSlot === "3_days") {
+    setSelectedSlot("Mon,Wed,Fri");
+  } else {
+    setSelectedSlot("Mon,Tue,Wed,Thu,Fri,Sat");
+  }
+}, [visible, selectedPlanSlot]);
+
+useEffect(() => {
+  if (
+    !visible ||
+    currentLocation ||
+    resolvingLocation ||
+    attemptedLocationLookup
+  ) {
+    return;
+  }
+
+  setAttemptedLocationLookup(true);
+  refreshDeviceLocation();
+}, [
+  visible,
+  currentLocation,
+  resolvingLocation,
+  attemptedLocationLookup,
+  refreshDeviceLocation,
+]);
+
+useEffect(() => {
+  console.log("TODAY:", getTodayDate());
+  console.log("SELECTED DATE:", selectedDate);
+}, [visible, selectedDate]);
   const convertTo24Hour = (timeStr) => {
     const [time, modifier] = timeStr.split(' ');
     let [hours, minutes] = time.split(':').map(Number);
@@ -58,12 +184,13 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
   };
 
   const handleApply = async () => {
-    if (loading) return;
-    if (!hasUserLocation) {
-      Alert.alert(
-        'Location Required',
-        'Please update your profile with an address or location before searching for trainers.'
-      );
+    if (loading || resolvingLocation) return;
+
+    const location = await resolveSearchLocation({ showAlert: true });
+
+    console.log("Trainer Search Location:", location);
+
+    if (!location) {
       return;
     }
 
@@ -73,13 +200,17 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
         slot_days: selectedSlot.split(',').map(d => d.toLowerCase()),
         time: convertTo24Hour(selectedTime),
         start_date: selectedDate,
+        latitude: location.latitude,
+        longitude: location.longitude,
       };
 
       console.log('🔥 FINAL PAYLOAD:', payload);
 
       await dispatch(fetchAvailableTrainersThunk(payload)).unwrap();
 
-      onClose();
+      // Close modal and indicate success so parent can react
+      onClose(true);
+
       navigation.navigate('TrainerList', {
         isFiltered: true,
         mode: 'book',
@@ -87,7 +218,14 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
       });
 
     } catch (err) {
-      console.log(err);
+      console.log('Fetch available trainers error:', err);
+
+      const message =
+        typeof err === 'string'
+          ? err
+          : err?.message || (err && JSON.stringify(err)) || 'Failed to fetch trainers';
+
+      Alert.alert('Unable to load trainers', message);
     }
   };
 
@@ -118,16 +256,18 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
               <Text style={styles.closeText}>✕</Text>
             </TouchableOpacity>
           </View>
-          <CalendarPicker
-            selectedDate={selectedDate}
-            onSelect={setSelectedDate}
-          />
+         
+<CalendarPicker
+  key={selectedDate}
+  selectedDate={selectedDate}
+  onSelect={setSelectedDate}
+/>
           <View style={styles.inputUnderline} />
 
           <Text style={styles.sectionTitle}>Select Slot</Text>
 
           <View style={styles.slotRow}>
-            {slotOptions.map(slot => (
+            {['Mon,Wed,Fri', 'Tue,Thu,Sat'].map(slot => (
               <TouchableOpacity
                 key={slot}
                 style={[
@@ -178,12 +318,12 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
 
           <View style={styles.applyWrapper}>
             <TouchableOpacity
-              style={[styles.applyBtn, loading && { opacity: 0.5 }]}
-              disabled={loading}
+              style={[styles.applyBtn, (loading || resolvingLocation) && { opacity: 0.5 }]}
+              disabled={loading || resolvingLocation}
               onPress={handleApply}
             >
               <Text style={styles.applyText}>
-                {loading ? 'Loading...' : 'View Available Trainers →'}
+                {loading || resolvingLocation ? 'Loading...' : 'View Available Trainers →'}
               </Text>
             </TouchableOpacity>
 

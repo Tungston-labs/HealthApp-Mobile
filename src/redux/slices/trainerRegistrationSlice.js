@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { registerTrainerApi } from "../../services/trainerServices";
-import { extractApiErrorMessage } from "../../utils/registrationErrors";
 
 export const registerTrainerThunk = createAsyncThunk(
   "trainer/register",
@@ -9,22 +8,22 @@ export const registerTrainerThunk = createAsyncThunk(
       const response = await registerTrainerApi(formData);
       return response.data;
     } catch (error) {
-      console.log("TRAINER REGISTER ERROR FULL ↓↓↓");
-      console.log("AXIOS ERROR OBJECT", error.toJSON ? error.toJSON() : error);
-      if (error.response) {
-        console.log("STATUS:", error.response.status);
-        console.log("DATA:", error.response.data);
-      } else if (error.request) {
-        console.log("NO RESPONSE RECEIVED:", error.request);
-      } else {
-        console.log("ERROR MESSAGE:", error.message);
-      }
-      const message = extractApiErrorMessage(
-        error.response?.data,
-        error.message || "Registration failed"
-      );
-      return rejectWithValue(message);
-    }
+  console.log("TRAINER REGISTER ERROR FULL ↓↓↓");
+  console.log("AXIOS ERROR OBJECT", error.toJSON ? error.toJSON() : error);
+  if (error.response) {
+    console.log("STATUS:", error.response.status);
+    console.log("DATA:", error.response.data);
+  } else if (error.request) {
+    console.log("NO RESPONSE RECEIVED:", error.request);
+  } else {
+    console.log("ERROR MESSAGE:", error.message);
+  }
+  return rejectWithValue(
+    error.response?.data ||
+    error.message ||
+    "Registration failed"
+  );
+}
   }
 );
 
