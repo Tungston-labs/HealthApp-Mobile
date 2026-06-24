@@ -6,8 +6,8 @@ const scale = width / 375;
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#FFFFFF",
-        paddingHorizontal: 25 * scale,
+        backgroundColor: "#FFFFFFF",
+        paddingHorizontal: 60,
         justifyContent: "center",
     },
 
@@ -18,11 +18,12 @@ export default StyleSheet.create({
 
     logo: {
         height: 38 * scale,
-        resizeMode: "contain", 
+        resizeMode: "contain",
     },
 
     inputContainer: {
         marginBottom: 25 * scale,
+        marginHorizontal: 30,
     },
 
     label: {
@@ -57,7 +58,6 @@ export default StyleSheet.create({
     },
 
     forgotPassword: {
-        alignSelf: "flex-end",
         color: "#000000",
         marginTop: 6 * scale,
         fontWeight: "900",
@@ -78,6 +78,8 @@ export default StyleSheet.create({
     loginBtn: {
         backgroundColor: "#EF0707",
         paddingVertical: 8 * scale,
+        marginRight: 22 * scale,
+
         paddingHorizontal: 22 * scale,
         borderRadius: 20 * scale,
         margin: 2,
