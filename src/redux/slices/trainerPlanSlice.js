@@ -15,6 +15,7 @@ export const fetchAvailableTrainersThunk = createAsyncThunk(
 
     try {
       const response = await fetchAvailableTrainersAPI(payload);
+      console.log("API RESPONSE", response.data);
       return response.data;
     } catch (err) {
       console.log('❗ fetchAvailableTrainersThunk caught error:', err?.response?.status, err?.response?.data);

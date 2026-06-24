@@ -53,6 +53,7 @@ const TrainerListScreen = () => {
   useEffect(() => {
     // Fetch unfiltered trainers if we are booking and not coming from filter
     if (mode === "book" && !isFiltered && planId) {
+      console.log("TRAINER SEARCH PAYLOAD", payload);
       dispatch(fetchAvailableTrainersThunk({ plan_id: planId }));
     }
 
