@@ -206,15 +206,15 @@ const TrainerDetailScreen = () => {
           <Text style={styles.bookText}>Book Now</Text>
         </TouchableOpacity>
 
-       <TrainerBookingModal
-  visible={showBookingModal}
-  onClose={() => setShowBookingModal(false)}
-  trainer={data} // ✅ pass trainer details
-  trainerId={trainerId}
-  planId={planId || data?.plan_id || data?.plan?.id}
-  mode={mode}
-  oldTrainerId={oldTrainerId}
-/>
+        <TrainerBookingModal
+          visible={showBookingModal}
+          onClose={() => setShowBookingModal(false)}
+          trainer={data}
+          trainerId={trainerId}
+          planId={planId || data?.plan_id || data?.plan?.id}
+          mode={mode}
+          oldTrainerId={oldTrainerId}
+        />
       </View>
     </View>
   );
