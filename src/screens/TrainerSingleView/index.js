@@ -24,8 +24,12 @@ const TrainerDetailScreen = () => {
   const route = useRoute();
   const dispatch = useDispatch();
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const { trainerId, planId } = route.params || {};
-  const [selectedCert, setSelectedCert] = useState(null);
+  const {
+    trainerId,
+    planId,
+    mode = "book",
+    oldTrainerId,
+  } = route.params || {}; const [selectedCert, setSelectedCert] = useState(null);
 
   const { loading, data, error } = useSelector(
     (state) => state.trainerDetail
@@ -202,13 +206,15 @@ const TrainerDetailScreen = () => {
           <Text style={styles.bookText}>Book Now</Text>
         </TouchableOpacity>
 
-        <TrainerBookingModal
-          visible={showBookingModal}
-          onClose={() => setShowBookingModal(false)}
-          trainerId={trainerId}
-          planId={planId || data?.plan_id || data?.plan?.id}
-          mode="book"
-        />
+       <TrainerBookingModal
+  visible={showBookingModal}
+  onClose={() => setShowBookingModal(false)}
+  trainer={data} // ✅ pass trainer details
+  trainerId={trainerId}
+  planId={planId || data?.plan_id || data?.plan?.id}
+  mode={mode}
+  oldTrainerId={oldTrainerId}
+/>
       </View>
     </View>
   );

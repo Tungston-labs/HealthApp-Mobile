@@ -60,11 +60,15 @@ const TrainerListScreen = () => {
       dispatch(resetTrainerChange());
       dispatch(fetchChangeTrainerThunk(trainerId));
     }
+    if (mode === "change") {
+      dispatch(resetTrainerDetail());
+    }
   }, [dispatch, mode, planId, trainerId, isFiltered]);
 
   // ---------------- ACTIONS ----------------
   const handleBookNow = (trainer) => {
     setSelectedTrainer(trainer);
+
     if (mode === "book") {
       dispatch(fetchTrainerDetailThunk(trainer.id));
     }
@@ -104,6 +108,8 @@ const TrainerListScreen = () => {
             <TrainerCard
               trainer={item}
               planId={plan?.id || planId}
+              mode={mode}
+              oldTrainerId={trainerId}
               onBookNow={() => handleBookNow(item)}
             />
           )}

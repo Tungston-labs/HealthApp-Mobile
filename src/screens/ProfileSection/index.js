@@ -62,8 +62,11 @@ const ProfileSection = () => {
     error: changeError,
   } = useSelector((state) => state.trainerChange || {});
 
-  const trainer = trainerId ? data ?? null : session;
-  console.log({ trainer });
+const trainer =
+  route.params?.trainerId && data
+    ? data
+    : session;  
+    console.log({ trainer });
 
   useEffect(() => {
     if (trainerId) {
@@ -144,16 +147,33 @@ const ProfileSection = () => {
       dispatch(resetNutritionState());
     }
   }, [nutritionSuccess, nutritionError, dispatch]);
+console.log("route.params", route.params);
+console.log("session", session);
+console.log("trainer", trainer);
+console.log("route.params", route.params);
+console.log("trainerId", trainerId);
+console.log("session", session);
+console.log("redux trainerDetail data", data);
+console.log("trainer", trainer);
+const currentTrainerId =
+  trainer?.id ||
+  trainer?.trainer_id ||
+  trainer?.current_trainer_id;
+
+console.log("currentTrainerId", currentTrainerId);
 
   const handleChangeTrainer = () => {
-    if (!trainer?.id) {
+    console.log("CHANGE TRAINER CLICKED");
+  console.log("trainer", trainer);
+  console.log("currentTrainerId", currentTrainerId);
+    if (!currentTrainerId) {
       alert("Trainer not available");
       return;
     }
 
     navigation.navigate("TrainerList", {
       mode: "change",
-      trainerId: trainer.id,
+      trainerId: currentTrainerId,
     });
   };
 

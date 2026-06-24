@@ -39,7 +39,7 @@ const PaymentScreen = ({ navigation, route }) => {
     booking_type,
     amount = 0,
   } = route.params || {};
-
+console.log("PAYMENT PARAMS =>", route.params);
   const filters = useSelector((state) => state.trainer.filters);
   const { start_date, time, slot_days } = filters || {};
 

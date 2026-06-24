@@ -40,13 +40,27 @@ const TrainerBookingModal = ({
   const { loading, data, error } = useSelector(
     (state) => state.trainerDetail
   );
-const route=useRoute()
+  const route = useRoute()
   const bookingMode = mode || "book";
-  const selectedTrainerId = trainer?.id || trainerId || data?.id;
-  const selectedPlanId = plan?.id || planId || data?.plan_id || data?.plan?.id;
-useEffect(() => {
-  console.log("PAYMENT PARAMS", route.params);
-}, []);
+  const displayTrainer =
+    bookingMode === "change"
+      ? trainer
+      : data || trainer;
+
+  const selectedTrainerId =
+    bookingMode === "change"
+      ? trainer?.id
+      : trainer?.id || trainerId || data?.id;
+
+  const selectedPlanId =
+    plan?.id ||
+    planId ||
+    data?.plan_id ||
+    data?.plan?.id;
+
+  useEffect(() => {
+    console.log("PAYMENT PARAMS", route.params);
+  }, []);
   useEffect(() => {
     if (bookingMode === "change") {
       console.log("🧠 CHANGE MODE IDS:", {
@@ -118,24 +132,32 @@ useEffect(() => {
         if (res.data.status) {
           Alert.alert("Success", "Trainer changed successfully");
           onClose();
-navigation.navigate("MainApp", {
-  screen: "MySessions",
-});        }
+          navigation.navigate("MainApp", {
+            screen: "MySessions",
+          });
+        }
       } catch (err) {
         Alert.alert("Error", "Trainer change failed");
       }
       return; // ⛔ STOP – no navigation
     }
-    onClose()
-    navigation.navigate("Payment", {
-      mode: bookingMode,
-      trainerId: bookingMode === "book" ? selectedTrainerId : undefined,
-      new_trainer_id: bookingMode === "change" ? selectedTrainerId : undefined,
-      old_trainer_id: oldTrainerId,
-      plan_id: selectedPlanId,
-      booking_type: selected.toLowerCase(),
-      amount,
-    });
+  navigation.navigate("Payment", {
+  mode: bookingMode,
+  trainerId:
+    bookingMode === "book"
+      ? selectedTrainerId
+      : undefined,
+  new_trainer_id:
+    bookingMode === "change"
+      ? selectedTrainerId
+      : undefined,
+  old_trainer_id: oldTrainerId,
+  plan_id: selectedPlanId,
+  booking_type: selected.toLowerCase(),
+  amount,
+});
+
+onClose();
   };
 
   return (
@@ -157,7 +179,7 @@ navigation.navigate("MainApp", {
               <Text style={styles.errorText}>{error}</Text>
             )}
 
-            {!loading && !error && (data || trainer) && (
+            {!loading && !error && displayTrainer && (
               <ScrollView
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
@@ -167,29 +189,18 @@ navigation.navigate("MainApp", {
                 <View style={styles.headerSection}>
                   <Image
                     source={
-                      data?.profile_pic || trainer?.profile_pic
-                        ? {
-                          uri:
-                            data?.profile_pic ||
-                            trainer?.profile_pic,
-                        }
+                      displayTrainer?.profile_pic
+                        ? { uri: displayTrainer.profile_pic }
                         : require("../../../assets/trainer2.jpg")
                     }
                     style={styles.profileImage}
                   />
-
                   <TrainerInfoCard
-                    name={data?.name || trainer?.name}
-                    experience={data?.experience || trainer?.experience}
-                    sessionTiming={
-                      data?.section_timing ||
-                      trainer?.section_timing
-                    }
-                    numSessions={
-                      data?.no_of_section ||
-                      trainer?.no_of_section
-                    }
-                    workoutType={plan?.name || data?.plan_name}
+                    name={displayTrainer?.name}
+                    experience={displayTrainer?.experience}
+                    sessionTiming={displayTrainer?.section_timing}
+                    numSessions={displayTrainer?.no_of_section}
+                    workoutType={plan?.name || displayTrainer?.plan_name}
                   />
                 </View>
 
@@ -259,7 +270,7 @@ navigation.navigate("MainApp", {
             )}
           </View>
 
-          {(data || trainer) && !loading && (
+          {displayTrainer && !loading && (
             <View style={styles.footer}>
               <TouchableOpacity
                 style={[

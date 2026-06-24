@@ -10,6 +10,8 @@ const fallbackImage = require('../../../assets/trainer1.jpg');
 const TrainerCard = ({
   trainer = {},
   planId,
+  mode,
+  oldTrainerId,
   onBookNow,
   showBookButton = true,
   showPrice = true,
@@ -29,7 +31,7 @@ const TrainerCard = ({
   const experience = Number.isFinite(Number(experienceValue))
     ? Number(experienceValue)
     : 0;
-console.log("TRAINER CARD DATA:", trainer);
+  console.log("TRAINER CARD DATA:", trainer);
   return (
     <View style={styles.card}>
       {/* IMAGE + PROFILE */}
@@ -52,6 +54,8 @@ console.log("TRAINER CARD DATA:", trainer);
             navigation.navigate("TrainerDetail", {
               trainerId: trainer.id,
               planId: planId || trainer.plan?.id || trainer.plan_id,
+              mode,
+              oldTrainerId,
             })
           }
         >
@@ -65,8 +69,8 @@ console.log("TRAINER CARD DATA:", trainer);
           {trainer.trainer_name || trainer.name || "Trainer"}
         </Text>
         <Text style={styles.plansName}>
-  {trainer.plan_name || trainer.plan?.name || ""}
-</Text>
+          {trainer.plan_name || trainer.plan?.name || ""}
+        </Text>
 
         <Text style={styles.exp}>
           {experience} {experience === 1 ? "Year" : "Years"} experience
