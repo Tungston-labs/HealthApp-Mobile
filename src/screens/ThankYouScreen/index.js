@@ -52,7 +52,7 @@ export default function ThankYouScreen() {
           <TouchableOpacity
             style={[
               styles.loginBtn,
-              !isApproved && { opacity: 0.7 },
+              !isApproved,
             ]}
             onPress={handleGoToLogin}
           >

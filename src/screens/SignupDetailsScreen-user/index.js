@@ -16,10 +16,11 @@ import styles from './style';
 import { getCurrentLocation } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { Image } from 'react-native';
 import { validateSignup, validateUserStep2 } from "../../utils/Validators";
 import { showError } from "../../utils/toast";
 import { validateUserStep1 } from "../../utils/Validators";
+import { Image } from 'react-native';
+import Logo from '../../Images/logo.png';
 
 export default function SignupDetailsScreenUser() {
   const navigation = useNavigation();
@@ -95,7 +96,7 @@ export default function SignupDetailsScreenUser() {
       console.log('Latitude:', latitude);
       console.log('Longitude:', longitude);
     } catch (err) {
-      console.log('Location error:', err); 
+      console.log('Location error:', err);
       Alert.alert('Error', 'Unable to fetch location. Please try again.');
     }
   };
@@ -110,6 +111,7 @@ export default function SignupDetailsScreenUser() {
           paddingBottom: 120,
         }}
       >
+        <Image source={Logo} style={styles.logo} />
 
         <Text style={styles.welcomeText}>Welcome to health app</Text>
         <Text style={styles.subtitle}>Enter basic details</Text>

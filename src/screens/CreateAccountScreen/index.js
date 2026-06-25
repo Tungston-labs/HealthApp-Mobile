@@ -51,6 +51,7 @@ export default function CreateAccountScreen({ navigation }) {
   const [coords, setCoords] = useState(null);
   const [expertiseOpen, setExpertiseOpen] = useState(false);
   const [expertiseValue, setExpertiseValue] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const expertiseMap = {
     Cycling: 1,
     Gym: 2,
@@ -536,13 +537,26 @@ export default function CreateAccountScreen({ navigation }) {
           />
         </View>
 
-        <TextInput
-          placeholder="Enter password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          style={styles.inputUnderline}
-        />
+        <View style={styles.passwordRow}>
+          <TextInput
+            placeholder="Enter password"
+            placeholderTextColor="#888"
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+            style={[styles.inputUnderline, { flex: 1, marginBottom: 0 }]}
+          />
+
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+          >
+            <Ionicons
+              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={22}
+              color="#666"
+            />
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.uploadContainer}>
           <Text style={styles.uploadTitle}>Upload Certificates </Text>

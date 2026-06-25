@@ -25,11 +25,6 @@ export default StyleSheet.create({
   },
   loginBtnWrapper: {
     alignSelf: "flex-end",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 8,
     borderRadius: 20 * scale,
   },
 
@@ -38,7 +33,15 @@ export default StyleSheet.create({
     paddingVertical: 8 * scale,
     paddingHorizontal: 22 * scale,
     borderRadius: 20 * scale,
-    margin: 6,
+    margin: 80,
+  },
+
+  loginText: {
+    fontSize: 13,
+    fontFamily: "Segoe UI",
+    fontWeight: "600",
+    color: "#ffffff",
+
   },
   title: {
     fontSize: 22,

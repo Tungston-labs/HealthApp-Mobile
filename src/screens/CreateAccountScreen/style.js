@@ -41,23 +41,23 @@ export default StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
     fontFamily: "Segoe UI",
-    fontWeight: "600",
+    fontWeight: "900",
     marginRight: 28,
   },
-profilePlaceholder: {
-  width: 80,
-  height: 80,
-  borderRadius: 40,
-  backgroundColor: '#eee',
-  alignItems: 'center',
-  justifyContent: 'center',
-},
+  profilePlaceholder: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#eee',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
-placeholderText: {
-  fontSize: 10,
-  color: '#888',
-  marginTop: 4,
-},
+  placeholderText: {
+    fontSize: 10,
+    color: '#888',
+    marginTop: 4,
+  },
 
   profileRow: {
     flexDirection: "row",
@@ -79,6 +79,12 @@ placeholderText: {
     paddingVertical: 16,
     fontSize: 15,
     fontFamily: "Segoe UI",
+  },
+  passwordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#888',
   },
 
   iconInputRow: {
@@ -123,17 +129,17 @@ placeholderText: {
     fontFamily: "Segoe UI",
   },
 
-dropdownList: {
-  position: "absolute",
-  top: 52,              // just below dropdownRow
-  left: 0,
-  right: 0,
-  backgroundColor: "#EEEEFF",
-  borderWidth: 1,
-  borderColor: "#D5D5D5",
-  borderRadius: 6,
-  zIndex: 999,
-},
+  dropdownList: {
+    position: "absolute",
+    top: 52,              // just below dropdownRow
+    left: 0,
+    right: 0,
+    backgroundColor: "#EEEEFF",
+    borderWidth: 1,
+    borderColor: "#D5D5D5",
+    borderRadius: 6,
+    zIndex: 999,
+  },
 
   dropdownItem: {
     paddingVertical: 12,
@@ -161,11 +167,11 @@ dropdownList: {
   },
 
   twoColRow: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  gap: 20,
-  marginBottom: 10,
-},
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 20,
+    marginBottom: 10,
+  },
 
   uploadContainer: {
     marginTop: 20,
@@ -182,7 +188,7 @@ dropdownList: {
 
   uploadBox: {
     height: 120,
-    backgroundColor: "#EEEEFF",
+    backgroundColor: "#EFEEE9",
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
