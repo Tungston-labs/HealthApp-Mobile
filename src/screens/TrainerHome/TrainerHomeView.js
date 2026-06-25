@@ -143,7 +143,7 @@ const TrainerHomeView = ({
               !isSchedulesLoading && (
                 <View style={styles.emptyContainer}>
                   <Image
-                    source={require('../../Images/empty.png')}
+                    source={require('../../Images/empty1.png')}
                     style={styles.emptyImage}
                     resizeMode="contain"
                   />

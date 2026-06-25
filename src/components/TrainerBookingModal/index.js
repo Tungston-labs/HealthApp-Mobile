@@ -14,10 +14,12 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import TrainerInfoCard from "../TrainerInfoCard";
 import { verifyChangeTrainerPayment } from "../../services/trainerServices";
+import { getCurrentLocation } from "../../utils/location";
+import { reverseGeocode } from "../../utils/reverseGeocode";
 
 const workoutOptions = ["Single", "Couple", "Group"];
 
@@ -36,14 +38,34 @@ const TrainerBookingModal = ({
 
   const [selected, setSelected] = useState("Single");
   const [address, setAddress] = useState("");
+  const [fetchingLocation, setFetchingLocation] = useState(false);
 
   const { loading, data, error } = useSelector(
     (state) => state.trainerDetail
   );
+  const { user } = useSelector((state) => state.auth || {});
 
+  const route = useRoute()
   const bookingMode = mode || "book";
-  const selectedTrainerId = trainer?.id || trainerId || data?.id;
-  const selectedPlanId = plan?.id || planId || data?.plan_id || data?.plan?.id;
+  const displayTrainer =
+    bookingMode === "change"
+      ? trainer
+      : data || trainer;
+
+  const selectedTrainerId =
+    bookingMode === "change"
+      ? trainer?.id
+      : trainer?.id || trainerId || data?.id;
+
+  const selectedPlanId =
+    plan?.id ||
+    planId ||
+    data?.plan_id ||
+    data?.plan?.id;
+
+  useEffect(() => {
+    console.log("PAYMENT PARAMS", route.params);
+  }, []);
 
   useEffect(() => {
     if (bookingMode === "change") {
@@ -55,11 +77,40 @@ const TrainerBookingModal = ({
   }, [bookingMode, oldTrainerId, selectedTrainerId]);
 
   useEffect(() => {
-    if (!visible) {
+    if (visible) {
+      if (user?.address) {
+        setAddress(user.address);
+      }
+    } else {
       setSelected("Single");
       setAddress("");
     }
-  }, [visible]);
+  }, [visible, user]);
+
+  const handleFetchLocation = async () => {
+    setFetchingLocation(true);
+    try {
+      const coords = await getCurrentLocation();
+      const fullAddress = await reverseGeocode(
+        coords.latitude,
+        coords.longitude
+      );
+      if (fullAddress) {
+        setAddress(fullAddress);
+      } else {
+        Alert.alert("Location Error", "Could not resolve address from coordinates.");
+      }
+    } catch (err) {
+      console.log("Error fetching location:", err);
+      if (user?.address) {
+        setAddress(user.address);
+      } else {
+        Alert.alert("Location Error", "Unable to fetch location. Please enter your address manually.");
+      }
+    } finally {
+      setFetchingLocation(false);
+    }
+  };
 
   const amount = useMemo(() => {
     if (!data && !trainer) return 0;
@@ -116,25 +167,34 @@ const TrainerBookingModal = ({
         if (res.data.status) {
           Alert.alert("Success", "Trainer changed successfully");
           onClose();
-navigation.navigate("MainApp", {
-  screen: "MySessions",
-});        }
+          navigation.navigate("MainApp", {
+            screen: "MySessions",
+          });
+        }
       } catch (err) {
         Alert.alert("Error", "Trainer change failed");
       }
       return; // ⛔ STOP – no navigation
     }
 
-    // 🔹 PAYMENT REQUIRED
     navigation.navigate("Payment", {
       mode: bookingMode,
-      trainerId: bookingMode === "book" ? selectedTrainerId : undefined,
-      new_trainer_id: bookingMode === "change" ? selectedTrainerId : undefined,
+      trainerId:
+        bookingMode === "book"
+          ? selectedTrainerId
+          : undefined,
+      new_trainer_id:
+        bookingMode === "change"
+          ? selectedTrainerId
+          : undefined,
       old_trainer_id: oldTrainerId,
       plan_id: selectedPlanId,
       booking_type: selected.toLowerCase(),
       amount,
+      address,
     });
+
+    onClose();
   };
 
   return (
@@ -156,7 +216,7 @@ navigation.navigate("MainApp", {
               <Text style={styles.errorText}>{error}</Text>
             )}
 
-            {!loading && !error && (data || trainer) && (
+            {!loading && !error && displayTrainer && (
               <ScrollView
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
@@ -166,29 +226,18 @@ navigation.navigate("MainApp", {
                 <View style={styles.headerSection}>
                   <Image
                     source={
-                      data?.profile_pic || trainer?.profile_pic
-                        ? {
-                          uri:
-                            data?.profile_pic ||
-                            trainer?.profile_pic,
-                        }
+                      displayTrainer?.profile_pic
+                        ? { uri: displayTrainer.profile_pic }
                         : require("../../../assets/trainer2.jpg")
                     }
                     style={styles.profileImage}
                   />
-
                   <TrainerInfoCard
-                    name={data?.name || trainer?.name}
-                    experience={data?.experience || trainer?.experience}
-                    sessionTiming={
-                      data?.section_timing ||
-                      trainer?.section_timing
-                    }
-                    numSessions={
-                      data?.no_of_section ||
-                      trainer?.no_of_section
-                    }
-                    workoutType={plan?.name || data?.plan_name}
+                    name={displayTrainer?.name}
+                    experience={displayTrainer?.experience}
+                    sessionTiming={displayTrainer?.section_timing}
+                    numSessions={displayTrainer?.no_of_section}
+                    workoutType={plan?.name || displayTrainer?.plan_name}
                   />
                 </View>
 
@@ -234,10 +283,14 @@ navigation.navigate("MainApp", {
                     Address
                   </Text>
 
-                  <TouchableOpacity>
-                    <Text style={styles.addNewText}>
-                      + Add New
-                    </Text>
+                  <TouchableOpacity onPress={handleFetchLocation} disabled={fetchingLocation}>
+                    {fetchingLocation ? (
+                      <ActivityIndicator size="small" color="#EF0707" style={{ marginRight: 5 }} />
+                    ) : (
+                      <Text style={styles.addNewText}>
+                        + Add New
+                      </Text>
+                    )}
                   </TouchableOpacity>
                 </View>
 
@@ -258,7 +311,7 @@ navigation.navigate("MainApp", {
             )}
           </View>
 
-          {(data || trainer) && !loading && (
+          {displayTrainer && !loading && (
             <View style={styles.footer}>
               <TouchableOpacity
                 style={[

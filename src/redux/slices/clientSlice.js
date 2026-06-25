@@ -1,36 +1,37 @@
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { registerClientApi } from "../../services/clientServices";
 import { setToken } from "../../storage/asyncStorage";
-import { setAuth } from "../slices/authSlice"; // ✅ import setAuth
+import {
+  extractApiErrorMessage,
+  extractApiFieldErrors,
+} from "../../utils/registrationErrors";
 
 export const registerClientThunk = createAsyncThunk(
   "client/register",
-  async (payload, { rejectWithValue, dispatch }) => {
+  async (formData, { rejectWithValue }) => {
     try {
-      const res = await registerClientApi(payload);
-      const responseData = res.data;
-      const tokenObject = responseData?.token;
-      const access = tokenObject?.access || responseData?.access;
-      const refresh = tokenObject?.refresh || responseData?.refresh;
-      const user = responseData?.user || responseData?.data;
+      const res = await registerClientApi(formData);
+      const user = res.data?.data;
+      const access = res.data?.access;
+      const refresh = res.data?.refresh;
 
       if (access || refresh) {
         await setToken(access, refresh);
       }
 
-      if (user) {
-        await AsyncStorage.setItem("user", JSON.stringify(user));
-      }
-
-      if (access) {
-        dispatch(setAuth({ user, access }));
-      }
-
-      return responseData;
+      return { user, access, refresh };
     } catch (err) {
-      return rejectWithValue(err.response?.data || "Registration failed");
+      const payload = err.response?.data;
+      const message = extractApiErrorMessage(
+        payload,
+        err.message || "Registration failed"
+      );
+      return rejectWithValue({
+        message,
+        fieldErrors: extractApiFieldErrors(payload),
+        status: err.response?.status,
+      });
     }
   }
 );
@@ -54,13 +55,14 @@ const clientSlice = createSlice({
         builder
             .addCase(registerClientThunk.pending, (state) => {
                 state.loading = true;
+                state.error = null;
             })
             .addCase(registerClientThunk.fulfilled, (state, action) => {
                 state.loading = false;
                 state.registered = true;
 
-                const access = action.payload?.token?.access ?? action.payload?.access;
-                const refresh = action.payload?.token?.refresh ?? action.payload?.refresh;
+                const access = action.payload?.access;
+                const refresh = action.payload?.refresh;
                 if (access || refresh) {
                     setToken(access, refresh);
                 }
@@ -68,7 +70,7 @@ const clientSlice = createSlice({
 
             .addCase(registerClientThunk.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload;
+                state.error = action.payload?.message || action.payload;
             });
     },
 });

@@ -1,16 +1,40 @@
 import React, { useEffect } from "react";
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Platform, Alert } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Platform } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import Toast from 'react-native-toast-message';
 import styles from "./style";
 import { useSelector, useDispatch } from "react-redux";
 import { registerClientThunk, resetClientState } from "../../redux/slices/clientSlice";
-import { resetRegistration, updateRegistration } from "../../redux/slices/registrationSlice";
-import { fetchMobProfileThunk } from "../../redux/slices/mobProfileSlice";
+import { resetRegistration } from "../../redux/slices/registrationSlice";
 import { setAuth } from "../../redux/slices/authSlice";
-import Toast from "react-native-toast-message";
 import { getCurrentLocation } from "../../utils/location";
 import { reverseGeocode } from "../../utils/reverseGeocode";
+import { validateUserStep1 } from "../../utils/Validators";
+
+const WIZARD_FIELD_STEPS = {
+  gender: 1,
+  dob: 2,
+  age: 2,
+  blood_group: 3,
+  wellness_goal: 4,
+  health_issues: 5,
+  weight: 6,
+  height: 7,
+};
+
+const BASIC_DETAIL_FIELDS = [
+  "name",
+  "email",
+  "phno",
+  "phone",
+  "mobile",
+  "password",
+  "profile_pic",
+  "address",
+  "latitude",
+  "longitude",
+];
 
 export default function BMIResultScreen({ navigation }) {
   const {
@@ -26,9 +50,84 @@ export default function BMIResultScreen({ navigation }) {
     (state) => state.registration
   );
 
-  const { loading, registered, error } = useSelector(
+  const { loading, registered } = useSelector(
     (state) => state.client
   );
+
+  const showRegistrationIssue = (message, target = {}) => {
+    Toast.show({
+      type: "error",
+      text1: message || "Please complete the missing details",
+    });
+
+    if (target.screen === "basic") {
+      navigation.navigate("SignupDetailsScreenUser");
+      return;
+    }
+
+    if (target.step) {
+      navigation.navigate("MainWizardScreen", { initialStep: target.step });
+    }
+  };
+
+  const validateFinalRegistration = (data) => {
+    const step1 = validateUserStep1(data);
+    if (!step1.ok) {
+      return { ok: false, msg: step1.msg, target: { screen: "basic" } };
+    }
+
+    const requiredWizardFields = [
+      { field: "gender", msg: "Please select your gender", step: 1 },
+      { field: "dob", msg: "Please select your date of birth", step: 2 },
+      { field: "blood_group", msg: "Please select your blood group", step: 3 },
+      { field: "wellness_goal", msg: "Please select at least one wellness goal", step: 4 },
+      { field: "health_issues", msg: "Please select at least one health condition", step: 5 },
+      { field: "weight", msg: "Please select your weight", step: 6 },
+      { field: "height", msg: "Please select your height", step: 7 },
+    ];
+
+    const missing = requiredWizardFields.find(({ field }) => {
+      const value = data[field];
+      return Array.isArray(value) ? value.length === 0 : !value;
+    });
+
+    if (missing) {
+      return {
+        ok: false,
+        msg: missing.msg,
+        target: { step: missing.step },
+      };
+    }
+
+    return { ok: true };
+  };
+
+  const getBackendErrorTarget = (err) => {
+    const field = err?.fieldErrors?.[0]?.field;
+    const message = err?.fieldErrors?.[0]?.message || err?.message || err;
+
+    if (field) {
+      if (BASIC_DETAIL_FIELDS.includes(field)) {
+        return { message, target: { screen: "basic" } };
+      }
+
+      if (WIZARD_FIELD_STEPS[field]) {
+        return { message, target: { step: WIZARD_FIELD_STEPS[field] } };
+      }
+    }
+
+    if (/email|phone|mobile|phno/i.test(String(message))) {
+      return { message, target: { screen: "basic" } };
+    }
+
+    return {
+      message:
+        err?.status === 400 && !err?.fieldErrors?.length
+          ? "Registration failed. The server did not return field-specific validation details."
+          : message,
+      target: {},
+    };
+  };
 
   const weightInKg =
     weightUnit === "LBS" ? weight * 0.453592 : weight;
@@ -67,6 +166,35 @@ export default function BMIResultScreen({ navigation }) {
     bmiColor = "#F5554A";
   }
 
+  const getBmiPositionPercent = (val) => {
+    if (val < 15) return 0;
+    if (val > 40) return 100;
+
+    if (val < 18.5) {
+      const ratio = (val - 15) / (18.5 - 15);
+      return ratio * 18.18;
+    } else if (val < 25) {
+      const ratio = (val - 18.5) / (25 - 18.5);
+      return 18.18 + ratio * (45.45 - 18.18);
+    } else if (val < 30) {
+      const ratio = (val - 25) / (30 - 25);
+      return 45.45 + ratio * (72.73 - 45.45);
+    } else {
+      const ratio = (val - 30) / (40 - 30);
+      return 72.73 + ratio * (100 - 72.73);
+    }
+  };
+
+  const progressPercent = getBmiPositionPercent(bmiValue);
+  const SCALE_WIDTH = 269.5;
+  const CHIP_WIDTH = 100;
+  const HALF_CHIP_PERCENT = (CHIP_WIDTH / 2 / SCALE_WIDTH) * 100;
+  const chipLeftPercent = Math.max(
+    HALF_CHIP_PERCENT,
+    Math.min(100 - HALF_CHIP_PERCENT, progressPercent)
+  );
+  const arrowOffset = (progressPercent - chipLeftPercent) * (SCALE_WIDTH / 100);
+
   const buildRegisterPayload = (data) => {
     const formData = new FormData();
 
@@ -81,48 +209,10 @@ export default function BMIResultScreen({ navigation }) {
     formData.append("blood_group", data.blood_group);
     formData.append("height", String(data.height));
     formData.append("weight", String(data.weight));
-    const addressParts = [
-      data.address?.trim(),
-      data.landmark?.trim(),
-      data.city?.trim(),
-      data.pincode?.trim(),
-    ].filter(Boolean);
-
-    const fullAddress = addressParts.join(", ");
-    const locationValue =
-      data.location?.trim() ||
-      fullAddress ||
-      (data.latitude != null && data.longitude != null
-        ? `Lat: ${Number(data.latitude).toFixed(6)}, Lng: ${Number(data.longitude).toFixed(6)}`
-        : "");
-
-    if (locationValue) {
-      formData.append("location", locationValue);
-    }
-
-    if (fullAddress) {
-      formData.append("address", fullAddress);
-    }
-
-    if (data.city) {
-      formData.append("city", data.city);
-    }
-
-    if (data.pincode) {
-      formData.append("pincode", data.pincode);
-    }
-
-    if (data.landmark) {
-      formData.append("landmark", data.landmark);
-    }
-
-    if (data.latitude != null) {
-      formData.append("latitude", Number(data.latitude).toFixed(6));
-    }
-
-    if (data.longitude != null) {
-      formData.append("longitude", Number(data.longitude).toFixed(6));
-    }
+    formData.append(
+      "address",
+      `${data.address || ""}, ${data.landmark || ""}, ${data.city || ""} - ${data.pincode || ""}`
+    );
 
     // Arrays
     formData.append(
@@ -148,82 +238,83 @@ export default function BMIResultScreen({ navigation }) {
       });
     }
 
+    // include lat/lng if available — round to 6 decimals to match backend DecimalField
+    if (data.latitude != null) {
+      const lat = Number(data.latitude);
+      if (!Number.isNaN(lat)) {
+        formData.append("latitude", String(lat.toFixed(6)));
+      }
+    }
+    if (data.longitude != null) {
+      const lon = Number(data.longitude);
+      if (!Number.isNaN(lon)) {
+        formData.append("longitude", String(lon.toFixed(6)));
+      }
+    }
+
     return formData;
   };
 
 
 
-const ensureRegistrationLocation = async (data) => {
-  if (data.latitude != null && data.longitude != null) {
-    return data;
-  }
-
-  const coords = await getCurrentLocation();
-  const latitude = Number(coords.latitude.toFixed(6));
-  const longitude = Number(coords.longitude.toFixed(6));
-
-  const addressParts = [
-    data.address?.trim(),
-    data.landmark?.trim(),
-    data.city?.trim(),
-    data.pincode?.trim(),
-  ].filter(Boolean);
-
-  let locationValue = data.location?.trim();
-  let addressValue = data.address?.trim();
-  const fullAddress = addressParts.join(", ");
-
-  if (!locationValue && fullAddress) {
-    locationValue = fullAddress;
-    addressValue = addressValue || fullAddress;
-  }
-
-  if (!locationValue) {
-    try {
-      const reverseAddress = await reverseGeocode(latitude, longitude);
-      locationValue = reverseAddress;
-      addressValue = addressValue || reverseAddress;
-    } catch (err) {
-      console.warn("Reverse geocode failed", err);
-      if (!locationValue) {
-        locationValue = `Lat: ${latitude}, Lng: ${longitude}`;
-        addressValue = addressValue || locationValue;
-      }
-    }
-  }
-
-  const updated = {
-    ...data,
-    latitude,
-    longitude,
-    location: locationValue,
-    address: addressValue,
-  };
-
-  dispatch(updateRegistration(updated));
-  return updated;
-};
-
 const handleFinalSubmit = async () => {
-  let registrationData = registration;
+  // Ensure we send latitude/longitude if available — try to fetch device location when missing
+  let regData = { ...registration };
 
-  try {
-    if (registrationData.latitude == null || registrationData.longitude == null) {
-      registrationData = await ensureRegistrationLocation(registrationData);
+  const validation = validateFinalRegistration(regData);
+  if (!validation.ok) {
+    showRegistrationIssue(validation.msg, validation.target);
+    return;
+  }
+
+  if (!regData.latitude || !regData.longitude) {
+    try {
+      const coords = await getCurrentLocation();
+      regData.latitude = coords.latitude;
+      regData.longitude = coords.longitude;
+
+      // Only fill address when it's empty to avoid overwriting user-entered address
+      if (!regData.address) {
+        try {
+          regData.address = await reverseGeocode(coords.latitude, coords.longitude);
+        } catch (e) {
+          console.log('Reverse geocode failed:', e?.message || e);
+        }
+      }
+    } catch (e) {
+      console.log('Unable to fetch device location during registration:', e?.message || e);
+      // proceed without lat/lng — user can set later
     }
-  } catch (err) {
-    Alert.alert(
-      'Location Required',
-      'Please allow location access or use the profile location option before continuing.'
+  }
+
+  const typedAddress = [
+    regData.address,
+    regData.landmark,
+    regData.city,
+    regData.pincode,
+  ]
+    .filter(Boolean)
+    .join(", ")
+    .trim();
+
+  if (!typedAddress && (!regData.latitude || !regData.longitude)) {
+    showRegistrationIssue(
+      "Please add your address or use your current location",
+      { screen: "basic" }
     );
     return;
   }
 
-  const formData = buildRegisterPayload(registrationData);
+  const formData = buildRegisterPayload(regData);
   
   try {
-    await dispatch(registerClientThunk(formData)).unwrap();
-    await dispatch(fetchMobProfileThunk()).unwrap();
+    const res = await dispatch(registerClientThunk(formData)).unwrap();
+    const user = res?.user;
+    const access = res?.access;
+
+    if (user && access) {
+      dispatch(setAuth({ user, access }));
+    }
 
     Toast.show({
       type: 'success',
@@ -231,7 +322,8 @@ const handleFinalSubmit = async () => {
       text2: 'Welcome! Redirecting to the app.',
     });
   } catch (err) {
-    Alert.alert("Registration failed", err?.message || err);
+    const { message, target } = getBackendErrorTarget(err);
+    showRegistrationIssue(message, target);
   }
 };
 
@@ -241,19 +333,8 @@ useEffect(() => {
     dispatch(resetRegistration());
     dispatch(resetClientState());
   }
-}, [registered]);
+}, [registered, dispatch]);
 
-
-useEffect(() => {
-  if (error && !registered) {
-    Alert.alert(
-      "Registration failed",
-      typeof error === "string"
-        ? error
-        : error.message || "Registration failed"
-    );
-  }
-}, [error, registered]);
 
 if (!weight || !height) {
   return (
@@ -306,28 +387,44 @@ if (!weight || !height) {
               You have {bmiText} Body Weight!
             </Text>
 
-            <View style={styles.chipWrapper}>
-              <View style={[styles.chip, { backgroundColor: bmiColor }]}>
-                <Text style={styles.chipText}>{bmiText}</Text>
+            {/* ==== SCALE & POINTER ==== */}
+            <View style={{ width: SCALE_WIDTH, alignSelf: "center", marginTop: 20, position: "relative" }}>
+              {/* Dynamic pointer container */}
+              <View style={{ width: "100%", height: 35, position: "relative" }}>
+                <View
+                  style={[
+                    styles.chipWrapper,
+                    {
+                      left: `${chipLeftPercent}%`,
+                    },
+                  ]}
+                >
+                  <View style={[styles.chip, { backgroundColor: bmiColor }]}>
+                    <Text style={styles.chipText}>{bmiText}</Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.chipArrow,
+                      {
+                        borderTopColor: bmiColor,
+                        transform: [{ translateX: arrowOffset }],
+                      },
+                    ]}
+                  />
+                </View>
               </View>
-              <View
-                style={[
-                  styles.chipArrow,
-                  { borderTopColor: bmiColor },
-                ]}
-              />
-            </View>
 
-            {/* ==== SCALE ==== */}
-            <View style={styles.scaleWrapper}>
-              {[
-                ...Array(10).fill("#84CDEE"),
-                ...Array(15).fill("#78B060"),
-                ...Array(15).fill("#FFDF32"),
-                ...Array(15).fill("#F5554A"),
-              ].map((c, i) => (
-                <View key={i} style={[styles.scaleBar, { backgroundColor: c }]} />
-              ))}
+              {/* ==== SCALE BAR ROW ==== */}
+              <View style={[styles.scaleWrapper, { marginTop: 0, marginHorizontal: 0 }]}>
+                {[
+                  ...Array(10).fill("#84CDEE"),
+                  ...Array(15).fill("#78B060"),
+                  ...Array(15).fill("#FFDF32"),
+                  ...Array(15).fill("#F5554A"),
+                ].map((c, i) => (
+                  <View key={i} style={[styles.scaleBar, { backgroundColor: c }]} />
+                ))}
+              </View>
             </View>
 
             {/* ==== INFO ==== */}

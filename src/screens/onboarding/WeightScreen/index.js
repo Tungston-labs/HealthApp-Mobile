@@ -12,23 +12,28 @@ import { updateRegistration } from '../../../redux/slices/registrationSlice';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+const MIN = 0;
+const MAX = 200;
+const ITEM_WIDTH = 8;
+const numbers = Array.from({ length: MAX - MIN + 1 }, (_, i) => MIN + i);
+const toLbs = kg => Math.round(kg * 2.20462);
+
 export default function WeightScreen() {
   const dispatch = useDispatch();
 
   const { weight, weightUnit } = useSelector(state => state.registration);
 
-  const MIN = 0;
-  const MAX = 200;
-  const ITEM_WIDTH = 8;
   const scrollRef = useRef(null);
 
   const [unit, setUnit] = useState(weightUnit || 'KG');
-  const [kgValue, setKgValue] = useState(weight ?? 55);
+  const [kgValue, setKgValue] = useState(() => {
+    if (weight != null) {
+      return weightUnit === 'LBS' ? Math.round(weight / 2.20462) : weight;
+    }
+    return 55;
+  });
 
-  const numbers = Array.from({ length: MAX - MIN + 1 }, (_, i) => MIN + i);
   const sidePadding = SCREEN_WIDTH / 2 - ITEM_WIDTH / 2;
-
-  const toLbs = kg => Math.round(kg * 2.20462);
   const displayedValue = unit === 'KG' ? kgValue : toLbs(kgValue);
 
   // 🔹 Scroll handler
@@ -40,15 +45,17 @@ export default function WeightScreen() {
     if (clamped !== kgValue) {
       setKgValue(clamped);
 
+      const resolvedWeight = unit === 'KG' ? clamped : toLbs(clamped);
       dispatch(
         updateRegistration({
-          weight: clamped,
+          weight: resolvedWeight,
           weightUnit: unit,
         }),
       );
     }
   };
 
+  // Scroll to initial position once on mount
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -56,14 +63,29 @@ export default function WeightScreen() {
         animated: false,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Initialize weight in Redux if not already set
+  useEffect(() => {
+    if (weight == null) {
+      const resolvedWeight = unit === 'KG' ? kgValue : toLbs(kgValue);
+      dispatch(
+        updateRegistration({
+          weight: resolvedWeight,
+          weightUnit: unit,
+        }),
+      );
+    }
+  }, [dispatch, weight, kgValue, unit]);
 
   const changeUnit = newUnit => {
     setUnit(newUnit);
 
+    const resolvedWeight = newUnit === 'KG' ? kgValue : toLbs(kgValue);
     dispatch(
       updateRegistration({
-        weight: kgValue,
+        weight: resolvedWeight,
         weightUnit: newUnit,
       }),
     );

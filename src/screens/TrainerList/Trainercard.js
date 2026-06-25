@@ -4,12 +4,15 @@ import { View, Text, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './styles';
 import { useNavigation } from '@react-navigation/native';
+import { getImageSource } from '../../utils/media';
 
 const fallbackImage = require('../../../assets/trainer1.jpg');
 
 const TrainerCard = ({
   trainer = {},
   planId,
+  mode,
+  oldTrainerId,
   onBookNow,
   showBookButton = true,
   showPrice = true,
@@ -18,9 +21,10 @@ const TrainerCard = ({
   onPressCard,
 }) => {
   const navigation = useNavigation();
-  const imageSource = trainer.trainer_profile_pic || trainer.profile_pic
-    ? { uri: trainer.trainer_profile_pic || trainer.profile_pic }
-    : fallbackImage;
+  const imageSource = getImageSource(
+    trainer.trainer_profile_pic || trainer.profile_pic || trainer.profile_pic_url,
+    fallbackImage
+  );
   const experienceValue = [
     trainer.years_of_experience,
     trainer.experience,
@@ -29,7 +33,7 @@ const TrainerCard = ({
   const experience = Number.isFinite(Number(experienceValue))
     ? Number(experienceValue)
     : 0;
-console.log("TRAINER CARD DATA:", trainer);
+  console.log("TRAINER CARD DATA:", trainer);
   return (
     <View style={styles.card}>
       {/* IMAGE + PROFILE */}
@@ -52,6 +56,8 @@ console.log("TRAINER CARD DATA:", trainer);
             navigation.navigate("TrainerDetail", {
               trainerId: trainer.id,
               planId: planId || trainer.plan?.id || trainer.plan_id,
+              mode,
+              oldTrainerId,
             })
           }
         >
@@ -65,8 +71,8 @@ console.log("TRAINER CARD DATA:", trainer);
           {trainer.trainer_name || trainer.name || "Trainer"}
         </Text>
         <Text style={styles.plansName}>
-  {trainer.plan_name || trainer.plan?.name || ""}
-</Text>
+          {trainer.plan_name || trainer.plan?.name || ""}
+        </Text>
 
         <Text style={styles.exp}>
           {experience} {experience === 1 ? "Year" : "Years"} experience

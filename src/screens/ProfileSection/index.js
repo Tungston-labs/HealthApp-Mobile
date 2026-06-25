@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Linking,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
@@ -31,10 +32,8 @@ import {
   resetNutritionState,
 } from "../../redux/slices/NutritionRequestSlice";
 
-import {
-  fetchChangeTrainerThunk,
-  resetTrainerChange,
-} from "../../redux/slices/changeTrainerSlice";
+import { resetTrainerChange } from "../../redux/slices/changeTrainerSlice";
+import { getImageSource } from "../../utils/media";
 
 const ProfileSection = () => {
   const dispatch = useDispatch();
@@ -57,12 +56,15 @@ const ProfileSection = () => {
   );
 
   const {
-    loading: changeLoading,
     data: changeData,
     error: changeError,
   } = useSelector((state) => state.trainerChange || {});
 
-  const trainer = trainerId ? data ?? null : session;
+  const hasTrainerDetail = data && Object.keys(data).length > 0;
+  const trainer =
+    trainerId && hasTrainerDetail
+      ? data
+      : session;
   console.log({ trainer });
 
   useEffect(() => {
@@ -70,6 +72,14 @@ const ProfileSection = () => {
       dispatch(fetchTrainerDetailThunk(trainerId));
     }
   }, [trainerId, dispatch]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (trainerId) {
+        dispatch(fetchTrainerDetailThunk(trainerId));
+      }
+    }, [trainerId, dispatch])
+  );
 
   const trainerPhone =
     trainer?.phno ||
@@ -144,16 +154,34 @@ const ProfileSection = () => {
       dispatch(resetNutritionState());
     }
   }, [nutritionSuccess, nutritionError, dispatch]);
+  console.log("route.params", route.params);
+  console.log("session", session);
+  console.log("trainer", trainer);
+  console.log("route.params", route.params);
+  console.log("trainerId", trainerId);
+  console.log("session", session);
+  console.log("redux trainerDetail data", data);
+  console.log("trainer", trainer);
+  const currentTrainerId =
+    trainerId ||
+    trainer?.id ||
+    trainer?.trainer_id ||
+    trainer?.current_trainer_id;
+
+  console.log("currentTrainerId", currentTrainerId);
 
   const handleChangeTrainer = () => {
-    if (!trainer?.id) {
+    console.log("CHANGE TRAINER CLICKED");
+    console.log("trainer", trainer);
+    console.log("currentTrainerId", currentTrainerId);
+    if (!currentTrainerId) {
       alert("Trainer not available");
       return;
     }
 
     navigation.navigate("TrainerList", {
       mode: "change",
-      trainerId: trainer.id,
+      trainerId: currentTrainerId,
     });
   };
 
@@ -182,7 +210,15 @@ const ProfileSection = () => {
     );
   }
 
-  if (trainerId && !loading && !trainer) {
+  if (trainerId && loading && !hasTrainerDetail && !session) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" style={styles.loader} />
+      </View>
+    );
+  }
+
+  if (trainerId && !loading && !hasTrainerDetail && !session) {
     return (
       <EmptyState
         title="Trainer not found"
@@ -193,9 +229,10 @@ const ProfileSection = () => {
 
   const fallbackImage = require("../../../assets/trainer1.jpg");
 
-  const imageSource = trainer?.profile_pic
-    ? { uri: trainer.profile_pic }
-    : fallbackImage;
+  const imageSource = getImageSource(
+    trainer?.profile_pic || trainer?.profile_pic_url || trainer?.trainer_profile_pic,
+    fallbackImage
+  );
 
   const trainerTiming = trainer?.section_timing
     ? `${trainer.section_timing} min`
