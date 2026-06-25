@@ -5,6 +5,7 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: 20,
+    marginHorizontal:15,
     backgroundColor: "#fff",
   },
 

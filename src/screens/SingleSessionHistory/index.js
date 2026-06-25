@@ -13,6 +13,9 @@ import styles from "./styles";
 import {
   fetchCompletedSessionDetailThunk,
 } from "../../redux/slices//completedSessionDetailSlice";
+import { getImageSource } from "../../utils/media";
+
+const fallbackImage = require("../../../assets/trainer2.jpg");
 
 const SingleSessionHistory = ({ route }) => {
   const dispatch = useDispatch();
@@ -27,7 +30,7 @@ const SingleSessionHistory = ({ route }) => {
     if (sessionId) {
       dispatch(fetchCompletedSessionDetailThunk(sessionId));
     }
-  }, [sessionId]);
+  }, [sessionId, dispatch]);
 
   if (loading) {
     return (
@@ -47,17 +50,19 @@ const SingleSessionHistory = ({ route }) => {
 
   if (!session) return null;
 
+  const trainerImage =
+    session.trainer?.profile_pic ||
+    session.trainer?.profile_pic_url ||
+    session.trainer_profile_pic ||
+    session.profile_pic;
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <HeaderWithBack title="Session history" subtitle="SessionDetails" />
 
       {/* Top Image */}
       <Image
-        source={{
-          uri:
-            session.trainer?.profile_pic ||
-            "https://via.placeholder.com/600x300",
-        }}
+        source={getImageSource(trainerImage, fallbackImage)}
         style={styles.bannerImage}
       />
 

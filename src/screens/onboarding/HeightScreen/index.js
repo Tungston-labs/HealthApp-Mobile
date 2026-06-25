@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -55,28 +55,22 @@ export default function HeightPicker() {
     return `${feet}' ${inches}"`;
   };
 
-  const handleScroll = (e) => {
-    const y = e.nativeEvent.contentOffset.y;
-    const index = Math.round(y / ITEM_HEIGHT);
-    const invertedIndex = numbers.length - 1 - index;
+const handleScroll = (e) => {
+  const y = e.nativeEvent.contentOffset.y;
+  const index = Math.round(y / ITEM_HEIGHT);
+  const invertedIndex = numbers.length - 1 - index;
 
-    const clamped = Math.max(
-      0,
-      Math.min(numbers.length - 1, invertedIndex)
-    );
+  const clamped = Math.max(
+    0,
+    Math.min(numbers.length - 1, invertedIndex)
+  );
 
-    const newCm = numbers[clamped];
+  const newCm = numbers[clamped];
 
-    if (newCm !== cmValue) {
-      setCmValue(newCm);
-      dispatch(
-        updateRegistration({
-          height: newCm,
-          heightUnit: unit,
-        })
-      );
-    }
-  };
+  if (newCm !== cmValue) {
+    setCmValue(newCm);
+  }
+};
   const formatSideLabel = (cm) => {
     if (unit === "Cm") return cm;
 
@@ -84,13 +78,25 @@ export default function HeightPicker() {
     return `${feet}'${inches}"`;
   };
 
-  useEffect(() => {
-    const index = initialCm - MIN_CM;
-    scrollRef.current?.scrollTo({
-      y: index * ITEM_HEIGHT,
-      animated: false,
-    });
-  }, []);
+useEffect(() => {
+  const index = initialCm - MIN_CM;
+
+  scrollRef.current?.scrollTo({
+    y: index * ITEM_HEIGHT,
+    animated: false,
+  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+useEffect(() => {
+  if (height == null) {
+    dispatch(
+      updateRegistration({
+        height: cmValue,
+        heightUnit: unit,
+      })
+    );
+  }
+}, [dispatch, height, cmValue, unit]);
 
   //  Unit change handler
   const changeUnit = (newUnit) => {
@@ -104,15 +110,17 @@ export default function HeightPicker() {
     );
   };
 
-  //  Label logic (unchanged)
+const fixedLabels = useMemo(() => {
   let mid = Math.round(cmValue / 5) * 5;
-  const fixedLabels = [
+
+  return [
     Math.min(MAX_CM, mid + 10),
     Math.min(MAX_CM, mid + 5),
     mid,
     Math.max(MIN_CM, mid - 5),
     Math.max(MIN_CM, mid - 10),
   ];
+}, [cmValue]);
 
   return (
     <View style={styles.container}>
@@ -176,18 +184,26 @@ export default function HeightPicker() {
 
         {/* Ruler */}
         <View style={styles.rulerContainer}>
-          <ScrollView
-            ref={scrollRef}
-            showsVerticalScrollIndicator={false}
-            snapToInterval={ITEM_HEIGHT}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
-            contentContainerStyle={{
-              paddingTop: sidePadding,
-              paddingBottom: sidePadding,
-              alignItems: "center",
-            }}
-          >
+         <ScrollView
+  ref={scrollRef}
+  showsVerticalScrollIndicator={false}
+  snapToInterval={ITEM_HEIGHT}
+  onScroll={handleScroll}
+  scrollEventThrottle={16}
+  onMomentumScrollEnd={() => {
+    dispatch(
+      updateRegistration({
+        height: cmValue,
+        heightUnit: unit,
+      })
+    );
+  }}
+  contentContainerStyle={{
+    paddingTop: sidePadding,
+    paddingBottom: sidePadding,
+    alignItems: "center",
+  }}
+>
             {numbers.map((num) => {
               const isBig = num % 5 === 0;
               return (

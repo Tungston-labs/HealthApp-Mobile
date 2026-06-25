@@ -4,6 +4,7 @@ import { View, Text, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './styles';
 import { useNavigation } from '@react-navigation/native';
+import { getImageSource } from '../../utils/media';
 
 const fallbackImage = require('../../../assets/trainer1.jpg');
 
@@ -20,9 +21,10 @@ const TrainerCard = ({
   onPressCard,
 }) => {
   const navigation = useNavigation();
-  const imageSource = trainer.trainer_profile_pic || trainer.profile_pic
-    ? { uri: trainer.trainer_profile_pic || trainer.profile_pic }
-    : fallbackImage;
+  const imageSource = getImageSource(
+    trainer.trainer_profile_pic || trainer.profile_pic || trainer.profile_pic_url,
+    fallbackImage
+  );
   const experienceValue = [
     trainer.years_of_experience,
     trainer.experience,

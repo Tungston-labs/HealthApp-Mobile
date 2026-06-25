@@ -1,5 +1,5 @@
 // screens/ClientListScreen/index.js
-import React, { useEffect } from "react";
+import React, { useCallback } from "react";
 import { View, FlatList, ActivityIndicator } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./styles";
@@ -7,7 +7,7 @@ import HeaderWithBack from "../../components/HeaderWithBack";
 import TrainerCard from "../../screens/TrainerList/Trainercard";
 import EmptyState from "../../components/EmptyState";
 import { fetchClientTrainersThunk } from "../../redux/slices/clientTrainerSlice";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 const ClientListScreen = () => {
   const dispatch = useDispatch();
@@ -15,9 +15,11 @@ const ClientListScreen = () => {
 
   const { trainers, loading } = useSelector(state => state.clientTrainer);
   console.log({ trainers })
-  useEffect(() => {
-    dispatch(fetchClientTrainersThunk());
-  }, [dispatch]);
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchClientTrainersThunk());
+    }, [dispatch])
+  );
   if (loading) {
     return (
       <View style={styles.loaderContainer}>

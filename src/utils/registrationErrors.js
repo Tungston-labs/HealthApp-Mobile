@@ -1,4 +1,5 @@
 const DUPLICATE_EMAIL_REGEX = /(email).*(already|exist|taken|registered)|(already|exist|taken|registered).*(email)/i;
+const DUPLICATE_PHONE_REGEX = /(phno|phone|mobile|number).*(already|exist|taken|registered)|(already|exist|taken|registered).*(phno|phone|mobile|number)/i;
 const GENERIC_API_MESSAGES = [
   /^validation failed$/i,
   /^login failed$/i,
@@ -38,7 +39,55 @@ const getEmailMessages = (payload) => {
   return [...directEmail, ...nestedEmail];
 };
 
+const getFieldMessages = (payload, fieldNames) => {
+  if (!isPlainObject(payload)) return [];
+
+  const messages = [];
+  const containers = [payload, isPlainObject(payload.errors) ? payload.errors : null].filter(Boolean);
+
+  containers.forEach((container) => {
+    fieldNames.forEach((field) => {
+      messages.push(...collectMessages(container[field]));
+    });
+  });
+
+  return messages;
+};
+
+const FIELD_LABELS = {
+  name: "Name",
+  email: "Email",
+  phno: "Phone number",
+  phone: "Phone number",
+  mobile: "Phone number",
+  password: "Password",
+  profile_pic: "Profile picture",
+  dob: "Date of birth",
+  age: "Age",
+  gender: "Gender",
+  blood_group: "Blood group",
+  wellness_goal: "Wellness goal",
+  health_issues: "Health conditions",
+  height: "Height",
+  weight: "Weight",
+  address: "Address",
+  latitude: "Location",
+  longitude: "Location",
+};
+
+const NON_FIELD_KEYS = new Set([
+  "message",
+  "detail",
+  "status",
+  "success",
+  "data",
+  "non_field_errors",
+]);
+
 export const hasEmailFieldError = (payload) => getEmailMessages(payload).length > 0;
+
+export const hasPhoneFieldError = (payload) =>
+  getFieldMessages(payload, ["phno", "phone", "mobile"]).length > 0;
 
 export const isDuplicateEmailError = (payload) => {
   const emailMessages = getEmailMessages(payload);
@@ -51,6 +100,42 @@ export const isDuplicateEmailError = (payload) => {
     (message) =>
       /email/i.test(message) && DUPLICATE_EMAIL_REGEX.test(message)
   );
+};
+
+export const isDuplicatePhoneError = (payload) => {
+  const phoneMessages = getFieldMessages(payload, ["phno", "phone", "mobile"]);
+
+  if (phoneMessages.some((message) => DUPLICATE_PHONE_REGEX.test(message))) {
+    return true;
+  }
+
+  return collectMessages(payload).some(
+    (message) =>
+      /(phno|phone|mobile|number)/i.test(message) &&
+      DUPLICATE_PHONE_REGEX.test(message)
+  );
+};
+
+export const extractApiFieldErrors = (payload) => {
+  if (!isPlainObject(payload)) return [];
+
+  const source = isPlainObject(payload.errors) ? payload.errors : payload;
+
+  return Object.entries(source)
+    .filter(([field]) => !NON_FIELD_KEYS.has(field))
+    .filter(([, value]) => collectMessages(value).length > 0)
+    .map(([field, value]) => {
+      const message = collectMessages(value)[0];
+      const label = FIELD_LABELS[field] || field.replace(/_/g, " ");
+
+      return {
+        field,
+        message:
+          message && !GENERIC_API_MESSAGES.some((pattern) => pattern.test(message))
+            ? message
+            : `${label} is invalid`,
+      };
+    });
 };
 
 export const extractApiErrorMessage = (
@@ -66,8 +151,26 @@ export const extractApiErrorMessage = (
     return duplicateEmailMessage;
   }
 
+  const phoneMessages = getFieldMessages(payload, ["phno", "phone", "mobile"]);
+  const duplicatePhoneMessage = phoneMessages.find((message) =>
+    DUPLICATE_PHONE_REGEX.test(message)
+  );
+
+  if (duplicatePhoneMessage) {
+    return duplicatePhoneMessage;
+  }
+
   if (emailMessages.length > 0) {
     return emailMessages[0];
+  }
+
+  if (phoneMessages.length > 0) {
+    return phoneMessages[0];
+  }
+
+  const fieldErrors = extractApiFieldErrors(payload);
+  if (fieldErrors.length > 0) {
+    return fieldErrors[0].message;
   }
 
   const allMessages = collectMessages(payload);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import MainLayout from "../../../components/MainLayout";
 import GenderScreen from "../GenderScreen";
@@ -11,10 +11,16 @@ import HeightScreen from "../HeightScreen";
 import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 
-export default function MainWizardScreen() {
+export default function MainWizardScreen({ route }) {
   const navigation = useNavigation();
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(route?.params?.initialStep || 1);
   const registration = useSelector(state => state.registration);
+
+  useEffect(() => {
+    if (route?.params?.initialStep) {
+      setStep(route.params.initialStep);
+    }
+  }, [route?.params?.initialStep]);
 
   const getScreenContent = () => {
     switch (step) {
@@ -107,7 +113,7 @@ const handleNext = () => {
       break;
 
     case 4:
-      if (!reg.wellness_goal) {
+      if (!reg.wellness_goal || reg.wellness_goal.length === 0) {
         Toast.show({
           type: "error",
           text1: "Select a wellness goal",
@@ -141,6 +147,14 @@ const handleNext = () => {
   }
 
   if (step === 7) {
+    if (!reg.height) {
+      Toast.show({
+        type: "error",
+        text1: "Select your height",
+      });
+      return;
+    }
+
     navigation.navigate("BMIResultScreen");
   } else {
     setStep(prev => prev + 1);
@@ -160,4 +174,3 @@ const handleNext = () => {
     </MainLayout>
   );
 }
-

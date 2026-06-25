@@ -5,12 +5,36 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import Toast from 'react-native-toast-message';
 import styles from "./style";
 import { useSelector, useDispatch } from "react-redux";
-import { Alert } from "react-native";
 import { registerClientThunk, resetClientState } from "../../redux/slices/clientSlice";
 import { resetRegistration } from "../../redux/slices/registrationSlice";
 import { setAuth } from "../../redux/slices/authSlice";
 import { getCurrentLocation } from "../../utils/location";
 import { reverseGeocode } from "../../utils/reverseGeocode";
+import { validateUserStep1 } from "../../utils/Validators";
+
+const WIZARD_FIELD_STEPS = {
+  gender: 1,
+  dob: 2,
+  age: 2,
+  blood_group: 3,
+  wellness_goal: 4,
+  health_issues: 5,
+  weight: 6,
+  height: 7,
+};
+
+const BASIC_DETAIL_FIELDS = [
+  "name",
+  "email",
+  "phno",
+  "phone",
+  "mobile",
+  "password",
+  "profile_pic",
+  "address",
+  "latitude",
+  "longitude",
+];
 
 export default function BMIResultScreen({ navigation }) {
   const {
@@ -26,9 +50,84 @@ export default function BMIResultScreen({ navigation }) {
     (state) => state.registration
   );
 
-  const { loading, registered, error } = useSelector(
+  const { loading, registered } = useSelector(
     (state) => state.client
   );
+
+  const showRegistrationIssue = (message, target = {}) => {
+    Toast.show({
+      type: "error",
+      text1: message || "Please complete the missing details",
+    });
+
+    if (target.screen === "basic") {
+      navigation.navigate("SignupDetailsScreenUser");
+      return;
+    }
+
+    if (target.step) {
+      navigation.navigate("MainWizardScreen", { initialStep: target.step });
+    }
+  };
+
+  const validateFinalRegistration = (data) => {
+    const step1 = validateUserStep1(data);
+    if (!step1.ok) {
+      return { ok: false, msg: step1.msg, target: { screen: "basic" } };
+    }
+
+    const requiredWizardFields = [
+      { field: "gender", msg: "Please select your gender", step: 1 },
+      { field: "dob", msg: "Please select your date of birth", step: 2 },
+      { field: "blood_group", msg: "Please select your blood group", step: 3 },
+      { field: "wellness_goal", msg: "Please select at least one wellness goal", step: 4 },
+      { field: "health_issues", msg: "Please select at least one health condition", step: 5 },
+      { field: "weight", msg: "Please select your weight", step: 6 },
+      { field: "height", msg: "Please select your height", step: 7 },
+    ];
+
+    const missing = requiredWizardFields.find(({ field }) => {
+      const value = data[field];
+      return Array.isArray(value) ? value.length === 0 : !value;
+    });
+
+    if (missing) {
+      return {
+        ok: false,
+        msg: missing.msg,
+        target: { step: missing.step },
+      };
+    }
+
+    return { ok: true };
+  };
+
+  const getBackendErrorTarget = (err) => {
+    const field = err?.fieldErrors?.[0]?.field;
+    const message = err?.fieldErrors?.[0]?.message || err?.message || err;
+
+    if (field) {
+      if (BASIC_DETAIL_FIELDS.includes(field)) {
+        return { message, target: { screen: "basic" } };
+      }
+
+      if (WIZARD_FIELD_STEPS[field]) {
+        return { message, target: { step: WIZARD_FIELD_STEPS[field] } };
+      }
+    }
+
+    if (/email|phone|mobile|phno/i.test(String(message))) {
+      return { message, target: { screen: "basic" } };
+    }
+
+    return {
+      message:
+        err?.status === 400 && !err?.fieldErrors?.length
+          ? "Registration failed. The server did not return field-specific validation details."
+          : message,
+      target: {},
+    };
+  };
 
   const weightInKg =
     weightUnit === "LBS" ? weight * 0.453592 : weight;
@@ -66,6 +165,35 @@ export default function BMIResultScreen({ navigation }) {
     bmiText = "Obesity";
     bmiColor = "#F5554A";
   }
+
+  const getBmiPositionPercent = (val) => {
+    if (val < 15) return 0;
+    if (val > 40) return 100;
+
+    if (val < 18.5) {
+      const ratio = (val - 15) / (18.5 - 15);
+      return ratio * 18.18;
+    } else if (val < 25) {
+      const ratio = (val - 18.5) / (25 - 18.5);
+      return 18.18 + ratio * (45.45 - 18.18);
+    } else if (val < 30) {
+      const ratio = (val - 25) / (30 - 25);
+      return 45.45 + ratio * (72.73 - 45.45);
+    } else {
+      const ratio = (val - 30) / (40 - 30);
+      return 72.73 + ratio * (100 - 72.73);
+    }
+  };
+
+  const progressPercent = getBmiPositionPercent(bmiValue);
+  const SCALE_WIDTH = 269.5;
+  const CHIP_WIDTH = 100;
+  const HALF_CHIP_PERCENT = (CHIP_WIDTH / 2 / SCALE_WIDTH) * 100;
+  const chipLeftPercent = Math.max(
+    HALF_CHIP_PERCENT,
+    Math.min(100 - HALF_CHIP_PERCENT, progressPercent)
+  );
+  const arrowOffset = (progressPercent - chipLeftPercent) * (SCALE_WIDTH / 100);
 
   const buildRegisterPayload = (data) => {
     const formData = new FormData();
@@ -133,6 +261,12 @@ const handleFinalSubmit = async () => {
   // Ensure we send latitude/longitude if available — try to fetch device location when missing
   let regData = { ...registration };
 
+  const validation = validateFinalRegistration(regData);
+  if (!validation.ok) {
+    showRegistrationIssue(validation.msg, validation.target);
+    return;
+  }
+
   if (!regData.latitude || !regData.longitude) {
     try {
       const coords = await getCurrentLocation();
@@ -153,6 +287,24 @@ const handleFinalSubmit = async () => {
     }
   }
 
+  const typedAddress = [
+    regData.address,
+    regData.landmark,
+    regData.city,
+    regData.pincode,
+  ]
+    .filter(Boolean)
+    .join(", ")
+    .trim();
+
+  if (!typedAddress && (!regData.latitude || !regData.longitude)) {
+    showRegistrationIssue(
+      "Please add your address or use your current location",
+      { screen: "basic" }
+    );
+    return;
+  }
+
   const formData = buildRegisterPayload(regData);
   
   try {
@@ -170,7 +322,8 @@ const handleFinalSubmit = async () => {
       text2: 'Welcome! Redirecting to the app.',
     });
   } catch (err) {
-    Alert.alert("Registration failed", err?.message || err);
+    const { message, target } = getBackendErrorTarget(err);
+    showRegistrationIssue(message, target);
   }
 };
 
@@ -180,19 +333,8 @@ useEffect(() => {
     dispatch(resetRegistration());
     dispatch(resetClientState());
   }
-}, [registered]);
+}, [registered, dispatch]);
 
-
-useEffect(() => {
-  if (error && !registered) {
-    Alert.alert(
-      "Registration failed",
-      typeof error === "string"
-        ? error
-        : error.message || "Registration failed"
-    );
-  }
-}, [error, registered]);
 
 if (!weight || !height) {
   return (
@@ -245,28 +387,44 @@ if (!weight || !height) {
               You have {bmiText} Body Weight!
             </Text>
 
-            <View style={styles.chipWrapper}>
-              <View style={[styles.chip, { backgroundColor: bmiColor }]}>
-                <Text style={styles.chipText}>{bmiText}</Text>
+            {/* ==== SCALE & POINTER ==== */}
+            <View style={{ width: SCALE_WIDTH, alignSelf: "center", marginTop: 20, position: "relative" }}>
+              {/* Dynamic pointer container */}
+              <View style={{ width: "100%", height: 35, position: "relative" }}>
+                <View
+                  style={[
+                    styles.chipWrapper,
+                    {
+                      left: `${chipLeftPercent}%`,
+                    },
+                  ]}
+                >
+                  <View style={[styles.chip, { backgroundColor: bmiColor }]}>
+                    <Text style={styles.chipText}>{bmiText}</Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.chipArrow,
+                      {
+                        borderTopColor: bmiColor,
+                        transform: [{ translateX: arrowOffset }],
+                      },
+                    ]}
+                  />
+                </View>
               </View>
-              <View
-                style={[
-                  styles.chipArrow,
-                  { borderTopColor: bmiColor },
-                ]}
-              />
-            </View>
 
-            {/* ==== SCALE ==== */}
-            <View style={styles.scaleWrapper}>
-              {[
-                ...Array(10).fill("#84CDEE"),
-                ...Array(15).fill("#78B060"),
-                ...Array(15).fill("#FFDF32"),
-                ...Array(15).fill("#F5554A"),
-              ].map((c, i) => (
-                <View key={i} style={[styles.scaleBar, { backgroundColor: c }]} />
-              ))}
+              {/* ==== SCALE BAR ROW ==== */}
+              <View style={[styles.scaleWrapper, { marginTop: 0, marginHorizontal: 0 }]}>
+                {[
+                  ...Array(10).fill("#84CDEE"),
+                  ...Array(15).fill("#78B060"),
+                  ...Array(15).fill("#FFDF32"),
+                  ...Array(15).fill("#F5554A"),
+                ].map((c, i) => (
+                  <View key={i} style={[styles.scaleBar, { backgroundColor: c }]} />
+                ))}
+              </View>
             </View>
 
             {/* ==== INFO ==== */}

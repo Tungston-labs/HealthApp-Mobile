@@ -61,10 +61,10 @@ export default StyleSheet.create({
   },
 
   chipWrapper: {
+    position: "absolute",
+    width: 100,
+    marginLeft: -50,
     alignItems: "center",
-    marginTop: 10,
-    marginBottom:-6,
-    marginRight:90,
   },
 
   chip: {
@@ -98,7 +98,7 @@ export default StyleSheet.create({
   marginHorizontal: 6, 
 },
 scaleBar: {
-  width: 5.5,
+  width: 4.3,
   height: 28,
   borderRadius: 20,
   marginHorizontal: 0.3, 

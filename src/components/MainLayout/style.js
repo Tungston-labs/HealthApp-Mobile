@@ -10,6 +10,8 @@ export default StyleSheet.create({
   headerWrapper: {
     marginTop: 70,
     marginBottom: 15,
+    marginHorizontal: 15,
+
   },
 
   progressContainer: {
@@ -33,12 +35,15 @@ export default StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 5,
+
   },
 
   headerTitle: {
     fontSize: 20,
     fontWeight: "450",
     marginBottom: 20,
+    marginHorizontal: 15,
+
     fontFamily: "Segoe UI",
   },
 
@@ -55,6 +60,8 @@ export default StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 30,
+    marginHorizontal: 15,
+
     backgroundColor: "#EF0707",
     justifyContent: "center",
     alignItems: "center",

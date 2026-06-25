@@ -7,17 +7,17 @@ import { validateUserStep2 } from "../../../utils/Validators";
 import { showError } from "../../../utils/toast";
 import { useNavigation } from "@react-navigation/native";
 
+const days = Array.from({ length: 31 }, (_, i) => i + 1);
+const months = [
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December"
+];
+const years = Array.from({ length: 50 }, (_, i) => 1980 + i);
+
 export default function AgeScreen() {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const registration = useSelector(state => state.registration);
-
-  const days = Array.from({ length: 31 }, (_, i) => i + 1);
-  const months = [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December"
-  ];
-  const years = Array.from({ length: 50 }, (_, i) => 1980 + i);
 
   const ITEM_HEIGHT = 40;
   const VISIBLE_ITEMS = 5;
@@ -56,7 +56,7 @@ export default function AgeScreen() {
         age: finalAge,
       })
     );
-  }, [selectedDay, selectedMonth, selectedYear]);
+  }, [selectedDay, selectedMonth, selectedYear, dispatch]);
 
   const onScrollEnd = (event, setItem, length) => {
     const index = Math.round(event.nativeEvent.contentOffset.y / ITEM_HEIGHT);

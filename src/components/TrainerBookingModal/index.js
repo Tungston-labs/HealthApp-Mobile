@@ -18,6 +18,8 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import TrainerInfoCard from "../TrainerInfoCard";
 import { verifyChangeTrainerPayment } from "../../services/trainerServices";
+import { getCurrentLocation } from "../../utils/location";
+import { reverseGeocode } from "../../utils/reverseGeocode";
 
 const workoutOptions = ["Single", "Couple", "Group"];
 
@@ -36,10 +38,13 @@ const TrainerBookingModal = ({
 
   const [selected, setSelected] = useState("Single");
   const [address, setAddress] = useState("");
+  const [fetchingLocation, setFetchingLocation] = useState(false);
 
   const { loading, data, error } = useSelector(
     (state) => state.trainerDetail
   );
+  const { user } = useSelector((state) => state.auth || {});
+  
   const route = useRoute()
   const bookingMode = mode || "book";
   const displayTrainer =
@@ -61,6 +66,7 @@ const TrainerBookingModal = ({
   useEffect(() => {
     console.log("PAYMENT PARAMS", route.params);
   }, []);
+  
   useEffect(() => {
     if (bookingMode === "change") {
       console.log("🧠 CHANGE MODE IDS:", {
@@ -71,11 +77,40 @@ const TrainerBookingModal = ({
   }, [bookingMode, oldTrainerId, selectedTrainerId]);
 
   useEffect(() => {
-    if (!visible) {
+    if (visible) {
+      if (user?.address) {
+        setAddress(user.address);
+      }
+    } else {
       setSelected("Single");
       setAddress("");
     }
-  }, [visible]);
+  }, [visible, user]);
+
+  const handleFetchLocation = async () => {
+    setFetchingLocation(true);
+    try {
+      const coords = await getCurrentLocation();
+      const fullAddress = await reverseGeocode(
+        coords.latitude,
+        coords.longitude
+      );
+      if (fullAddress) {
+        setAddress(fullAddress);
+      } else {
+        Alert.alert("Location Error", "Could not resolve address from coordinates.");
+      }
+    } catch (err) {
+      console.log("Error fetching location:", err);
+      if (user?.address) {
+        setAddress(user.address);
+      } else {
+        Alert.alert("Location Error", "Unable to fetch location. Please enter your address manually.");
+      }
+    } finally {
+      setFetchingLocation(false);
+    }
+  };
 
   const amount = useMemo(() => {
     if (!data && !trainer) return 0;
@@ -141,23 +176,25 @@ const TrainerBookingModal = ({
       }
       return; // ⛔ STOP – no navigation
     }
-  navigation.navigate("Payment", {
-  mode: bookingMode,
-  trainerId:
-    bookingMode === "book"
-      ? selectedTrainerId
-      : undefined,
-  new_trainer_id:
-    bookingMode === "change"
-      ? selectedTrainerId
-      : undefined,
-  old_trainer_id: oldTrainerId,
-  plan_id: selectedPlanId,
-  booking_type: selected.toLowerCase(),
-  amount,
-});
+    
+    navigation.navigate("Payment", {
+      mode: bookingMode,
+      trainerId:
+        bookingMode === "book"
+          ? selectedTrainerId
+          : undefined,
+      new_trainer_id:
+        bookingMode === "change"
+          ? selectedTrainerId
+          : undefined,
+      old_trainer_id: oldTrainerId,
+      plan_id: selectedPlanId,
+      booking_type: selected.toLowerCase(),
+      amount,
+      address,
+    });
 
-onClose();
+    onClose();
   };
 
   return (
@@ -246,10 +283,14 @@ onClose();
                     Address
                   </Text>
 
-                  <TouchableOpacity>
-                    <Text style={styles.addNewText}>
-                      + Add New
-                    </Text>
+                  <TouchableOpacity onPress={handleFetchLocation} disabled={fetchingLocation}>
+                    {fetchingLocation ? (
+                      <ActivityIndicator size="small" color="#EF0707" style={{ marginRight: 5 }} />
+                    ) : (
+                      <Text style={styles.addNewText}>
+                        + Add New
+                      </Text>
+                    )}
                   </TouchableOpacity>
                 </View>
 

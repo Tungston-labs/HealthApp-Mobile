@@ -36,6 +36,7 @@ const completedSessionDetailSlice = createSlice({
       .addCase(fetchCompletedSessionDetailThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.session = null;
       })
       .addCase(fetchCompletedSessionDetailThunk.fulfilled, (state, action) => {
         state.loading = false;

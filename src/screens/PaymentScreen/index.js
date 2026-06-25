@@ -38,6 +38,7 @@ const PaymentScreen = ({ navigation, route }) => {
     plan_id,
     booking_type,
     amount = 0,
+    address,
   } = route.params || {};
 console.log("PAYMENT PARAMS =>", route.params);
   const filters = useSelector((state) => state.trainer.filters);
@@ -95,6 +96,7 @@ console.log("PAYMENT PARAMS =>", route.params);
           start_date,
           time,
           slot_days,
+          address,
         });
 
       }
@@ -162,13 +164,26 @@ console.log("PAYMENT PARAMS =>", route.params);
           start_date,
           time,
           slot_days,
+          address,
         });
       }
 
       setShowSuccess(true);
     } catch (err) {
-      console.log("❌ PAYMENT ERROR:", err?.response?.data || err.message);
-      Alert.alert("Payment failed", "Please try again");
+      console.log("❌ PAYMENT ERROR:", err?.response?.data || err.message || err);
+      
+      let msg = "Please try again";
+      if (err?.response?.data) {
+        msg = err.response.data.error || err.response.data.message || err.response.data.detail || msg;
+      } else if (err?.description) {
+        msg = err.description;
+      } else if (err?.message) {
+        msg = err.message;
+      } else if (typeof err === "string") {
+        msg = err;
+      }
+      
+      Alert.alert("Payment failed", msg);
     } finally {
       setPaying(false);
     }

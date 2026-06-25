@@ -7,6 +7,10 @@ export default StyleSheet.create({
         paddingHorizontal: 16,
     },
 
+    loader: {
+        marginTop: 40,
+    },
+
     header: {
         marginTop: 40,
         flexDirection: "row",
