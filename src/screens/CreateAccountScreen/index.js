@@ -331,7 +331,7 @@ export default function CreateAccountScreen({ navigation }) {
           </View>
         </View>
 
-        <View>
+        <View style={styles.addressInputRow}>
           <TouchableOpacity
             style={styles.dropdownRow}
             onPress={() => setGenderOpen(!genderOpen)}
@@ -358,7 +358,7 @@ export default function CreateAccountScreen({ navigation }) {
           )}
         </View>
 
-        <View>
+        <View style={styles.addressInputRow}>
           <TouchableOpacity
             style={styles.dropdownRow}
             onPress={() => setExpertiseOpen(!expertiseOpen)}
@@ -456,7 +456,7 @@ export default function CreateAccountScreen({ navigation }) {
           />
         </View>
 
-
+ <View style={styles.addressInputRow}>
         <TextInput
           placeholder="Landmark"
           placeholderTextColor="#888"
@@ -472,6 +472,7 @@ export default function CreateAccountScreen({ navigation }) {
           onChangeText={setAddress}
           multiline
         />
+        </View>
         <View style={styles.twoColRow}>
 
           {/* SECTION TIMING */}
@@ -535,6 +536,7 @@ export default function CreateAccountScreen({ navigation }) {
             style={styles.inputUnderline}
           />
         </View>
+ <View style={styles.addressInputRow}>
 
         <TextInput
           placeholder="Enter password"
@@ -543,7 +545,7 @@ export default function CreateAccountScreen({ navigation }) {
           onChangeText={setPassword}
           style={styles.inputUnderline}
         />
-
+</View>
         <View style={styles.uploadContainer}>
           <Text style={styles.uploadTitle}>Upload Certificates </Text>
 

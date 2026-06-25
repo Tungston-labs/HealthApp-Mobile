@@ -4,18 +4,19 @@ const { width } = Dimensions.get("window");
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EFEEE9",
+    backgroundColor: "#fff",
     paddingHorizontal: 30,
+    marginHorizontal: 15,
     paddingVertical: 40,
   },
 
   logo: {
-  width: 140,
-  height: 50,
-  resizeMode: 'contain',
-  alignSelf: 'flex-start', // 👈 left aligned
-  marginBottom: 10,
-},
+    width: 140,
+    height: 50,
+    resizeMode: 'contain',
+    alignSelf: 'flex-start',
+    marginBottom: 10,
+  },
 
   welcomeText: {
     fontSize: 24,
@@ -32,7 +33,7 @@ export default StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#cfcccc',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -56,7 +57,7 @@ export default StyleSheet.create({
 
   nameInput: {
     flex: 1,
-    marginLeft: 8,
+    marginHorizontal: 8,
     fontSize: 16,
     color: '#000',
   },
@@ -73,6 +74,8 @@ export default StyleSheet.create({
     borderBottomColor: "#898989",
     paddingVertical: 10,
     marginTop: 12,
+    marginHorizontal: 10,
+
     fontSize: 15,
     color: "#000",
   },
@@ -83,11 +86,13 @@ export default StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#898989",
     paddingVertical: 10,
+    marginHorizontal: 10,
+
     marginTop: 15,
   },
 
   inputField: {
-    marginLeft: 10,
+    marginHorizontal: 10,
     flex: 1,
     fontSize: 15,
     color: "#000",
@@ -97,17 +102,23 @@ export default StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginLeft: 10,
+
     marginTop: 25,
   },
 
   locationLeft: {
     flexDirection: "row",
     alignItems: "center",
+     backgroundColor: '#cfcccc',
+     padding:8,
+     borderRadius:12,
+
   },
 
   locationText: {
     marginLeft: 7,
-    color: "#6E6E6E",
+    color: "#252323",
     fontSize: 15,
   },
 
@@ -128,10 +139,13 @@ export default StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 15,
+    marginHorizontal: 10,
+
   },
 
   smallInput: {
     width: width * 0.38,
+
   },
 
   backLogin: {
@@ -175,5 +189,5 @@ export default StyleSheet.create({
     right: 25,
   },
 
-  
+
 });

@@ -64,6 +64,7 @@ placeholderText: {
     alignItems: "center",
     marginBottom: 15,
     gap: 10,
+    marginHorizontal:15,
   },
 
   profileImage: {
@@ -78,6 +79,7 @@ placeholderText: {
     borderBottomColor: "#898989",
     paddingVertical: 16,
     fontSize: 15,
+    
     fontFamily: "Segoe UI",
   },
 
@@ -89,8 +91,11 @@ placeholderText: {
     paddingVertical: 10,
     marginBottom: 8,
     gap: 10,
+    marginHorizontal:15,
   },
-
+addressInputRow:{
+  marginHorizontal:15,
+},
   iconInputRowSmall: {
     flex: 1,
     flexDirection: "row",
@@ -115,6 +120,7 @@ placeholderText: {
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 4,
+
   },
 
   dropdownText: {
@@ -153,6 +159,7 @@ dropdownList: {
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 12,
+    marginHorizontal:15,
   },
 
   useLocationText: {
@@ -165,6 +172,8 @@ dropdownList: {
   justifyContent: "space-between",
   gap: 20,
   marginBottom: 10,
+      marginHorizontal:15,
+
 },
 
   uploadContainer: {
@@ -172,6 +181,8 @@ dropdownList: {
     backgroundColor: "#E5E5ED",
     padding: 12,
     borderRadius: 10,
+          marginHorizontal:15,
+
   },
 
   uploadTitle: {

@@ -24,7 +24,7 @@ export default function ThankYouScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.innerWrapper}>
         <Image
-          source={require("../../Images/thankyou.png")}
+          source={require("../../Images/thankyou1.png")}
           style={styles.clockImage}
         />
 
