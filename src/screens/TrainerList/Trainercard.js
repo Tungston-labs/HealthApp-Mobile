@@ -82,7 +82,7 @@ const TrainerCard = ({
           <View style={styles.ratingplan}>
             {showPrice && (
               <View style={styles.priceRow}>
-                <Text style={styles.price}>₹ {trainer.single_price ?? 0}</Text>
+                <Text style={styles.price}>₹ {trainer.expecting_salary ?? 0}</Text>
                 {trainer.plan?.name && (
                   <Text style={styles.planName}>
                     {trainer.plan.name}

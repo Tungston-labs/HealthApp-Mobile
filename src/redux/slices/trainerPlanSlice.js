@@ -6,7 +6,7 @@ export const fetchAvailableTrainersThunk = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     // Basic sanity log for incoming payloads (helps diagnose 400s)
     console.log('🔎 fetchAvailableTrainersThunk payload:', JSON.stringify(payload));
-
+    
     // Allow server to validate payload; still perform light validation to avoid trivially empty calls
     if (!payload || !payload.plan_id) {
       console.log('⛔ Missing plan_id in payload:', payload);
@@ -16,6 +16,9 @@ export const fetchAvailableTrainersThunk = createAsyncThunk(
     try {
       const response = await fetchAvailableTrainersAPI(payload);
       console.log("API RESPONSE", response.data);
+      console.log(
+  JSON.stringify(response.data.trainers, null, 2)
+);
       return response.data;
     } catch (err) {
       console.log('❗ fetchAvailableTrainersThunk caught error:', err?.response?.status, err?.response?.data);

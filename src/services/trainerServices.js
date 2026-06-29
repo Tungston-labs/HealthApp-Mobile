@@ -168,3 +168,15 @@ export const createChangeTrainerOrder = (payload) =>
 
 export const verifyChangeTrainerPayment = (payload) =>
   api.post("trainer/payment/change-trainer/verify/", payload);
+
+export const getPlansApi = async () => {
+  const response = await fetch(
+    "http://178.248.112.16:9001/api/plan/public/"
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch plans");
+  }
+
+  return await response.json();
+};
