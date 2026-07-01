@@ -11,7 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import styles from './style';
+import styles, { pickerSelectStyles } from './style';
 import { getCurrentLocation } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,10 +20,13 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import DOBPicker from './DOBPicker';
 import { uploadImageApi } from '../../services/trainerServices';
 import Toast from 'react-native-toast-message';
-import { validateSignup } from '../../utils/Validators';
+import { sectionTimingRegex, validateSignup } from '../../utils/Validators';
+import RNPickerSelect from 'react-native-picker-select';
+
 export default function CreateAccountScreen({ navigation }) {
   const [images, setImages] = useState([]);
   const dispatch = useDispatch();
+  const [sectionOpen, setSectionOpen] = useState(false);
 
   const { loading, error, success } = useSelector(state => state.trainerReg);
   const [isUploading, setIsUploading] = useState(false); const [name, setName] = useState('');
@@ -148,105 +151,116 @@ export default function CreateAccountScreen({ navigation }) {
   const handleRemoveImage = index => {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
-const handleSubmit = async () => {
-  const validationData = {
-    name, email, phno, dob, genderValue, expertiseValue,
-    aadhaar, password, location, landmark, address, city, pincode,
-    profileImage, aadhaarImage, images, sectionTiming
-  };
+  const handleSubmit = async () => {
+    const validationData = {
+      name, email, phno, dob, genderValue, expertiseValue,
+      aadhaar, password, location, landmark, address, city, pincode,
+      profileImage, aadhaarImage, images, sectionTiming
+    };
 
-  const check = validateSignup(validationData);
-  if (!check.ok) {
-    Toast.show({
-      type: 'error',
-      text1: 'Validation Error',
-      text2: check.msg,
-    });
-    return;
-  }
-
-  try {
-    setIsUploading(true);
-    const adarImageUrl = await uploadImageApi(aadhaarImage);
-    let certUrls = [];
-    for (const img of images) {
-      const url = await uploadImageApi(img);
-      if (url) certUrls.push(url);
-    }
-    const formData = new FormData();
-    const finalLocationString = location?.trim() || [landmark, address, city, pincode].filter(Boolean).join(", ");
-    formData.append("name", name);
-    formData.append("email", email.toLowerCase().trim());
-    formData.append("phno", phno);
-    formData.append("dob", dob);
-    formData.append("gender", genderValue.toLowerCase());
-    formData.append("password", password);
-    formData.append("location", finalLocationString); 
-    formData.append("address", address || "");
-    formData.append("city", city || "");
-    formData.append("pincode", pincode || "");
-    formData.append("landmark", landmark || "");
-    formData.append("adar_number", aadhaar);
-    formData.append("section_timing", sectionTiming);
-
-    if (coords?.latitude && coords?.longitude) {
-      formData.append("latitude", Number(coords.latitude).toFixed(6));
-      formData.append("longitude", Number(coords.longitude).toFixed(6));
-    }
-
-    const planId = expertiseMap[expertiseValue];
-    if (planId) formData.append("training_field", Number(planId));
-    formData.append("experience", Number(experience) || 0);
-    formData.append("no_of_section", Number(sessions) || 0);
-    formData.append("expecting_salary", Number(fee) || 0);
-
-    if (profileImage?.uri) {
-      const fixedUri = Platform.OS === "android"
-        ? (profileImage.uri.startsWith("file://") ? profileImage.uri : `file://${profileImage.uri}`)
-        : profileImage.uri;
-
-      formData.append("profile_pic", {
-        uri: fixedUri,
-        name: profileImage.fileName || `profile_${Date.now()}.jpg`,
-        type: profileImage.type || "image/jpeg",
+    const check = validateSignup(validationData);
+    if (!check.ok) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: check.msg,
       });
+      return;
     }
 
-    if (adarImageUrl) formData.append("adar_image", adarImageUrl);
-    certUrls.forEach(url => {
-      formData.append("certificates[]", url);
-    });
-    await dispatch(registerTrainerThunk(formData)).unwrap();
+    try {
+      setIsUploading(true);
 
-    Toast.show({
-      type: 'success',
-      text1: 'Success',
-      text2: 'Trainer Registered Successfully!',
-    });
-    navigation.reset({ index: 0, routes: [{ name: "ThankYouScreen" }] });
-  } catch (err) {
-    console.log("REGISTRATION ERROR:", err);
-    let errorMessage = "Something went wrong";
-    if (typeof err === 'string') {
-      errorMessage = err;
-    } else if (err?.message && typeof err.message === 'string') {
-      errorMessage = err.message;
-    } else if (typeof err === 'object') {
-      const values = Object.values(err);
-      if (values.length > 0) {
-        errorMessage = Array.isArray(values[0]) ? values[0][0] : JSON.stringify(values[0]);
+      const adarImageUrl = await uploadImageApi(aadhaarImage);
+      let certUrls = [];
+      for (const img of images) {
+        const url = await uploadImageApi(img);
+        if (url) certUrls.push(url);
       }
+
+      const formData = new FormData();
+      const finalLocationString = location?.trim() || [landmark, address, city, pincode].filter(Boolean).join(", ");
+
+      formData.append("name", name);
+      formData.append("email", email.toLowerCase().trim());
+      formData.append("phno", phno);
+      formData.append("dob", dob);
+      formData.append("gender", genderValue.toLowerCase());
+      formData.append("password", password);
+
+      formData.append("location", finalLocationString);
+      formData.append("address", address || "");
+      formData.append("city", city || "");
+      formData.append("pincode", pincode || "");
+      formData.append("landmark", landmark || "");
+
+      formData.append("adar_number", aadhaar);
+      formData.append("section_timing", Number(sectionTiming));
+
+      if (coords?.latitude && coords?.longitude) {
+        formData.append("latitude", Number(coords.latitude).toFixed(6));
+        formData.append("longitude", Number(coords.longitude).toFixed(6));
+      }
+
+      const planId = expertiseMap[expertiseValue];
+      if (planId) formData.append("training_field", Number(planId));
+      formData.append("experience", Number(experience) || 0);
+      formData.append("no_of_section", Number(sessions) || 0);
+      formData.append("expecting_salary", Number(fee) || 0);
+
+      if (profileImage?.uri) {
+        const fixedUri = Platform.OS === "android"
+          ? (profileImage.uri.startsWith("file://") ? profileImage.uri : `file://${profileImage.uri}`)
+          : profileImage.uri;
+
+        formData.append("profile_pic", {
+          uri: fixedUri,
+          name: profileImage.fileName || `profile_${Date.now()}.jpg`,
+          type: profileImage.type || "image/jpeg",
+        });
+      }
+
+      if (adarImageUrl) formData.append("adar_image", adarImageUrl);
+      certUrls.forEach(url => {
+        formData.append("certificates[]", url);
+      });
+
+      await dispatch(registerTrainerThunk(formData)).unwrap();
+
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Trainer Registered Successfully!',
+      });
+
+      navigation.reset({ index: 0, routes: [{ name: "ThankYouScreen" }] });
+
+    } catch (err) {
+      console.log("REGISTRATION ERROR:", err);
+      let errorMessage = "Something went wrong";
+
+      if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err?.message && typeof err.message === 'string') {
+        errorMessage = err.message;
+      } else if (typeof err === 'object') {
+        const values = Object.values(err);
+        if (values.length > 0) {
+          errorMessage = Array.isArray(values[0]) ? values[0][0] : JSON.stringify(values[0]);
+        }
+      }
+
+      Toast.show({
+        type: 'error',
+        text1: 'Registration Failed',
+        text2: errorMessage,
+        visibilityTime: 5000,
+      });
+
+    } finally {
+      setIsUploading(false);
     }
-    Toast.show({
-      type: 'error',
-      text1: 'Registration Failed',
-      text2: errorMessage,
-      visibilityTime: 5000,
-    });
-  } finally {
-    setIsUploading(false);
-  }
-};
+  };
 
 
   return (
@@ -434,20 +448,55 @@ const handleSubmit = async () => {
           onChangeText={setAddress}
           multiline
         />
-        <View style={styles.twoColRow}>
-          <TextInput
-            placeholder="Section timing"
-            value={sectionTiming}
-            onChangeText={setSectionTiming}
-            style={styles.inputUnderline}
-          />
-          <TextInput
-            placeholder="Experience ( yr )"
-            value={experience}
-            onChangeText={setExperience}
-            style={styles.inputUnderline}
-          />
-        </View>
+<View style={styles.twoColRow}>
+
+  {/* SECTION TIMING */}
+  <View style={{ flex: 1, position: "relative" }}>
+    <TouchableOpacity
+      style={styles.dropdownRow}
+      onPress={() => setSectionOpen(!sectionOpen)}
+    >
+      <Text
+        style={[
+          styles.dropdownText,
+          sectionTiming && { color: "#000" }
+        ]}
+      >
+        {sectionTiming ? `${sectionTiming} min` : "Section timing"}
+      </Text>
+    </TouchableOpacity>
+
+    {sectionOpen && (
+      <View style={styles.dropdownList}>
+        {["15", "20", "30", "45", "60"].map(t => (
+          <TouchableOpacity
+            key={t}
+            style={styles.dropdownItem}
+            onPress={() => {
+              setSectionTiming(t);
+              setSectionOpen(false);
+            }}
+          >
+            <Text style={styles.dropdownItemText}>{t} min</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    )}
+  </View>
+
+  {/* EXPERIENCE (WILL NOT MOVE) */}
+  <TextInput
+    placeholder="Experience (yr)"
+    value={experience}
+    onChangeText={setExperience}
+    keyboardType="numeric"
+    style={[styles.inputUnderline, { flex: 1 }]}
+  />
+
+</View>
+
+
+
         <View style={styles.twoColRow}>
           <TextInput
             placeholder="No of session"
