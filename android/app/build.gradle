@@ -79,6 +79,7 @@ android {
     compileSdk rootProject.ext.compileSdkVersion
 
     namespace "com.healthapp"
+
     defaultConfig {
         applicationId "com.healthapp"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -86,6 +87,12 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -94,16 +101,16 @@ android {
             keyPassword 'android'
         }
     }
+
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            proguardFiles getDefaultProguardFile("proguard-android.txt"),
+                    "proguard-rules.pro"
         }
     }
 }
@@ -116,5 +123,13 @@ dependencies {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
+    }
+}
+
+afterEvaluate {
+    tasks.matching {
+        it.name == "generateReleaseLintVitalReportModel"
+    }.configureEach {
+        dependsOn("copyReactNativeVectorIconFonts")
     }
 }

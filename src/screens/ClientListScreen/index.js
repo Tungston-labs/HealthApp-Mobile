@@ -48,7 +48,7 @@ const ClientListScreen = () => {
       <FlatList
         data={trainers}
         keyExtractor={item => String(item.id)}
-        
+
         renderItem={({ item }) => (
 
           <TrainerCard

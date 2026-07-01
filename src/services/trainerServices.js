@@ -1,6 +1,5 @@
 import { Platform } from "react-native";
-import api from "./api";
-import axios from "axios";
+import api, { publicApi } from "./api";
 
 export const uploadImageApi = async (file) => {
   const formData = new FormData();
@@ -18,8 +17,8 @@ export const uploadImageApi = async (file) => {
 
   console.log("📤 Uploading:", uri);
 
-  return axios.post(
-    "http://178.248.112.16:9001/api/trainer/upload-image/",
+  return publicApi.post(
+    "trainer/upload-image/",
     formData,
     {
       headers: {
@@ -27,15 +26,15 @@ export const uploadImageApi = async (file) => {
         "Content-Type": "multipart/form-data",
       },
       timeout: 30000,
-      withCredentials: false, 
+      withCredentials: false,
     }
   ).then(res => res.data.url);
 };
 
 
 export const registerTrainerApi = async (formData) => {
-  return axios.post(
-    "http://178.248.112.16:9001/api/trainer/",
+  return publicApi.post(
+    "trainer/",
     formData,
     {
       headers: {
@@ -51,8 +50,29 @@ export const registerTrainerApi = async (formData) => {
 
 
 export const fetchAvailableTrainersAPI = async (payload) => {
-  const response = await api.post("trainer/available-trainers/", payload);
-  return response;
+  // Normalize payload to avoid platform-specific formatting issues
+  const normalized = { ...payload };
+
+  if (normalized.slot_days) {
+    if (typeof normalized.slot_days === 'string') {
+      normalized.slot_days = normalized.slot_days
+        .split(',')
+        .map(s => s.trim().toLowerCase());
+    } else if (Array.isArray(normalized.slot_days)) {
+      normalized.slot_days = normalized.slot_days.map(s => String(s).trim().toLowerCase());
+    }
+  }
+
+  console.log('➡️ POST trainer/available-trainers/ payload:', JSON.stringify(normalized));
+
+  try {
+    const response = await api.post('trainer/available-trainers/', normalized);
+    return response;
+  } catch (err) {
+    console.log('❌ trainer/available-trainers/ error status:', err?.response?.status);
+    console.log('❌ trainer/available-trainers/ error data:', err?.response?.data);
+    throw err;
+  }
 };
 
 export const getTrainerDetailService = (trainerId) => {
@@ -65,7 +85,7 @@ export const reportTrainerService = (payload) => {
 };
 export const fetchTrainerDetailAPI = async (trainerId) => {
   const response = await api.get(`trainer/detail/${trainerId}/`);
-  console.log({response})
+  console.log({ response })
   return response.data;
 };
 
@@ -138,13 +158,21 @@ export const fetchChangeTrainer = async (trainerId) => {
   return response.data;
 };
 
-
-
 // change trainer payments
-
-
 export const createChangeTrainerOrder = (payload) =>
   api.post("trainer/payment/change-trainer/order/", payload);
 
 export const verifyChangeTrainerPayment = (payload) =>
   api.post("trainer/payment/change-trainer/verify/", payload);
+
+export const getPlansApi = async () => {
+  const response = await fetch(
+    "http://178.248.112.16:9001/api/plan/public/"
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch plans");
+  }
+
+  return await response.json();
+};

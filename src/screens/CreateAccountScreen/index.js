@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { registerTrainerThunk } from '../../redux/slices/trainerRegistrationSlice';
 import { launchImageLibrary } from 'react-native-image-picker';
 import DOBPicker from './DOBPicker';
-import { uploadImageApi } from '../../services/trainerServices';
+import { getPlansApi, uploadImageApi } from '../../services/trainerServices';
 import Toast from 'react-native-toast-message';
 import { sectionTimingRegex, validateSignup } from '../../utils/Validators';
 import RNPickerSelect from 'react-native-picker-select';
@@ -49,16 +49,10 @@ export default function CreateAccountScreen({ navigation }) {
   const [pincode, setPincode] = useState("");
   const [landmark, setLandmark] = useState("");
   const [coords, setCoords] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [expertiseOpen, setExpertiseOpen] = useState(false);
   const [expertiseValue, setExpertiseValue] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const expertiseMap = {
-    Cycling: 1,
-    Gym: 2,
-    Zumba: 3,
-    Swimming: 4,
-    Boxing: 5,
-  };
+  const [plans, setPlans] = useState([]);
   const handlePickProfileImage = () => {
     launchImageLibrary(
       {
@@ -80,6 +74,18 @@ export default function CreateAccountScreen({ navigation }) {
       },
     );
   };
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await getPlansApi();
+        setPlans(response.data);
+      } catch (err) {
+        console.log("Plans Error:", err);
+      }
+    };
+
+    fetchPlans();
+  }, []);
   const handlePickAadhaarImage = () => {
     launchImageLibrary(
       {
@@ -209,8 +215,9 @@ export default function CreateAccountScreen({ navigation }) {
         formData.append("longitude", Number(coords.longitude).toFixed(6));
       }
 
-      const planId = expertiseMap[expertiseValue];
-      if (planId) formData.append("training_field", Number(planId));
+      if (expertiseValue?.id) {
+        formData.append("training_field", expertiseValue.id);
+      }
       formData.append("experience", Number(experience) || 0);
       formData.append("no_of_section", Number(sessions) || 0);
       formData.append("expecting_salary", Number(fee) || 0);
@@ -332,7 +339,7 @@ export default function CreateAccountScreen({ navigation }) {
           </View>
         </View>
 
-        <View>
+        <View style={styles.addressInputRow}>
           <TouchableOpacity
             style={styles.dropdownRow}
             onPress={() => setGenderOpen(!genderOpen)}
@@ -359,29 +366,30 @@ export default function CreateAccountScreen({ navigation }) {
           )}
         </View>
 
-        <View>
+        <View style={styles.addressInputRow}>
           <TouchableOpacity
             style={styles.dropdownRow}
             onPress={() => setExpertiseOpen(!expertiseOpen)}
           >
             <Text style={styles.dropdownText}>
-              {expertiseValue || 'Expertise'}
-            </Text>
+              {expertiseValue?.plan_name || "Expertise"}            </Text>
             <Ionicons name="chevron-down" size={20} color="#444" />
           </TouchableOpacity>
 
           {expertiseOpen && (
             <View style={styles.dropdownList}>
-              {['Cycling', 'Gym', 'Zumba', 'Swimming', 'Boxing'].map(ex => (
+              {plans.map(plan => (
                 <TouchableOpacity
-                  key={ex}
+                  key={plan.id}
                   onPress={() => {
-                    setExpertiseValue(ex);
+                    setExpertiseValue(plan);
                     setExpertiseOpen(false);
                   }}
                   style={styles.dropdownItem}
                 >
-                  <Text style={styles.dropdownItemText}>{ex}</Text>
+                  <Text style={styles.dropdownItemText}>
+                    {plan.plan_name}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -457,22 +465,23 @@ export default function CreateAccountScreen({ navigation }) {
           />
         </View>
 
-
-        <TextInput
-          placeholder="Landmark"
-          placeholderTextColor="#888"
-          style={styles.inputUnderline}
-          value={landmark}
-          onChangeText={setLandmark}
-        />
-        <TextInput
-          placeholder="Address"
-          placeholderTextColor="#888"
-          style={styles.inputUnderline}
-          value={address}
-          onChangeText={setAddress}
-          multiline
-        />
+        <View style={styles.addressInputRow}>
+          <TextInput
+            placeholder="Landmark"
+            placeholderTextColor="#888"
+            style={styles.inputUnderline}
+            value={landmark}
+            onChangeText={setLandmark}
+          />
+          <TextInput
+            placeholder="Address"
+            placeholderTextColor="#888"
+            style={styles.inputUnderline}
+            value={address}
+            onChangeText={setAddress}
+            multiline
+          />
+        </View>
         <View style={styles.twoColRow}>
 
           {/* SECTION TIMING */}
@@ -536,7 +545,6 @@ export default function CreateAccountScreen({ navigation }) {
             style={styles.inputUnderline}
           />
         </View>
-
         <View style={styles.passwordRow}>
           <TextInput
             placeholder="Enter password"
@@ -557,7 +565,6 @@ export default function CreateAccountScreen({ navigation }) {
             />
           </TouchableOpacity>
         </View>
-
         <View style={styles.uploadContainer}>
           <Text style={styles.uploadTitle}>Upload Certificates </Text>
 
