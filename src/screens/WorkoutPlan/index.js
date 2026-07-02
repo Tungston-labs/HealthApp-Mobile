@@ -12,37 +12,78 @@ import { useCallback } from "react";
 import { fetchPlansThunk } from "../../redux/slices/planSlice";
 import styles from "./style";
 import { fetchWeeklySessionsThunk } from "../../redux/slices/UpcomingSessionSlice";
-
+import CommonActionModal from "../../components/ModalComponents";
+import {
+  requestNutritionThunk,
+  resetNutritionState,
+} from "../../redux/slices/NutritionRequestSlice";
 const WorkoutPlan = ({ navigation }) => {
   const dispatch = useDispatch();
-const { sessions } = useSelector(
-  state => state.weeklySessions
-);
+  const { sessions } = useSelector(
+    state => state.weeklySessions
+  );
 
-useEffect(() => {
-  dispatch(fetchWeeklySessionsThunk());
-}, []);
+  useEffect(() => {
+    dispatch(fetchWeeklySessionsThunk());
+  }, []);
   const [showModal, setShowModal] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [selectedPlanSlot, setSelectedPlanSlot] = useState(null);
   const [showUpcoming, setShowUpcoming] = useState(false);
+  const [consultType, setConsultType] = useState("call");
+  const [consultNote, setConsultNote] = useState("");
+  const [showConsultModal, setShowConsultModal] = useState(false);
+
 
   const { plans, loading, error } = useSelector(
     (state) => state.planList
   );
 
   const user = useSelector((state) => state.auth?.user);
-useEffect(() => {
-  console.log("Sessions:", sessions);
-}, [sessions]);
+  useEffect(() => {
+    console.log("Sessions:", sessions);
+  }, [sessions]);
   useEffect(() => {
     dispatch(fetchPlansThunk());
   }, [dispatch]);
-useFocusEffect(
-  useCallback(() => {
-    dispatch(fetchPlansThunk());
-  }, [dispatch])
-);
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchPlansThunk());
+    }, [dispatch])
+  );
+  const {
+    loading: nutritionLoading,
+    success: nutritionSuccess,
+    error: nutritionError,
+  } = useSelector((state) => state.nutritionRequest || {});
+
+  const handleConsultSubmit = () => {
+    if (!consultNote.trim()) {
+      alert("Please enter a note");
+      return;
+    }
+
+    dispatch(
+      requestNutritionThunk({
+        consultation_type: consultType,
+        note: consultNote,
+      })
+    );
+  };
+  useEffect(() => {
+    if (nutritionSuccess) {
+      alert("Nutrition request submitted successfully");
+      setShowConsultModal(false);
+      setConsultNote("");
+      setConsultType("call");
+      dispatch(resetNutritionState());
+    }
+
+    if (nutritionError) {
+      alert(nutritionError);
+      dispatch(resetNutritionState());
+    }
+  }, [nutritionSuccess, nutritionError, dispatch]);
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       {/*  FIXED HEADER */}
@@ -77,9 +118,11 @@ useFocusEffect(
             sessions && sessions.length > 0 ? (
               <>
                 <UpcomingSessionSection
-    sessions={sessions}
-    loading={loading}
-/>
+                  sessions={sessions}
+                  loading={loading}
+                  onConsultPress={() => setShowConsultModal(true)}
+
+                />
                 <View style={{ height: 16 }} />
               </>
             ) : null
@@ -116,6 +159,24 @@ useFocusEffect(
             setShowUpcoming(true);
           }
         }}
+      />
+
+      <CommonActionModal
+        visible={showConsultModal}
+        onClose={() => setShowConsultModal(false)}
+        onConfirm={!nutritionLoading ? handleConsultSubmit : undefined}
+        iconName="chatbubble-ellipses-outline"
+        iconColor="#000000"
+        title="Request a Consultation"
+        description="Choose your consultation type and leave a short note."
+        cancelText="Cancel"
+        confirmText={nutritionLoading ? "Sending..." : "Send"}
+        showDropdown
+        showNote
+        selectedValue={consultType}
+        onSelectValue={setConsultType}
+        noteValue={consultNote}
+        onChangeNote={setConsultNote}
       />
     </View>
   );

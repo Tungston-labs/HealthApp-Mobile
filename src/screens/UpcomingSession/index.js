@@ -11,21 +11,16 @@ import GradientCard from "../../components/LinearGradient";
 import { fetchWeeklySessionsThunk } from "../../redux/slices/UpcomingSessionSlice";
 import styles from "./styles";
 
-const UpcomingSessionSection = () => {
-  const dispatch = useDispatch();
+const UpcomingSessionSection = ({
+  onConsultPress,
+  loading,
+  sessions,
+}) => {
 
-  const { sessions, loading } = useSelector(
-    (state) => state.weeklySessions
-  );
-
-  useEffect(() => {
-    dispatch(fetchWeeklySessionsThunk());
-  }, [dispatch]);
 
   return (
     <View>
-      <GradientCard />
-
+<GradientCard onPress={onConsultPress} />
       <Text style={styles.sectionTitle}>Up-coming sessions</Text>
 
       {loading ? (

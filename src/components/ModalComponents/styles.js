@@ -1,19 +1,33 @@
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  card: {
-    width: "85%",
-    backgroundColor: "#EFEEE9",
-    borderRadius: 16,
-    padding: 20,
-    alignItems: "center",
-  },
+overlay: {
+  flex: 1,
+  backgroundColor: "rgba(0,0,0,0.5)",
+  justifyContent: "center",
+  alignItems: "center",
+  
+},
+
+card: {
+  width: "90%",
+  maxWidth: 420,
+  backgroundColor: "#fff",
+  borderRadius: 20,
+  padding: 20,
+  marginLeft: 10,
+},
+
+noteBox: {
+  minHeight: 100,
+  maxHeight: 140,
+  borderWidth: 1,
+  borderColor: "#E5E5E5",
+  borderRadius: 12,
+  padding: 12,
+  textAlignVertical: "top",
+  marginTop: 8,
+},
   iconCircle: {
     width: 50,
     height: 50,
@@ -87,19 +101,6 @@ export default StyleSheet.create({
     color: "#333",
   },
 
-  noteBox: {
-    height: 120,
-    borderWidth: 1,
-    borderColor: "#D8D7F5",
-    backgroundColor: "#F2F1FF",
-    width: 300,
-    padding: 12,
-    fontSize: 14,
-    borderRadius: 8,
-    textAlignVertical: "top",
-    color: "#000",
-    marginBottom: 20,
-  },
   cancelBtn: {
     backgroundColor: "#030303",
     paddingVertical: 12,

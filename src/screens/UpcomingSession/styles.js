@@ -94,7 +94,7 @@ export default StyleSheet.create({
     fontWeight: "600",
   },
   dayButton: {
-    backgroundColor: "#6C63FF",
+    backgroundColor: "#EF0707",
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 6,

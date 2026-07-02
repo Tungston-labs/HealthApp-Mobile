@@ -123,40 +123,8 @@ const ProfileSection = () => {
     }
   }, [cancelSuccess, cancelError, dispatch]);
 
-  const {
-    loading: nutritionLoading,
-    success: nutritionSuccess,
-    error: nutritionError,
-  } = useSelector((state) => state.nutritionRequest || {});
 
-  const handleConsultSubmit = () => {
-    if (!consultNote.trim()) {
-      alert("Please enter a note");
-      return;
-    }
 
-    dispatch(
-      requestNutritionThunk({
-        consultation_type: consultType,
-        note: consultNote,
-      })
-    );
-  };
-
-  useEffect(() => {
-    if (nutritionSuccess) {
-      alert("Nutrition request submitted successfully");
-      setShowConsultModal(false);
-      setConsultNote("");
-      setConsultType("call");
-      dispatch(resetNutritionState());
-    }
-
-    if (nutritionError) {
-      alert(nutritionError);
-      dispatch(resetNutritionState());
-    }
-  }, [nutritionSuccess, nutritionError, dispatch]);
   console.log("route.params", route.params);
   console.log("session", session);
   console.log("trainer", trainer);
@@ -362,23 +330,6 @@ const ProfileSection = () => {
         confirmText="Call now"
       />
 
-      <CommonActionModal
-        visible={showConsultModal}
-        onClose={() => setShowConsultModal(false)}
-        onConfirm={!nutritionLoading ? handleConsultSubmit : undefined}
-        iconName="chatbubble-ellipses-outline"
-        iconColor="#000000"
-        title="Request a Consultation"
-        description="Choose your consultation type and leave a short note."
-        cancelText="Cancel"
-        confirmText={nutritionLoading ? "Sending..." : "Send"}
-        showDropdown
-        showNote
-        selectedValue={consultType}
-        onSelectValue={setConsultType}
-        noteValue={consultNote}
-        onChangeNote={setConsultNote}
-      />
     </View>
   );
 };
