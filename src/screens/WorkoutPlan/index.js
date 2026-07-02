@@ -7,7 +7,8 @@ import FilterModal from "../../components/FIlterModal";
 import PlanCard from "../../components/PlanCard";
 import Skeleton from "../../components/Skelton";
 import UpcomingSessionSection from "../UpcomingSession";
-
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 import { fetchPlansThunk } from "../../redux/slices/planSlice";
 import styles from "./style";
 
@@ -32,7 +33,11 @@ const WorkoutPlan = ({ navigation }) => {
   useEffect(() => {
     dispatch(fetchPlansThunk());
   }, [dispatch]);
-
+useFocusEffect(
+  useCallback(() => {
+    dispatch(fetchPlansThunk());
+  }, [dispatch])
+);
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       {/*  FIXED HEADER */}
@@ -64,12 +69,11 @@ const WorkoutPlan = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
 
           ListHeaderComponent={
-            sessions && sessions.length > 0 ? (
               <>
                 <UpcomingSessionSection />
                 <View style={{ height: 16 }} />
               </>
-            ) : null
+           
           }
 
           ListEmptyComponent={
