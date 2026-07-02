@@ -11,10 +11,17 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { fetchPlansThunk } from "../../redux/slices/planSlice";
 import styles from "./style";
+import { fetchWeeklySessionsThunk } from "../../redux/slices/UpcomingSessionSlice";
 
 const WorkoutPlan = ({ navigation }) => {
   const dispatch = useDispatch();
+const { sessions } = useSelector(
+  state => state.weeklySessions
+);
 
+useEffect(() => {
+  dispatch(fetchWeeklySessionsThunk());
+}, []);
   const [showModal, setShowModal] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [selectedPlanSlot, setSelectedPlanSlot] = useState(null);
@@ -24,12 +31,10 @@ const WorkoutPlan = ({ navigation }) => {
     (state) => state.planList
   );
 
-  const { sessions } = useSelector(
-    (state) => state.weeklySessions
-  );
-
   const user = useSelector((state) => state.auth?.user);
-
+useEffect(() => {
+  console.log("Sessions:", sessions);
+}, [sessions]);
   useEffect(() => {
     dispatch(fetchPlansThunk());
   }, [dispatch]);
@@ -69,11 +74,15 @@ useFocusEffect(
           showsVerticalScrollIndicator={false}
 
           ListHeaderComponent={
+            sessions && sessions.length > 0 ? (
               <>
-                <UpcomingSessionSection />
+                <UpcomingSessionSection
+    sessions={sessions}
+    loading={loading}
+/>
                 <View style={{ height: 16 }} />
               </>
-           
+            ) : null
           }
 
           ListEmptyComponent={
