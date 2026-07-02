@@ -20,8 +20,8 @@ export const fetchClientTrainersAPI = async (payload = {}) => {
     throw err;
   }
 };
-export const ClientCancelTraining = async () => {
-  const response = await api.post("refund/training/cancel/");
+export const ClientCancelTraining = async (payload = {}) => {
+  const response = await api.post("refund/training/cancel/", payload);
   return response.data;
 };
 export const requestNutritionAPI = async (payload) => {

@@ -33,6 +33,7 @@ import {
 } from "../../redux/slices/NutritionRequestSlice";
 
 import { resetTrainerChange } from "../../redux/slices/changeTrainerSlice";
+import { fetchClientTrainersThunk } from "../../redux/slices/clientTrainerSlice";
 import { getImageSource } from "../../utils/media";
 
 const ProfileSection = () => {
@@ -111,6 +112,7 @@ const trainer =
     if (cancelSuccess) {
       alert("Cancellation request submitted successfully");
       setShowCancelModal(false);
+      dispatch(fetchClientTrainersThunk());
       dispatch(resetCancelState());
     }
 
@@ -331,7 +333,8 @@ console.log("currentTrainerId", currentTrainerId);
         visible={showCancelModal}
         onClose={() => setShowCancelModal(false)}
         onConfirm={() => {
-          dispatch(cancelTrainingThunk());
+          const payload = currentTrainerId ? { trainer_id: currentTrainerId } : {};
+          dispatch(cancelTrainingThunk(payload));
           setShowCancelModal(false);
         }}
         iconName="close-circle-outline"

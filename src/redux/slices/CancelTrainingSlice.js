@@ -1,12 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {ClientCancelTraining} from "../../services/clientServices"
+
 export const cancelTrainingThunk = createAsyncThunk(
   "training/cancel",
-  async (_, { rejectWithValue }) => {
+  async (payload = {}, { rejectWithValue }) => {
     try {
-      const data = await ClientCancelTraining();
+      const data = await ClientCancelTraining(payload);
+
+      console.log("SUCCESS", data);
+
       return data;
     } catch (err) {
+      console.log("STATUS", err.response?.status);
+      console.log("DATA", err.response?.data);
+      console.log("ERROR", err);
+
       return rejectWithValue(
         err.response?.data?.message || "Cancel request failed"
       );
