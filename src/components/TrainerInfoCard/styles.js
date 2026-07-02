@@ -8,7 +8,7 @@ export default StyleSheet.create({
   },
 
   name: {
-    fontSize: 22,
+    fontSize: 20,
     fontFamily: "SegoeUI",
     fontWeight: "700",
     color: "#000",
@@ -17,8 +17,8 @@ export default StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "flex-start",
-    marginTop: 10,
-    gap: 40,
+    marginTop: 8,
+    gap: 50,
   },
 
   
@@ -26,7 +26,7 @@ export default StyleSheet.create({
     flexDirection: "row",
    alignItems: "flex-start",
     marginTop: 10,
-    gap: 20,
+    gap: 30,
 
   },
 

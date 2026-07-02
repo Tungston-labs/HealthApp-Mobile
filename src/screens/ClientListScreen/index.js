@@ -40,7 +40,6 @@ const ClientListScreen = () => {
       </View>
     );
   }
-
   return (
     <View style={styles.container}>
       <HeaderWithBack title="Trainers" subtitle="Trainer Informations" />

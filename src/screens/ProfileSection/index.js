@@ -10,7 +10,8 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
-
+import TicketModal from "../../components/TicketModal";
+import { createTicket } from "../../services/ticketService";
 import CommonActionModal from "../../components/ModalComponents";
 import TrainerInfoCard from "../../components/TrainerInfoCard";
 import EmptyState from "../../components/EmptyState";
@@ -39,7 +40,7 @@ const ProfileSection = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const route = useRoute();
-
+const [showTicketModal, setShowTicketModal] = useState(false);
   const [consultType, setConsultType] = useState("call");
   const [consultNote, setConsultNote] = useState("");
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -199,7 +200,9 @@ const ProfileSection = () => {
       dispatch(resetTrainerChange());
     }
   }, [changeData, changeError, dispatch, trainer]);
-
+useEffect(() => {
+  console.log("showTicketModal =", showTicketModal);
+}, [showTicketModal]);
   if (!session && !trainerId) {
     return (
       <EmptyState
@@ -250,6 +253,26 @@ const ProfileSection = () => {
 
     navigation.navigate("ClientList");
   };
+
+const handleTicketSubmit = async ({ trainer_id, complaint }) => {
+  try {
+    await createTicket({
+      trainer_id,
+      complaint,
+    });
+
+    alert("Complaint submitted successfully.");
+    setShowTicketModal(false);
+  } catch (error) {
+    console.log("Ticket Error:", error?.response?.data);
+
+    alert(
+      error?.response?.data?.detail ||
+      error?.response?.data?.message ||
+      "Unable to submit complaint."
+    );
+  }
+};
 
   return (
     <View style={styles.container}>
@@ -302,12 +325,15 @@ const ProfileSection = () => {
         <View style={styles.divider} />
 
         <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => setShowConsultModal(true)}
-          >
-            <Text style={styles.buttonText}>Report</Text>
-          </TouchableOpacity>
+       <TouchableOpacity
+  style={styles.primaryButton}
+  onPress={() => {
+    console.log("Report button pressed");
+    setShowTicketModal(true);
+  }}
+>
+  <Text style={styles.buttonText}>Report</Text>
+</TouchableOpacity>
 
           <TouchableOpacity
             style={styles.cancelButton}
@@ -358,23 +384,17 @@ const ProfileSection = () => {
         confirmText="Call now"
       />
 
-      <CommonActionModal
-        visible={showConsultModal}
-        onClose={() => setShowConsultModal(false)}
-        onConfirm={!nutritionLoading ? handleConsultSubmit : undefined}
-        iconName="chatbubble-ellipses-outline"
-        iconColor="#000000"
-        title="Request a Consultation"
-        description="Choose your consultation type and leave a short note."
-        cancelText="Cancel"
-        confirmText={nutritionLoading ? "Sending..." : "Send"}
-        showDropdown
-        showNote
-        selectedValue={consultType}
-        onSelectValue={setConsultType}
-        noteValue={consultNote}
-        onChangeNote={setConsultNote}
-      />
+<TicketModal
+  visible={showTicketModal}
+  onClose={() => setShowTicketModal(false)}
+  trainerId={
+    trainer?.id ||
+    trainer?.trainer_id ||
+    trainerId
+  }
+  trainerName={trainer?.name || "Trainer"}
+  onSubmit={handleTicketSubmit}
+/>
     </View>
   );
 };

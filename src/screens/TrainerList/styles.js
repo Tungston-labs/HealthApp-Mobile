@@ -16,8 +16,8 @@ export default StyleSheet.create({
   },
 
 trainerImg: {
-  width: 100,
-  height: 100,
+  width: 75,
+  height: 75,
   borderRadius: 12,
 },
 planName: {
@@ -53,8 +53,8 @@ planName: {
   },
 
   trainerName: {
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: 18,
+    fontWeight: "500",
   },
   separator: {
   height: 1,

@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+
 export const pickerSelectStyles = {
   inputIOS: {
     borderBottomWidth: 1,
@@ -131,7 +132,7 @@ export default StyleSheet.create({
 
   dropdownList: {
     position: "absolute",
-    top: 52,              // just below dropdownRow
+    top: 52,
     left: 0,
     right: 0,
     backgroundColor: "#EEEEFF",
@@ -268,3 +269,5 @@ export default StyleSheet.create({
     fontWeight: "600",
   },
 });
+
+
