@@ -43,9 +43,7 @@ const WorkoutPlan = ({ navigation }) => {
   useEffect(() => {
     console.log("Sessions:", sessions);
   }, [sessions]);
-  useEffect(() => {
-    dispatch(fetchPlansThunk());
-  }, [dispatch]);
+
   useFocusEffect(
     useCallback(() => {
       dispatch(fetchPlansThunk());

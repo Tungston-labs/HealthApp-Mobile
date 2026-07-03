@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "700",
     color: "#000",
+    marginTop: 10,
   },
 
   subheading: {

@@ -8,7 +8,6 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: 24 * scale,
-
     justifyContent: "center",   
     alignItems: "center",      
   },
@@ -24,6 +23,7 @@ export default StyleSheet.create({
   inputContainer: {
     width: "100%",
     marginBottom: 20 * scale,
+    
   },
 
   label: {
@@ -31,7 +31,8 @@ export default StyleSheet.create({
     color: "#222",
     fontWeight: "600",
     marginBottom: 8 * scale,
-    marginLeft: 2,
+        marginHorizontal:20,
+
   },
 
   inputWrapper: {
@@ -41,6 +42,9 @@ export default StyleSheet.create({
     borderColor: "#ccc",
     paddingBottom: 8 * scale,
     gap: 10 * scale,
+        marginHorizontal:20,
+
+    
   },
 
   input: {
@@ -48,6 +52,8 @@ export default StyleSheet.create({
     fontSize: 14 * scale,
     paddingVertical: 6 * scale,
     color: "#333",
+        marginHorizontal:20,
+
   },
 
   resetBtn: {

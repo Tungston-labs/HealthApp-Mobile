@@ -221,22 +221,22 @@ dropdownList: {
     fontFamily: "Segoe UI",
   },
 
-  uploadImagesRow: {
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 10,
-  },
+uploadImagesRow: {
+  flexDirection: "row",
+  marginTop: 10,
+  paddingRight: 10,
+},
 
-  uploadImageCard: {
-    width: 95,
-    height: 95,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-
+ uploadImageCard: {
+  width: 95,
+  height: 95,
+  backgroundColor: "#fff",
+  borderRadius: 10,
+  overflow: "hidden",
+  borderWidth: 1,
+  borderColor: "#ddd",
+  marginRight: 10,
+},
   deleteBadge: {
     position: "absolute",
     right: 0,

@@ -31,11 +31,10 @@ const weeklySessionsSlice = createSlice({
                 state.loading = true;
             })
             .addCase(fetchWeeklySessionsThunk.fulfilled, (state, action) => {
+                console.log("Payload:", action.payload);
                 state.loading = false;
-
-                state.sessions = action.payload.data;  
+                state.sessions = action.payload.data;
             })
-
             .addCase(fetchWeeklySessionsThunk.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;

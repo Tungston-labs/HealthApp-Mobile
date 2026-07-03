@@ -568,23 +568,27 @@ export default function CreateAccountScreen({ navigation }) {
             <Text style={styles.uploadHelper}>Click to choose images</Text>
           </View>
 
-          <View style={styles.uploadImagesRow}>
-            {images.map((item, i) => (
-              <View key={i} style={styles.uploadImageCard}>
-                <TouchableOpacity
-                  style={styles.deleteBadge}
-                  onPress={() => handleRemoveImage(i)}
-                >
-                  <Ionicons name="close" size={16} color="#fff" />
-                </TouchableOpacity>
+          <ScrollView
+    horizontal
+    showsHorizontalScrollIndicator={false}
+    contentContainerStyle={styles.uploadImagesRow}
+  >
+    {images.map((item, i) => (
+      <View key={i} style={styles.uploadImageCard}>
+        <TouchableOpacity
+          style={styles.deleteBadge}
+          onPress={() => handleRemoveImage(i)}
+        >
+          <Ionicons name="close" size={16} color="#fff" />
+        </TouchableOpacity>
 
-                <Image
-                  source={{ uri: item.uri }}
-                  style={styles.uploadPreviewImg}
-                />
-              </View>
-            ))}
-          </View>
+        <Image
+          source={{ uri: item.uri }}
+          style={styles.uploadPreviewImg}
+        />
+      </View>
+    ))}
+  </ScrollView>
         </View>
       </ScrollView>
       {error && (

@@ -8,13 +8,14 @@ export default StyleSheet.create({
 },
 
 backButton: {
-  paddingTop: 4,              
+  paddingTop: 20,              
 },
 
 titleContainer: {
   flex: 1,
   flexDirection: "column",
   marginLeft: 10,
+  marginTop:20,
 },
 
 title: {

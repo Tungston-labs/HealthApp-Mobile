@@ -15,12 +15,12 @@ card: {
   backgroundColor: "#fff",
   borderRadius: 20,
   padding: 20,
-  marginLeft: 10,
+  marginLeft: 12,
 },
 
 noteBox: {
   minHeight: 100,
-  maxHeight: 140,
+  maxHeight: 150,
   borderWidth: 1,
   borderColor: "#E5E5E5",
   borderRadius: 12,
@@ -36,6 +36,7 @@ noteBox: {
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
+      alignSelf: "center",
   },
   title: {
     fontSize: 18,
@@ -53,6 +54,7 @@ noteBox: {
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
+    marginTop:15
   },
   label: {
     fontSize: 14,
@@ -70,7 +72,7 @@ noteBox: {
     borderColor: "#D8D7F5",
     backgroundColor: "#EFEEE9",
     height: 48,
-    width: 300,
+    // width: 300,
     paddingHorizontal: 12,
     borderRadius: 8,
   },

@@ -9,15 +9,17 @@ export default StyleSheet.create({
     marginTop: 32,
   },
 
-  card: {
-    flexDirection: "row",
-    padding: 12,
-    marginBottom: 20,
-  },
+card: {
+  flexDirection: "row",
+  paddingVertical: 16,
+  paddingHorizontal: 12,
+  alignItems: "flex-start",
+  position: "relative",
+},
 
 trainerImg: {
-  width: 100,
-  height: 100,
+  width: 70,
+  height: 70,
   borderRadius: 12,
 },
 planName: {
@@ -29,18 +31,18 @@ planName: {
 
   viewProfileBtn: {
   position: "absolute",
-  bottom: 14,
-  left: 27,
+  bottom: 54,
+  left: 10,
   alignSelf: "center",
   backgroundColor: "#fff",
   paddingHorizontal: 6,
-  paddingVertical: 2,
+  paddingVertical: 6,
   borderRadius: 10,
   elevation: 2,
   borderWidth: 1,
   borderColor: "#8D8D8D", // you can change this color if needed
 },
-
+ 
   viewProfileText: {
     fontSize: 10,
     fontWeight: "600",

@@ -32,6 +32,7 @@ export default StyleSheet.create({
     color: "#898989",
     lineHeight: 20 * scale,
     marginBottom: 25 * scale,
+    marginHorizontal:20,
   },
 
   label: {
@@ -40,16 +41,19 @@ export default StyleSheet.create({
     color: "#000000",
     alignSelf: "flex-start",
     marginBottom: 8 * scale,
+        marginHorizontal:20,
+
   },
 
   inputWrapper: {
     flexDirection: "row",
-    alignItems: "center",
     paddingVertical: 10 * scale,
     borderBottomWidth: 2,
     borderColor: "#898989",
-    width: "100%",
     marginBottom: 25 * scale,
+        marginHorizontal:20,
+
+    
   },
 
   inputIcon: {
@@ -60,6 +64,7 @@ export default StyleSheet.create({
     flex: 1,
     fontSize: 15 * scale,
     color: "#000000",
+    
   },
   
   continueWrapper: {
@@ -76,7 +81,7 @@ export default StyleSheet.create({
   paddingVertical: 10 * scale,
   paddingHorizontal: 18 * scale,   
   borderRadius: 20 * scale,
-
+  marginHorizontal:20,
   alignSelf: "flex-end",           
   marginBottom: 20 * scale,
 

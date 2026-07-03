@@ -10,11 +10,12 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
-
+import TicketModal from "../../components/TicketModal";
+import { createTicket } from "../../services/ticketService";
 import CommonActionModal from "../../components/ModalComponents";
 import TrainerInfoCard from "../../components/TrainerInfoCard";
 import EmptyState from "../../components/EmptyState";
-
+import { Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
   useFocusEffect,
@@ -41,11 +42,10 @@ const ProfileSection = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const [consultType, setConsultType] = useState("call");
-  const [consultNote, setConsultNote] = useState("");
+const [showTicketModal, setShowTicketModal] = useState(false);
+
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
-  const [showConsultModal, setShowConsultModal] = useState(false);
 
   const { user } = useSelector((state) => state.auth || {});
   const session = user?.session ?? null;
@@ -108,31 +108,54 @@ const ProfileSection = () => {
     }, [dispatch])
   );
 
+useEffect(() => {
+  if (cancelSuccess) {
+    dispatch(fetchClientTrainersThunk());
+    dispatch(resetCancelState());
+    setShowCancelModal(false);
+
+    Alert.alert(
+      "Success",
+      "Cancellation request submitted successfully.",
+      [
+        {
+          text: "OK",
+          onPress: () => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            } else {
+              navigation.navigate("ClientStackScreen");
+            }
+          },
+        },
+      ]
+    );
+  }
+
+  if (cancelError) {
+    Alert.alert("Error", cancelError);
+    dispatch(resetCancelState());
+  }
+}, [cancelSuccess, cancelError, dispatch, navigation]);
+
   useEffect(() => {
-    if (cancelSuccess) {
-      alert("Cancellation request submitted successfully");
-      setShowCancelModal(false);
-      dispatch(fetchClientTrainersThunk());
-      dispatch(resetCancelState());
+    if (changeData) {
+      alert("Trainer change request successful");
+      dispatch(resetTrainerChange());
+
+      // refresh trainer data if needed
+      dispatch(fetchTrainerDetailThunk(trainer.id));
     }
 
-    if (cancelError) {
-      alert(cancelError);
-      navigation.navigate("MainApp");
-      dispatch(resetCancelState());
+    if (changeError) {
+      alert(changeError);
+      dispatch(resetTrainerChange());
     }
-  }, [cancelSuccess, cancelError, dispatch]);
+  }, [changeData, changeError, dispatch, trainer]);
+useEffect(() => {
+  console.log("showTicketModal =", showTicketModal);
+}, [showTicketModal]);
 
-
-
-  console.log("route.params", route.params);
-  console.log("session", session);
-  console.log("trainer", trainer);
-  console.log("route.params", route.params);
-  console.log("trainerId", trainerId);
-  console.log("session", session);
-  console.log("redux trainerDetail data", data);
-  console.log("trainer", trainer);
   const currentTrainerId =
     trainerId ||
     trainer?.id ||
@@ -156,20 +179,7 @@ const ProfileSection = () => {
     });
   };
 
-  useEffect(() => {
-    if (changeData) {
-      alert("Trainer change request successful");
-      dispatch(resetTrainerChange());
 
-      // refresh trainer data if needed
-      dispatch(fetchTrainerDetailThunk(trainer.id));
-    }
-
-    if (changeError) {
-      alert(changeError);
-      dispatch(resetTrainerChange());
-    }
-  }, [changeData, changeError, dispatch, trainer]);
 
   if (!session && !trainerId) {
     return (
@@ -222,6 +232,25 @@ const ProfileSection = () => {
     navigation.navigate("ClientList");
   };
 
+const handleTicketSubmit = async ({ trainer_id, complaint }) => {
+  try {
+    await createTicket({
+      trainer_id,
+      complaint,
+    });
+
+    alert("Complaint submitted successfully.");
+    setShowTicketModal(false);
+  } catch (error) {
+    console.log("Ticket Error:", error?.response?.data);
+
+    alert(
+      error?.response?.data?.detail ||
+      error?.response?.data?.message ||
+      "Unable to submit complaint."
+    );
+  }
+};
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -273,12 +302,15 @@ const ProfileSection = () => {
         <View style={styles.divider} />
 
         <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => setShowConsultModal(true)}
-          >
-            <Text style={styles.buttonText}>Report</Text>
-          </TouchableOpacity>
+         <TouchableOpacity
+  style={styles.primaryButton}
+  onPress={() => {
+    console.log("Report button pressed");
+    setShowTicketModal(true);
+  }}
+>
+  <Text style={styles.buttonText}>Report</Text>
+</TouchableOpacity>
 
           <TouchableOpacity
             style={styles.cancelButton}
@@ -329,7 +361,17 @@ const ProfileSection = () => {
         cancelText="Cancel"
         confirmText="Call now"
       />
-
+<TicketModal
+  visible={showTicketModal}
+  onClose={() => setShowTicketModal(false)}
+  trainerId={
+    trainer?.id ||
+    trainer?.trainer_id ||
+    trainerId
+  }
+  trainerName={trainer?.name || "Trainer"}
+  onSubmit={handleTicketSubmit}
+/>
     </View>
   );
 };
