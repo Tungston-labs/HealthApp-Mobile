@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0BD3DD0AA8247C7561A9B6C6 /* libPods-HealthApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24643DC85A299AC089C5EE55 /* libPods-HealthApp.a */; };
 		10102FF1D41C4E3E9FE4C879 /* SEGUISB.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 80BD648896944164955A28C6 /* SEGUISB.TTF */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		1F250CB1AA80478F9428BAF8 /* SEGOEUIL.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 37E7D95A630149898C46AD1C /* SEGOEUIL.TTF */; };
 		50AD73D397994D4088AE981F /* SEGOEUISL.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 14C3885E6C904501AA45738C /* SEGOEUISL.TTF */; };
-		58D4397CD63075E79CFE76BE /* libPods-HealthApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B9F2CC3742E9A787C1D66471 /* libPods-HealthApp.a */; };
 		5D8C65B4CF204AC29074F91D /* SEGOEUII.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 55182BE308144436AD33D7A0 /* SEGOEUII.TTF */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
@@ -22,21 +22,21 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		11B3468D18D2CC62E54C341E /* Pods-HealthApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthApp.debug.xcconfig"; path = "Target Support Files/Pods-HealthApp/Pods-HealthApp.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* HealthApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HealthApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = HealthApp/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = HealthApp/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = HealthApp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		14C3885E6C904501AA45738C /* SEGOEUISL.TTF */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SEGOEUISL.TTF; path = ../assets/fonts/SEGOEUISL.TTF; sourceTree = "<group>"; };
+		24643DC85A299AC089C5EE55 /* libPods-HealthApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HealthApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2D30442F936CCD9D1CB0FA15 /* Pods-HealthApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthApp.debug.xcconfig"; path = "Target Support Files/Pods-HealthApp/Pods-HealthApp.debug.xcconfig"; sourceTree = "<group>"; };
 		37E7D95A630149898C46AD1C /* SEGOEUIL.TTF */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SEGOEUIL.TTF; path = ../assets/fonts/SEGOEUIL.TTF; sourceTree = "<group>"; };
+		3F000CA4D676DA813FFDFEA2 /* Pods-HealthApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthApp.release.xcconfig"; path = "Target Support Files/Pods-HealthApp/Pods-HealthApp.release.xcconfig"; sourceTree = "<group>"; };
 		418FDC37297B45DEAFEAAA23 /* SEGUIBL.TTF */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SEGUIBL.TTF; path = ../assets/fonts/SEGUIBL.TTF; sourceTree = "<group>"; };
 		45B8346049BE47829038D8EA /* SEGOEUIZ.TTF */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SEGOEUIZ.TTF; path = ../assets/fonts/SEGOEUIZ.TTF; sourceTree = "<group>"; };
 		55182BE308144436AD33D7A0 /* SEGOEUII.TTF */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SEGOEUII.TTF; path = ../assets/fonts/SEGOEUII.TTF; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = HealthApp/AppDelegate.swift; sourceTree = "<group>"; };
 		80BD648896944164955A28C6 /* SEGUISB.TTF */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SEGUISB.TTF; path = ../assets/fonts/SEGUISB.TTF; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = HealthApp/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		843406EB08D6165917F50C2C /* Pods-HealthApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthApp.release.xcconfig"; path = "Target Support Files/Pods-HealthApp/Pods-HealthApp.release.xcconfig"; sourceTree = "<group>"; };
-		B9F2CC3742E9A787C1D66471 /* libPods-HealthApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HealthApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E88F57089B58462D8C2EFE31 /* SEGUIBLI.TTF */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SEGUIBLI.TTF; path = ../assets/fonts/SEGUIBLI.TTF; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -46,7 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				58D4397CD63075E79CFE76BE /* libPods-HealthApp.a in Frameworks */,
+				0BD3DD0AA8247C7561A9B6C6 /* libPods-HealthApp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,7 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				B9F2CC3742E9A787C1D66471 /* libPods-HealthApp.a */,
+				24643DC85A299AC089C5EE55 /* libPods-HealthApp.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -121,8 +121,8 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				11B3468D18D2CC62E54C341E /* Pods-HealthApp.debug.xcconfig */,
-				843406EB08D6165917F50C2C /* Pods-HealthApp.release.xcconfig */,
+				2D30442F936CCD9D1CB0FA15 /* Pods-HealthApp.debug.xcconfig */,
+				3F000CA4D676DA813FFDFEA2 /* Pods-HealthApp.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -134,13 +134,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "HealthApp" */;
 			buildPhases = (
-				FCE72199C94F808DCD1248EB /* [CP] Check Pods Manifest.lock */,
+				77D10B9994DAB841FAF4B9EE /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				A365212B5FE6C3549C412CA0 /* [CP] Embed Pods Frameworks */,
-				E122C1C0B974C6424A42B848 /* [CP] Copy Pods Resources */,
+				595200F20D6EA4CDAA1CE448 /* [CP] Embed Pods Frameworks */,
+				4528A32F909FCD4FF857C46C /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -219,28 +219,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		A365212B5FE6C3549C412CA0 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-HealthApp/Pods-HealthApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-HealthApp/Pods-HealthApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HealthApp/Pods-HealthApp-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E122C1C0B974C6424A42B848 /* [CP] Copy Pods Resources */ = {
+		4528A32F909FCD4FF857C46C /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -248,20 +227,33 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HealthApp/Pods-HealthApp-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HealthApp/Pods-HealthApp-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HealthApp/Pods-HealthApp-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		FCE72199C94F808DCD1248EB /* [CP] Check Pods Manifest.lock */ = {
+		595200F20D6EA4CDAA1CE448 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-HealthApp/Pods-HealthApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-HealthApp/Pods-HealthApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HealthApp/Pods-HealthApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		77D10B9994DAB841FAF4B9EE /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -299,7 +291,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 11B3468D18D2CC62E54C341E /* Pods-HealthApp.debug.xcconfig */;
+			baseConfigurationReference = 2D30442F936CCD9D1CB0FA15 /* Pods-HealthApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -319,7 +311,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.tungston.healthapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tungston.healthapp.test;
 				PRODUCT_NAME = HealthApp;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -329,11 +321,12 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 843406EB08D6165917F50C2C /* Pods-HealthApp.release.xcconfig */;
+			baseConfigurationReference = 3F000CA4D676DA813FFDFEA2 /* Pods-HealthApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8V477R5F9D;
 				INFOPLIST_FILE = HealthApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FitsApio;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -347,7 +340,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.tungston.healthapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tungston.healthapp.test;
 				PRODUCT_NAME = HealthApp;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

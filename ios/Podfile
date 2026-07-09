@@ -22,11 +22,14 @@ def patch_fmt_consteval_for_xcode_26(installer)
     'fmt',
     'base.h'
   )
+
   return unless File.exist?(fmt_base_header)
 
   contents = File.read(fmt_base_header)
+
   original_check = '#elif defined(__apple_build_version__) && __apple_build_version__ < 14000029L'
   patched_check = '#elif defined(__apple_build_version__) && (__apple_build_version__ < 14000029L || __apple_build_version__ >= 21000000L)'
+
   return if contents.include?(patched_check)
   return unless contents.include?(original_check)
 
@@ -48,48 +51,49 @@ target 'HealthApp' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
+
     patch_fmt_consteval_for_xcode_26(installer)
 
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
 
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
-
-        # React Native 0.82 requires C++20
         config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
         config.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'
-
-        # Don't fail on warnings
         config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
-
-        # Disable Xcode 26 strict errors for RN pod source files
-        config.build_settings['OTHER_CFLAGS'] ||= ['$(inherited)']
-        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=deprecated-objc-isa-usage'
-        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=return-type'
-        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=unreachable-code'
-        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=unused-variable'
-        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=unused-function'
-        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=objc-root-class'
-        config.build_settings['OTHER_CFLAGS'] << '-Wno-error=non-modular-include-in-framework-module'
-
-        config.build_settings['OTHER_CPLUSPLUSFLAGS'] ||= ['$(inherited)']
-        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=deprecated-objc-isa-usage'
-        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=return-type'
-        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=unreachable-code'
-        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=unused-variable'
-        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=unused-function'
-        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=objc-root-class'
-        config.build_settings['OTHER_CPLUSPLUSFLAGS'] << '-Wno-error=non-modular-include-in-framework-module'
-
-        # Enable modules
+        config.build_settings['CLANG_ENABLE_OBJC_ARC'] = 'YES'
+        config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
         config.build_settings['CLANG_CXX_ENABLE_MODULES'] = 'YES'
 
-        # Allow non-modular includes inside framework modules for pods that require it
-        config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+        c_flags = Array(config.build_settings['OTHER_CFLAGS'])
+        c_flags.unshift('$(inherited)') unless c_flags.include?('$(inherited)')
 
-        # ARC
-        config.build_settings['CLANG_ENABLE_OBJC_ARC'] = 'YES'
+        c_flags += %w[
+          -Wno-error=deprecated-objc-isa-usage
+          -Wno-error=return-type
+          -Wno-error=unreachable-code
+          -Wno-error=unused-variable
+          -Wno-error=unused-function
+          -Wno-error=objc-root-class
+          -Wno-error=non-modular-include-in-framework-module
+        ]
 
+        config.build_settings['OTHER_CFLAGS'] = c_flags.uniq
+
+        cpp_flags = Array(config.build_settings['OTHER_CPLUSPLUSFLAGS'])
+        cpp_flags.unshift('$(inherited)') unless cpp_flags.include?('$(inherited)')
+
+        cpp_flags += %w[
+          -Wno-error=deprecated-objc-isa-usage
+          -Wno-error=return-type
+          -Wno-error=unreachable-code
+          -Wno-error=unused-variable
+          -Wno-error=unused-function
+          -Wno-error=objc-root-class
+          -Wno-error=non-modular-include-in-framework-module
+        ]
+
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] = cpp_flags.uniq
       end
     end
   end
