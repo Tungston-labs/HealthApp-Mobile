@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ActivityIndicator,
-  Alert,
 } from "react-native";
+import { showError, showSuccess } from "../../utils/toast";
 import Icon from "react-native-vector-icons/Ionicons";
 import ArrowIcon from "react-native-vector-icons/Feather";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,7 +27,7 @@ export default function ForgotPasswordScreen({ navigation }) {
   );
   const handleContinue = () => {
     if (!email) {
-      Alert.alert("Error", "Email is required");
+      showError("Error", "Email is required");
       return;
     }
     if (loading) return;
@@ -35,26 +35,16 @@ export default function ForgotPasswordScreen({ navigation }) {
   };
   useEffect(() => {
     if (success) {
-      Alert.alert("Success", message, [
-        {
-          text: "OK",
-          onPress: () => {
-            dispatch(resetForgotPasswordState());
-            navigation.navigate("OtpScreen", { email });
-          },
-        },
-      ]);
+      dispatch(resetForgotPasswordState());
+      navigation.navigate("OtpScreen", { email });
+      showSuccess("Success", message);
     }
 
     if (error) {
-      Alert.alert("Error", error, [
-        {
-          text: "OK",
-          onPress: () => dispatch(resetForgotPasswordState()),
-        },
-      ]);
+      dispatch(resetForgotPasswordState());
+      showError("Error", error);
     }
-  }, [success, error]);
+  }, [success, error, email, message, navigation, dispatch]);
 
   return (
     <SafeAreaView style={styles.container}>

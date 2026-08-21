@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  Alert,
 } from "react-native";
+import { showError } from "../../utils/toast";
 import Icon from "react-native-vector-icons/Ionicons";
 import RazorpayCheckout from "react-native-razorpay";
 import { useDispatch, useSelector } from "react-redux";
@@ -61,17 +61,17 @@ const PaymentScreen = ({ navigation, route }) => {
       const paymentTrainerId = mode === "book" ? trainerId : new_trainer_id;
 
       if (!paymentTrainerId) {
-        Alert.alert("Trainer unavailable", "Please select a trainer again.");
+        showError("Trainer unavailable", "Please select a trainer again.");
         return;
       }
 
       if (!plan_id) {
-        Alert.alert("Plan unavailable", "Please select a workout plan again before payment.");
+        showError("Plan unavailable", "Please select a workout plan again before payment.");
         return;
       }
 
       if (mode === "book" && (!booking_type || !start_date || !time || !slot_days?.length)) {
-        Alert.alert("Booking details missing", "Please select date, slot, and time again.");
+        showError("Booking details missing", "Please select date, slot, and time again.");
         return;
       }
 
@@ -183,7 +183,7 @@ const PaymentScreen = ({ navigation, route }) => {
         msg = err;
       }
 
-      Alert.alert("Payment failed", msg);
+      showError("Payment failed", msg);
     } finally {
       setPaying(false);
     }

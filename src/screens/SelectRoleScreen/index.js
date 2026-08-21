@@ -6,7 +6,6 @@ import {
   ImageBackground,
   SafeAreaView,
   Animated,
-  Alert,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";

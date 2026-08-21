@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ActivityIndicator,
-  Alert,
 } from "react-native";
+import { showError } from "../../utils/toast";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import { loginClientThunk, resetAuthState } from "../../redux/slices/authSlice";
@@ -70,14 +70,14 @@ export default function LoginScreen({ navigation }) {
         ],
       });
     }
-  }, [isLoggedIn, role, isVerified]);
+  }, [isLoggedIn, role, isVerified, navigation, user]);
 
   useEffect(() => {
     if (error && isFocused) {
-      Alert.alert("Login Failed", error);
+      showError("Login Failed", error);
       dispatch(resetAuthState());
     }
-  }, [error, isFocused]);
+  }, [error, isFocused, dispatch]);
 
 
   return (

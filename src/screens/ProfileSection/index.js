@@ -8,6 +8,7 @@ import {
   Linking,
   ActivityIndicator,
 } from "react-native";
+import { showError, showSuccess } from "../../utils/toast";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
 import TicketModal from "../../components/TicketModal";
@@ -88,11 +89,11 @@ const [showTicketModal, setShowTicketModal] = useState(false);
 
   const handleEmergencyCall = () => {
     if (!trainerPhone) {
-      alert("Trainer phone number not available");
+      showError("Trainer phone number not available");
       return;
     }
     Linking.openURL(`tel:${trainerPhone}`).catch(() =>
-      alert("Unable to make the call")
+      showError("Unable to make the call")
     );
     setShowEmergencyModal(false);
   };
@@ -110,13 +111,13 @@ const [showTicketModal, setShowTicketModal] = useState(false);
 
   useEffect(() => {
     if (cancelSuccess) {
-      alert("Cancellation request submitted successfully");
+      showSuccess("Cancellation request submitted successfully");
       setShowCancelModal(false);
       dispatch(resetCancelState());
     }
 
     if (cancelError) {
-      alert(cancelError);
+      showError(cancelError);
       dispatch(resetCancelState());
     }
   }, [cancelSuccess, cancelError, dispatch]);
@@ -129,7 +130,7 @@ const [showTicketModal, setShowTicketModal] = useState(false);
 
   const handleConsultSubmit = () => {
     if (!consultNote.trim()) {
-      alert("Please enter a note");
+      showError("Please enter a note");
       return;
     }
 
@@ -143,7 +144,7 @@ const [showTicketModal, setShowTicketModal] = useState(false);
 
   useEffect(() => {
     if (nutritionSuccess) {
-      alert("Nutrition request submitted successfully");
+      showSuccess("Nutrition request submitted successfully");
       setShowConsultModal(false);
       setConsultNote("");
       setConsultType("call");
@@ -151,7 +152,7 @@ const [showTicketModal, setShowTicketModal] = useState(false);
     }
 
     if (nutritionError) {
-      alert(nutritionError);
+      showError(nutritionError);
       dispatch(resetNutritionState());
     }
   }, [nutritionSuccess, nutritionError, dispatch]);
@@ -176,7 +177,7 @@ const [showTicketModal, setShowTicketModal] = useState(false);
     console.log("trainer", trainer);
     console.log("currentTrainerId", currentTrainerId);
     if (!currentTrainerId) {
-      alert("Trainer not available");
+      showError("Trainer not available");
       return;
     }
 
@@ -188,7 +189,7 @@ const [showTicketModal, setShowTicketModal] = useState(false);
 
   useEffect(() => {
     if (changeData) {
-      alert("Trainer change request successful");
+      showSuccess("Trainer change request successful");
       dispatch(resetTrainerChange());
 
       // refresh trainer data if needed
@@ -196,7 +197,7 @@ const [showTicketModal, setShowTicketModal] = useState(false);
     }
 
     if (changeError) {
-      alert(changeError);
+      showError(changeError);
       dispatch(resetTrainerChange());
     }
   }, [changeData, changeError, dispatch, trainer]);
@@ -261,12 +262,12 @@ const handleTicketSubmit = async ({ trainer_id, complaint }) => {
       complaint,
     });
 
-    alert("Complaint submitted successfully.");
+    showSuccess("Complaint submitted successfully.");
     setShowTicketModal(false);
   } catch (error) {
     console.log("Ticket Error:", error?.response?.data);
 
-    alert(
+    showError(
       error?.response?.data?.detail ||
       error?.response?.data?.message ||
       "Unable to submit complaint."

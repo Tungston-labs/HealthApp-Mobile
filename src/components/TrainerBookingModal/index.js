@@ -8,10 +8,10 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { showError, showSuccess } from "../../utils/toast";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -65,7 +65,7 @@ const TrainerBookingModal = ({
 
   useEffect(() => {
     console.log("PAYMENT PARAMS", route.params);
-  }, []);
+  }, [route.params]);
 
   useEffect(() => {
     if (bookingMode === "change") {
@@ -98,14 +98,14 @@ const TrainerBookingModal = ({
       if (fullAddress) {
         setAddress(fullAddress);
       } else {
-        Alert.alert("Location Error", "Could not resolve address from coordinates.");
+        showError("Location Error", "Could not resolve address from coordinates.");
       }
     } catch (err) {
       console.log("Error fetching location:", err);
       if (user?.address) {
         setAddress(user.address);
       } else {
-        Alert.alert("Location Error", "Unable to fetch location. Please enter your address manually.");
+        showError("Location Error", "Unable to fetch location. Please enter your address manually.");
       }
     } finally {
       setFetchingLocation(false);
@@ -135,23 +135,23 @@ const TrainerBookingModal = ({
 
   const handlePayment = async () => {
     if (!address.trim()) {
-      Alert.alert("Address required", "Please enter your address");
+      showError("Address required", "Please enter your address");
       return;
     }
 
     // 🔹 CHANGE TRAINER + NO PRICE DIFFERENCE
     if (!selectedTrainerId) {
-      Alert.alert("Trainer unavailable", "Please select a trainer again.");
+      showError("Trainer unavailable", "Please select a trainer again.");
       return;
     }
 
     if (!selectedPlanId) {
-      Alert.alert("Plan unavailable", "Please select a workout plan again before booking.");
+      showError("Plan unavailable", "Please select a workout plan again before booking.");
       return;
     }
 
     if (bookingMode === "change" && !oldTrainerId) {
-      Alert.alert("Trainer unavailable", "Current trainer details are missing.");
+      showError("Trainer unavailable", "Current trainer details are missing.");
       return;
     }
 
@@ -165,14 +165,14 @@ const TrainerBookingModal = ({
         });
 
         if (res.data.status) {
-          Alert.alert("Success", "Trainer changed successfully");
+          showSuccess("Success", "Trainer changed successfully");
           onClose();
           navigation.navigate("MainApp", {
             screen: "MySessions",
           });
         }
       } catch (err) {
-        Alert.alert("Error", "Trainer change failed");
+        showError("Error", "Trainer change failed");
       }
       return; // ⛔ STOP – no navigation
     }

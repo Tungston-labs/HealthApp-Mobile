@@ -1,4 +1,4 @@
-import { ErrorToast, SuccessToast } from 'react-native-toast-message';
+import { ErrorToast, SuccessToast, InfoToast } from 'react-native-toast-message';
 
 export const toastConfig = {
   /* Overwrite the 'error' type */
@@ -7,7 +7,7 @@ export const toastConfig = {
       {...props}
       style={{ 
         borderLeftColor: '#FF0000',
-        backgroundColor: '#FFEBEE', // Very light red background (or use #FF0000 for solid red)
+        backgroundColor: '#FFEBEE', // Very light red background
         height: 70,
         width: '90%',
       }}
@@ -27,8 +27,44 @@ export const toastConfig = {
   success: (props) => (
     <SuccessToast
       {...props}
-      style={{ borderLeftColor: '#4CAF50', backgroundColor: '#E8F5E9' }}
-      text1Style={{ color: '#2E7D32', fontWeight: 'bold' }}
+      style={{ 
+        borderLeftColor: '#4CAF50', 
+        backgroundColor: '#E8F5E9',
+        height: 70,
+        width: '90%',
+      }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{ 
+        fontSize: 16,
+        color: '#2E7D32', 
+        fontWeight: 'bold' 
+      }}
+      text2Style={{
+        fontSize: 14,
+        color: '#1B5E20'
+      }}
+    />
+  ),
+
+  info: (props) => (
+    <InfoToast
+      {...props}
+      style={{ 
+        borderLeftColor: '#2196F3', 
+        backgroundColor: '#E3F2FD',
+        height: 70,
+        width: '90%',
+      }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{ 
+        fontSize: 16,
+        color: '#0D47A1', 
+        fontWeight: 'bold' 
+      }}
+      text2Style={{
+        fontSize: 14,
+        color: '#1565C0'
+      }}
     />
   )
 };

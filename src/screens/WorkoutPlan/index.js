@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { showError, showSuccess } from "../../utils/toast";
 
 import Header from "../../components/Header";
 import FilterModal from "../../components/FIlterModal";
@@ -25,7 +26,7 @@ const WorkoutPlan = ({ navigation }) => {
 
   useEffect(() => {
     dispatch(fetchWeeklySessionsThunk());
-  }, []);
+  }, [dispatch]);
   const [showModal, setShowModal] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [selectedPlanSlot, setSelectedPlanSlot] = useState(null);
@@ -59,7 +60,7 @@ const WorkoutPlan = ({ navigation }) => {
 
   const handleConsultSubmit = () => {
     if (!consultNote.trim()) {
-      alert("Please enter a note");
+      showError("Please enter a note");
       return;
     }
 
@@ -72,7 +73,7 @@ const WorkoutPlan = ({ navigation }) => {
   };
   useEffect(() => {
     if (nutritionSuccess) {
-      alert("Nutrition request submitted successfully");
+      showSuccess("Nutrition request submitted successfully");
       setShowConsultModal(false);
       setConsultNote("");
       setConsultType("call");
@@ -80,7 +81,7 @@ const WorkoutPlan = ({ navigation }) => {
     }
 
     if (nutritionError) {
-      alert(nutritionError);
+      showError(nutritionError);
       dispatch(resetNutritionState());
     }
   }, [nutritionSuccess, nutritionError, dispatch]);

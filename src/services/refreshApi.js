@@ -1,7 +1,8 @@
 import axios from "axios";
+import { API_BASE_URL } from "./api";
 
 const refreshApi = axios.create({
-  baseURL: "http://178.248.112.16:9001/api/",
+  baseURL: API_BASE_URL,
   timeout: 15000,
   headers: {
     "Content-Type": "application/json",
@@ -9,3 +10,4 @@ const refreshApi = axios.create({
 });
 
 export default refreshApi;
+

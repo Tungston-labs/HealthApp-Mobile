@@ -27,7 +27,7 @@ export default StyleSheet.create({
   },
 
   locationBtn: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#000",
     paddingVertical: 14,
     borderRadius: 30,
     borderColor: "#DADADA",
@@ -37,7 +37,7 @@ export default StyleSheet.create({
   },
 
   locationText: {
-    color: "#505050",
+    color: "#fff",
     fontSize: 15,
     fontWeight: "600",
   },

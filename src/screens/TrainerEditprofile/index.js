@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 
 import {
   View,
@@ -9,17 +8,16 @@ import {
   ScrollView,
   StatusBar,
   ActivityIndicator,
-  Alert,
 } from "react-native";
+import { showError, showSuccess } from "../../utils/toast";
 import { useDispatch, useSelector } from "react-redux";
 import { launchImageLibrary } from "react-native-image-picker";
-import Geolocation from "react-native-geolocation-service";
 import ProfileHeader from "../../components/ProfileHeader";
 import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
 import { updateTrainerProfileThunk } from "../../redux/slices/trainerProfileSlice";
+import { getCurrentLocation } from "../../utils/location";
+import { reverseGeocodeFull } from "../../utils/reverseGeocode";
 import styles from "./style";
-
-const GOOGLE_API_KEY = "YOUR_GOOGLE_MAPS_KEY";
 
 const TrainerEditProfile = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -47,6 +45,12 @@ const TrainerEditProfile = ({ navigation }) => {
         landmark: profile.landmark || "",
         address: profile.location || "",
       });
+      if (profile.latitude !== undefined && profile.latitude !== null) {
+        setLatitude(Number(profile.latitude));
+      }
+      if (profile.longitude !== undefined && profile.longitude !== null) {
+        setLongitude(Number(profile.longitude));
+      }
     }
   }, [profile]);
 
@@ -62,75 +66,76 @@ const TrainerEditProfile = ({ navigation }) => {
   };
 
 
-  const OPENCAGE_KEY = "YOUR_OPENCAGE_KEY";
-
-  const useMyLocation = () => {
+  const useMyLocation = async () => {
     if (fetchingLocation) return;
 
     setFetchingLocation(true);
 
-    Geolocation.getCurrentPosition(
-      async position => {
-        try {
-          const { latitude, longitude } = position.coords;
+    try {
+      const coords = await getCurrentLocation();
+      const latitudeVal = Number(coords.latitude.toFixed(6));
+      const longitudeVal = Number(coords.longitude.toFixed(6));
 
-          setLatitude(latitude);
-          setLongitude(longitude);
+      setLatitude(latitudeVal);
+      setLongitude(longitudeVal);
 
-          const res = await axios.get(
-            "https://api.opencagedata.com/geocode/v1/json",
-            {
-              params: {
-                q: `${latitude},${longitude}`,
-                key: OPENCAGE_KEY,
-                language: "en",
-              },
-            }
-          );
+      const data = await reverseGeocodeFull(latitudeVal, longitudeVal);
+      const components = data.components;
 
-          if (!res.data.results || res.data.results.length === 0) {
-            throw new Error("Address not found");
-          }
+      setForm(prev => ({
+        ...prev,
+        address: data.formatted,
+        city: components.city || components.town || components.village || "",
+        pincode: components.postcode || "",
+        landmark:
+          components.suburb ||
+          components.neighbourhood ||
+          components.road ||
+          "",
+      }));
 
-          const data = res.data.results[0];
-          const components = data.components;
-
-          setForm(prev => ({
-            ...prev,
-            address: data.formatted,
-            city: components.city || components.town || components.village || "",
-            pincode: components.postcode || "",
-            landmark:
-              components.suburb ||
-              components.neighbourhood ||
-              components.road ||
-              "",
-          }));
-
-          Alert.alert("Success", "Location fetched successfully");
-        } catch (err) {
-          console.log("GEOCODE ERROR:", err);
-          // Alert.alert("Error", "Unable to fetch address");
-        } finally {
-          setFetchingLocation(false);
-        }
-      },
-      error => {
-        setFetchingLocation(false);
-        Alert.alert("Location error", error.message);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 20000,
-        maximumAge: 10000,
-      }
-    );
+      showSuccess("Success", "Location fetched successfully");
+    } catch (err) {
+      console.log("GEOCODE ERROR:", err);
+      showError("Location error", err.message || "Unable to fetch location");
+    } finally {
+      setFetchingLocation(false);
+    }
   };
 
 
 
 
   const handleSave = async () => {
+    if (!form.name || form.name.trim().length < 3) {
+      showError("Validation Error", "Please enter a valid name (at least 3 characters)");
+      return;
+    }
+    if (!form.phone || !/^[6-9]\d{9}$/.test(form.phone)) {
+      showError("Validation Error", "Please enter a valid 10 digit phone number");
+      return;
+    }
+    if (!form.dob || !/^\d{4}-\d{2}-\d{2}$/.test(form.dob)) {
+      showError("Validation Error", "Please enter a valid Date of Birth (YYYY-MM-DD)");
+      return;
+    }
+    if (!form.aadhaar || !/^\d{12}$/.test(form.aadhaar)) {
+      showError("Validation Error", "Aadhaar must be exactly 12 digits");
+      return;
+    }
+    if (!form.pincode || form.pincode.trim().length < 6) {
+      showError("Validation Error", "Please enter a valid pincode");
+      return;
+    }
+    if (!form.city || form.city.trim().length < 2) {
+      showError("Validation Error", "Please enter a valid city");
+      return;
+    }
+    if (!form.address || form.address.trim().length < 5) {
+      showError("Validation Error", "Please enter a valid address");
+      return;
+    }
+
     setSaving(true);
 
     const formData = new FormData();
@@ -138,13 +143,12 @@ const TrainerEditProfile = ({ navigation }) => {
     formData.append("phno", form.phone);
     formData.append("dob", form.dob);
     formData.append("adar_number", form.aadhaar);
-    formData.append("location", form.address);
     formData.append("city", form.city);
     formData.append("pincode", form.pincode);
     formData.append("landmark", form.landmark);
     formData.append("location", form.address);
 
-    if (latitude !== null && longitude !== null) {
+    if (latitude !== null && longitude !== null && !isNaN(latitude) && !isNaN(longitude)) {
       formData.append("latitude", latitude.toFixed(6));
       formData.append("longitude", longitude.toFixed(6));
     }
@@ -162,9 +166,10 @@ const TrainerEditProfile = ({ navigation }) => {
     setSaving(false);
 
     if (!res.error) {
+      showSuccess("Success", "Profile updated successfully");
       navigation.goBack();
     } else {
-      Alert.alert("Update failed");
+      showError("Update failed");
     }
   };
 
@@ -244,7 +249,7 @@ const TrainerEditProfile = ({ navigation }) => {
                 formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4, 6)}-${cleaned.slice(6, 8)}`;
               }
 
-              setForm({ ...form, dob: formatted });
+              handleChange("dob", formatted);
             }}
           />
 

@@ -4,8 +4,8 @@ import {
   Text,
   Modal,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
+import { showError } from '../../utils/toast';
 import styles from './styles';
 import CalendarPicker from './CalendarPicker';
 import { useNavigation } from '@react-navigation/native';
@@ -114,7 +114,7 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
     }
 
     if (showAlert) {
-      Alert.alert(
+      showError(
         'Location Required',
         'Please allow location access so we can find available trainers near you.'
       );
@@ -225,7 +225,7 @@ useEffect(() => {
           ? err
           : err?.message || (err && JSON.stringify(err)) || 'Failed to fetch trainers';
 
-      Alert.alert('Unable to load trainers', message);
+      showError('Unable to load trainers', message);
     }
   };
 

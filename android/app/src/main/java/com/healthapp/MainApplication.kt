@@ -1,4 +1,4 @@
-package com.healthapp
+package com.fitsapio
 
 import android.app.Application
 import com.facebook.react.PackageList

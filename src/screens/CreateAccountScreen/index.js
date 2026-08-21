@@ -8,7 +8,6 @@ import {
   Image,
   SafeAreaView,
   Platform,
-  Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import styles, { pickerSelectStyles } from './style';
@@ -22,6 +21,7 @@ import { getPlansApi, uploadImageApi } from '../../services/trainerServices';
 import Toast from 'react-native-toast-message';
 import { sectionTimingRegex, validateSignup } from '../../utils/Validators';
 import RNPickerSelect from 'react-native-picker-select';
+import { API_BASE_URL } from '../../services/api';
 
 export default function CreateAccountScreen({ navigation }) {
   const [images, setImages] = useState([]);
@@ -64,7 +64,7 @@ export default function CreateAccountScreen({ navigation }) {
         if (response.didCancel) return;
 
         if (response.errorCode) {
-          alert('Failed to pick image');
+          Toast.show({ type: 'error', text1: 'Failed to pick image' });
           return;
         }
 
@@ -74,18 +74,23 @@ export default function CreateAccountScreen({ navigation }) {
       },
     );
   };
-  useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const response = await getPlansApi();
-        setPlans(response.data);
-      } catch (err) {
-        console.log("Plans Error:", err);
-      }
-    };
+useEffect(() => {
+  const fetchPlans = async () => {
+    try {
+      const response = await getPlansApi();
 
-    fetchPlans();
-  }, []);
+      console.log("Plans API response:", response);
+      console.log("Plans API data:", response.data);
+
+      setPlans(response.data);
+    } catch (err) {
+      console.log("Plans Error:", err);
+    }
+  };
+
+  fetchPlans();
+}, []);
+
   const handlePickAadhaarImage = () => {
     launchImageLibrary(
       {
@@ -104,7 +109,7 @@ export default function CreateAccountScreen({ navigation }) {
   useEffect(() => {
     const testConnection = async () => {
       try {
-        const response = await fetch('http://178.248.112.16:9001/');
+        const response = await fetch(API_BASE_URL);
         console.log(" Connection Test Success:", response.status);
       } catch (error) {
         console.log(" Connection Test Failed. This is a Network Config issue:", error.message);
@@ -131,7 +136,7 @@ export default function CreateAccountScreen({ navigation }) {
 
       // ... rest of your address logic
       setAddress(fullAddress);
-      alert("Location fetched successfully");
+      Toast.show({ type: 'success', text1: 'Location fetched successfully' });
     } catch (err) {
       console.log("Location error:", err);
     }
@@ -151,7 +156,7 @@ export default function CreateAccountScreen({ navigation }) {
         }
 
         if (response.errorCode) {
-          alert('Image pick error');
+          Toast.show({ type: 'error', text1: 'Image pick error' });
           return;
         }
 

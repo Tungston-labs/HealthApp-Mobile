@@ -1,5 +1,5 @@
 import { Platform } from "react-native";
-import api, { publicApi } from "./api";
+import api, { publicApi, API_BASE_URL } from "./api";
 
 export const uploadImageApi = async (file) => {
   const formData = new FormData();
@@ -167,7 +167,7 @@ export const verifyChangeTrainerPayment = (payload) =>
 
 export const getPlansApi = async () => {
   const response = await fetch(
-    "http://178.248.112.16:9001/api/plan/public/"
+    `${API_BASE_URL}plan/public/`
   );
 
   if (!response.ok) {

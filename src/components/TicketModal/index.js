@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import {
   Modal,
   View,
- Text,
- TextInput,
- TouchableOpacity,
- ActivityIndicator,
- Alert,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
+import { showError } from "../../utils/toast";
 
 import styles from "./style";
 
@@ -23,7 +23,7 @@ const TicketModal = ({
 
 const handleSubmit = async () => {
   if (!complaint.trim()) {
-    Alert.alert("Validation", "Please enter your complaint.");
+    showError("Validation", "Please enter your complaint.");
     return;
   }
 

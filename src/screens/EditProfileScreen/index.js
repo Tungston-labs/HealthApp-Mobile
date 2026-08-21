@@ -6,9 +6,9 @@ import {
   ScrollView,
   StatusBar,
   ActivityIndicator,
-  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
+import { showError, showSuccess } from "../../utils/toast";
 
 import { useDispatch, useSelector } from "react-redux";
 import { launchImageLibrary } from "react-native-image-picker";
@@ -28,6 +28,7 @@ const EditProfile = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
+  const [fetchingLocation, setFetchingLocation] = useState(false);
 
   const { profileData } = route.params || {};
 
@@ -64,6 +65,12 @@ const EditProfile = ({ navigation, route }) => {
           ? profileData.wellness_goal.join(", ")
           : "",
       });
+      if (profileData.latitude !== undefined && profileData.latitude !== null) {
+        setLatitude(Number(profileData.latitude));
+      }
+      if (profileData.longitude !== undefined && profileData.longitude !== null) {
+        setLongitude(Number(profileData.longitude));
+      }
     }
   }, [profileData]);
 
@@ -78,31 +85,25 @@ const EditProfile = ({ navigation, route }) => {
     );
   };
   const handleUseLocation = async () => {
-    Alert.alert(
-      "Use current location?",
-      "This will replace your existing address.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "OK",
-          onPress: async () => {
-            try {
-              const coords = await getCurrentLocation();
-              const fullAddress = await reverseGeocode(
-                coords.latitude,
-                coords.longitude
-              );
+    if (fetchingLocation) return;
+    setFetchingLocation(true);
+    try {
+      const coords = await getCurrentLocation();
+      const latitudeVal = Number(coords.latitude.toFixed(6));
+      const longitudeVal = Number(coords.longitude.toFixed(6));
 
-              setForm(prev => ({ ...prev, address: fullAddress }));
-              setLatitude(coords.latitude);
-              setLongitude(coords.longitude);
-            } catch {
-              Alert.alert("Error", "Unable to fetch location");
-            }
-          },
-        },
-      ]
-    );
+      const fullAddress = await reverseGeocode(latitudeVal, longitudeVal);
+
+      setForm(prev => ({ ...prev, address: fullAddress }));
+      setLatitude(latitudeVal);
+      setLongitude(longitudeVal);
+      showSuccess("Success", "Location fetched successfully");
+    } catch (err) {
+      console.log("Location fetch error:", err);
+      showError("Error", "Unable to fetch location");
+    } finally {
+      setFetchingLocation(false);
+    }
   };
 
 
@@ -110,6 +111,31 @@ const EditProfile = ({ navigation, route }) => {
 
   /* ---------------- SAVE ---------------- */
   const handleSave = async () => {
+    if (!form.name || form.name.trim().length < 3) {
+      showError("Validation Error", "Please enter a valid name (at least 3 characters)");
+      return;
+    }
+    if (!form.dob || !/^\d{4}-\d{2}-\d{2}$/.test(form.dob)) {
+      showError("Validation Error", "Please enter a valid Date of Birth (YYYY-MM-DD)");
+      return;
+    }
+    if (!form.blood) {
+      showError("Validation Error", "Blood group is required");
+      return;
+    }
+    if (!form.weight || isNaN(form.weight) || parseFloat(form.weight) <= 0) {
+      showError("Validation Error", "Please enter a valid weight");
+      return;
+    }
+    if (!form.height || isNaN(form.height) || parseFloat(form.height) <= 0) {
+      showError("Validation Error", "Please enter a valid height");
+      return;
+    }
+    if (!form.address || form.address.trim().length < 5) {
+      showError("Validation Error", "Please enter a valid address");
+      return;
+    }
+
     const formData = new FormData();
 
     formData.append("name", form.name);
@@ -118,7 +144,7 @@ const EditProfile = ({ navigation, route }) => {
     formData.append("weight", form.weight);
     formData.append("height", form.height);
     formData.append("address", form.address);
-    if (latitude !== null && longitude !== null) {
+    if (latitude !== null && longitude !== null && !isNaN(latitude) && !isNaN(longitude)) {
       formData.append("latitude", latitude.toFixed(6));
       formData.append("longitude", longitude.toFixed(6));
     }
@@ -155,7 +181,7 @@ const EditProfile = ({ navigation, route }) => {
     const res = await dispatch(updateProfileThunk(formData));
 
     if (res.meta.requestStatus === "fulfilled") {
-      Alert.alert("Success", "Profile updated successfully");
+      showSuccess("Success", "Profile updated successfully");
       dispatch(resetProfileEditState());
       navigation.goBack();
     }
@@ -164,7 +190,7 @@ const EditProfile = ({ navigation, route }) => {
   /* ---------------- ERROR ---------------- */
   useEffect(() => {
     if (error) {
-      Alert.alert("Error", error);
+      showError("Error", error);
       dispatch(resetProfileEditState());
     }
   }, [error, dispatch]);
@@ -256,8 +282,14 @@ const EditProfile = ({ navigation, route }) => {
             value={form.height}
             onChangeText={v => setForm({ ...form, height: v })}
           />
-          <TouchableOpacity style={styles.locationBtn} onPress={handleUseLocation}>
-            <Text style={styles.locationText}>Use my location</Text>
+          <TouchableOpacity
+            style={[styles.locationBtn, fetchingLocation && { opacity: 0.6 }]}
+            onPress={handleUseLocation}
+            disabled={fetchingLocation}
+          >
+            <Text style={styles.locationText}>
+              {fetchingLocation ? "Fetching location..." : "Use my location"}
+            </Text>
           </TouchableOpacity>
 
           <Text style={styles.label}>Address</Text>

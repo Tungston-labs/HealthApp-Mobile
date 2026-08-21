@@ -8,8 +8,8 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from "react-native";
+import { showError } from "../../utils/toast";
 import styles from "./style";
 import { verifyOtpAction, resetOtpState } from "../../redux/slices/verifyOtpSlice";
 import Logo from "../../Images/logo.png";
@@ -24,11 +24,12 @@ export default function OtpScreen({ navigation, route }) {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const inputRefs = useRef([]);
 
-  if (!email) {
-    Alert.alert("Error", "Email not found. Please go back and try again.");
-    navigation.navigate("Login");
-    return;
-  }
+  useEffect(() => {
+    if (!email) {
+      showError("Error", "Email not found. Please go back and try again.");
+      navigation.navigate("Login");
+    }
+  }, [email, navigation]);
 
   const handleChange = (text, index) => {
     const newOtp = [...otp];
@@ -83,9 +84,13 @@ export default function OtpScreen({ navigation, route }) {
     }
 
     if (error) {
-      Alert.alert("OTP Verification Failed", error.message || "Try again");
+      showError("OTP Verification Failed", error.message || "Try again");
     }
-  }, [success, error]);
+  }, [success, error, email, navigation, dispatch]);
+
+  if (!email) {
+    return null;
+  }
 
   return (
     <SafeAreaView style={styles.container}>

@@ -156,6 +156,7 @@ export default StyleSheet.create({
     borderWidth: 1,
     borderColor: "#8E8E8E",
     paddingVertical: 14,
+    backgroundColor: "#000",
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
@@ -165,6 +166,7 @@ export default StyleSheet.create({
   useLocationText: {
     fontSize: 15,
     fontFamily: "Segoe UI",
+    color: "#fff",
   },
 
   twoColRow: {

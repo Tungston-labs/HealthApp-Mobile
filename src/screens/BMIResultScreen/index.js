@@ -281,10 +281,18 @@ const handleFinalSubmit = async () => {
           console.log('Reverse geocode failed:', e?.message || e);
         }
       }
-    } catch (e) {
-      console.log('Unable to fetch device location during registration:', e?.message || e);
-      // proceed without lat/lng — user can set later
-    }
+    }  catch (err) {
+  console.log("========== REGISTRATION ERROR ==========");
+  console.log("ERROR:", err);
+  console.log("STATUS:", err?.status);
+  console.log("RESPONSE STATUS:", err?.response?.status);
+  console.log("RESPONSE DATA:", err?.response?.data);
+  console.log("RESPONSE HEADERS:", err?.response?.headers);
+  console.log("========================================");
+
+  const { message, target } = getBackendErrorTarget(err);
+  showRegistrationIssue(message, target);
+}
   }
 
   const typedAddress = [

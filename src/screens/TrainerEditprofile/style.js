@@ -45,6 +45,7 @@ export default StyleSheet.create({
     marginTop: 26,
     paddingVertical: 14,
     borderRadius: 30,
+    backgroundColor:"#000",
     borderWidth: 1,
     borderColor: "#E0E0E0",
     alignItems: "center",
@@ -52,7 +53,7 @@ export default StyleSheet.create({
 
   locationText: {
     fontSize: 15,
-    color: "#505050",
+    color: "#fff",
     fontWeight: "500",
   },
 

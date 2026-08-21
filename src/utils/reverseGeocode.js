@@ -2,7 +2,7 @@ import axios from "axios";
 
 const OPENCAGE_KEY = "550c51a876a140cfb4a49fb6b08bac99";
 
-export const reverseGeocode = async (lat, lng) => {
+export const reverseGeocodeFull = async (lat, lng) => {
   try {
     const res = await axios.get(
       "https://api.opencagedata.com/geocode/v1/json",
@@ -16,13 +16,18 @@ export const reverseGeocode = async (lat, lng) => {
       }
     );
 
-    if (res.data.results.length === 0) {
+    if (!res.data.results || res.data.results.length === 0) {
       throw new Error("No address found");
     }
 
-    return res.data.results[0].formatted;
+    return res.data.results[0];
   } catch (err) {
-    console.log(" OpenCage error:", err.message);
+    console.log("OpenCage error:", err.message);
     throw err;
   }
+};
+
+export const reverseGeocode = async (lat, lng) => {
+  const result = await reverseGeocodeFull(lat, lng);
+  return result.formatted;
 };

@@ -1,4 +1,4 @@
-package com.healthapp
+package com.fitsapio
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

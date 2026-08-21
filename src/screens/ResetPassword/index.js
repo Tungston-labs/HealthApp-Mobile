@@ -5,8 +5,8 @@ import {
   TextInput,
   TouchableOpacity,
   SafeAreaView,
-  Alert,
 } from "react-native";
+import { showError, showSuccess } from "../../utils/toast";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./style";
 import { useDispatch, useSelector } from "react-redux";
@@ -59,11 +59,11 @@ export default function ResetPasswordScreen({ navigation, route }) {
         })
       ).unwrap();
 
-      Alert.alert("Success", "Password reset successfully");
+      showSuccess("Success", "Password reset successfully");
       dispatch(resetState());
       navigation.navigate("Login");
     } catch (err) {
-      Alert.alert(
+      showError(
         "Error",
         err?.message || JSON.stringify(err) || "Failed to reset password"
       );

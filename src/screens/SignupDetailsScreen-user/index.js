@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
-  Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
@@ -16,9 +15,9 @@ import styles from './style';
 import { getCurrentLocation } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { validateSignup, validateUserStep2 } from "../../utils/Validators";
-import { showError } from "../../utils/toast";
-import { validateUserStep1 } from "../../utils/Validators";
+import { validateSignup, validateUserStep2 } from '../../utils/Validators';
+import { showError, showSuccess } from '../../utils/toast';
+import { validateUserStep1 } from '../../utils/Validators';
 import { Image } from 'react-native';
 import Logo from '../../Images/logo.png';
 
@@ -37,7 +36,6 @@ export default function SignupDetailsScreenUser() {
   };
 
   const handleContinue = () => {
-
     const result = validateUserStep1(registration);
 
     if (!result.ok) {
@@ -49,24 +47,21 @@ export default function SignupDetailsScreenUser() {
   };
 
   const handlePickProfileImage = async () => {
-    launchImageLibrary(
-      { mediaType: 'photo', quality: 0.7 },
-      response => {
-        if (response.didCancel || !response.assets?.length) return;
+    launchImageLibrary({ mediaType: 'photo', quality: 0.7 }, response => {
+      if (response.didCancel || !response.assets?.length) return;
 
-        const image = response.assets[0];
+      const image = response.assets[0];
 
-        dispatch(
-          updateRegistration({
-            profile_pic: {
-              uri: image.uri,
-              type: image.type || 'image/jpeg',
-              name: image.fileName || 'profile.jpg',
-            },
-          })
-        );
-      }
-    );
+      dispatch(
+        updateRegistration({
+          profile_pic: {
+            uri: image.uri,
+            type: image.type || 'image/jpeg',
+            name: image.fileName || 'profile.jpg',
+          },
+        }),
+      );
+    });
   };
 
   const handleUseLocation = async () => {
@@ -85,19 +80,19 @@ export default function SignupDetailsScreenUser() {
           address: address,
           latitude,
           longitude,
-        })
+        }),
       );
 
-      Alert.alert(
+      showSuccess(
         'Success',
-        `📍 Location fetched\nLat: ${latitude}\nLng: ${longitude}`
+        `📍 Location fetched\nLat: ${latitude}\nLng: ${longitude}`,
       );
 
       console.log('Latitude:', latitude);
       console.log('Longitude:', longitude);
     } catch (err) {
       console.log('Location error:', err);
-      Alert.alert('Error', 'Unable to fetch location. Please try again.');
+      showError('Error', 'Unable to fetch location. Please try again.');
     }
   };
 
@@ -148,6 +143,7 @@ export default function SignupDetailsScreenUser() {
             style={styles.inputField}
             placeholder="Enter Email"
             value={registration.email}
+            placeholderTextColor="#888"
             keyboardType="email-address"
             onChangeText={handleChange('email')}
           />
@@ -160,6 +156,7 @@ export default function SignupDetailsScreenUser() {
             placeholder="Phone"
             value={registration.phno}
             keyboardType="phone-pad"
+            placeholderTextColor="#888"
             onChangeText={handleChange('phno')}
           />
         </View>
@@ -171,6 +168,7 @@ export default function SignupDetailsScreenUser() {
             placeholder="Password"
             secureTextEntry={!showPassword}
             value={registration.password}
+            placeholderTextColor="#888"
             onChangeText={handleChange('password')}
           />
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
@@ -187,7 +185,6 @@ export default function SignupDetailsScreenUser() {
             <Ionicons name="location-outline" size={20} color="#777" />
             <TouchableOpacity onPress={handleUseLocation}>
               <Text style={styles.locationText}>Use my location</Text>
-
             </TouchableOpacity>
           </View>
 
@@ -208,12 +205,14 @@ export default function SignupDetailsScreenUser() {
                 style={[styles.input, styles.smallInput]}
                 placeholder="Pincode"
                 keyboardType="numeric"
+                placeholderTextColor="#888"
                 onChangeText={handleChange('pincode')}
               />
 
               <TextInput
                 style={[styles.input, styles.smallInput]}
                 placeholder="City/Town"
+                placeholderTextColor="#888"
                 onChangeText={handleChange('city')}
               />
             </View>
@@ -221,12 +220,14 @@ export default function SignupDetailsScreenUser() {
             <TextInput
               style={styles.input}
               placeholder="Landmark"
+              placeholderTextColor="#888"
               onChangeText={handleChange('landmark')}
             />
 
             <TextInput
               style={styles.input}
               placeholder="Address"
+              placeholderTextColor="#888"
               value={registration.address}
               onChangeText={handleChange('address')}
             />
