@@ -6,6 +6,8 @@ import {
   ScrollView,
   StatusBar,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { showError, showSuccess } from "../../utils/toast";
@@ -209,123 +211,132 @@ const EditProfile = ({ navigation, route }) => {
 
       <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
 
-      <ScrollView style={styles.container}>
-        {/* ✅ WORKING PROFILE HEADER */}
-        <ProfileHeader
-          image={imageSource}
-          name={form.name}
-          showBack
-          onBack={() => navigation.goBack()}
-          showEdit
-          onEdit={pickImage}   
-        />
-
-        {/* FORM */}
-        <View style={styles.formWrapper}>
-          <Text style={styles.label}>Name</Text>
-          <TextInput
-            style={styles.input}
-            value={form.name}
-            onChangeText={v => setForm({ ...form, name: v })}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          style={styles.container}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ paddingBottom: 40 }}
+        >
+          {/* ✅ WORKING PROFILE HEADER */}
+          <ProfileHeader
+            image={imageSource}
+            name={form.name}
+            showBack
+            onBack={() => navigation.goBack()}
+            showEdit
+            onEdit={pickImage}   
           />
 
-          {/* <Text style={styles.label}>Date of Birth</Text>
-          <TextInput
-            style={styles.input}
-            value={form.dob}
-            onChangeText={v => setForm({ ...form, dob: v })}
-          /> */}
+          {/* FORM */}
+          <View style={styles.formWrapper}>
+            <Text style={styles.label}>Name</Text>
+            <TextInput
+              style={styles.input}
+              value={form.name}
+              onChangeText={v => setForm({ ...form, name: v })}
+            />
 
-          <Text style={styles.label}>Date of Birth</Text>
-          <TextInput
-            style={styles.input}
-            value={form.dob}
-            placeholder="YYYY-MM-DD"
-            keyboardType="number-pad"
-            maxLength={10}
-            onChangeText={(text) => {
-              // Remove non-numeric characters
-              let cleaned = text.replace(/\D/g, "");
+            {/* <Text style={styles.label}>Date of Birth</Text>
+            <TextInput
+              style={styles.input}
+              value={form.dob}
+              onChangeText={v => setForm({ ...form, dob: v })}
+            /> */}
 
-              let formatted = cleaned;
+            <Text style={styles.label}>Date of Birth</Text>
+            <TextInput
+              style={styles.input}
+              value={form.dob}
+              placeholder="YYYY-MM-DD"
+              keyboardType="number-pad"
+              maxLength={10}
+              onChangeText={(text) => {
+                // Remove non-numeric characters
+                let cleaned = text.replace(/\D/g, "");
 
-              if (cleaned.length > 4 && cleaned.length <= 6) {
-                formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4)}`;
-              }
-              else if (cleaned.length > 6) {
-                formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4, 6)}-${cleaned.slice(6, 8)}`;
-              }
+                let formatted = cleaned;
 
-              setForm({ ...form, dob: formatted });
-            }}
-          />
-          
-          <Text style={styles.label}>Blood Group</Text>
-          <TextInput
-            style={styles.input}
-            value={form.blood}
-            onChangeText={v => setForm({ ...form, blood: v })}
-          />
+                if (cleaned.length > 4 && cleaned.length <= 6) {
+                  formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4)}`;
+                }
+                else if (cleaned.length > 6) {
+                  formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4, 6)}-${cleaned.slice(6, 8)}`;
+                }
 
-          <Text style={styles.label}>Weight</Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="numeric"
-            value={form.weight}
-            onChangeText={v => setForm({ ...form, weight: v })}
-          />
+                setForm({ ...form, dob: formatted });
+              }}
+            />
+            
+            <Text style={styles.label}>Blood Group</Text>
+            <TextInput
+              style={styles.input}
+              value={form.blood}
+              onChangeText={v => setForm({ ...form, blood: v })}
+            />
 
-          <Text style={styles.label}>Height</Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="numeric"
-            value={form.height}
-            onChangeText={v => setForm({ ...form, height: v })}
-          />
-          <TouchableOpacity
-            style={[styles.locationBtn, fetchingLocation && { opacity: 0.6 }]}
-            onPress={handleUseLocation}
-            disabled={fetchingLocation}
-          >
-            <Text style={styles.locationText}>
-              {fetchingLocation ? "Fetching location..." : "Use my location"}
-            </Text>
-          </TouchableOpacity>
+            <Text style={styles.label}>Weight</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              value={form.weight}
+              onChangeText={v => setForm({ ...form, weight: v })}
+            />
 
-          <Text style={styles.label}>Address</Text>
-          <TextInput
-            style={styles.input}
-            value={form.address}
-            onChangeText={v => setForm({ ...form, address: v })}
-          />
+            <Text style={styles.label}>Height</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              value={form.height}
+              onChangeText={v => setForm({ ...form, height: v })}
+            />
+            <TouchableOpacity
+              style={[styles.locationBtn, fetchingLocation && { opacity: 0.6 }]}
+              onPress={handleUseLocation}
+              disabled={fetchingLocation}
+            >
+              <Text style={styles.locationText}>
+                {fetchingLocation ? "Fetching location..." : "Use my location"}
+              </Text>
+            </TouchableOpacity>
 
-          <Text style={styles.label}>Health Condition</Text>
-          <TextInput
-            style={styles.input}
-            value={form.condition}
-            onChangeText={v => setForm({ ...form, condition: v })}
-          />
+            <Text style={styles.label}>Address</Text>
+            <TextInput
+              style={styles.input}
+              value={form.address}
+              onChangeText={v => setForm({ ...form, address: v })}
+            />
 
-          <Text style={styles.label}>Wellness Goal</Text>
-          <TextInput
-            style={styles.input}
-            value={form.goal}
-            onChangeText={v => setForm({ ...form, goal: v })}
-          />
+            <Text style={styles.label}>Health Condition</Text>
+            <TextInput
+              style={styles.input}
+              value={form.condition}
+              onChangeText={v => setForm({ ...form, condition: v })}
+            />
 
-          <TouchableOpacity
-            style={styles.saveBtn}
-            onPress={handleSave}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#FFF" />
-            ) : (
-              <Text style={styles.saveText}>Save</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+            <Text style={styles.label}>Wellness Goal</Text>
+            <TextInput
+              style={styles.input}
+              value={form.goal}
+              onChangeText={v => setForm({ ...form, goal: v })}
+            />
+
+            <TouchableOpacity
+              style={styles.saveBtn}
+              onPress={handleSave}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <Text style={styles.saveText}>Save</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 };

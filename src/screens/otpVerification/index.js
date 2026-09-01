@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   KeyboardAvoidingView,
+  ScrollView,
   Platform,
 } from "react-native";
 import { showError } from "../../utils/toast";
@@ -95,37 +96,49 @@ export default function OtpScreen({ navigation, route }) {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : null}
-        style={styles.innerContainer}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
       >
-        <View style={styles.logoContainer}>
-          <Image source={Logo} style={styles.logo} />
-        </View>
-        <Text style={styles.description}>
-          Enter the code you received in your email{"\n"}below to reset your password.
-        </Text>
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            paddingBottom: 20,
+          }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.innerContainer}>
+            <View style={styles.logoContainer}>
+              <Image source={Logo} style={styles.logo} />
+            </View>
+            <Text style={styles.description}>
+              Enter the code you received in your email{"\n"}below to reset your password.
+            </Text>
 
-        <View style={styles.otpContainer}>
-          {otp.map((digit, index) => (
-            <TextInput
-              key={index}
-              ref={(ref) => (inputRefs.current[index] = ref)}
-              style={styles.otpBox}
-              keyboardType="numeric"
-              maxLength={1}
-              value={digit}
-              onChangeText={(text) => handleChange(text, index)}
-              onKeyPress={(e) => handleKeyPress(e, index)}
-              autoFocus={index === 0}
-            />
-          ))}
-        </View>
+            <View style={styles.otpContainer}>
+              {otp.map((digit, index) => (
+                <TextInput
+                  key={index}
+                  ref={(ref) => (inputRefs.current[index] = ref)}
+                  style={styles.otpBox}
+                  keyboardType="numeric"
+                  maxLength={1}
+                  value={digit}
+                  onChangeText={(text) => handleChange(text, index)}
+                  onKeyPress={(e) => handleKeyPress(e, index)}
+                  autoFocus={index === 0}
+                />
+              ))}
+            </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.backToLogin}>
-            Back to <Text style={styles.loginText}>Log in</Text>
-          </Text>
-        </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+              <Text style={styles.backToLogin}>
+                Back to <Text style={styles.loginText}>Log in</Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

@@ -202,7 +202,7 @@ const TrainerBookingModal = ({
       <View style={styles.overlay}>
         <KeyboardAvoidingView
           style={styles.modalContainer}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
           {/* Close */}
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>

@@ -8,6 +8,8 @@ import {
   ScrollView,
   StatusBar,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { showError, showSuccess } from "../../utils/toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -183,143 +185,149 @@ const TrainerEditProfile = ({ navigation }) => {
 
       <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
 
-      <ScrollView
-        style={styles.container}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
       >
+        <ScrollView
+          style={styles.container}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.scrollContent}
+        >
 
-        <ProfileHeader
-          image={
-            profileImage
-              ? { uri: profileImage.uri }
-              : profile?.profile_pic_url
-                ? { uri: profile.profile_pic_url }
-                : require("../../../assets/trainer2.jpg")
-          }
-          name="Edit Profile"
-          showBack
-          showEdit
-          onEdit={pickProfileImage}
-          onBack={() => navigation.goBack()}
-        />
-
-
-        <View style={styles.formWrapper}>
-
-          <Text style={styles.label}>Name</Text>
-          <TextInput
-            style={styles.input}
-            value={form.name}
-            onChangeText={v => handleChange("name", v)}
+          <ProfileHeader
+            image={
+              profileImage
+                ? { uri: profileImage.uri }
+                : profile?.profile_pic_url
+                  ? { uri: profile.profile_pic_url }
+                  : require("../../../assets/trainer2.jpg")
+            }
+            name="Edit Profile"
+            showBack
+            showEdit
+            onEdit={pickProfileImage}
+            onBack={() => navigation.goBack()}
           />
 
-          <View style={styles.row}>
-            <View style={styles.col}>
-              <Text style={styles.label}>Email</Text>
-              <TextInput style={styles.input} value={form.email} editable={false} />
+
+          <View style={styles.formWrapper}>
+
+            <Text style={styles.label}>Name</Text>
+            <TextInput
+              style={styles.input}
+              value={form.name}
+              onChangeText={v => handleChange("name", v)}
+            />
+
+            <View style={styles.row}>
+              <View style={styles.col}>
+                <Text style={styles.label}>Email</Text>
+                <TextInput style={styles.input} value={form.email} editable={false} />
+              </View>
+              <View style={styles.col}>
+                <Text style={styles.label}>Phone</Text>
+                <TextInput
+                  style={styles.input}
+                  value={form.phone}
+                  onChangeText={v => handleChange("phone", v)}
+                />
+              </View>
             </View>
-            <View style={styles.col}>
-              <Text style={styles.label}>Phone</Text>
-              <TextInput
-                style={styles.input}
-                value={form.phone}
-                onChangeText={v => handleChange("phone", v)}
-              />
-            </View>
-          </View>
 
-          <Text style={styles.label}>Date of Birth</Text>
-          <TextInput
-            style={styles.input}
-            value={form.dob}
-            placeholder="YYYY-MM-DD"
-            keyboardType="number-pad"
-            maxLength={10}
-            onChangeText={(text) => {
-              // Remove non-numeric characters
-              let cleaned = text.replace(/\D/g, "");
+            <Text style={styles.label}>Date of Birth</Text>
+            <TextInput
+              style={styles.input}
+              value={form.dob}
+              placeholder="YYYY-MM-DD"
+              keyboardType="number-pad"
+              maxLength={10}
+              onChangeText={(text) => {
+                // Remove non-numeric characters
+                let cleaned = text.replace(/\D/g, "");
 
-              let formatted = cleaned;
+                let formatted = cleaned;
 
-              if (cleaned.length > 4 && cleaned.length <= 6) {
-                formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4)}`;
-              }
-              else if (cleaned.length > 6) {
-                formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4, 6)}-${cleaned.slice(6, 8)}`;
-              }
+                if (cleaned.length > 4 && cleaned.length <= 6) {
+                  formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4)}`;
+                }
+                else if (cleaned.length > 6) {
+                  formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4, 6)}-${cleaned.slice(6, 8)}`;
+                }
 
-              handleChange("dob", formatted);
-            }}
-          />
+                handleChange("dob", formatted);
+              }}
+            />
 
-          <Text style={styles.label}>Aadhaar</Text>
-          <TextInput
-            style={styles.input}
-            value={form.aadhaar}
-            onChangeText={v => handleChange("aadhaar", v)}
-          />
+            <Text style={styles.label}>Aadhaar</Text>
+            <TextInput
+              style={styles.input}
+              value={form.aadhaar}
+              onChangeText={v => handleChange("aadhaar", v)}
+            />
 
-          <TouchableOpacity
-            style={[
-              styles.locationBtn,
-              fetchingLocation && { opacity: 0.6 }
-            ]}
-            onPress={useMyLocation}
-            disabled={fetchingLocation}
-          >
-            <Text style={styles.locationText}>
-              {fetchingLocation ? "Fetching location..." : "Use my location"}
-            </Text>
-          </TouchableOpacity>
-
-
-          <View style={styles.row}>
-            <View style={styles.col}>
-              <Text style={styles.label}>Pincode</Text>
-              <TextInput
-                style={styles.input}
-                value={form.pincode}
-                onChangeText={v => handleChange("pincode", v)}
-              />
-            </View>
-            <View style={styles.col}>
-              <Text style={styles.label}>City</Text>
-              <TextInput
-                style={styles.input}
-                value={form.city}
-                onChangeText={v => handleChange("city", v)}
-              />
-            </View>
-          </View>
-
-          <Text style={styles.label}>Landmark</Text>
-          <TextInput
-            style={styles.input}
-            value={form.landmark}
-            onChangeText={v => handleChange("landmark", v)}
-          />
-
-          <Text style={styles.label}>Address</Text>
-          <TextInput
-            style={styles.input}
-            value={form.address}
-            onChangeText={v => handleChange("address", v)}
-          />
-
-          <View style={styles.saveWrapper}>
             <TouchableOpacity
-              style={styles.saveBtn}
-              onPress={handleSave}
-              disabled={saving}
+              style={[
+                styles.locationBtn,
+                fetchingLocation && { opacity: 0.6 }
+              ]}
+              onPress={useMyLocation}
+              disabled={fetchingLocation}
             >
-              <Text style={styles.saveText}>
-                {saving ? "Saving..." : "Save"}
+              <Text style={styles.locationText}>
+                {fetchingLocation ? "Fetching location..." : "Use my location"}
               </Text>
             </TouchableOpacity>
+
+
+            <View style={styles.row}>
+              <View style={styles.col}>
+                <Text style={styles.label}>Pincode</Text>
+                <TextInput
+                  style={styles.input}
+                  value={form.pincode}
+                  onChangeText={v => handleChange("pincode", v)}
+                />
+              </View>
+              <View style={styles.col}>
+                <Text style={styles.label}>City</Text>
+                <TextInput
+                  style={styles.input}
+                  value={form.city}
+                  onChangeText={v => handleChange("city", v)}
+                />
+              </View>
+            </View>
+
+            <Text style={styles.label}>Landmark</Text>
+            <TextInput
+              style={styles.input}
+              value={form.landmark}
+              onChangeText={v => handleChange("landmark", v)}
+            />
+
+            <Text style={styles.label}>Address</Text>
+            <TextInput
+              style={styles.input}
+              value={form.address}
+              onChangeText={v => handleChange("address", v)}
+            />
+
+            <View style={styles.saveWrapper}>
+              <TouchableOpacity
+                style={styles.saveBtn}
+                onPress={handleSave}
+                disabled={saving}
+              >
+                <Text style={styles.saveText}>
+                  {saving ? "Saving..." : "Save"}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 };

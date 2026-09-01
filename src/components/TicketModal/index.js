@@ -6,6 +6,11 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { showError } from "../../utils/toast";
 
@@ -48,49 +53,65 @@ const handleSubmit = async () => {
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-
-          <Text style={styles.title}>Report Trainer</Text>
-
-          <Text style={styles.subtitle}>
-            Send a complaint regarding{" "}
-            <Text style={{ fontWeight: "bold" }}>{trainerName}</Text>
-          </Text>
-
-          <Text style={styles.label}>Complaint</Text>
-
-          <TextInput
-            style={styles.textArea}
-            placeholder="Describe your complaint..."
-            multiline
-            value={complaint}
-            onChangeText={setComplaint}
-          />
-
-          <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={onClose}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.overlay}>
+            <ScrollView
+              contentContainerStyle={{
+                flexGrow: 1,
+                justifyContent: "center",
+              }}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
             >
-              <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
+              <View style={styles.modalContainer}>
 
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={handleSubmit}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.submitText}>Submit</Text>
-              )}
-            </TouchableOpacity>
+                <Text style={styles.title}>Report Trainer</Text>
+
+                <Text style={styles.subtitle}>
+                  Send a complaint regarding{" "}
+                  <Text style={{ fontWeight: "bold" }}>{trainerName}</Text>
+                </Text>
+
+                <Text style={styles.label}>Complaint</Text>
+
+                <TextInput
+                  style={styles.textArea}
+                  placeholder="Describe your complaint..."
+                  multiline
+                  value={complaint}
+                  onChangeText={setComplaint}
+                />
+
+                <View style={styles.buttonRow}>
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={onClose}
+                  >
+                    <Text style={styles.cancelText}>Cancel</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.submitButton}
+                    onPress={handleSubmit}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <Text style={styles.submitText}>Submit</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+
+              </View>
+            </ScrollView>
           </View>
-
-        </View>
-      </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };

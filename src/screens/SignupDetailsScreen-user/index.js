@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
@@ -98,162 +100,168 @@ export default function SignupDetailsScreenUser() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'center',
-          paddingBottom: 120,
-        }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
       >
-        <Image source={Logo} style={styles.logo} />
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: 'center',
+            paddingBottom: 120,
+          }}
+        >
+          <Image source={Logo} style={styles.logo} />
 
-        <Text style={styles.welcomeText}>Welcome to health app</Text>
-        <Text style={styles.subtitle}>Enter basic details</Text>
+          <Text style={styles.welcomeText}>Welcome to health app</Text>
+          <Text style={styles.subtitle}>Enter basic details</Text>
 
-        <View style={styles.profileRow}>
-          <TouchableOpacity onPress={handlePickProfileImage}>
-            {registration.profile_pic?.uri ? (
-              <Image
-                source={{ uri: registration.profile_pic.uri }}
-                style={styles.profileImage}
+          <View style={styles.profileRow}>
+            <TouchableOpacity onPress={handlePickProfileImage}>
+              {registration.profile_pic?.uri ? (
+                <Image
+                  source={{ uri: registration.profile_pic.uri }}
+                  style={styles.profileImage}
+                />
+              ) : (
+                <View style={styles.profilePlaceholder}>
+                  <Ionicons name="camera-outline" size={26} color="#777" />
+                </View>
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.nameInputWrapper}>
+              <Ionicons name="person-outline" size={18} color="#777" />
+              <TextInput
+                placeholder="Enter Name"
+                value={registration.name}
+                onChangeText={handleChange('name')}
+                placeholderTextColor="#888"
+                style={styles.nameInput}
               />
-            ) : (
-              <View style={styles.profilePlaceholder}>
-                <Ionicons name="camera-outline" size={26} color="#777" />
-              </View>
-            )}
-          </TouchableOpacity>
+            </View>
+          </View>
 
-          <View style={styles.nameInputWrapper}>
-            <Ionicons name="person-outline" size={18} color="#777" />
+          <View style={styles.inputRow}>
+            <Ionicons name="mail-outline" size={18} color="#777" />
             <TextInput
-              placeholder="Enter Name"
-              value={registration.name}
-              onChangeText={handleChange('name')}
+              style={styles.inputField}
+              placeholder="Enter Email"
+              value={registration.email}
               placeholderTextColor="#888"
-              style={styles.nameInput}
+              keyboardType="email-address"
+              onChangeText={handleChange('email')}
             />
           </View>
-        </View>
 
-        <View style={styles.inputRow}>
-          <Ionicons name="mail-outline" size={18} color="#777" />
-          <TextInput
-            style={styles.inputField}
-            placeholder="Enter Email"
-            value={registration.email}
-            placeholderTextColor="#888"
-            keyboardType="email-address"
-            onChangeText={handleChange('email')}
-          />
-        </View>
-
-        <View style={styles.inputRow}>
-          <Ionicons name="call-outline" size={18} color="#777" />
-          <TextInput
-            style={styles.inputField}
-            placeholder="Phone"
-            value={registration.phno}
-            keyboardType="phone-pad"
-            placeholderTextColor="#888"
-            onChangeText={handleChange('phno')}
-          />
-        </View>
-
-        <View style={styles.inputRow}>
-          <Ionicons name="lock-closed-outline" size={18} color="#777" />
-          <TextInput
-            style={styles.inputField}
-            placeholder="Password"
-            secureTextEntry={!showPassword}
-            value={registration.password}
-            placeholderTextColor="#888"
-            onChangeText={handleChange('password')}
-          />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <Ionicons
-              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-              size={18}
-              color="#777"
+          <View style={styles.inputRow}>
+            <Ionicons name="call-outline" size={18} color="#777" />
+            <TextInput
+              style={styles.inputField}
+              placeholder="Phone"
+              value={registration.phno}
+              keyboardType="phone-pad"
+              placeholderTextColor="#888"
+              onChangeText={handleChange('phno')}
             />
-          </TouchableOpacity>
-        </View>
+          </View>
 
-        <View style={styles.locationRow}>
-          <View style={styles.locationLeft}>
-            <Ionicons name="location-outline" size={20} color="#777" />
-            <TouchableOpacity onPress={handleUseLocation}>
-              <Text style={styles.locationText}>Use my location</Text>
+          <View style={styles.inputRow}>
+            <Ionicons name="lock-closed-outline" size={18} color="#777" />
+            <TextInput
+              style={styles.inputField}
+              placeholder="Password"
+              secureTextEntry={!showPassword}
+              value={registration.password}
+              placeholderTextColor="#888"
+              onChangeText={handleChange('password')}
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Ionicons
+                name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                size={18}
+                color="#777"
+              />
             </TouchableOpacity>
+          </View>
+
+          <View style={styles.locationRow}>
+            <View style={styles.locationLeft}>
+              <Ionicons name="location-outline" size={20} color="#777" />
+              <TouchableOpacity onPress={handleUseLocation}>
+                <Text style={styles.locationText}>Use my location</Text>
+              </TouchableOpacity>
+            </View>
+
+            {showLocationFields && (
+              <TouchableOpacity
+                style={styles.clearBtn}
+                onPress={() => setShowLocationFields(false)}
+              >
+                <Text style={styles.clearText}>Clear</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {showLocationFields && (
-            <TouchableOpacity
-              style={styles.clearBtn}
-              onPress={() => setShowLocationFields(false)}
-            >
-              <Text style={styles.clearText}>Clear</Text>
-            </TouchableOpacity>
+            <>
+              <View style={styles.locationInputsRow}>
+                <TextInput
+                  style={[styles.input, styles.smallInput]}
+                  placeholder="Pincode"
+                  keyboardType="numeric"
+                  placeholderTextColor="#888"
+                  onChangeText={handleChange('pincode')}
+                />
+
+                <TextInput
+                  style={[styles.input, styles.smallInput]}
+                  placeholder="City/Town"
+                  placeholderTextColor="#888"
+                  onChangeText={handleChange('city')}
+                />
+              </View>
+
+              <TextInput
+                style={styles.input}
+                placeholder="Landmark"
+                placeholderTextColor="#888"
+                onChangeText={handleChange('landmark')}
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Address"
+                placeholderTextColor="#888"
+                value={registration.address}
+                onChangeText={handleChange('address')}
+              />
+            </>
           )}
+
+          <TouchableOpacity
+            style={{ marginTop: 20 }}
+            onPress={() => navigation.navigate('Login')}
+          >
+            <Text style={styles.backLogin}>Back to Log in</Text>
+          </TouchableOpacity>
+        </ScrollView>
+
+        {/* CONTINUE */}
+        <View style={styles.continueFixed}>
+          <TouchableOpacity style={styles.continueBtn} onPress={handleContinue}>
+            <Text style={styles.continueText}>Continue</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color="#fff"
+              style={styles.arrowIcon}
+            />
+          </TouchableOpacity>
         </View>
-
-        {showLocationFields && (
-          <>
-            <View style={styles.locationInputsRow}>
-              <TextInput
-                style={[styles.input, styles.smallInput]}
-                placeholder="Pincode"
-                keyboardType="numeric"
-                placeholderTextColor="#888"
-                onChangeText={handleChange('pincode')}
-              />
-
-              <TextInput
-                style={[styles.input, styles.smallInput]}
-                placeholder="City/Town"
-                placeholderTextColor="#888"
-                onChangeText={handleChange('city')}
-              />
-            </View>
-
-            <TextInput
-              style={styles.input}
-              placeholder="Landmark"
-              placeholderTextColor="#888"
-              onChangeText={handleChange('landmark')}
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Address"
-              placeholderTextColor="#888"
-              value={registration.address}
-              onChangeText={handleChange('address')}
-            />
-          </>
-        )}
-
-        <TouchableOpacity
-          style={{ marginTop: 20 }}
-          onPress={() => navigation.navigate('Login')}
-        >
-          <Text style={styles.backLogin}>Back to Log in</Text>
-        </TouchableOpacity>
-      </ScrollView>
-
-      {/* CONTINUE */}
-      <View style={styles.continueFixed}>
-        <TouchableOpacity style={styles.continueBtn} onPress={handleContinue}>
-          <Text style={styles.continueText}>Continue</Text>
-          <Ionicons
-            name="chevron-forward"
-            size={20}
-            color="#fff"
-            style={styles.arrowIcon}
-          />
-        </TouchableOpacity>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

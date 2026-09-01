@@ -6,6 +6,9 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
 import { showError, showSuccess } from "../../utils/toast";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -48,50 +51,65 @@ export default function ForgotPasswordScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.centerWrapper}>
-
-        <View style={styles.logoContainer}>
-          <Image source={Logo} style={styles.logo} />
-        </View>
-
-        <Text style={styles.description}>
-          Enter your registered email address below. We’ll send you a code to reset your password.
-        </Text>
-        <Text style={styles.label}>Email</Text>
-        <View style={styles.inputWrapper}>
-          <Icon name="mail-outline" size={20} color="#8D8D8D" />
-          <TextInput
-            placeholder="Enter Email"
-            placeholderTextColor="#999"
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            returnKeyType="done"
-            onSubmitEditing={handleContinue}
-          />
-        </View>
-        <TouchableOpacity
-          style={styles.continueBtn}
-          onPress={handleContinue}
-          disabled={loading}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            paddingBottom: 20,
+          }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <>
-              <Text style={styles.continueText}>Continue</Text>
-              <ArrowIcon name="chevron-right" size={22} color="#fff" />
-            </>
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.backToLogin}>
-            Back to <Text style={styles.loginText}>Log in</Text>
-          </Text>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.centerWrapper}>
+
+            <View style={styles.logoContainer}>
+              <Image source={Logo} style={styles.logo} />
+            </View>
+
+            <Text style={styles.description}>
+              Enter your registered email address below. We’ll send you a code to reset your password.
+            </Text>
+            <Text style={styles.label}>Email</Text>
+            <View style={styles.inputWrapper}>
+              <Icon name="mail-outline" size={20} color="#8D8D8D" />
+              <TextInput
+                placeholder="Enter Email"
+                placeholderTextColor="#999"
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                returnKeyType="done"
+                onSubmitEditing={handleContinue}
+              />
+            </View>
+            <TouchableOpacity
+              style={styles.continueBtn}
+              onPress={handleContinue}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <>
+                  <Text style={styles.continueText}>Continue</Text>
+                  <ArrowIcon name="chevron-right" size={22} color="#fff" />
+                </>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+              <Text style={styles.backToLogin}>
+                Back to <Text style={styles.loginText}>Log in</Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
     </SafeAreaView>
   );
