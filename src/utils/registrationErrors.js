@@ -1,10 +1,11 @@
-const DUPLICATE_EMAIL_REGEX = /(email).*(already|exist|taken|registered)|(already|exist|taken|registered).*(email)/i;
-const DUPLICATE_PHONE_REGEX = /(phno|phone|mobile|number).*(already|exist|taken|registered)|(already|exist|taken|registered).*(phno|phone|mobile|number)/i;
+const DUPLICATE_EMAIL_REGEX = /(email).*(already|exist|taken|registered|unique|integrityerror)|(already|exist|taken|registered|unique|integrityerror).*(email)/i;
+const DUPLICATE_PHONE_REGEX = /(phno|phone|mobile|number).*(already|exist|taken|registered|unique|integrityerror)|(already|exist|taken|registered|unique|integrityerror).*(phno|phone|mobile|number)/i;
 const GENERIC_API_MESSAGES = [
   /^validation failed$/i,
   /^login failed$/i,
   /^registration failed$/i,
   /^request failed$/i,
+  /integrityerror/i,
 ];
 
 const isPlainObject = (value) =>
@@ -91,29 +92,20 @@ export const hasPhoneFieldError = (payload) =>
 
 export const isDuplicateEmailError = (payload) => {
   const emailMessages = getEmailMessages(payload);
-
   if (emailMessages.some((message) => DUPLICATE_EMAIL_REGEX.test(message))) {
     return true;
   }
-
-  return collectMessages(payload).some(
-    (message) =>
-      /email/i.test(message) && DUPLICATE_EMAIL_REGEX.test(message)
-  );
+  const rawString = typeof payload === "string" ? payload : JSON.stringify(payload || {});
+  return /email/i.test(rawString) && DUPLICATE_EMAIL_REGEX.test(rawString);
 };
 
 export const isDuplicatePhoneError = (payload) => {
   const phoneMessages = getFieldMessages(payload, ["phno", "phone", "mobile"]);
-
   if (phoneMessages.some((message) => DUPLICATE_PHONE_REGEX.test(message))) {
     return true;
   }
-
-  return collectMessages(payload).some(
-    (message) =>
-      /(phno|phone|mobile|number)/i.test(message) &&
-      DUPLICATE_PHONE_REGEX.test(message)
-  );
+  const rawString = typeof payload === "string" ? payload : JSON.stringify(payload || {});
+  return /(phno|phone|mobile|number)/i.test(rawString) && DUPLICATE_PHONE_REGEX.test(rawString);
 };
 
 export const extractApiFieldErrors = (payload) => {
@@ -128,12 +120,18 @@ export const extractApiFieldErrors = (payload) => {
       const message = collectMessages(value)[0];
       const label = FIELD_LABELS[field] || field.replace(/_/g, " ");
 
+      let cleanMessage = message;
+      if (DUPLICATE_PHONE_REGEX.test(message) || /(phno|phone|mobile)/i.test(field)) {
+        cleanMessage = "This phone number is already registered. Please enter a different phone number or log in.";
+      } else if (DUPLICATE_EMAIL_REGEX.test(message) || field === "email") {
+        cleanMessage = "This email address is already registered. Please enter a different email address or log in.";
+      } else if (GENERIC_API_MESSAGES.some((pattern) => pattern.test(message))) {
+        cleanMessage = `${label} is invalid`;
+      }
+
       return {
         field,
-        message:
-          message && !GENERIC_API_MESSAGES.some((pattern) => pattern.test(message))
-            ? message
-            : `${label} is invalid`,
+        message: cleanMessage,
       };
     });
 };
@@ -142,13 +140,33 @@ export const extractApiErrorMessage = (
   payload,
   fallback = "Something went wrong"
 ) => {
+  const rawString = typeof payload === "string" ? payload : JSON.stringify(payload || {});
+
+  if (/(phno|phone|mobile)/i.test(rawString) && /(already|exist|taken|registered|unique|integrityerror)/i.test(rawString)) {
+    return "This phone number is already registered. Please enter a different phone number or log in.";
+  }
+
+  if (/(email)/i.test(rawString) && /(already|exist|taken|registered|unique|integrityerror)/i.test(rawString)) {
+    return "This email address is already registered. Please enter a different email address or log in.";
+  }
+
+  if (/integrityerror/i.test(rawString)) {
+    if (/(phno|phone|mobile|number)/i.test(rawString)) {
+      return "This phone number is already registered. Please enter a different phone number or log in.";
+    }
+    if (/email/i.test(rawString)) {
+      return "This email address is already registered. Please enter a different email address or log in.";
+    }
+    return "An account with this phone number or email already exists. Please check your details or log in.";
+  }
+
   const emailMessages = getEmailMessages(payload);
   const duplicateEmailMessage = emailMessages.find((message) =>
     DUPLICATE_EMAIL_REGEX.test(message)
   );
 
   if (duplicateEmailMessage) {
-    return duplicateEmailMessage;
+    return "This email address is already registered. Please enter a different email address or log in.";
   }
 
   const phoneMessages = getFieldMessages(payload, ["phno", "phone", "mobile"]);
@@ -157,7 +175,7 @@ export const extractApiErrorMessage = (
   );
 
   if (duplicatePhoneMessage) {
-    return duplicatePhoneMessage;
+    return "This phone number is already registered. Please enter a different phone number or log in.";
   }
 
   if (emailMessages.length > 0) {
@@ -183,11 +201,11 @@ export const extractApiErrorMessage = (
     return firstUsefulMessage;
   }
 
-  if (typeof payload?.message === "string" && payload.message.trim()) {
+  if (typeof payload?.message === "string" && payload.message.trim() && !/integrityerror/i.test(payload.message)) {
     return payload.message.trim();
   }
 
-  if (typeof payload?.detail === "string" && payload.detail.trim()) {
+  if (typeof payload?.detail === "string" && payload.detail.trim() && !/integrityerror/i.test(payload.detail)) {
     return payload.detail.trim();
   }
 

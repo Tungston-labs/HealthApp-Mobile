@@ -51,7 +51,7 @@ const CommonActionModal = ({
     >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <TouchableWithoutFeedback
           onPress={() => {
@@ -66,6 +66,7 @@ const CommonActionModal = ({
                 justifyContent: "center",
               }}
               keyboardShouldPersistTaps="handled"
+              automaticallyAdjustKeyboardInsets={true}
               showsVerticalScrollIndicator={false}
             >
               <View style={styles.card}>

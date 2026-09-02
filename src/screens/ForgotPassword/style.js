@@ -8,11 +8,9 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 25 * scale,
-    justifyContent: "center", 
   },
 
   centerWrapper: {
-    alignItems: "center", 
     width: "100%",
   },
 

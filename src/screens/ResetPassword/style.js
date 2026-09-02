@@ -8,21 +8,34 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: 24 * scale,
+  },
 
-    justifyContent: "center",   
-    alignItems: "center",      
+  logoContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 30 * scale,
+    marginBottom: 20 * scale,
+    width: "100%",
+  },
+
+  logo: {
+    height: 42 * scale,   
+    width: 170 * scale,  
+    resizeMode: "contain",
   },
 
   title: {
     textAlign: "center",
     fontSize: 14 * scale,
     color: "#555",
-    marginBottom: 35 * scale,
+    marginBottom: 30 * scale,
     lineHeight: 20 * scale,
+    paddingHorizontal: 10 * scale,
   },
 
   inputContainer: {
     width: "100%",
+    alignSelf: "stretch",
     marginBottom: 20 * scale,
   },
 
@@ -41,11 +54,13 @@ export default StyleSheet.create({
     borderColor: "#ccc",
     paddingBottom: 8 * scale,
     gap: 10 * scale,
+    width: "100%",
+    alignSelf: "stretch",
   },
 
   input: {
     flex: 1,
-    fontSize: 14 * scale,
+    fontSize: 15 * scale,
     paddingVertical: 6 * scale,
     color: "#333",
   },
@@ -61,14 +76,14 @@ export default StyleSheet.create({
     paddingHorizontal: 18 * scale,
     borderRadius: 25 * scale,
 
-    width: 180 * scale,
+    width: 200 * scale,
     elevation: 4,
     shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 3 },
 
-    marginTop: 10 * scale,
+    marginTop: 15 * scale,
   },
 
   resetText: {
@@ -82,6 +97,7 @@ export default StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginTop: 25 * scale,
+    marginBottom: 20 * scale,
   },
 
   back: {
@@ -94,13 +110,4 @@ export default StyleSheet.create({
     color: "#020202",
     fontWeight: "700",
   },
-  logoContainer: {
-        alignItems: "center",
-        marginBottom: 40 * scale,
-    },
-
-    logo: {
-        height: 28 * scale,   
-        width: 120 * scale,  
-    },
 });

@@ -18,8 +18,9 @@ import { launchImageLibrary } from "react-native-image-picker";
 import ProfileHeader from "../../components/ProfileHeader";
 import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
 import styles from "./styles";
-import { getCurrentLocation } from "../../utils/location";
+import { getCurrentLocation, checkLocationPermission, requestLocationPermission } from "../../utils/location";
 import { reverseGeocode } from "../../utils/reverseGeocode";
+import LocationDisclosureModal from "../../components/LocationDisclosureModal";
 
 import {
   updateProfileThunk,
@@ -31,6 +32,7 @@ const EditProfile = ({ navigation, route }) => {
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [fetchingLocation, setFetchingLocation] = useState(false);
+  const [showDisclosureModal, setShowDisclosureModal] = useState(false);
 
   const { profileData } = route.params || {};
 
@@ -86,7 +88,8 @@ const EditProfile = ({ navigation, route }) => {
       }
     );
   };
-  const handleUseLocation = async () => {
+
+  const fetchLocationData = async () => {
     if (fetchingLocation) return;
     setFetchingLocation(true);
     try {
@@ -107,6 +110,28 @@ const EditProfile = ({ navigation, route }) => {
       setFetchingLocation(false);
     }
   };
+
+  const handleUseLocation = async () => {
+    const hasPermission = await checkLocationPermission();
+    if (hasPermission) {
+      fetchLocationData();
+    } else {
+      setShowDisclosureModal(true);
+    }
+  };
+
+  const handleAcceptDisclosure = async () => {
+    setShowDisclosureModal(false);
+    const granted = await requestLocationPermission();
+    if (granted) {
+      fetchLocationData();
+    }
+  };
+
+  const handleCancelDisclosure = () => {
+    setShowDisclosureModal(false);
+  };
+
 
 
 
@@ -212,12 +237,13 @@ const EditProfile = ({ navigation, route }) => {
       <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <ScrollView
           style={styles.container}
           keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={true}
           contentContainerStyle={{ paddingBottom: 40 }}
         >
           {/* ✅ WORKING PROFILE HEADER */}
@@ -337,8 +363,14 @@ const EditProfile = ({ navigation, route }) => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      <LocationDisclosureModal
+        visible={showDisclosureModal}
+        onAccept={handleAcceptDisclosure}
+        onCancel={handleCancelDisclosure}
+      />
     </View>
   );
 };
+
 
 export default EditProfile;

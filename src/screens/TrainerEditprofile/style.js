@@ -38,7 +38,7 @@ export default StyleSheet.create({
   },
 
   col: {
-    width: "48%",
+    width: "68%",
   },
 
   locationBtn: {

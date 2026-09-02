@@ -55,7 +55,7 @@ const handleSubmit = async () => {
     >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.overlay}>
@@ -65,6 +65,7 @@ const handleSubmit = async () => {
                 justifyContent: "center",
               }}
               keyboardShouldPersistTaps="handled"
+              automaticallyAdjustKeyboardInsets={true}
               showsVerticalScrollIndicator={false}
             >
               <View style={styles.modalContainer}>

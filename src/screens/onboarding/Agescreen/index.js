@@ -12,7 +12,8 @@ const months = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
 ];
-const years = Array.from({ length: 50 }, (_, i) => 1980 + i);
+const currentYear = new Date().getFullYear();
+const years = Array.from({ length: currentYear - 1950 + 1 }, (_, i) => 1950 + i);
 
 export default function AgeScreen() {
   const dispatch = useDispatch();

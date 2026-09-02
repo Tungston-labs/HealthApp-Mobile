@@ -12,8 +12,9 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import styles, { pickerSelectStyles } from './style';
-import { getCurrentLocation } from '../../utils/location';
+import { getCurrentLocation, checkLocationPermission, requestLocationPermission } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
+import LocationDisclosureModal from '../../components/LocationDisclosureModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerTrainerThunk } from '../../redux/slices/trainerRegistrationSlice';
 import { launchImageLibrary } from 'react-native-image-picker';
@@ -30,7 +31,8 @@ export default function CreateAccountScreen({ navigation }) {
   const [sectionOpen, setSectionOpen] = useState(false);
 
   const { loading, error, success } = useSelector(state => state.trainerReg);
-  const [isUploading, setIsUploading] = useState(false); const [name, setName] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phno, setPhno] = useState('');
   const [dob, setDob] = useState('');
@@ -45,15 +47,17 @@ export default function CreateAccountScreen({ navigation }) {
   const [aadhaarImage, setAadhaarImage] = useState(null);
   const [genderOpen, setGenderOpen] = useState(false);
   const [genderValue, setGenderValue] = useState('');
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [pincode, setPincode] = useState("");
-  const [landmark, setLandmark] = useState("");
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [pincode, setPincode] = useState('');
+  const [landmark, setLandmark] = useState('');
   const [coords, setCoords] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [expertiseOpen, setExpertiseOpen] = useState(false);
   const [expertiseValue, setExpertiseValue] = useState('');
   const [plans, setPlans] = useState([]);
+  const [showDisclosureModal, setShowDisclosureModal] = useState(false);
+
   const handlePickProfileImage = () => {
     launchImageLibrary(
       {
@@ -75,22 +79,22 @@ export default function CreateAccountScreen({ navigation }) {
       },
     );
   };
-useEffect(() => {
-  const fetchPlans = async () => {
-    try {
-      const response = await getPlansApi();
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await getPlansApi();
 
-      console.log("Plans API response:", response);
-      console.log("Plans API data:", response.data);
+        console.log('Plans API response:', response);
+        console.log('Plans API data:', response.data);
 
-      setPlans(response.data);
-    } catch (err) {
-      console.log("Plans Error:", err);
-    }
-  };
+        setPlans(response.data);
+      } catch (err) {
+        console.log('Plans Error:', err);
+      }
+    };
 
-  fetchPlans();
-}, []);
+    fetchPlans();
+  }, []);
 
   const handlePickAadhaarImage = () => {
     launchImageLibrary(
@@ -111,37 +115,61 @@ useEffect(() => {
     const testConnection = async () => {
       try {
         const response = await fetch(API_BASE_URL);
-        console.log(" Connection Test Success:", response.status);
+        console.log(' Connection Test Success:', response.status);
       } catch (error) {
-        console.log(" Connection Test Failed. This is a Network Config issue:", error.message);
+        console.log(
+          ' Connection Test Failed. This is a Network Config issue:',
+          error.message,
+        );
       }
     };
     testConnection();
   }, []);
-  const handleUseLocation = async () => {
+
+  const fetchLocationData = async () => {
     try {
       const locationData = await getCurrentLocation();
 
-      // Round to 6 decimal places immediately
       const roundedCoords = {
         latitude: parseFloat(locationData.latitude.toFixed(6)),
         longitude: parseFloat(locationData.longitude.toFixed(6)),
       };
 
-      setCoords(roundedCoords); // Save the cleaned coordinates
+      setCoords(roundedCoords);
 
       const fullAddress = await reverseGeocode(
         roundedCoords.latitude,
-        roundedCoords.longitude
+        roundedCoords.longitude,
       );
 
-      // ... rest of your address logic
       setAddress(fullAddress);
       Toast.show({ type: 'success', text1: 'Location fetched successfully' });
     } catch (err) {
-      console.log("Location error:", err);
+      console.log('Location error:', err);
     }
   };
+
+  const handleUseLocation = async () => {
+    const hasPermission = await checkLocationPermission();
+    if (hasPermission) {
+      fetchLocationData();
+    } else {
+      setShowDisclosureModal(true);
+    }
+  };
+
+  const handleAcceptDisclosure = async () => {
+    setShowDisclosureModal(false);
+    const granted = await requestLocationPermission();
+    if (granted) {
+      fetchLocationData();
+    }
+  };
+
+  const handleCancelDisclosure = () => {
+    setShowDisclosureModal(false);
+  };
+
 
   const handlePickImage = () => {
     launchImageLibrary(
@@ -172,9 +200,23 @@ useEffect(() => {
   };
   const handleSubmit = async () => {
     const validationData = {
-      name, email, phno, dob, genderValue, expertiseValue,
-      aadhaar, password, location, landmark, address, city, pincode,
-      profileImage, aadhaarImage, images, sectionTiming
+      name,
+      email,
+      phno,
+      dob,
+      genderValue,
+      expertiseValue,
+      aadhaar,
+      password,
+      location,
+      landmark,
+      address,
+      city,
+      pincode,
+      profileImage,
+      aadhaarImage,
+      images,
+      sectionTiming,
     };
 
     const check = validateSignup(validationData);
@@ -198,51 +240,56 @@ useEffect(() => {
       }
 
       const formData = new FormData();
-      const finalLocationString = location?.trim() || [landmark, address, city, pincode].filter(Boolean).join(", ");
+      const finalLocationString =
+        location?.trim() ||
+        [landmark, address, city, pincode].filter(Boolean).join(', ');
 
-      formData.append("name", name);
-      formData.append("email", email.toLowerCase().trim());
-      formData.append("phno", phno);
-      formData.append("dob", dob);
-      formData.append("gender", genderValue.toLowerCase());
-      formData.append("password", password);
+      formData.append('name', name);
+      formData.append('email', email.toLowerCase().trim());
+      formData.append('phno', phno);
+      formData.append('dob', dob);
+      formData.append('gender', genderValue.toLowerCase());
+      formData.append('password', password);
 
-      formData.append("location", finalLocationString);
-      formData.append("address", address || "");
-      formData.append("city", city || "");
-      formData.append("pincode", pincode || "");
-      formData.append("landmark", landmark || "");
+      formData.append('location', finalLocationString);
+      formData.append('address', address || '');
+      formData.append('city', city || '');
+      formData.append('pincode', pincode || '');
+      formData.append('landmark', landmark || '');
 
-      formData.append("adar_number", aadhaar);
-      formData.append("section_timing", Number(sectionTiming));
+      formData.append('adar_number', aadhaar);
+      formData.append('section_timing', Number(sectionTiming));
 
       if (coords?.latitude && coords?.longitude) {
-        formData.append("latitude", Number(coords.latitude).toFixed(6));
-        formData.append("longitude", Number(coords.longitude).toFixed(6));
+        formData.append('latitude', Number(coords.latitude).toFixed(6));
+        formData.append('longitude', Number(coords.longitude).toFixed(6));
       }
 
       if (expertiseValue?.id) {
-        formData.append("training_field", expertiseValue.id);
+        formData.append('training_field', expertiseValue.id);
       }
-      formData.append("experience", Number(experience) || 0);
-      formData.append("no_of_section", Number(sessions) || 0);
-      formData.append("expecting_salary", Number(fee) || 0);
+      formData.append('experience', Number(experience) || 0);
+      formData.append('no_of_section', Number(sessions) || 0);
+      formData.append('expecting_salary', Number(fee) || 0);
 
       if (profileImage?.uri) {
-        const fixedUri = Platform.OS === "android"
-          ? (profileImage.uri.startsWith("file://") ? profileImage.uri : `file://${profileImage.uri}`)
-          : profileImage.uri;
+        const fixedUri =
+          Platform.OS === 'android'
+            ? profileImage.uri.startsWith('file://')
+              ? profileImage.uri
+              : `file://${profileImage.uri}`
+            : profileImage.uri;
 
-        formData.append("profile_pic", {
+        formData.append('profile_pic', {
           uri: fixedUri,
           name: profileImage.fileName || `profile_${Date.now()}.jpg`,
-          type: profileImage.type || "image/jpeg",
+          type: profileImage.type || 'image/jpeg',
         });
       }
 
-      if (adarImageUrl) formData.append("adar_image", adarImageUrl);
+      if (adarImageUrl) formData.append('adar_image', adarImageUrl);
       certUrls.forEach(url => {
-        formData.append("certificates[]", url);
+        formData.append('certificates[]', url);
       });
 
       await dispatch(registerTrainerThunk(formData)).unwrap();
@@ -253,11 +300,10 @@ useEffect(() => {
         text2: 'Trainer Registered Successfully!',
       });
 
-      navigation.reset({ index: 0, routes: [{ name: "ThankYouScreen" }] });
-
+      navigation.reset({ index: 0, routes: [{ name: 'ThankYouScreen' }] });
     } catch (err) {
-      console.log("REGISTRATION ERROR:", err);
-      let errorMessage = "Something went wrong";
+      console.log('REGISTRATION ERROR:', err);
+      let errorMessage = 'Something went wrong';
 
       if (typeof err === 'string') {
         errorMessage = err;
@@ -266,7 +312,9 @@ useEffect(() => {
       } else if (typeof err === 'object') {
         const values = Object.values(err);
         if (values.length > 0) {
-          errorMessage = Array.isArray(values[0]) ? values[0][0] : JSON.stringify(values[0]);
+          errorMessage = Array.isArray(values[0])
+            ? values[0][0]
+            : JSON.stringify(values[0]);
         }
       }
 
@@ -276,7 +324,6 @@ useEffect(() => {
         text2: errorMessage,
         visibilityTime: 5000,
       });
-
     } finally {
       setIsUploading(false);
     }
@@ -285,346 +332,358 @@ useEffect(() => {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 120 }}
+          contentContainerStyle={{ paddingBottom: 60 }}
           keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={true}
           showsVerticalScrollIndicator={false}
         >
-        <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={28} color="#000" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Create an account</Text>
-        </View>
-
-        {/* Profile Row */}
-        <View style={styles.profileRow}>
-          <TouchableOpacity onPress={handlePickProfileImage}>
-            {profileImage ? (
-              <Image
-                source={{ uri: profileImage.uri }}
-                style={styles.profileImage}
-              />
-            ) : (
-              <View style={styles.profilePlaceholder}>
-                <Ionicons name="camera-outline" size={28} color="#888" />
-                <Text style={styles.placeholderText}>Add Photo</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-
-          <TextInput
-            placeholder="Enter Name"
-            value={name}
-            onChangeText={setName}
-            placeholderTextColor="#888"
-            style={styles.inputUnderline}
-          />
-        </View>
-
-        <View style={styles.twoColRow}>
-          <View style={styles.iconInputRowSmall}>
-            <Ionicons name="mail-outline" size={20} color="#666" />
-            <TextInput
-              placeholder="Enter Email"
-              placeholderTextColor="#888"
-              value={email}
-              onChangeText={setEmail}
-              style={styles.inputFlex}
-            />
+          <View style={styles.headerRow}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="chevron-back" size={28} color="#000" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Create an account</Text>
           </View>
 
-          <View style={styles.iconInputRowSmall}>
-            <Ionicons name="call-outline" size={20} color="#666" />
-            <TextInput
-              placeholder="Ph number"
-              placeholderTextColor="#888"
-              style={styles.inputFlex}
-              value={phno}
-              onChangeText={setPhno}
-            />
-          </View>
-        </View>
-
-        <View style={styles.addressInputRow}>
-          <TouchableOpacity
-            style={styles.dropdownRow}
-            onPress={() => setGenderOpen(!genderOpen)}
-          >
-            <Text style={styles.dropdownText}>{genderValue || 'Gender'}</Text>
-            <Ionicons name="chevron-down" size={20} color="#444" />
-          </TouchableOpacity>
-
-          {genderOpen && (
-            <View style={styles.dropdownList}>
-              {['Male', 'Female', 'Other'].map(g => (
-                <TouchableOpacity
-                  key={g}
-                  onPress={() => {
-                    setGenderValue(g);
-                    setGenderOpen(false);
-                  }}
-                  style={styles.dropdownItem}
-                >
-                  <Text style={styles.dropdownItemText}>{g}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-        </View>
-
-        <View style={styles.addressInputRow}>
-          <TouchableOpacity
-            style={styles.dropdownRow}
-            onPress={() => setExpertiseOpen(!expertiseOpen)}
-          >
-            <Text style={styles.dropdownText}>
-              {expertiseValue?.plan_name || "Expertise"}            </Text>
-            <Ionicons name="chevron-down" size={20} color="#444" />
-          </TouchableOpacity>
-
-          {expertiseOpen && (
-            <View style={styles.dropdownList}>
-              {plans.map(plan => (
-                <TouchableOpacity
-                  key={plan.id}
-                  onPress={() => {
-                    setExpertiseValue(plan);
-                    setExpertiseOpen(false);
-                  }}
-                  style={styles.dropdownItem}
-                >
-                  <Text style={styles.dropdownItemText}>
-                    {plan.plan_name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-        </View>
-
-        <View style={styles.iconInputRow}>
-          <DOBPicker value={dob} onChange={setDob} />
-        </View>
-
-        <View style={styles.iconInputRow}>
-          <Ionicons name="document-outline" size={20} color="#666" />
-
-          <TextInput
-            placeholder="Aadhaar Number"
-            placeholderTextColor="#888"
-            style={styles.inputFlex}
-            value={aadhaar}
-            onChangeText={setAadhaar}
-          />
-
-          <TouchableOpacity
-            style={styles.uploadButton}
-            onPress={handlePickAadhaarImage}
-          >
-            <Ionicons name="cloud-upload-outline" size={18} color="#fff" />
-            <Text style={styles.uploadBtnText}>Upload</Text>
-          </TouchableOpacity>
-        </View>
-
-        {aadhaarImage && (
-          <View style={{ marginTop: 10 }}>
-            <View style={styles.uploadImageCard}>
-              <TouchableOpacity
-                style={styles.deleteBadge}
-                onPress={() => setAadhaarImage(null)}
-              >
-                <Ionicons name="close" size={16} color="#ffffff" />
-              </TouchableOpacity>
-
-              <Image
-                source={{ uri: aadhaarImage.uri }}
-                style={styles.uploadPreviewImg}
-              />
-            </View>
-          </View>
-        )}
-
-
-        <TouchableOpacity
-          style={styles.useLocationBtn}
-          onPress={handleUseLocation}
-        >
-          <Text style={styles.useLocationText}>Use my location</Text>
-        </TouchableOpacity>
-
-        <View style={styles.twoColRow}>
-          <TextInput
-            placeholder="Enter pincode"
-            placeholderTextColor="#888"
-            style={styles.inputUnderline}
-            value={pincode}
-            onChangeText={setPincode}
-            keyboardType="numeric"
-          />
-
-          <TextInput
-            placeholder="City/Town"
-            placeholderTextColor="#888"
-            style={styles.inputUnderline}
-            value={city}
-            onChangeText={setCity}
-          />
-        </View>
-
-        <View style={styles.addressInputRow}>
-          <TextInput
-            placeholder="Landmark"
-            placeholderTextColor="#888"
-            style={styles.inputUnderline}
-            value={landmark}
-            onChangeText={setLandmark}
-          />
-          <TextInput
-            placeholder="Address"
-            placeholderTextColor="#888"
-            style={styles.inputUnderline}
-            value={address}
-            onChangeText={setAddress}
-            multiline
-          />
-        </View>
-        <View style={styles.twoColRow}>
-
-          {/* SECTION TIMING */}
-          <View style={{ flex: 1, position: "relative" }}>
-            <TouchableOpacity
-              style={styles.dropdownRow}
-              onPress={() => setSectionOpen(!sectionOpen)}
-            >
-              <Text
-                style={[
-                  styles.dropdownText,
-                  sectionTiming && { color: "#000" }
-                ]}
-              >
-                {sectionTiming ? `${sectionTiming} min` : "Section timing"}
-              </Text>
+          {/* Profile Row */}
+          <View style={styles.profileRow}>
+            <TouchableOpacity onPress={handlePickProfileImage}>
+              {profileImage ? (
+                <Image
+                  source={{ uri: profileImage.uri }}
+                  style={styles.profileImage}
+                />
+              ) : (
+                <View style={styles.profilePlaceholder}>
+                  <Ionicons name="camera-outline" size={28} color="#888" />
+                  <Text style={styles.placeholderText}>Add Photo</Text>
+                </View>
+              )}
             </TouchableOpacity>
 
-            {sectionOpen && (
+            <TextInput
+              placeholder="Enter Name"
+              value={name}
+              onChangeText={setName}
+              placeholderTextColor="#888"
+              style={styles.inputUnderline}
+            />
+          </View>
+
+          <View style={styles.twoColRow}>
+            <View style={styles.iconInputRowSmall}>
+              <Ionicons name="mail-outline" size={20} color="#666" />
+              <TextInput
+                placeholder="Enter Email"
+                placeholderTextColor="#888"
+                value={email}
+                onChangeText={setEmail}
+                style={styles.inputFlex}
+              />
+            </View>
+
+            <View style={styles.iconInputRowSmall}>
+              <Ionicons name="call-outline" size={20} color="#666" />
+              <TextInput
+                placeholder="Ph number"
+                placeholderTextColor="#888"
+                style={styles.inputFlex}
+                value={phno}
+                onChangeText={setPhno}
+              />
+            </View>
+          </View>
+
+          <View style={styles.addressInputRow}>
+            <TouchableOpacity
+              style={styles.dropdownRow}
+              onPress={() => setGenderOpen(!genderOpen)}
+            >
+              <Text style={styles.dropdownText}>{genderValue || 'Gender'}</Text>
+              <Ionicons name="chevron-down" size={20} color="#444" />
+            </TouchableOpacity>
+
+            {genderOpen && (
               <View style={styles.dropdownList}>
-                {["15", "20", "30", "45", "60"].map(t => (
+                {['Male', 'Female', 'Other'].map(g => (
                   <TouchableOpacity
-                    key={t}
-                    style={styles.dropdownItem}
+                    key={g}
                     onPress={() => {
-                      setSectionTiming(t);
-                      setSectionOpen(false);
+                      setGenderValue(g);
+                      setGenderOpen(false);
                     }}
+                    style={styles.dropdownItem}
                   >
-                    <Text style={styles.dropdownItemText}>{t} min</Text>
+                    <Text style={styles.dropdownItemText}>{g}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
             )}
           </View>
 
-          {/* EXPERIENCE (WILL NOT MOVE) */}
-          <TextInput
-            placeholder="Experience (yr)"
-            value={experience}
-            onChangeText={setExperience}
-            keyboardType="numeric"
-            style={[styles.inputUnderline, { flex: 1 }]}
-          />
+          <View style={styles.addressInputRow}>
+            <TouchableOpacity
+              style={styles.dropdownRow}
+              onPress={() => setExpertiseOpen(!expertiseOpen)}
+            >
+              <Text style={styles.dropdownText}>
+                {expertiseValue?.plan_name || 'Expertise'}{' '}
+              </Text>
+              <Ionicons name="chevron-down" size={20} color="#444" />
+            </TouchableOpacity>
 
-        </View>
+            {expertiseOpen && (
+              <View style={styles.dropdownList}>
+                {plans.map(plan => (
+                  <TouchableOpacity
+                    key={plan.id}
+                    onPress={() => {
+                      setExpertiseValue(plan);
+                      setExpertiseOpen(false);
+                    }}
+                    style={styles.dropdownItem}
+                  >
+                    <Text style={styles.dropdownItemText}>
+                      {plan.plan_name}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </View>
 
+          <View style={styles.iconInputRow}>
+            <DOBPicker value={dob} onChange={setDob} />
+          </View>
 
+          <View style={styles.iconInputRow}>
+            <Ionicons name="document-outline" size={20} color="#666" />
 
-        <View style={styles.twoColRow}>
-          <TextInput
-            placeholder="No of session"
-            value={sessions}
-            onChangeText={setSessions}
-            style={styles.inputUnderline}
-          />
-          <TextInput
-            placeholder="Fee / Session"
-            value={fee}
-            onChangeText={setFee}
-            style={styles.inputUnderline}
-          />
-        </View>
-        <View style={styles.passwordRow}>
-          <TextInput
-            placeholder="Enter password"
-            placeholderTextColor="#888"
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
-            style={[styles.inputUnderline, { flex: 1, marginBottom: 0 }]}
-          />
-
-          <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
-          >
-            <Ionicons
-              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-              size={22}
-              color="#666"
+            <TextInput
+              placeholder="Aadhaar Number"
+              placeholderTextColor="#888"
+              style={styles.inputFlex}
+              value={aadhaar}
+              onChangeText={setAadhaar}
             />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.uploadContainer}>
-          <Text style={styles.uploadTitle}>Upload Certificates </Text>
 
-          <View style={styles.uploadBox}>
             <TouchableOpacity
               style={styles.uploadButton}
-              onPress={handlePickImage}
+              onPress={handlePickAadhaarImage}
             >
               <Ionicons name="cloud-upload-outline" size={18} color="#fff" />
               <Text style={styles.uploadBtnText}>Upload</Text>
             </TouchableOpacity>
-            <Text style={styles.uploadHelper}>Click to choose images</Text>
           </View>
 
-          <View style={styles.uploadImagesRow}>
-            {images.map((item, i) => (
-              <View key={i} style={styles.uploadImageCard}>
+          {aadhaarImage && (
+            <View style={{ marginTop: 10 }}>
+              <View style={styles.uploadImageCard}>
                 <TouchableOpacity
                   style={styles.deleteBadge}
-                  onPress={() => handleRemoveImage(i)}
+                  onPress={() => setAadhaarImage(null)}
                 >
-                  <Ionicons name="close" size={16} color="#fff" />
+                  <Ionicons name="close" size={16} color="#ffffff" />
                 </TouchableOpacity>
 
                 <Image
-                  source={{ uri: item.uri }}
+                  source={{ uri: aadhaarImage.uri }}
                   style={styles.uploadPreviewImg}
                 />
               </View>
-            ))}
-          </View>
-        </View>
-      </ScrollView>
-      {error && (
-        <Text style={{ color: 'red', textAlign: 'center' }}>{error}</Text>
-      )}
+            </View>
+          )}
 
-      <View style={styles.footerBtnWrapper}>
-        <TouchableOpacity
-          style={styles.continueBtn}
-          disabled={loading}
-          onPress={handleSubmit}
-        >
-          <Text style={styles.continueText}>
-            {loading ? 'Submitting...' : 'Save & Continue'}
-          </Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={styles.useLocationBtn}
+            onPress={handleUseLocation}
+          >
+            <Text style={styles.useLocationText}>Use my location</Text>
+          </TouchableOpacity>
+
+          <View style={styles.twoColRow}>
+            <TextInput
+              placeholder="Enter pincode"
+              placeholderTextColor="#888"
+              style={styles.inputUnderline}
+              value={pincode}
+              onChangeText={setPincode}
+              keyboardType="numeric"
+            />
+
+            <TextInput
+              placeholder="City/Town"
+              placeholderTextColor="#888"
+              style={styles.inputUnderline}
+              value={city}
+              onChangeText={setCity}
+            />
+          </View>
+
+          <View style={styles.addressInputRow}>
+            <TextInput
+              placeholder="Landmark"
+              placeholderTextColor="#888"
+              style={styles.inputUnderline}
+              value={landmark}
+              onChangeText={setLandmark}
+            />
+            <TextInput
+              placeholder="Address"
+              placeholderTextColor="#888"
+              style={styles.inputUnderline}
+              value={address}
+              onChangeText={setAddress}
+              multiline
+            />
+          </View>
+          <View style={styles.twoColRow}>
+            {/* SECTION TIMING */}
+            <View style={{ flex: 1, position: 'relative' }}>
+              <TouchableOpacity
+                style={styles.dropdownRow}
+                onPress={() => setSectionOpen(!sectionOpen)}
+              >
+                <Text
+                  style={[
+                    styles.dropdownText,
+                    sectionTiming && { color: '#000' },
+                  ]}
+                >
+                  {sectionTiming ? `${sectionTiming} min` : 'Section timing'}
+                </Text>
+              </TouchableOpacity>
+
+              {sectionOpen && (
+                <View style={styles.dropdownList}>
+                  {['15', '20', '30', '45', '60'].map(t => (
+                    <TouchableOpacity
+                      key={t}
+                      style={styles.dropdownItem}
+                      onPress={() => {
+                        setSectionTiming(t);
+                        setSectionOpen(false);
+                      }}
+                    >
+                      <Text style={styles.dropdownItemText}>{t} min</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+
+            {/* EXPERIENCE (WILL NOT MOVE) */}
+            <TextInput
+              placeholder="Experience (yr)"
+              value={experience}
+              placeholderTextColor="#888"
+              onChangeText={setExperience}
+              keyboardType="numeric"
+              style={[styles.inputUnderline, { flex: 1 }]}
+            />
+          </View>
+
+          <View style={styles.twoColRow}>
+            <TextInput
+              placeholder="No of session"
+              value={sessions}
+              placeholderTextColor="#888"
+              onChangeText={setSessions}
+              style={styles.inputUnderline}
+            />
+            <TextInput
+              placeholder="Fee / Session"
+              placeholderTextColor="#888"
+              value={fee}
+              onChangeText={setFee}
+              style={styles.inputUnderline}
+            />
+          </View>
+          <View style={styles.passwordRow}>
+            <TextInput
+              placeholder="Enter password"
+              placeholderTextColor="#888"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+              style={[styles.inputUnderline, { flex: 1, marginBottom: 0 }]}
+            />
+
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Ionicons
+                name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                size={22}
+                color="#666"
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.uploadContainer}>
+            <Text style={styles.uploadTitle}>Upload Certificates </Text>
+
+            <View style={styles.uploadBox}>
+              <TouchableOpacity
+                style={styles.uploadButton}
+                onPress={handlePickImage}
+              >
+                <Ionicons name="cloud-upload-outline" size={18} color="#fff" />
+                <Text style={styles.uploadBtnText}>Upload</Text>
+              </TouchableOpacity>
+              <Text style={styles.uploadHelper}>Click to choose images</Text>
+            </View>
+
+            <View style={styles.uploadImagesRow}>
+              {images.map((item, i) => (
+                <View key={i} style={styles.uploadImageCard}>
+                  <TouchableOpacity
+                    style={styles.deleteBadge}
+                    onPress={() => handleRemoveImage(i)}
+                  >
+                    <Ionicons name="close" size={16} color="#fff" />
+                  </TouchableOpacity>
+
+                  <Image
+                    source={{ uri: item.uri }}
+                    style={styles.uploadPreviewImg}
+                  />
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {error && (
+            <Text style={{ color: 'red', textAlign: 'center', marginTop: 10 }}>
+              {error}
+            </Text>
+          )}
+
+          <View
+            style={[
+              styles.footerBtnWrapper,
+              { marginTop: 20, marginBottom: 20 },
+            ]}
+          >
+            <TouchableOpacity
+              style={styles.continueBtn}
+              disabled={loading}
+              onPress={handleSubmit}
+            >
+              <Text style={styles.continueText}>
+                {loading ? 'Submitting...' : 'Save & Continue'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
+      <LocationDisclosureModal
+        visible={showDisclosureModal}
+        onAccept={handleAcceptDisclosure}
+        onCancel={handleCancelDisclosure}
+      />
     </SafeAreaView>
   );
 }
+

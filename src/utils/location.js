@@ -1,21 +1,42 @@
 import { PermissionsAndroid, Platform } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 
-export const getCurrentLocation = async () => {
+export const checkLocationPermission = async () => {
+  if (Platform.OS === 'android') {
+    const granted = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    return granted;
+  }
+  return true;
+};
+
+export const requestLocationPermission = async () => {
   if (Platform.OS === 'android') {
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
       {
         title: 'Location Permission',
-        message: 'App needs access to your location',
+        message: 'Fitsapio needs access to your location to show nearby trainers and gyms.',
         buttonNeutral: 'Ask Me Later',
         buttonNegative: 'Cancel',
         buttonPositive: 'OK',
       },
     );
 
-    if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-      throw new Error('Location permission denied');
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  }
+  return true;
+};
+
+export const getCurrentLocation = async () => {
+  if (Platform.OS === 'android') {
+    const hasPermission = await checkLocationPermission();
+    if (!hasPermission) {
+      const granted = await requestLocationPermission();
+      if (!granted) {
+        throw new Error('Location permission denied');
+      }
     }
   }
 

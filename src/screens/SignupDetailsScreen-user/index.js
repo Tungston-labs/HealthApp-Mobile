@@ -14,8 +14,9 @@ import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateRegistration } from '../../redux/slices/registrationSlice';
 import styles from './style';
-import { getCurrentLocation } from '../../utils/location';
+import { getCurrentLocation, checkLocationPermission, requestLocationPermission } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
+import LocationDisclosureModal from '../../components/LocationDisclosureModal';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { validateSignup, validateUserStep2 } from '../../utils/Validators';
 import { showError, showSuccess } from '../../utils/toast';
@@ -32,6 +33,7 @@ export default function SignupDetailsScreenUser() {
   const [showLocationFields, setShowLocationFields] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [location, setLocation] = useState('');
+  const [showDisclosureModal, setShowDisclosureModal] = useState(false);
 
   const handleChange = field => value => {
     dispatch(updateRegistration({ [field]: value }));
@@ -66,7 +68,7 @@ export default function SignupDetailsScreenUser() {
     });
   };
 
-  const handleUseLocation = async () => {
+  const fetchLocationData = async () => {
     try {
       const coords = await getCurrentLocation();
       const latitude = Number(coords.latitude.toFixed(6));
@@ -98,19 +100,41 @@ export default function SignupDetailsScreenUser() {
     }
   };
 
+  const handleUseLocation = async () => {
+    const hasPermission = await checkLocationPermission();
+    if (hasPermission) {
+      fetchLocationData();
+    } else {
+      setShowDisclosureModal(true);
+    }
+  };
+
+  const handleAcceptDisclosure = async () => {
+    setShowDisclosureModal(false);
+    const granted = await requestLocationPermission();
+    if (granted) {
+      fetchLocationData();
+    }
+  };
+
+  const handleCancelDisclosure = () => {
+    setShowDisclosureModal(false);
+  };
+
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
         <ScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={true}
           contentContainerStyle={{
             flexGrow: 1,
-            justifyContent: 'center',
-            paddingBottom: 120,
+            paddingBottom: 40,
           }}
         >
           <Image source={Logo} style={styles.logo} />
@@ -241,27 +265,33 @@ export default function SignupDetailsScreenUser() {
             </>
           )}
 
+          {/* CONTINUE BUTTON INSIDE SCROLLVIEW */}
+          <View style={{ alignItems: 'flex-end', marginTop: 15, marginBottom: 10 }}>
+            <TouchableOpacity style={styles.continueBtn} onPress={handleContinue}>
+              <Text style={styles.continueText}>Continue</Text>
+              <Ionicons
+                name="chevron-forward"
+                size={20}
+                color="#fff"
+                style={styles.arrowIcon}
+              />
+            </TouchableOpacity>
+          </View>
+
           <TouchableOpacity
-            style={{ marginTop: 20 }}
+            style={{ marginTop: 10, marginBottom: 20 }}
             onPress={() => navigation.navigate('Login')}
           >
             <Text style={styles.backLogin}>Back to Log in</Text>
           </TouchableOpacity>
         </ScrollView>
-
-        {/* CONTINUE */}
-        <View style={styles.continueFixed}>
-          <TouchableOpacity style={styles.continueBtn} onPress={handleContinue}>
-            <Text style={styles.continueText}>Continue</Text>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color="#fff"
-              style={styles.arrowIcon}
-            />
-          </TouchableOpacity>
-        </View>
       </KeyboardAvoidingView>
+      <LocationDisclosureModal
+        visible={showDisclosureModal}
+        onAccept={handleAcceptDisclosure}
+        onCancel={handleCancelDisclosure}
+      />
     </SafeAreaView>
   );
 }
+

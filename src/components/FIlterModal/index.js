@@ -11,7 +11,8 @@ import CalendarPicker from './CalendarPicker';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAvailableTrainersThunk } from '../../redux/slices/trainerPlanSlice';
-import { getCurrentLocation } from '../../utils/location';
+import { getCurrentLocation, checkLocationPermission, requestLocationPermission } from '../../utils/location';
+import LocationDisclosureModal from '../LocationDisclosureModal';
 
 const getTodayDate = () => {
   const today = new Date();
@@ -60,6 +61,8 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [resolvingLocation, setResolvingLocation] = useState(false);
   const [attemptedLocationLookup, setAttemptedLocationLookup] = useState(false);
+  const [showDisclosureModal, setShowDisclosureModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -98,15 +101,40 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
     }
   }, []);
 
+  const triggerLocationWithDisclosure = useCallback(async (action) => {
+    const hasPermission = await checkLocationPermission();
+    if (hasPermission) {
+      return action();
+    }
+    setPendingAction(() => action);
+    setShowDisclosureModal(true);
+  }, []);
+
+  const handleAcceptDisclosure = async () => {
+    setShowDisclosureModal(false);
+    const granted = await requestLocationPermission();
+    if (granted && pendingAction) {
+      pendingAction();
+    }
+    setPendingAction(null);
+  };
+
+  const handleCancelDisclosure = () => {
+    setShowDisclosureModal(false);
+    setPendingAction(null);
+  };
+
   const resolveSearchLocation = useCallback(async ({ showAlert = false } = {}) => {
     if (currentLocation) {
       return currentLocation;
     }
 
-    const liveLocation = await fetchDeviceLocation();
-
-    if (liveLocation) {
-      return liveLocation;
+    const hasPermission = await checkLocationPermission();
+    if (hasPermission) {
+      const liveLocation = await fetchDeviceLocation();
+      if (liveLocation) {
+        return liveLocation;
+      }
     }
 
     if (storedLocation) {
@@ -124,6 +152,11 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
   }, [currentLocation, fetchDeviceLocation, storedLocation]);
 
   const refreshDeviceLocation = useCallback(async () => {
+    const hasPermission = await checkLocationPermission();
+    if (!hasPermission) {
+      if (storedLocation) return storedLocation;
+      return null;
+    }
     const liveLocation = await fetchDeviceLocation();
 
     if (!liveLocation && storedLocation) {
@@ -166,6 +199,7 @@ useEffect(() => {
   attemptedLocationLookup,
   refreshDeviceLocation,
 ]);
+
 
 useEffect(() => {
   console.log("TODAY:", getTodayDate());
@@ -330,8 +364,14 @@ useEffect(() => {
           </View>
         </View>
       </View>
+      <LocationDisclosureModal
+        visible={showDisclosureModal}
+        onAccept={handleAcceptDisclosure}
+        onCancel={handleCancelDisclosure}
+      />
     </Modal>
   );
 };
+
 
 export default FilterModal;

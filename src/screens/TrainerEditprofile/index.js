@@ -17,8 +17,9 @@ import { launchImageLibrary } from "react-native-image-picker";
 import ProfileHeader from "../../components/ProfileHeader";
 import BackgroundCurve from "../../components/ProfileHeader/BackgroundCurve";
 import { updateTrainerProfileThunk } from "../../redux/slices/trainerProfileSlice";
-import { getCurrentLocation } from "../../utils/location";
+import { getCurrentLocation, checkLocationPermission, requestLocationPermission } from "../../utils/location";
 import { reverseGeocodeFull } from "../../utils/reverseGeocode";
+import LocationDisclosureModal from "../../components/LocationDisclosureModal";
 import styles from "./style";
 
 const TrainerEditProfile = ({ navigation }) => {
@@ -31,8 +32,7 @@ const TrainerEditProfile = ({ navigation }) => {
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [fetchingLocation, setFetchingLocation] = useState(false);
-
-
+  const [showDisclosureModal, setShowDisclosureModal] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -67,8 +67,7 @@ const TrainerEditProfile = ({ navigation }) => {
     });
   };
 
-
-  const useMyLocation = async () => {
+  const fetchLocationData = async () => {
     if (fetchingLocation) return;
 
     setFetchingLocation(true);
@@ -104,6 +103,28 @@ const TrainerEditProfile = ({ navigation }) => {
       setFetchingLocation(false);
     }
   };
+
+  const useMyLocation = async () => {
+    const hasPermission = await checkLocationPermission();
+    if (hasPermission) {
+      fetchLocationData();
+    } else {
+      setShowDisclosureModal(true);
+    }
+  };
+
+  const handleAcceptDisclosure = async () => {
+    setShowDisclosureModal(false);
+    const granted = await requestLocationPermission();
+    if (granted) {
+      fetchLocationData();
+    }
+  };
+
+  const handleCancelDisclosure = () => {
+    setShowDisclosureModal(false);
+  };
+
 
 
 
@@ -186,13 +207,14 @@ const TrainerEditProfile = ({ navigation }) => {
       <BackgroundCurve circleMultiplier={3.2} imageCenterY={150} />
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <ScrollView
           style={styles.container}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={true}
           contentContainerStyle={styles.scrollContent}
         >
 
@@ -328,8 +350,14 @@ const TrainerEditProfile = ({ navigation }) => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      <LocationDisclosureModal
+        visible={showDisclosureModal}
+        onAccept={handleAcceptDisclosure}
+        onCancel={handleCancelDisclosure}
+      />
     </View>
   );
 };
+
 
 export default TrainerEditProfile;

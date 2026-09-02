@@ -18,8 +18,9 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import TrainerInfoCard from "../TrainerInfoCard";
 import { verifyChangeTrainerPayment } from "../../services/trainerServices";
-import { getCurrentLocation } from "../../utils/location";
+import { getCurrentLocation, checkLocationPermission, requestLocationPermission } from "../../utils/location";
 import { reverseGeocode } from "../../utils/reverseGeocode";
+import LocationDisclosureModal from "../LocationDisclosureModal";
 
 const workoutOptions = ["Single", "Couple", "Group"];
 
@@ -39,6 +40,7 @@ const TrainerBookingModal = ({
   const [selected, setSelected] = useState("Single");
   const [address, setAddress] = useState("");
   const [fetchingLocation, setFetchingLocation] = useState(false);
+  const [showDisclosureModal, setShowDisclosureModal] = useState(false);
 
   const { loading, data, error } = useSelector(
     (state) => state.trainerDetail
@@ -87,7 +89,7 @@ const TrainerBookingModal = ({
     }
   }, [visible, user]);
 
-  const handleFetchLocation = async () => {
+  const fetchLocationData = async () => {
     setFetchingLocation(true);
     try {
       const coords = await getCurrentLocation();
@@ -111,6 +113,28 @@ const TrainerBookingModal = ({
       setFetchingLocation(false);
     }
   };
+
+  const handleFetchLocation = async () => {
+    const hasPermission = await checkLocationPermission();
+    if (hasPermission) {
+      fetchLocationData();
+    } else {
+      setShowDisclosureModal(true);
+    }
+  };
+
+  const handleAcceptDisclosure = async () => {
+    setShowDisclosureModal(false);
+    const granted = await requestLocationPermission();
+    if (granted) {
+      fetchLocationData();
+    }
+  };
+
+  const handleCancelDisclosure = () => {
+    setShowDisclosureModal(false);
+  };
+
 
   const amount = useMemo(() => {
     if (!data && !trainer) return 0;
@@ -334,6 +358,11 @@ const TrainerBookingModal = ({
           )}
         </KeyboardAvoidingView>
       </View>
+      <LocationDisclosureModal
+        visible={showDisclosureModal}
+        onAccept={handleAcceptDisclosure}
+        onCancel={handleCancelDisclosure}
+      />
     </Modal>
   );
 };

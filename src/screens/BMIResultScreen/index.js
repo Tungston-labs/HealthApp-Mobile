@@ -8,9 +8,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { registerClientThunk, resetClientState } from "../../redux/slices/clientSlice";
 import { resetRegistration } from "../../redux/slices/registrationSlice";
 import { setAuth } from "../../redux/slices/authSlice";
-import { getCurrentLocation } from "../../utils/location";
+import { clearWeeklySessions } from "../../redux/slices/UpcomingSessionSlice";
+import { getCurrentLocation, checkLocationPermission, requestLocationPermission } from "../../utils/location";
 import { reverseGeocode } from "../../utils/reverseGeocode";
+import LocationDisclosureModal from "../../components/LocationDisclosureModal";
 import { validateUserStep1 } from "../../utils/Validators";
+
 
 const WIZARD_FIELD_STEPS = {
   gender: 1,
@@ -53,6 +56,9 @@ export default function BMIResultScreen({ navigation }) {
   const { loading, registered } = useSelector(
     (state) => state.client
   );
+
+  const [showDisclosureModal, setShowDisclosureModal] = React.useState(false);
+
 
   const showRegistrationIssue = (message, target = {}) => {
     Toast.show({
@@ -104,7 +110,8 @@ export default function BMIResultScreen({ navigation }) {
 
   const getBackendErrorTarget = (err) => {
     const field = err?.fieldErrors?.[0]?.field;
-    const message = err?.fieldErrors?.[0]?.message || err?.message || err;
+    const rawMessage = typeof err === "string" ? err : err?.message || err?.errorMessage || (typeof err === "object" ? JSON.stringify(err) : "");
+    const message = err?.fieldErrors?.[0]?.message || (typeof err?.message === "string" ? err.message : rawMessage);
 
     if (field) {
       if (BASIC_DETAIL_FIELDS.includes(field)) {
@@ -116,18 +123,19 @@ export default function BMIResultScreen({ navigation }) {
       }
     }
 
-    if (/email|phone|mobile|phno/i.test(String(message))) {
+    if (/email|phone|mobile|phno|exist|already|registered|integrityerror/i.test(rawMessage)) {
       return { message, target: { screen: "basic" } };
     }
 
     return {
       message:
         err?.status === 400 && !err?.fieldErrors?.length
-          ? "Registration failed. The server did not return field-specific validation details."
+          ? "Registration failed. Please check your account details."
           : message,
-      target: {},
+      target: { screen: "basic" },
     };
   };
+
 
   const weightInKg =
     weightUnit === "LBS" ? weight * 0.453592 : weight;
@@ -257,23 +265,13 @@ export default function BMIResultScreen({ navigation }) {
 
 
 
-const handleFinalSubmit = async () => {
-  // Ensure we send latitude/longitude if available — try to fetch device location when missing
-  let regData = { ...registration };
-
-  const validation = validateFinalRegistration(regData);
-  if (!validation.ok) {
-    showRegistrationIssue(validation.msg, validation.target);
-    return;
-  }
-
+const processFinalSubmit = async (regData) => {
   if (!regData.latitude || !regData.longitude) {
     try {
       const coords = await getCurrentLocation();
       regData.latitude = coords.latitude;
       regData.longitude = coords.longitude;
 
-      // Only fill address when it's empty to avoid overwriting user-entered address
       if (!regData.address) {
         try {
           regData.address = await reverseGeocode(coords.latitude, coords.longitude);
@@ -281,18 +279,9 @@ const handleFinalSubmit = async () => {
           console.log('Reverse geocode failed:', e?.message || e);
         }
       }
-    }  catch (err) {
-  console.log("========== REGISTRATION ERROR ==========");
-  console.log("ERROR:", err);
-  console.log("STATUS:", err?.status);
-  console.log("RESPONSE STATUS:", err?.response?.status);
-  console.log("RESPONSE DATA:", err?.response?.data);
-  console.log("RESPONSE HEADERS:", err?.response?.headers);
-  console.log("========================================");
-
-  const { message, target } = getBackendErrorTarget(err);
-  showRegistrationIssue(message, target);
-}
+    } catch (err) {
+      console.log('Location fetch skipped/failed during registration');
+    }
   }
 
   const typedAddress = [
@@ -320,6 +309,8 @@ const handleFinalSubmit = async () => {
     const user = res?.user;
     const access = res?.access;
 
+    dispatch(clearWeeklySessions());
+
     if (user && access) {
       dispatch(setAuth({ user, access }));
     }
@@ -334,6 +325,39 @@ const handleFinalSubmit = async () => {
     showRegistrationIssue(message, target);
   }
 };
+
+
+const handleFinalSubmit = async () => {
+  let regData = { ...registration };
+
+  const validation = validateFinalRegistration(regData);
+  if (!validation.ok) {
+    showRegistrationIssue(validation.msg, validation.target);
+    return;
+  }
+
+  if (!regData.latitude || !regData.longitude) {
+    const hasPermission = await checkLocationPermission();
+    if (!hasPermission) {
+      setShowDisclosureModal(true);
+      return;
+    }
+  }
+
+  await processFinalSubmit(regData);
+};
+
+const handleAcceptDisclosure = async () => {
+  setShowDisclosureModal(false);
+  await requestLocationPermission();
+  await processFinalSubmit({ ...registration });
+};
+
+const handleCancelDisclosure = () => {
+  setShowDisclosureModal(false);
+  processFinalSubmit({ ...registration });
+};
+
 
 
 useEffect(() => {
@@ -503,6 +527,11 @@ if (!weight || !height) {
         )}
       </TouchableOpacity>
 
+      <LocationDisclosureModal
+        visible={showDisclosureModal}
+        onAccept={handleAcceptDisclosure}
+        onCancel={handleCancelDisclosure}
+      />
     </View>
   );
 }

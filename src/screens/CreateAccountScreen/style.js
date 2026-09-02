@@ -78,6 +78,7 @@ export default StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#898989",
     paddingVertical: 16,
+    color: "#000000",
     fontSize: 15,
     fontFamily: "Segoe UI",
   },
