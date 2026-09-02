@@ -11,7 +11,9 @@ import CalendarPicker from './CalendarPicker';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAvailableTrainersThunk } from '../../redux/slices/trainerPlanSlice';
+import { normalizeSlotDays, normalizeTime24 } from '../../services/trainerServices';
 import { getCurrentLocation, checkLocationPermission, requestLocationPermission } from '../../utils/location';
+
 import LocationDisclosureModal from '../LocationDisclosureModal';
 
 const getTodayDate = () => {
@@ -231,12 +233,13 @@ useEffect(() => {
     try {
       const payload = {
         plan_id: planId,
-        slot_days: selectedSlot.split(',').map(d => d.toLowerCase()),
-        time: convertTo24Hour(selectedTime),
+        slot_days: normalizeSlotDays(selectedSlot),
+        time: normalizeTime24(selectedTime),
         start_date: selectedDate,
         latitude: location.latitude,
         longitude: location.longitude,
       };
+
 
       console.log('🔥 FINAL PAYLOAD:', payload);
 

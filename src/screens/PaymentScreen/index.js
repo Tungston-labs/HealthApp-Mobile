@@ -21,6 +21,8 @@ import { fetchTrainerDetailThunk } from "../../redux/slices/trainerDetailSlice";
 import {
   createChangeTrainerOrder,
   verifyChangeTrainerPayment,
+  normalizeSlotDays,
+  normalizeTime24,
 } from "../../services/trainerServices";
 import {
   createTrainerBookingOrder,
@@ -36,17 +38,23 @@ const PaymentScreen = ({ navigation, route }) => {
     old_trainer_id,
     trainerId,
     plan_id,
-    booking_type,
+    booking_type = "single",
     amount = 0,
     address,
   } = route.params || {};
+
   console.log("PAYMENT PARAMS =>", route.params);
   const filters = useSelector((state) => state.trainer.filters);
-  const { start_date, time, slot_days } = filters || {};
+
+  const getTodayDate = () => new Date().toISOString().split("T")[0];
+  const start_date = filters?.start_date || route.params?.start_date || getTodayDate();
+  const time = normalizeTime24(filters?.time || route.params?.time || "10:00");
+  const slot_days = normalizeSlotDays(filters?.slot_days || route.params?.slot_days || ["mon", "wed", "fri"]);
+
 
   const { loading, data } = useSelector((state) => state.trainerDetail);
 
-  const [selectedMethod, setSelectedMethod] = useState("razorpay");
+  const [selectedMethod] = useState("razorpay");
   const [showSuccess, setShowSuccess] = useState(false);
   const [paying, setPaying] = useState(false);
   const [orderRequired, setOrderRequired] = useState(true);
@@ -70,35 +78,30 @@ const PaymentScreen = ({ navigation, route }) => {
         return;
       }
 
-      if (mode === "book" && (!booking_type || !start_date || !time || !slot_days?.length)) {
-        showError("Booking details missing", "Please select date, slot, and time again.");
-        return;
-      }
-
       setPaying(true);
 
-      let res;
+      let orderData = route.params?.preCreatedOrder;
 
-      if (mode === "change") {
-        res = await createChangeTrainerOrder({
-          old_trainer_id,
-          new_trainer_id,
-          plan_id,
-        });
-      }
-      // 🆕 NEW BOOKING FLOW
-      else {
-        // 🆕 NEW BOOKING FLOW
-        res = await createTrainerBookingOrder({
-          trainer_id: paymentTrainerId,
-          plan_id,
-          booking_type,
-          start_date,
-          time,
-          slot_days,
-          address,
-        });
-
+      if (!orderData) {
+        let res;
+        if (mode === "change") {
+          res = await createChangeTrainerOrder({
+            old_trainer_id,
+            new_trainer_id,
+            plan_id,
+          });
+        } else {
+          res = await createTrainerBookingOrder({
+            trainer_id: paymentTrainerId,
+            plan_id,
+            booking_type,
+            start_date,
+            time,
+            slot_days,
+            address: address || "Not provided",
+          });
+        }
+        orderData = res?.data;
       }
 
       const {
@@ -106,7 +109,8 @@ const PaymentScreen = ({ navigation, route }) => {
         order_id,
         amount: backend_amount,
         key,
-      } = res?.data || {};
+      } = orderData || {};
+
 
       setOrderRequired(order_required);
 
@@ -164,7 +168,7 @@ const PaymentScreen = ({ navigation, route }) => {
           start_date,
           time,
           slot_days,
-          address,
+          address: address || "Not provided",
         });
       }
 
@@ -172,9 +176,16 @@ const PaymentScreen = ({ navigation, route }) => {
     } catch (err) {
       console.log("❌ PAYMENT ERROR:", err?.response?.data || err.message || err);
 
-      let msg = "Please try again";
-      if (err?.response?.data) {
-        msg = err.response.data.error || err.response.data.message || err.response.data.detail || msg;
+      let msg = "Payment failed. Please try again.";
+      const backendData = err?.response?.data;
+
+      if (backendData) {
+        msg =
+          backendData.error ||
+          backendData.message ||
+          backendData.detail ||
+          backendData.non_field_errors?.[0] ||
+          (typeof backendData === "string" ? backendData : msg);
       } else if (err?.description) {
         msg = err.description;
       } else if (err?.message) {
@@ -183,7 +194,7 @@ const PaymentScreen = ({ navigation, route }) => {
         msg = err;
       }
 
-      showError("Payment failed", msg);
+      showError("Booking Failed", msg);
     } finally {
       setPaying(false);
     }

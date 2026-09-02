@@ -49,18 +49,58 @@ export const registerTrainerApi = async (formData) => {
 
 
 
+export const mapDayTo3Letter = (day) => {
+  if (!day) return "mon";
+  const str = String(day).trim().toLowerCase();
+  if (str.startsWith("mon")) return "mon";
+  if (str.startsWith("tue")) return "tue";
+  if (str.startsWith("wed")) return "wed";
+  if (str.startsWith("thu")) return "thu";
+  if (str.startsWith("fri")) return "fri";
+  if (str.startsWith("sat")) return "sat";
+  if (str.startsWith("sun")) return "sun";
+  return str.slice(0, 3);
+};
+
+export const normalizeSlotDays = (slotDays) => {
+  if (!slotDays) return ["mon", "wed", "fri"];
+  let rawList = [];
+  if (typeof slotDays === "string") {
+    rawList = slotDays.split(",");
+  } else if (Array.isArray(slotDays)) {
+    rawList = slotDays;
+  }
+  const result = rawList.map(mapDayTo3Letter).filter(Boolean);
+  return result.length > 0 ? result : ["mon", "wed", "fri"];
+};
+
+export const normalizeTime24 = (timeStr) => {
+  if (!timeStr) return "10:00";
+  let str = String(timeStr).trim();
+  if (str.includes(" ")) {
+    const [t, modifier] = str.split(" ");
+    let [h, m] = t.split(":").map(Number);
+    if (modifier?.toUpperCase() === "PM" && h < 12) h += 12;
+    if (modifier?.toUpperCase() === "AM" && h === 12) h = 0;
+    return `${String(h).padStart(2, "0")}:${String(m || 0).padStart(2, "0")}`;
+  }
+  const parts = str.split(":");
+  if (parts.length >= 2) {
+    const h = String(parts[0]).padStart(2, "0");
+    const m = String(parts[1]).padStart(2, "0");
+    return `${h}:${m}`;
+  }
+  return "10:00";
+};
+
 export const fetchAvailableTrainersAPI = async (payload) => {
-  // Normalize payload to avoid platform-specific formatting issues
   const normalized = { ...payload };
 
   if (normalized.slot_days) {
-    if (typeof normalized.slot_days === 'string') {
-      normalized.slot_days = normalized.slot_days
-        .split(',')
-        .map(s => s.trim().toLowerCase());
-    } else if (Array.isArray(normalized.slot_days)) {
-      normalized.slot_days = normalized.slot_days.map(s => String(s).trim().toLowerCase());
-    }
+    normalized.slot_days = normalizeSlotDays(normalized.slot_days);
+  }
+  if (normalized.time) {
+    normalized.time = normalizeTime24(normalized.time);
   }
 
   console.log('➡️ POST trainer/available-trainers/ payload:', JSON.stringify(normalized));
@@ -74,6 +114,7 @@ export const fetchAvailableTrainersAPI = async (payload) => {
     throw err;
   }
 };
+
 
 export const getTrainerDetailService = (trainerId) => {
   return api.get(`detail/${trainerId}/`);

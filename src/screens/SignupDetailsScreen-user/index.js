@@ -8,12 +8,14 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateRegistration } from '../../redux/slices/registrationSlice';
 import styles from './style';
+import { publicApi } from '../../services/api';
 import { getCurrentLocation, checkLocationPermission, requestLocationPermission } from '../../utils/location';
 import { reverseGeocode } from '../../utils/reverseGeocode';
 import LocationDisclosureModal from '../../components/LocationDisclosureModal';
@@ -23,6 +25,7 @@ import { showError, showSuccess } from '../../utils/toast';
 import { validateUserStep1 } from '../../utils/Validators';
 import { Image } from 'react-native';
 import Logo from '../../Images/logo.png';
+
 
 export default function SignupDetailsScreenUser() {
   const navigation = useNavigation();
@@ -34,12 +37,13 @@ export default function SignupDetailsScreenUser() {
   const [showPassword, setShowPassword] = useState(false);
   const [location, setLocation] = useState('');
   const [showDisclosureModal, setShowDisclosureModal] = useState(false);
+  const [checking, setChecking] = useState(false);
 
   const handleChange = field => value => {
     dispatch(updateRegistration({ [field]: value }));
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     const result = validateUserStep1(registration);
 
     if (!result.ok) {
@@ -47,8 +51,64 @@ export default function SignupDetailsScreenUser() {
       return;
     }
 
+    setChecking(true);
+    try {
+      const emailVal = registration.email?.toLowerCase()?.trim();
+      const phoneVal = registration.phno?.trim();
+
+      const checkData = new FormData();
+      checkData.append('name', registration.name || 'Check User');
+      checkData.append('email', emailVal);
+      checkData.append('phno', phoneVal);
+      checkData.append('password', registration.password || 'Test1234');
+      checkData.append('gender', 'male');
+      checkData.append('dob', '2000-01-01');
+      checkData.append('age', '24');
+      checkData.append('blood_group', 'O+');
+      checkData.append('wellness_goal', 'Fitness');
+      checkData.append('health_issues', 'None');
+      checkData.append('height', '170');
+      checkData.append('weight', '70');
+
+      const res = await publicApi.post('client/register/', checkData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }).catch(err => err.response);
+
+      console.log('STEP 1 DIRECT PRE-CHECK RESPONSE:', res?.status, res?.data);
+
+      const payload = res?.data;
+      const rawStr = JSON.stringify(payload || {});
+
+      if (res?.status === 400 || res?.status === 409 || res?.status === 500) {
+        if (/email/i.test(rawStr) && /(already|exist|taken|registered|unique|integrityerror)/i.test(rawStr)) {
+          showError('Email Already Exists', 'This email address is already registered. Please enter a different email address or log in.');
+          setChecking(false);
+          return;
+        }
+
+        if (/(phno|phone|mobile)/i.test(rawStr) && /(already|exist|taken|registered|unique|integrityerror)/i.test(rawStr)) {
+          showError('Phone Number Already Exists', 'This phone number is already registered. Please enter a different phone number or log in.');
+          setChecking(false);
+          return;
+        }
+
+        if (/integrityerror/i.test(rawStr)) {
+          showError('Account Already Exists', 'An account with this email address or phone number is already registered. Please check your details or log in.');
+          setChecking(false);
+          return;
+        }
+      }
+    } catch (err) {
+      console.log('Pre-check error:', err);
+    } finally {
+      setChecking(false);
+    }
+
     navigation.navigate('MainWizardScreen');
   };
+
+
+
 
   const handlePickProfileImage = async () => {
     launchImageLibrary({ mediaType: 'photo', quality: 0.7 }, response => {
@@ -267,16 +327,27 @@ export default function SignupDetailsScreenUser() {
 
           {/* CONTINUE BUTTON INSIDE SCROLLVIEW */}
           <View style={{ alignItems: 'flex-end', marginTop: 15, marginBottom: 10 }}>
-            <TouchableOpacity style={styles.continueBtn} onPress={handleContinue}>
-              <Text style={styles.continueText}>Continue</Text>
-              <Ionicons
-                name="chevron-forward"
-                size={20}
-                color="#fff"
-                style={styles.arrowIcon}
-              />
+            <TouchableOpacity 
+              style={[styles.continueBtn, checking && { opacity: 0.6 }]} 
+              onPress={handleContinue}
+              disabled={checking}
+            >
+              {checking ? (
+                <ActivityIndicator size="small" color="#fff" style={{ marginHorizontal: 10 }} />
+              ) : (
+                <>
+                  <Text style={styles.continueText}>Continue</Text>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={20}
+                    color="#fff"
+                    style={styles.arrowIcon}
+                  />
+                </>
+              )}
             </TouchableOpacity>
           </View>
+
 
           <TouchableOpacity
             style={{ marginTop: 10, marginBottom: 20 }}

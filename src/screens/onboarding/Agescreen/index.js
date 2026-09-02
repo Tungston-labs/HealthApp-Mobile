@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
+import { View, Text, FlatList } from "react-native";
 import styles from "./style";
 import { useDispatch, useSelector } from "react-redux";
 import { updateRegistration } from "../../../redux/slices/registrationSlice";
@@ -29,6 +29,30 @@ export default function AgeScreen() {
   const [selectedYear, setSelectedYear] = useState(null);
   const [age, setAge] = useState(0);
   const [touched, setTouched] = useState(false);
+
+  // Restore prefilled selection if registration.dob exists in Redux
+  useEffect(() => {
+    if (registration.dob && selectedDay === null) {
+      const parts = registration.dob.split('-');
+      if (parts.length === 3) {
+        const yVal = parseInt(parts[0], 10);
+        const mVal = parseInt(parts[1], 10) - 1;
+        const dVal = parseInt(parts[2], 10);
+
+        const dIdx = days.indexOf(dVal);
+        const yIdx = years.indexOf(yVal);
+
+        if (dIdx !== -1) setSelectedDay(dIdx);
+        if (mVal >= 0 && mVal < 12) setSelectedMonth(mVal);
+        if (yIdx !== -1) setSelectedYear(yIdx);
+        if (registration.age) setAge(registration.age);
+        setTouched(true);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [registration.dob]);
+
+
   useEffect(() => {
     if (
       selectedDay === null ||
@@ -110,6 +134,8 @@ export default function AgeScreen() {
           decelerationRate="fast"
           contentContainerStyle={{ paddingVertical: PADDING }}
           showsVerticalScrollIndicator={false}
+          initialScrollIndex={selectedDay !== null ? selectedDay : 0}
+          getItemLayout={(_, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })}
           onMomentumScrollEnd={(e) =>
             onScrollEnd(e, setSelectedDay, days.length)
           }
@@ -118,7 +144,6 @@ export default function AgeScreen() {
           }
         />
 
-
         <FlatList
           data={months}
           style={styles.wheel}
@@ -126,6 +151,8 @@ export default function AgeScreen() {
           decelerationRate="fast"
           contentContainerStyle={{ paddingVertical: PADDING }}
           showsVerticalScrollIndicator={false}
+          initialScrollIndex={selectedMonth !== null ? selectedMonth : 0}
+          getItemLayout={(_, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })}
           onMomentumScrollEnd={(e) =>
             onScrollEnd(e, setSelectedMonth, months.length)
           }
@@ -141,6 +168,8 @@ export default function AgeScreen() {
           decelerationRate="fast"
           contentContainerStyle={{ paddingVertical: PADDING }}
           showsVerticalScrollIndicator={false}
+          initialScrollIndex={selectedYear !== null ? selectedYear : 0}
+          getItemLayout={(_, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })}
           onMomentumScrollEnd={(e) =>
             onScrollEnd(e, setSelectedYear, years.length)
           }

@@ -25,7 +25,7 @@ const TrainerListScreen = () => {
     mode = "book",
     planId,
     trainerId,
-    isFiltered = false, // indicates if we came from filtered search
+    isFiltered = false,
   } = route.params || {};
 
   const [selectedTrainer, setSelectedTrainer] = useState(null);
@@ -40,27 +40,42 @@ const TrainerListScreen = () => {
 
   // ---------------- REDUX STATE ----------------
   const reduxState = useSelector((state) => {
-    // ✅ updated to match store registration
     if (mode === "book") return state.trainer || {};
     if (mode === "change") return state.trainerChange || {};
     return {};
   });
 
-  const { trainers = [], plan, loading, error } = reduxState;
-  const trainersList = Array.isArray(trainers) ? trainers : [];
+  const { trainers = [], plan, loading, error, filters } = reduxState;
+  const rawTrainersList = Array.isArray(trainers) ? trainers : [];
+
+  // Filter out any trainers booked/unavailable for the selected slot
+  const trainersList = rawTrainersList.filter((t) => {
+    if (t.is_available === false || t.is_booked_for_slot === true || t.is_booked === true) {
+      return false;
+    }
+    return true;
+  });
 
   // ---------------- FETCH LOGIC ----------------
   useEffect(() => {
-    // Fetch unfiltered trainers if we are booking and not coming from filter
     if (mode === "book" && !isFiltered && planId) {
-      dispatch(fetchAvailableTrainersThunk({ plan_id: planId }));
+      const payload = { plan_id: planId };
+      if (filters) {
+        if (filters.slot_days) payload.slot_days = filters.slot_days;
+        if (filters.time) payload.time = filters.time;
+        if (filters.start_date) payload.start_date = filters.start_date;
+        if (filters.latitude) payload.latitude = filters.latitude;
+        if (filters.longitude) payload.longitude = filters.longitude;
+      }
+      dispatch(fetchAvailableTrainersThunk(payload));
     }
 
     if (mode === "change" && trainerId) {
       dispatch(resetTrainerChange());
       dispatch(fetchChangeTrainerThunk(trainerId));
     }
-  }, [dispatch, mode, planId, trainerId, isFiltered]);
+  }, [dispatch, mode, planId, trainerId, isFiltered, filters]);
+
 
   // ---------------- ACTIONS ----------------
   const handleBookNow = (trainer) => {
@@ -96,6 +111,12 @@ const TrainerListScreen = () => {
             {getErrorMessage(error)}
           </Text>
         </View>
+      ) : trainersList.length === 0 ? (
+        <View style={{ alignItems: "center", marginTop: 50, paddingHorizontal: 20 }}>
+          <Text style={{ fontSize: 16, color: "#666", textAlign: "center" }}>
+            No available trainers found for the selected time slot. Please try selecting a different session time or day.
+          </Text>
+        </View>
       ) : (
         <FlatList
           data={trainersList}
@@ -121,7 +142,6 @@ const TrainerListScreen = () => {
         mode={mode}
         oldTrainerId={trainerId}
       />
-
     </View>
   );
 };

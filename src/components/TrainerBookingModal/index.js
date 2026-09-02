@@ -17,7 +17,9 @@ import styles from "./styles";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import TrainerInfoCard from "../TrainerInfoCard";
-import { verifyChangeTrainerPayment } from "../../services/trainerServices";
+import { createChangeTrainerOrder, verifyChangeTrainerPayment, fetchAvailableTrainersAPI, normalizeSlotDays, normalizeTime24 } from "../../services/trainerServices";
+import { createTrainerBookingOrder } from "../../services/paymentServices";
+
 import { getCurrentLocation, checkLocationPermission, requestLocationPermission } from "../../utils/location";
 import { reverseGeocode } from "../../utils/reverseGeocode";
 import LocationDisclosureModal from "../LocationDisclosureModal";
@@ -34,8 +36,9 @@ const TrainerBookingModal = ({
   mode,
   oldTrainerId,
 }) => {
-
   const navigation = useNavigation();
+  const filters = useSelector((state) => state.trainer?.filters);
+
 
   const [selected, setSelected] = useState("Single");
   const [address, setAddress] = useState("");
@@ -49,15 +52,19 @@ const TrainerBookingModal = ({
 
   const route = useRoute()
   const bookingMode = mode || "book";
-  const displayTrainer =
-    bookingMode === "change"
-      ? trainer
-      : data || trainer;
+  const displayTrainer = useMemo(() => {
+    if (bookingMode === "change") return trainer;
+    if (data && Object.keys(data).length > 0) {
+      return { ...(trainer || {}), ...data };
+    }
+    return trainer;
+  }, [bookingMode, trainer, data]);
 
   const selectedTrainerId =
     bookingMode === "change"
       ? trainer?.id
       : trainer?.id || trainerId || data?.id;
+
 
   const selectedPlanId =
     plan?.id ||
@@ -137,25 +144,30 @@ const TrainerBookingModal = ({
 
 
   const amount = useMemo(() => {
-    if (!data && !trainer) return 0;
+    if (!displayTrainer) return 0;
 
     if (bookingMode === "change") {
-      // Use price_difference from backend
-      return Math.abs(Number(trainer?.price_difference || 0));
+      return Math.abs(Number(displayTrainer?.price_difference || 0));
     }
 
-    // Book mode → use selected type from trainerDetail
+    const singleP = displayTrainer?.single_price ?? displayTrainer?.price ?? trainer?.single_price ?? data?.single_price ?? 0;
+    const coupleP = displayTrainer?.couple_price ?? trainer?.couple_price ?? data?.couple_price ?? 0;
+    const groupP = displayTrainer?.group_price ?? trainer?.group_price ?? data?.group_price ?? 0;
+
     switch (selected) {
       case "Single":
-        return Number(data?.single_price || 0);
+        return Number(singleP);
       case "Couple":
-        return Number(data?.couple_price || 0);
+        return Number(coupleP);
       case "Group":
-        return Number(data?.group_price || 0);
+        return Number(groupP);
       default:
-        return 0;
+        return Number(singleP);
     }
-  }, [bookingMode, selected, data, trainer]);
+  }, [bookingMode, selected, displayTrainer, trainer, data]);
+
+
+  const [submitting, setSubmitting] = useState(false);
 
   const handlePayment = async () => {
     if (!address.trim()) {
@@ -163,9 +175,13 @@ const TrainerBookingModal = ({
       return;
     }
 
-    // 🔹 CHANGE TRAINER + NO PRICE DIFFERENCE
     if (!selectedTrainerId) {
       showError("Trainer unavailable", "Please select a trainer again.");
+      return;
+    }
+
+    if (displayTrainer?.is_available === false || displayTrainer?.is_booked === true || displayTrainer?.is_booked_for_slot === true) {
+      showError("Trainer Unavailable", "This trainer is already booked for the selected session time slot. Please choose another trainer or select a different time slot.");
       return;
     }
 
@@ -181,6 +197,7 @@ const TrainerBookingModal = ({
 
     // 🔹 CHANGE TRAINER + NO PRICE DIFFERENCE
     if (bookingMode === "change" && amount === 0) {
+      setSubmitting(true);
       try {
         const res = await verifyChangeTrainerPayment({
           old_trainer_id: oldTrainerId,
@@ -197,29 +214,103 @@ const TrainerBookingModal = ({
         }
       } catch (err) {
         showError("Error", "Trainer change failed");
+      } finally {
+        setSubmitting(false);
       }
-      return; // ⛔ STOP – no navigation
+      return;
     }
 
-    navigation.navigate("Payment", {
-      mode: bookingMode,
-      trainerId:
-        bookingMode === "book"
-          ? selectedTrainerId
-          : undefined,
-      new_trainer_id:
-        bookingMode === "change"
-          ? selectedTrainerId
-          : undefined,
-      old_trainer_id: oldTrainerId,
-      plan_id: selectedPlanId,
-      booking_type: selected.toLowerCase(),
-      amount,
-      address,
-    });
+    // 🚀 PRE-CHECK & CREATE ORDER BEFORE NAVIGATING TO PAYMENT SCREEN
+    setSubmitting(true);
+    try {
+      let orderRes;
+      if (bookingMode === "change") {
+        orderRes = await createChangeTrainerOrder({
+          old_trainer_id: oldTrainerId,
+          new_trainer_id: selectedTrainerId,
+          plan_id: selectedPlanId,
+        });
+      } else {
+        const getTodayDate = () => new Date().toISOString().split("T")[0];
+        const startDate = filters?.start_date || getTodayDate();
+        const timeVal = normalizeTime24(filters?.time || "10:00");
+        const slotDays = normalizeSlotDays(filters?.slot_days || ["mon", "wed", "fri"]);
 
-    onClose();
+        // Pre-check trainer availability against the exact slot BEFORE payment
+        const checkRes = await fetchAvailableTrainersAPI({
+          plan_id: selectedPlanId,
+          start_date: startDate,
+          time: timeVal,
+          slot_days: slotDays,
+          latitude: filters?.latitude,
+          longitude: filters?.longitude,
+        }).catch(err => err.response);
+
+        const availableTrainers = checkRes?.data?.trainers || [];
+        const isTrainerAvailable = availableTrainers.some(
+          t => (t.id === selectedTrainerId || t.trainer_id === selectedTrainerId) &&
+               t.is_available !== false &&
+               t.is_booked !== true &&
+               t.is_booked_for_slot !== true
+        );
+
+        if (availableTrainers.length > 0 && !isTrainerAvailable) {
+          showError(
+            "Trainer Unavailable",
+            "This trainer is already booked for the selected session time slot. Please choose another trainer or select a different session time."
+          );
+          setSubmitting(false);
+          return;
+        }
+
+        orderRes = await createTrainerBookingOrder({
+          trainer_id: selectedTrainerId,
+          plan_id: selectedPlanId,
+          booking_type: selected.toLowerCase(),
+          start_date: startDate,
+          time: timeVal,
+          slot_days: slotDays,
+          address: address.trim(),
+        });
+      }
+
+      const orderData = orderRes?.data;
+      onClose();
+
+      navigation.navigate("Payment", {
+        mode: bookingMode,
+        trainerId: bookingMode === "book" ? selectedTrainerId : undefined,
+        new_trainer_id: bookingMode === "change" ? selectedTrainerId : undefined,
+        old_trainer_id: oldTrainerId,
+        plan_id: selectedPlanId,
+        booking_type: selected.toLowerCase(),
+        amount,
+        address: address.trim(),
+        preCreatedOrder: orderData,
+      });
+    } catch (err) {
+      console.log("BOOKING PRE-CHECK ERROR:", err?.response?.data || err?.message);
+      const backendData = err?.response?.data;
+      let msg = "Trainer is unavailable for the selected session time slot.";
+
+      if (backendData) {
+        msg =
+          backendData.error ||
+          backendData.message ||
+          backendData.detail ||
+          backendData.non_field_errors?.[0] ||
+          (typeof backendData === "string" ? backendData : msg);
+      } else if (err?.message) {
+        msg = err.message;
+      }
+
+      showError("Booking Failed", msg);
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
@@ -234,35 +325,42 @@ const TrainerBookingModal = ({
           </TouchableOpacity>
 
           <View style={{ flex: 1 }}>
-            {loading && <ActivityIndicator size="large" />}
+            {!displayTrainer && loading && <ActivityIndicator size="large" style={{ marginTop: 50 }} />}
 
-            {!loading && error && (
+            {!displayTrainer && !loading && error && (
               <Text style={styles.errorText}>{error}</Text>
             )}
 
-            {!loading && !error && displayTrainer && (
+            {displayTrainer && (
               <ScrollView
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
                 contentContainerStyle={styles.scrollContent}
               >
+
                 {/* Trainer Info */}
                 <View style={styles.headerSection}>
                   <Image
                     source={
-                      displayTrainer?.profile_pic
-                        ? { uri: displayTrainer.profile_pic }
+                      displayTrainer?.profile_pic || displayTrainer?.trainer_profile_pic || displayTrainer?.profile_pic_url
+                        ? { uri: displayTrainer.profile_pic || displayTrainer.trainer_profile_pic || displayTrainer.profile_pic_url }
                         : require("../../../assets/trainer2.jpg")
                     }
                     style={styles.profileImage}
                   />
                   <TrainerInfoCard
-                    name={displayTrainer?.name}
-                    experience={displayTrainer?.experience}
-                    sessionTiming={displayTrainer?.section_timing}
-                    numSessions={displayTrainer?.no_of_section}
-                    workoutType={plan?.name || displayTrainer?.plan_name}
+                    name={displayTrainer?.name || displayTrainer?.trainer_name || "Trainer"}
+                    experience={
+                      displayTrainer?.years_of_experience ??
+                      displayTrainer?.experience ??
+                      displayTrainer?.trainer_experience ??
+                      0
+                    }
+                    sessionTiming={displayTrainer?.section_timing || displayTrainer?.session_timing || 20}
+                    numSessions={displayTrainer?.no_of_section || displayTrainer?.num_sessions || 12}
+                    workoutType={plan?.name || displayTrainer?.plan_name || "Workout"}
                   />
+
                 </View>
 
                 <Text style={styles.sectionTitle}>
@@ -335,27 +433,33 @@ const TrainerBookingModal = ({
             )}
           </View>
 
-          {displayTrainer && !loading && (
+          {displayTrainer && (
             <View style={styles.footer}>
+
               <TouchableOpacity
                 style={[
                   styles.payBtn,
-                  !address.trim() && {
+                  (!address.trim() || submitting) && {
                     opacity: 0.6,
                   },
                 ]}
-                disabled={!address.trim()}
+                disabled={!address.trim() || submitting}
                 onPress={handlePayment}
               >
-                <Text style={styles.payText}>
-                  {bookingMode === "change"
-                    ? "Change-Pay ₹"
-                    : "Pay ₹"}
-                  {amount}
-                </Text>
+                {submitting ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.payText}>
+                    {bookingMode === "change"
+                      ? "Change-Pay ₹"
+                      : "Pay ₹"}
+                    {amount}
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           )}
+
         </KeyboardAvoidingView>
       </View>
       <LocationDisclosureModal
