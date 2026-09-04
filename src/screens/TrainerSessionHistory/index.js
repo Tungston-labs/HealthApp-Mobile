@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useCallback } from "react";
 import { View, FlatList, Text, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import styles from "./style";
 import SessionCard from "../../components/SessionCard";
 import HeaderWithBack from "../../components/HeaderWithBack";
@@ -23,10 +23,12 @@ const SessionHistory = () => {
     totalPages,
   } = useSelector(state => state.trainerHistory);
 
-  useEffect(() => {
-    dispatch(resetTrainerHistory());
-    dispatch(getTrainerHistory(1));
-  }, [dispatch]);
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(resetTrainerHistory());
+      dispatch(getTrainerHistory(1));
+    }, [dispatch])
+  );
 
   const loadMore = () => {
     if (!loading && currentPage < totalPages) {

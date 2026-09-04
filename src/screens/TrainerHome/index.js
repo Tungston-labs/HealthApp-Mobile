@@ -1,11 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Toast from 'react-native-toast-message';
+import { useDispatch } from 'react-redux';
 import { useGetUpcomingSchedulesQuery } from '../../redux/api/trainer/scheduleApi';
 import { useStartSession } from '../../hooks/trainer/useStartSession';
 import { useActiveSession } from '../../hooks/trainer/useActiveSession';
 import { useEndSession } from '../../hooks/trainer/useEndSession';
+import { resetTrainerHistory, getTrainerHistory } from '../../redux/slices/trainerHistorySlice';
 import TrainerHomeView from './TrainerHomeView';
+
 const TrainerHomeContainer = () => {
+  const dispatch = useDispatch();
   const [isManualRefreshLoading, setIsManualRefreshLoading] = useState(false);
   const [startingSessionId, setStartingSessionId] = useState(null);
 
@@ -96,6 +100,8 @@ const TrainerHomeContainer = () => {
     if (success) {
       await clearActiveSession();
       fetchActiveSession();
+      dispatch(resetTrainerHistory());
+      dispatch(getTrainerHistory(1));
       Toast.show({
         type: 'success',
         text1: 'Session ended successfully',
@@ -108,6 +114,7 @@ const TrainerHomeContainer = () => {
     handleEndSession,
     clearActiveSession,
     fetchActiveSession,
+    dispatch,
   ]);
 
   return (

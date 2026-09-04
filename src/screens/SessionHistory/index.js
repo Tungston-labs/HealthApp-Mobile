@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback } from "react";
 import {
   View,
   FlatList,
@@ -6,6 +6,7 @@ import {
   Text,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { useFocusEffect } from "@react-navigation/native";
 
 import HeaderWithBack from "../../components/HeaderWithBack";
 import HistoryCard from "../../components/Historycard";
@@ -31,12 +32,14 @@ const SessionHistory = ({ navigation }) => {
 
   const hasPlan = user?.session;
 
-  /* 🔹 INITIAL FETCH */
-  useEffect(() => {
-    if (hasPlan) {
-      dispatch(fetchCompletedSessionsThunk());
-    }
-  }, [hasPlan, dispatch]);
+  /* 🔹 FOCUS FETCH */
+  useFocusEffect(
+    useCallback(() => {
+      if (hasPlan) {
+        dispatch(fetchCompletedSessionsThunk());
+      }
+    }, [hasPlan, dispatch])
+  );
 
   /* 🔹 SAFETY */
   const safeSessions = Array.isArray(sessions) ? sessions : [];

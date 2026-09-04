@@ -103,130 +103,13 @@ const FilterModal = ({ visible, onClose, planId, selectedPlanSlot }) => {
     }
   }, []);
 
-  const triggerLocationWithDisclosure = useCallback(async (action) => {
-    const hasPermission = await checkLocationPermission();
-    if (hasPermission) {
-      return action();
-    }
-    setPendingAction(() => action);
-    setShowDisclosureModal(true);
-  }, []);
-
-  const handleAcceptDisclosure = async () => {
-    setShowDisclosureModal(false);
-    const granted = await requestLocationPermission();
-    if (granted && pendingAction) {
-      pendingAction();
-    }
-    setPendingAction(null);
-  };
-
-  const handleCancelDisclosure = () => {
-    setShowDisclosureModal(false);
-    setPendingAction(null);
-  };
-
-  const resolveSearchLocation = useCallback(async ({ showAlert = false } = {}) => {
-    if (currentLocation) {
-      return currentLocation;
-    }
-
-    const hasPermission = await checkLocationPermission();
-    if (hasPermission) {
-      const liveLocation = await fetchDeviceLocation();
-      if (liveLocation) {
-        return liveLocation;
-      }
-    }
-
-    if (storedLocation) {
-      return storedLocation;
-    }
-
-    if (showAlert) {
+  const performSearch = async (locationToUse) => {
+    const loc = locationToUse || currentLocation || storedLocation;
+    if (!loc) {
       showError(
         'Location Required',
         'Please allow location access so we can find available trainers near you.'
       );
-    }
-
-    return null;
-  }, [currentLocation, fetchDeviceLocation, storedLocation]);
-
-  const refreshDeviceLocation = useCallback(async () => {
-    const hasPermission = await checkLocationPermission();
-    if (!hasPermission) {
-      if (storedLocation) return storedLocation;
-      return null;
-    }
-    const liveLocation = await fetchDeviceLocation();
-
-    if (!liveLocation && storedLocation) {
-      return storedLocation;
-    }
-
-    return liveLocation;
-  }, [fetchDeviceLocation, storedLocation]);
-
-useEffect(() => {
-  if (!visible) return;
-
-  setSelectedDate(getTodayDate());
-  setCurrentLocation(null);
-  setAttemptedLocationLookup(false);
-
-  if (selectedPlanSlot === "3_days") {
-    setSelectedSlot("Mon,Wed,Fri");
-  } else {
-    setSelectedSlot("Mon,Tue,Wed,Thu,Fri,Sat");
-  }
-}, [visible, selectedPlanSlot]);
-
-useEffect(() => {
-  if (
-    !visible ||
-    currentLocation ||
-    resolvingLocation ||
-    attemptedLocationLookup
-  ) {
-    return;
-  }
-
-  setAttemptedLocationLookup(true);
-  refreshDeviceLocation();
-}, [
-  visible,
-  currentLocation,
-  resolvingLocation,
-  attemptedLocationLookup,
-  refreshDeviceLocation,
-]);
-
-
-useEffect(() => {
-  console.log("TODAY:", getTodayDate());
-  console.log("SELECTED DATE:", selectedDate);
-}, [visible, selectedDate]);
-  const convertTo24Hour = (timeStr) => {
-    const [time, modifier] = timeStr.split(' ');
-    let [hours, minutes] = time.split(':').map(Number);
-
-    if (modifier === 'PM' && hours < 12) hours += 12;
-    if (modifier === 'AM' && hours === 12) hours = 0;
-
-    return `${hours.toString().padStart(2, '0')}:${minutes
-      .toString()
-      .padStart(2, '0')}`;
-  };
-
-  const handleApply = async () => {
-    if (loading || resolvingLocation) return;
-
-    const location = await resolveSearchLocation({ showAlert: true });
-
-    console.log("Trainer Search Location:", location);
-
-    if (!location) {
       return;
     }
 
@@ -236,10 +119,9 @@ useEffect(() => {
         slot_days: normalizeSlotDays(selectedSlot),
         time: normalizeTime24(selectedTime),
         start_date: selectedDate,
-        latitude: location.latitude,
-        longitude: location.longitude,
+        latitude: loc.latitude,
+        longitude: loc.longitude,
       };
-
 
       console.log('🔥 FINAL PAYLOAD:', payload);
 
@@ -264,6 +146,122 @@ useEffect(() => {
 
       showError('Unable to load trainers', message);
     }
+  };
+
+  const handleAcceptDisclosure = async () => {
+    setShowDisclosureModal(false);
+    const granted = await requestLocationPermission();
+    if (granted) {
+      const liveLocation = await fetchDeviceLocation();
+      if (liveLocation) {
+        performSearch(liveLocation);
+        return;
+      }
+    }
+    if (pendingAction) {
+      pendingAction();
+    } else if (storedLocation) {
+      performSearch(storedLocation);
+    } else {
+      showError(
+        'Location Required',
+        'Please allow location access so we can find available trainers near you.'
+      );
+    }
+    setPendingAction(null);
+  };
+
+  const handleCancelDisclosure = () => {
+    setShowDisclosureModal(false);
+    setPendingAction(null);
+  };
+
+  const refreshDeviceLocation = useCallback(async () => {
+    const hasPermission = await checkLocationPermission();
+    if (!hasPermission) {
+      if (storedLocation) return storedLocation;
+      return null;
+    }
+    const liveLocation = await fetchDeviceLocation();
+
+    if (!liveLocation && storedLocation) {
+      return storedLocation;
+    }
+
+    return liveLocation;
+  }, [fetchDeviceLocation, storedLocation]);
+
+  useEffect(() => {
+    if (!visible) return;
+
+    setSelectedDate(getTodayDate());
+    setCurrentLocation(null);
+    setAttemptedLocationLookup(false);
+
+    if (selectedPlanSlot === "3_days") {
+      setSelectedSlot("Mon,Wed,Fri");
+    } else {
+      setSelectedSlot("Mon,Tue,Wed,Thu,Fri,Sat");
+    }
+  }, [visible, selectedPlanSlot]);
+
+  useEffect(() => {
+    if (
+      !visible ||
+      currentLocation ||
+      resolvingLocation ||
+      attemptedLocationLookup
+    ) {
+      return;
+    }
+
+    setAttemptedLocationLookup(true);
+    refreshDeviceLocation();
+  }, [
+    visible,
+    currentLocation,
+    resolvingLocation,
+    attemptedLocationLookup,
+    refreshDeviceLocation,
+  ]);
+
+  useEffect(() => {
+    console.log("TODAY:", getTodayDate());
+    console.log("SELECTED DATE:", selectedDate);
+  }, [visible, selectedDate]);
+
+  const convertTo24Hour = (timeStr) => {
+    const [time, modifier] = timeStr.split(' ');
+    let [hours, minutes] = time.split(':').map(Number);
+
+    if (modifier === 'PM' && hours < 12) hours += 12;
+    if (modifier === 'AM' && hours === 12) hours = 0;
+
+    return `${hours.toString().padStart(2, '0')}:${minutes
+      .toString()
+      .padStart(2, '0')}`;
+  };
+
+  const handleApply = async () => {
+    if (loading || resolvingLocation) return;
+
+    if (currentLocation) {
+      return performSearch(currentLocation);
+    }
+
+    const hasPermission = await checkLocationPermission();
+    if (hasPermission) {
+      const liveLocation = await fetchDeviceLocation();
+      if (liveLocation) {
+        return performSearch(liveLocation);
+      }
+      if (storedLocation) {
+        return performSearch(storedLocation);
+      }
+    }
+
+    // Trigger location disclosure modal if permission is not yet granted
+    setShowDisclosureModal(true);
   };
 
   const timeSlots = [

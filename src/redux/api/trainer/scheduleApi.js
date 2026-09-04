@@ -101,6 +101,7 @@ export const scheduleApi = createApi({
         method: 'POST',
         data: { booking_id: id },
       }),
+      invalidatesTags: ['ActiveSession', 'UpcomingSessions'],
     }),
 
     getOngoingSession: builder.query({
